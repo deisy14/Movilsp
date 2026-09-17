@@ -1,11 +1,13 @@
-package com.example.psirae
+package com.example.movilmanupuladora.ui.manipuladora
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.movilmanupuladora.R
 
 class activity_menu_dia : AppCompatActivity() {
 
@@ -29,7 +31,7 @@ class activity_menu_dia : AppCompatActivity() {
         }
 
         // Botón "Ver componentes"
-        val btnVerComponentes = findViewById<android.widget.Button>(
+        val btnVerComponentes = findViewById<Button>(
             R.id.btnVerComponentes
         )
 

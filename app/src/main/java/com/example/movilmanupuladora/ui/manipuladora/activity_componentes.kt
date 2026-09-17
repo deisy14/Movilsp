@@ -1,4 +1,4 @@
-package com.example.psirae
+package com.example.movilmanupuladora.ui.manipuladora
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,7 +6,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.psirae.databinding.ActivityComponentesBinding
+import com.example.movilmanupuladora.databinding.ActivityComponentesBinding
+import com.example.psirae.MainActivity
 
 class activity_componentes : AppCompatActivity() {
 
@@ -74,4 +75,3 @@ class activity_componentes : AppCompatActivity() {
         }
     }
 }
-

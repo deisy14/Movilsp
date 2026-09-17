@@ -1,13 +1,14 @@
-package com.example.psirae
+package com.example.movilmanupuladora.ui.manipuladora
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
-import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.movilmanupuladora.R
 
 class activity_ingredientes : AppCompatActivity() {
 
@@ -21,7 +22,7 @@ class activity_ingredientes : AppCompatActivity() {
         // BARRAS DEL SISTEMA
         // ==========================================
 
-        val main = findViewById<android.view.View>(R.id.main)
+        val main = findViewById<View>(R.id.main)
 
         ViewCompat.setOnApplyWindowInsetsListener(main) { v, insets ->
 
