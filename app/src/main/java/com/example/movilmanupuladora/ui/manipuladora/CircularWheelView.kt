@@ -1,4 +1,4 @@
-package com.example.psirae
+package com.example.movilmanupuladora.ui.manipuladora
 
 import android.content.Context
 import android.graphics.Canvas

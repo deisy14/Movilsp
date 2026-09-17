@@ -1,8 +1,10 @@
-package com.example.psirae
+package com.example.movilmanupuladora.ui.manipuladora
 
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -11,12 +13,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import android.text.Editable
-import android.text.TextWatcher
+import com.example.movilmanupuladora.R
+import com.example.psirae.MainActivity
 
 class inventario_activity : AppCompatActivity() {
 
-    // Productos
     private lateinit var itemLeche: LinearLayout
     private lateinit var itemQueso: LinearLayout
     private lateinit var itemYogurt: LinearLayout
@@ -25,35 +26,12 @@ class inventario_activity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
 
         setContentView(R.layout.activity_inventario)
 
-        // ==========================================
-        // INSETS
-        // ==========================================
-
-        val root = findViewById<View>(android.R.id.content)
-
-        ViewCompat.setOnApplyWindowInsetsListener(root) { v, insets ->
-
-            val systemBars =
-                insets.getInsets(WindowInsetsCompat.Type.systemBars())
-
-            v.setPadding(
-                systemBars.left,
-                systemBars.top,
-                systemBars.right,
-                systemBars.bottom
-            )
-
-            insets
-        }
-
-
-        // ==========================================
         // PRODUCTOS
-        // ==========================================
 
         itemLeche = findViewById(R.id.itemLeche)
         itemQueso = findViewById(R.id.itemQueso)
@@ -61,10 +39,7 @@ class inventario_activity : AppCompatActivity() {
         itemMantequilla = findViewById(R.id.itemMantequilla)
         itemChocolate = findViewById(R.id.itemChocolate)
 
-
-        // ==========================================
         // BUSCADOR
-        // ==========================================
 
         val edtBuscar =
             findViewById<EditText>(R.id.edtBuscarIngrediente)
@@ -86,9 +61,8 @@ class inventario_activity : AppCompatActivity() {
                     before: Int,
                     count: Int
                 ) {
-
                     filtrarInventario(
-                        s.toString()
+                        s?.toString() ?: ""
                     )
                 }
 
@@ -99,10 +73,7 @@ class inventario_activity : AppCompatActivity() {
             }
         )
 
-
-        // ==========================================
         // CATEGORÍAS
-        // ==========================================
 
         val btnLacteos =
             findViewById<TextView>(R.id.btnLacteos)
@@ -116,106 +87,61 @@ class inventario_activity : AppCompatActivity() {
         val btnVerduras =
             findViewById<TextView>(R.id.btnVerduras)
 
-
-        // ==========================================
         // LÁCTEOS
-        // ==========================================
 
         btnLacteos.setOnClickListener {
-
             activarCategoria(btnLacteos)
-
             mostrarLacteos()
         }
 
-
-        // ==========================================
         // PROTEÍNA
-        // ==========================================
 
         btnProteina.setOnClickListener {
-
             activarCategoria(btnProteina)
-
             ocultarProductos()
         }
 
-
-        // ==========================================
         // FRUTAS
-        // ==========================================
 
         btnFrutas.setOnClickListener {
-
             activarCategoria(btnFrutas)
-
             ocultarProductos()
         }
 
-
-        // ==========================================
         // VERDURAS
-        // ==========================================
 
         btnVerduras.setOnClickListener {
-
             activarCategoria(btnVerduras)
-
             ocultarProductos()
         }
 
-
-        // ==========================================
         // REGISTRAR ENTRADA
-        // ==========================================
 
         val btnRegistrarEntrada =
             findViewById<TextView>(R.id.btnRegistrarEntrada)
 
         btnRegistrarEntrada.setOnClickListener {
-
-            // Cuando tengas creada la pantalla:
-            //
-            // val intent = Intent(
-            //     this,
-            //     RegistrarEntradaActivity::class.java
-            // )
-            //
-            // startActivity(intent)
-
+            // Aquí posteriormente se abrirá
+            // RegistrarEntradaActivity
         }
 
-
-        // ==========================================
         // BARRA DE NAVEGACIÓN
-        // ==========================================
 
         configurarBarraNavegacion()
     }
 
-
     // ==================================================
-    // FILTRAR PRODUCTOS
+    // FILTRAR INVENTARIO
     // ==================================================
 
     private fun filtrarInventario(texto: String) {
 
-        val busqueda =
-            texto.lowercase().trim()
-
-
-        // Si no escribió nada,
-        // mostramos nuevamente los lácteos.
+        val busqueda = texto.lowercase().trim()
 
         if (busqueda.isEmpty()) {
-
             mostrarLacteos()
-
             return
         }
-
-
-        // LECHE
 
         itemLeche.visibility =
             if ("leche".contains(busqueda))
@@ -223,17 +149,11 @@ class inventario_activity : AppCompatActivity() {
             else
                 View.GONE
 
-
-        // QUESO
-
         itemQueso.visibility =
             if ("queso".contains(busqueda))
                 View.VISIBLE
             else
                 View.GONE
-
-
-        // YOGURT
 
         itemYogurt.visibility =
             if ("yogurt".contains(busqueda))
@@ -241,17 +161,11 @@ class inventario_activity : AppCompatActivity() {
             else
                 View.GONE
 
-
-        // MANTEQUILLA
-
         itemMantequilla.visibility =
             if ("mantequilla".contains(busqueda))
                 View.VISIBLE
             else
                 View.GONE
-
-
-        // CHOCOLATE
 
         itemChocolate.visibility =
             if ("chocolate".contains(busqueda))
@@ -260,7 +174,6 @@ class inventario_activity : AppCompatActivity() {
                 View.GONE
     }
 
-
     // ==================================================
     // MOSTRAR LÁCTEOS
     // ==================================================
@@ -268,16 +181,11 @@ class inventario_activity : AppCompatActivity() {
     private fun mostrarLacteos() {
 
         itemLeche.visibility = View.VISIBLE
-
         itemQueso.visibility = View.VISIBLE
-
         itemYogurt.visibility = View.VISIBLE
-
         itemMantequilla.visibility = View.VISIBLE
-
         itemChocolate.visibility = View.VISIBLE
     }
-
 
     // ==================================================
     // OCULTAR PRODUCTOS
@@ -286,16 +194,11 @@ class inventario_activity : AppCompatActivity() {
     private fun ocultarProductos() {
 
         itemLeche.visibility = View.GONE
-
         itemQueso.visibility = View.GONE
-
         itemYogurt.visibility = View.GONE
-
         itemMantequilla.visibility = View.GONE
-
         itemChocolate.visibility = View.GONE
     }
-
 
     // ==================================================
     // ACTIVAR CATEGORÍA
@@ -307,25 +210,11 @@ class inventario_activity : AppCompatActivity() {
 
         val categorias = listOf(
 
-            findViewById<TextView>(
-                R.id.btnLacteos
-            ),
-
-            findViewById<TextView>(
-                R.id.btnProteina
-            ),
-
-            findViewById<TextView>(
-                R.id.btnFrutas
-            ),
-
-            findViewById<TextView>(
-                R.id.btnVerduras
-            )
+            findViewById<TextView>(R.id.btnLacteos),
+            findViewById<TextView>(R.id.btnProteina),
+            findViewById<TextView>(R.id.btnFrutas),
+            findViewById<TextView>(R.id.btnVerduras)
         )
-
-
-        // Todas vuelven a estado normal
 
         for (categoria in categorias) {
 
@@ -338,9 +227,6 @@ class inventario_activity : AppCompatActivity() {
             )
         }
 
-
-        // Categoría seleccionada
-
         categoriaSeleccionada.setBackgroundResource(
             R.drawable.bg_categoria_activa
         )
@@ -349,7 +235,6 @@ class inventario_activity : AppCompatActivity() {
             Color.parseColor("#3F3B28")
         )
     }
-
 
     // ==================================================
     // BARRA DE NAVEGACIÓN
@@ -372,10 +257,7 @@ class inventario_activity : AppCompatActivity() {
         val navPerfil =
             findViewById<LinearLayout>(R.id.navPerfil)
 
-
-        // ==========================================
         // INICIO
-        // ==========================================
 
         navInicio.setOnClickListener {
 
@@ -386,43 +268,25 @@ class inventario_activity : AppCompatActivity() {
                 )
 
             startActivity(intent)
-
             finish()
         }
 
-
-        // ==========================================
         // ASIGNADAS
-        // ==========================================
 
         navAsignadas.setOnClickListener {
 
-            val intent =
-                Intent(
-                    this,
-                    navAsignadas::class.java
-                )
-
-            startActivity(intent)
-
-            finish()
+            // Aquí se colocará la Activity
+            // de Asignadas.
         }
 
-
-        // ==========================================
         // INVENTARIO
-        // ==========================================
 
         navInventario.setOnClickListener {
 
             // Ya estamos en Inventario.
-            // No hacemos nada.
         }
 
-
-        // ==========================================
         // AVISOS
-        // ==========================================
 
         navAvisos.setOnClickListener {
 
@@ -433,14 +297,10 @@ class inventario_activity : AppCompatActivity() {
                 )
 
             startActivity(intent)
-
             finish()
         }
 
-
-        // ==========================================
         // PERFIL
-        // ==========================================
 
         navPerfil.setOnClickListener {
 
@@ -451,7 +311,6 @@ class inventario_activity : AppCompatActivity() {
                 )
 
             startActivity(intent)
-
             finish()
         }
     }

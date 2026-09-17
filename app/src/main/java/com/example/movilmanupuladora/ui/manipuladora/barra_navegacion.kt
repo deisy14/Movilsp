@@ -1,4 +1,4 @@
-package com.example.psirae
+package com.example.movilmanupuladora.ui.manipuladora
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,11 +6,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.psirae.databinding.ActivityBarraNavegacionBinding
+import com.example.movilmanupuladora.databinding.ActivityBarraNavegacionBinding
+import com.example.psirae.MainActivity
 
 class barra_navegacion : AppCompatActivity() {
 
     private lateinit var binding: ActivityBarraNavegacionBinding
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

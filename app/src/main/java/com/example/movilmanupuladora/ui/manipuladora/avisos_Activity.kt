@@ -1,4 +1,4 @@
-package com.example.psirae
+package com.example.movilmanupuladora.ui.manipuladora
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,7 +6,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.psirae.databinding.ActivityAvisosBinding
+import com.example.movilmanupuladora.databinding.ActivityAvisosBinding
+import com.example.psirae.MainActivity
 
 class avisos_Activity : AppCompatActivity() {
 
