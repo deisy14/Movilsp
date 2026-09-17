@@ -1,6 +1,6 @@
-package com.example.movilmanipuladora.data.api
+package com.example.movilmanupuladora.data.api
 
-import com.example.movilmanipuladora.utils.Constants
+import com.example.movilmanupuladora.utils.Constants
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

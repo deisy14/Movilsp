@@ -14,7 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.movilmanupuladora.R
-import com.example.psirae.MainActivity
+import com.example.movilmanupuladora.MainActivity
 
 class inventario_activity : AppCompatActivity() {
 

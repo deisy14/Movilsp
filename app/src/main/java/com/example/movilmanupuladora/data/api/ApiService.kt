@@ -1,10 +1,10 @@
-package com.example.movilmanipuladora.data.api
+package com.example.movilmanupuladora.data.api
 
-import com.example.movilmanipuladora.data.model.LoginRequest
-import com.example.movilmanipuladora.data.model.LoginResponse
-import com.example.movilmanipuladora.data.model.RegistroResponse
-import com.example.movilmanipuladora.data.model.Rol
-import com.example.movilmanipuladora.data.model.Usuario
+import com.example.movilmanupuladora.data.model.LoginRequest
+import com.example.movilmanupuladora.data.model.LoginResponse
+import com.example.movilmanupuladora.data.model.RegistroResponse
+import com.example.movilmanupuladora.data.model.Rol
+import com.example.movilmanupuladora.data.model.Usuario
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET

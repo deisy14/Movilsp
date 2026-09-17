@@ -1,9 +1,9 @@
-package com.example.psirae
+package com.example.movilmanupuladora
 
 import android.os.Bundle
 import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
-import com.example.psirae.databinding.ActivityMainBinding
+import com.example.movilmanupuladora.databinding.ActivityMainBinding
 import kotlin.math.atan2
 
 class MainActivity : AppCompatActivity() {
@@ -125,10 +125,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        binding.root.findViewById<android.view.View>(
-            R.id.btnSalir
-        )?.setOnClickListener {
-            finish()
-        }
     }
+
 }

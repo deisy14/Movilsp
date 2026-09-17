@@ -1,6 +1,6 @@
-package com.example.movilmanipuladora.data.repository
+package com.example.movilmanupuladora.data.repository
 
-import com.example.movilmanipuladora.data.api.ApiService
+import com.example.movilmanupuladora.data.api.ApiService
 import com.example.movilmanupuladora.data.model.Rol
 import retrofit2.Response
 

@@ -1,4 +1,4 @@
-package com.example.movilmanipuladora.ui.auth
+package com.example.movilmanupuladora.ui.auth
 /*
 import android.content.Intent
 import android.os.Bundle

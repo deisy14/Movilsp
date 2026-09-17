@@ -1,4 +1,4 @@
-package com.example.movilmanipuladora.ui.auth
+package com.example.movilmanupuladora.ui.auth
 /*
 import android.os.Bundle
 import android.widget.ArrayAdapter

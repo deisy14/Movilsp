@@ -1,4 +1,4 @@
- <?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -11,68 +11,62 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Movilmanupuladora">
+
+        <!-- Login es la pantalla de inicio (LAUNCHER) -->
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.manipuladora.activity_login"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- MainActivity (rueda de platos) -->
         <activity
             android:name=".MainActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".activity_turno"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".activity_dashboard"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".barra_navegacion"
+            android:name=".ui.manipuladora.activity_turno"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".activity_menu_dia"
+            android:name=".ui.manipuladora.barra_navegacion"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".activity_componentes"
+            android:name=".ui.manipuladora.activity_menu_dia"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".activity_ingredientes"
+            android:name=".ui.manipuladora.activity_componentes"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".activity_preparacion"
+            android:name=".ui.manipuladora.activity_ingredientes"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".activity_comfrimacion"
+            android:name=".ui.manipuladora.activity_preparacion"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".activity_inventario"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-
-        <activity
-            android:name=".inventario_activity"
+            android:name=".ui.manipuladora.activity_comfrimacion"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".avisos_Activity"
+            android:name=".ui.manipuladora.inventario_activity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".activity_perfil"
+            android:name=".ui.manipuladora.avisos_Activity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora.activity_perfil"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
     </application>

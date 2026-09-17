@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.movilmanupuladora.databinding.ActivityAvisosBinding
-import com.example.psirae.MainActivity
+import com.example.movilmanupuladora.MainActivity
 
 class avisos_Activity : AppCompatActivity() {
 
