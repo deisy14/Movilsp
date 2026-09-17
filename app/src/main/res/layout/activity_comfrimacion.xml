@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FAFBF8">
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="22dp"
+            android:paddingEnd="22dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="130dp"
+            android:gravity="center_horizontal">
+
+            <!-- LOGO -->
+            <ImageView
+                android:id="@+id/imgLogo"
+                android:layout_width="115dp"
+                android:layout_height="55dp"
+                android:layout_marginTop="5dp"
+                android:src="@drawable/logo_sirae"
+                android:contentDescription="Logo SIRAE"
+                android:scaleType="centerInside" />
+
+            <!-- ICONO CHECK -->
+            <FrameLayout
+                android:layout_width="125dp"
+                android:layout_height="125dp"
+                android:layout_marginTop="25dp"
+                android:background="@drawable/ic_check_circle">
+
+            </FrameLayout>
+
+            <!-- TITULO -->
+            <TextView
+                android:id="@+id/txtTitulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="¡Desayuno preparado!"
+                android:textColor="#176B36"
+                android:textSize="23sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <!-- MENSAJE -->
+            <TextView
+                android:id="@+id/txtMensaje"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="El plato ha sido marcado como listo&#10;para servir."
+                android:textColor="#29405A"
+                android:textSize="14sp"
+                android:gravity="center"
+                android:lineSpacingExtra="2dp" />
+
+            <!-- TARJETA DEL PLATO -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="165dp"
+                android:layout_marginTop="28dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/bg_tarjeta_confirmacion">
+
+                <!-- IMAGEN CHOCOLATE -->
+                <ImageView
+                    android:id="@+id/imgChocolate"
+                    android:layout_width="105dp"
+                    android:layout_height="90dp"
+                    android:src="@drawable/chocolate"
+                    android:contentDescription="Chocolate"
+                    android:scaleType="centerInside" />
+
+                <!-- NOMBRE -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chocolate"
+                    android:textColor="#183C35"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+                <!-- TURNO -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="5dp"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:gravity="center"
+                    android:text="Turno: Mañana"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_badge_asignado" />
+
+            </LinearLayout>
+
+            <!-- HORA DE FINALIZACIÓN -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="18dp"
+                android:paddingEnd="18dp"
+                android:background="@drawable/bg_hora_confirmacion">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_reloj"
+                    android:contentDescription="Hora" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hora de finalización"
+                        android:textColor="#23432E"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/txtHora"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="09:35 a. m."
+                        android:textColor="#183C35"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- ========================================== -->
+            <!-- BOTÓN VER MENÚ -->
+            <!-- ========================================== -->
+
+            <FrameLayout
+                android:id="@+id/btnVerMenu"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="25dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="@drawable/bg_boton">
+
+                <!-- CONTENIDO CENTRAL -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="10dp"
+                        android:src="@drawable/ic_calendar"
+                        android:contentDescription="Menú" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ver menú del día"
+                        android:textColor="#173C2A"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <!-- FLECHA A LA DERECHA -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="70dp"
+                    android:gravity="center"
+                    android:text="›"
+                    android:textColor="#173C2A"
+                    android:textSize="28sp" />
+
+            </FrameLayout>
+
+            <!-- ========================================== -->
+            <!-- BOTÓN VOLVER -->
+            <!-- ========================================== -->
+
+            <LinearLayout
+                android:id="@+id/btnVolverInicio"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="@drawable/bg_boton_contorno">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="10dp"
+                    android:tint="@color/negro"
+                    android:src="@drawable/ic_home_yellow"
+                    android:contentDescription="Inicio" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Volver al inicio"
+                    android:textColor="#176B36"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</FrameLayout>

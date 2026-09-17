@@ -1,5 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+
+    <!-- VERDE PRINCIPAL SIRAE -->
+    <color name="verde_sirae">#5F7625</color>
+
+    <!-- VERDE PARA TEXTOS / ÉXITO -->
+    <color name="verde_exito">#5F7625</color>
+
+    <!-- VERDE CLARO -->
+    <color name="verde_muy_claro">#EEF4DF</color>
+
+    <!-- VERDE PRINCIPAL -->
+    <color name="verde_principal">#5F7625</color>
+
+    <!-- AMARILLO PRINCIPAL -->
+    <color name="amarillo_sirae">#E0BA28</color>
+
+    <!-- AMARILLO DEL BORDE -->
+    <color name="amarillo_borde">#E8D16A</color>
+
+    <!-- AMARILLO MÁS CLARO -->
+    <color name="amarillo_claro">#F7E7A1</color>
+
+    <!-- GRIS PARA TEXTOS SECUNDARIOS -->
+    <color name="texto_gris">#888888</color>
+
+    <!-- GRIS OSCURO -->
+    <color name="texto_principal">#252525</color>
+
+    <!-- GRIS DE FONDO -->
+    <color name="gris_fondo">#F5F5F5</color>
+
+    <!-- GRIS DE BORDE -->
+    <color name="gris_borde">#D9D9D9</color>
+
+    <!-- BLANCO -->
+    <color name="blanco">#FFFFFF</color>
+
+    <!-- FONDO -->
+    <color name="fondo_app">#FFFFFF</color>
+
+    <!-- NEGRO -->
+    <color name="negro">#000000</color>
+
 </resources>

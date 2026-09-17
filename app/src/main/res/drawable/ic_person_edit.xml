@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Cabeza -->
+    <path
+        android:fillColor="#9A6300"
+        android:pathData="M10,4A4,4 0,1 0,10 12A4,4 0,1 0,10 4Z"/>
+
+    <!-- Cuerpo -->
+    <path
+        android:fillColor="#9A6300"
+        android:pathData="M4,20C4,16.7 6.7,14 10,14C12.1,14 13.9,15.1 15,16.7L13.4,18.3C12.6,17 11.4,16 10,16C7.8,16 6,17.8 6,20H4Z"/>
+
+    <!-- Lápiz -->
+    <path
+        android:fillColor="#9A6300"
+        android:pathData="M16.5,11.1L19.3,13.9L14,19.2L11,19.8L11.6,16.8L16.5,11.1Z"/>
+
+    <!-- Punta del lápiz -->
+    <path
+        android:fillColor="#9A6300"
+        android:pathData="M19.8,13.4L17,10.6L18,9.6C18.5,9.1 19.3,9.1 19.8,9.6L20.8,10.6C21.3,11.1 21.3,11.9 20.8,12.4L19.8,13.4Z"/>
+
+</vector>
