@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <!-- ===================================== -->
+    <!-- CONTENIDO QUE SE PUEDE DESLIZAR -->
+    <!-- ===================================== -->
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:paddingBottom="90dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- =============================== -->
+            <!-- BARRA SUPERIOR -->
+            <!-- =============================== -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingBottom="16dp">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:contentDescription="Volver"
+                    android:src="@drawable/ic_arrow_back"
+                    app:tint="#173F2A" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="SIRAE"
+                    android:textColor="#176B35"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <View
+                    android:layout_width="28dp"
+                    android:layout_height="28dp" />
+
+            </LinearLayout>
+
+
+            <!-- =============================== -->
+            <!-- FECHA Y TURNO -->
+            <!-- =============================== -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:background="@drawable/bg_manana_activo"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="14dp">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:contentDescription="Calendario"
+                    android:src="@drawable/ic_calendar"
+                    app:tint="#173F2A" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Martes, 3 Sep 2026"
+                        android:textColor="#173F2A"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Turno asignado"
+                        android:textColor="#4A5A4F"
+                        android:textSize="11sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <!-- =============================== -->
+            <!-- TITULO -->
+            <!-- =============================== -->
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:text="Menú del día"
+                android:textColor="#173F2A"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Revisa los platos asignados para hoy"
+                android:textColor="#65736A"
+                android:textSize="14sp" />
+
+
+            <!-- =============================== -->
+            <!-- DESAYUNO PRINCIPAL -->
+            <!-- =============================== -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:background="@drawable/bg_seccion_seleccionada"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="14dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Desayuno"
+                        android:textColor="#173F2A"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="Plato asignado"
+                        android:textColor="#65736A"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Chocolate"
+                        android:textColor="#173F2A"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+
+                <!-- IMAGEN DEL DESAYUNO -->
+
+                <ImageView
+                    android:layout_width="110dp"
+                    android:layout_height="90dp"
+                    android:layout_marginStart="10dp"
+                    android:contentDescription="Imagen del desayuno"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/chocolate" />
+
+            </LinearLayout>
+
+
+            <!-- =============================== -->
+            <!-- OTROS PLATOS -->
+            <!-- =============================== -->
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:text="Otros platos del desayuno"
+                android:textColor="#173F2A"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+
+            <!-- =============================== -->
+            <!-- ARROZ DE LECHE -->
+            <!-- =============================== -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="10dp"
+                android:background="#FFFFFF"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:contentDescription="Arroz de leche"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/arroz_de_leche" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:text="Arroz de leche"
+                    android:textColor="#34443A"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="›"
+                    android:textColor="#173F2A"
+                    android:textSize="28sp" />
+
+            </LinearLayout>
+
+
+            <!-- =============================== -->
+            <!-- HUEVO, ARROZ COLADA -->
+            <!-- =============================== -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="8dp"
+                android:background="#FFFFFF"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:contentDescription="Huevo y arroz colada"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/img" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:text="Huevo, arroz colada"
+                    android:textColor="#34443A"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="›"
+                    android:textColor="#173F2A"
+                    android:textSize="28sp" />
+
+            </LinearLayout>
+
+
+            <!-- =============================== -->
+            <!-- HUEVO PERICO -->
+            <!-- =============================== -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="8dp"
+                android:background="#FFFFFF"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:contentDescription="Huevo perico"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/huevo_perico" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:text="Huevo perico"
+                    android:textColor="#34443A"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="›"
+                    android:textColor="#173F2A"
+                    android:textSize="28sp" />
+
+            </LinearLayout>
+
+
+            <!-- =============================== -->
+            <!-- BOTÓN -->
+            <!-- =============================== -->
+
+            <Button
+                android:id="@+id/btnVerComponentes"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:layout_marginTop="24dp"
+                android:backgroundTint="#FFD928"
+                android:text="Ver componentes     ›"
+                android:textAllCaps="false"
+                android:textColor="#173F2A"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <!-- Espacio para que el último contenido -->
+            <!-- no quede oculto detrás de la barra -->
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="90dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+    <!-- ===================================== -->
+    <!-- BARRA INFERIOR FIJA -->
+    <!-- ===================================== -->
+
+    <include
+        layout="@layout/activity_barra_navegacion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom" />
+
+</FrameLayout>

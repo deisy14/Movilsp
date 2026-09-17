@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:id="@+id/main"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FAFAF7">
+
+
+    <!-- ========================================= -->
+    <!-- CONTENIDO DESPLAZABLE -->
+    <!-- ========================================= -->
+
+    <ScrollView
+        android:id="@+id/scrollPerfil"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/barraNavegacion"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:id="@+id/contenedorPerfil"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+
+            <!-- ================================= -->
+            <!-- ENCABEZADO -->
+            <!-- ================================= -->
+
+            <LinearLayout
+                android:id="@+id/headerPerfil"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/txtSirae"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="SIRAE"
+                    android:textColor="#477A26"
+                    android:textSize="21sp"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
+
+
+            <!-- ================================= -->
+            <!-- TÍTULO -->
+            <!-- ================================= -->
+
+            <TextView
+                android:id="@+id/txtTituloPerfil"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:text="Perfil"
+                android:textColor="#3F3F3A"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                />
+
+
+            <!-- ================================= -->
+            <!-- AVATAR -->
+            <!-- ================================= -->
+
+            <LinearLayout
+                android:id="@+id/contenedorAvatar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtAvatar"
+                    android:layout_width="82dp"
+                    android:layout_height="82dp"
+                    android:background="@drawable/bg_avatar"
+                    android:gravity="center"
+                    android:text="MJ"
+                    android:textColor="#3F3F3A"
+                    android:textSize="25sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/txtNombreUsuario"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="María José Rojas"
+                    android:textColor="#3F3F3A"
+                    android:textSize="19sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/txtCargoUsuario"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Auxiliar de cocina · Turno mañana"
+                    android:textColor="#555550"
+                    android:textSize="14sp"/>
+
+
+                <!-- ESTADO -->
+
+                <TextView
+                    android:id="@+id/txtEstadoUsuario"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_estado"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
+                    android:text="● Activo"
+                    android:textColor="#477A26"
+                    android:textSize="13sp"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
+
+
+            <!-- ================================= -->
+            <!-- INFORMACIÓN DEL TURNO -->
+            <!-- ================================= -->
+
+            <LinearLayout
+                android:id="@+id/cardTurnoActual"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:background="@drawable/bg_card"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/txtEtiquetaTurno"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Turno actual"
+                    android:textColor="#96968F"
+                    android:textSize="13sp"/>
+
+                <TextView
+                    android:id="@+id/txtHorarioTurno"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="Mañana · 6:00 a. m. - 2:00 p. m."
+                    android:textColor="#3F3F3A"
+                    android:textSize="15sp"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
+
+
+            <!-- ================================= -->
+            <!-- OPCIONES -->
+            <!-- ================================= -->
+
+            <TextView
+                android:id="@+id/txtTituloCuenta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:text="Cuenta"
+                android:textColor="#3F3F3A"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+
+            <!-- ================================= -->
+            <!-- EDITAR PERFIL -->
+            <!-- ================================= -->
+
+            <LinearLayout
+                android:id="@+id/btnEditarPerfil"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_option"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="14dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:id="@+id/icEditarPerfil"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_person_edit"
+                    android:tint="#9A6300"
+                    android:contentDescription="Editar perfil"/>
+
+                <TextView
+                    android:id="@+id/txtEditarPerfil"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="14dp"
+                    android:text="Editar perfil"
+                    android:textColor="#3F3F3A"
+                    android:textSize="15sp"/>
+
+                <TextView
+                    android:id="@+id/flechaEditarPerfil"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="›"
+                    android:textColor="#477A26"
+                    android:textSize="28sp"/>
+
+            </LinearLayout>
+
+
+            <!-- ================================= -->
+            <!-- NOTIFICACIONES -->
+            <!-- ================================= -->
+
+            <LinearLayout
+                android:id="@+id/btnNotificaciones"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_option"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="14dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:id="@+id/icNotificaciones"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_notifications"
+                    android:tint="#9A6300"
+                    android:contentDescription="Notificaciones"/>
+
+                <TextView
+                    android:id="@+id/txtNotificaciones"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="14dp"
+                    android:text="Notificaciones"
+                    android:textColor="#3F3F3A"
+                    android:textSize="15sp"/>
+
+                <TextView
+                    android:id="@+id/flechaNotificaciones"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="›"
+                    android:textColor="#477A26"
+                    android:textSize="28sp"/>
+
+            </LinearLayout>
+
+
+            <!-- ================================= -->
+            <!-- AYUDA -->
+            <!-- ================================= -->
+
+            <LinearLayout
+                android:id="@+id/btnAyuda"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_option"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="14dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:id="@+id/icAyuda"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_help"
+                    android:tint="#9A6300"
+                    android:contentDescription="Ayuda"/>
+
+                <TextView
+                    android:id="@+id/txtAyuda"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="14dp"
+                    android:text="Ayuda y soporte"
+                    android:textColor="#3F3F3A"
+                    android:textSize="15sp"/>
+
+                <TextView
+                    android:id="@+id/flechaAyuda"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="›"
+                    android:textColor="#477A26"
+                    android:textSize="28sp"/>
+
+            </LinearLayout>
+
+
+            <!-- ================================= -->
+            <!-- CERRAR SESIÓN -->
+            <!-- ================================= -->
+
+            <Button
+                android:id="@+id/btnCerrarSesion"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="28dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/bg_login_card"
+                android:backgroundTint="@null"
+                android:colorAccent="#477A26"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:padding="0dp"
+                android:text="Cerrar sesión"
+                android:textAllCaps="false"
+                android:textColor="#3F3F3A"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:stateListAnimator="@null"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+    <!-- ========================================= -->
+    <!-- BARRA DE NAVEGACIÓN -->
+    <!-- ========================================= -->
+
+    <include
+        android:id="@+id/barraNavegacion"
+        layout="@layout/activity_barra_navegacion"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

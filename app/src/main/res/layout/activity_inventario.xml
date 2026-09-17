@@ -1,0 +1,526 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FAFAF7"
+    android:paddingStart="22dp"
+    android:paddingEnd="22dp"
+    android:paddingTop="20dp">
+
+    <!-- ========================================= -->
+    <!-- ENCABEZADO -->
+    <!-- ========================================= -->
+
+    <LinearLayout
+        android:id="@+id/headerInventario"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/txtSirae"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="SIRAE"
+            android:textColor="#356B24"
+            android:textSize="21sp"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
+
+
+    <!-- ========================================= -->
+    <!-- TITULO -->
+    <!-- ========================================= -->
+
+    <TextView
+        android:id="@+id/txtTituloInventario"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Inventario"
+        android:textColor="@color/negro"
+        android:textSize="24sp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/txtSubtituloInventario"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Existencias disponibles en cocina"
+        android:textColor="#686862"
+        android:textSize="16sp"/>
+
+
+    <!-- ========================================= -->
+    <!-- BUSCADOR -->
+    <!-- ========================================= -->
+
+    <LinearLayout
+        android:id="@+id/contenedorBusqueda"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_marginTop="17dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:background="@drawable/bg_busqueda">
+
+        <ImageView
+            android:id="@+id/icBuscar"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_search"
+            android:contentDescription="Buscar"/>
+
+        <EditText
+            android:id="@+id/edtBuscarIngrediente"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="10dp"
+            android:background="@null"
+            android:hint="Buscar ingrediente"
+            android:singleLine="true"
+            android:textColor="#555550"
+            android:textColorHint="#96968F"
+            android:textSize="16sp"/>
+
+    </LinearLayout>
+
+
+    <!-- ========================================= -->
+    <!-- CATEGORIAS -->
+    <!-- ========================================= -->
+
+    <HorizontalScrollView
+        android:id="@+id/scrollCategorias"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:scrollbars="none"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:id="@+id/contenedorCategorias"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- LÁCTEOS -->
+
+            <TextView
+                android:id="@+id/btnLacteos"
+                android:layout_width="92dp"
+                android:layout_height="35dp"
+                android:gravity="center"
+                android:text="Lácteos"
+                android:textColor="#3F3B28"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:background="@drawable/bg_categoria_activa"
+                android:clickable="true"
+                android:focusable="true"/>
+
+
+            <!-- PROTEÍNA -->
+
+            <TextView
+                android:id="@+id/btnProteina"
+                android:layout_width="94dp"
+                android:layout_height="35dp"
+                android:layout_marginStart="10dp"
+                android:gravity="center"
+                android:text="Proteína"
+                android:textColor="#6C6A63"
+                android:textSize="14sp"
+                android:background="@drawable/bg_categoria"
+                android:clickable="true"
+                android:focusable="true"/>
+
+
+            <!-- FRUTAS -->
+
+            <TextView
+                android:id="@+id/btnFrutas"
+                android:layout_width="81dp"
+                android:layout_height="35dp"
+                android:layout_marginStart="10dp"
+                android:gravity="center"
+                android:text="Frutas"
+                android:textColor="#6C6A63"
+                android:textSize="14sp"
+                android:background="@drawable/bg_categoria"
+                android:clickable="true"
+                android:focusable="true"/>
+
+
+            <!-- VERDURAS -->
+
+            <TextView
+                android:id="@+id/btnVerduras"
+                android:layout_width="97dp"
+                android:layout_height="35dp"
+                android:layout_marginStart="10dp"
+                android:gravity="center"
+                android:text="Verduras"
+                android:textColor="#6C6A63"
+                android:textSize="14sp"
+                android:background="@drawable/bg_categoria"
+                android:clickable="true"
+                android:focusable="true"/>
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
+
+    <!-- ========================================= -->
+    <!-- LISTA DE INVENTARIO -->
+    <!-- ========================================= -->
+
+    <ScrollView
+        android:id="@+id/scrollInventario"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="none"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:id="@+id/contenedorInventario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <!-- ================================= -->
+            <!-- LECHE -->
+            <!-- ================================= -->
+
+            <LinearLayout
+                android:id="@+id/itemLeche"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="17dp"
+                android:paddingEnd="17dp"
+                android:background="@drawable/bg_categoria">
+
+
+                <LinearLayout
+                    android:id="@+id/infoLeche"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txtLeche"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Leche entera"
+                        android:textColor="@color/negro"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/txtDetalleLeche"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="4.2 L disponibles · Actualizado hoy"
+                        android:textColor="#65655F"
+                        android:textSize="13sp"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/estadoLeche"
+                    android:layout_width="66dp"
+                    android:layout_height="27dp"
+                    android:gravity="center"
+                    android:text="Normal"
+                    android:textColor="#477A26"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_estado_normal"/>
+
+            </LinearLayout>
+
+
+            <!-- ================================= -->
+            <!-- QUESO -->
+            <!-- ================================= -->
+
+            <LinearLayout
+                android:id="@+id/itemQueso"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_marginTop="13dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="17dp"
+                android:paddingEnd="17dp"
+                android:background="@drawable/bg_categoria">
+
+
+                <LinearLayout
+                    android:id="@+id/infoQueso"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txtQueso"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Queso campesino"
+                        android:textColor="@color/negro"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/txtDetalleQueso"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1.8 kg disponibles · Actualizado hoy"
+                        android:textColor="#65655F"
+                        android:textSize="13sp"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/estadoQueso"
+                    android:layout_width="66dp"
+                    android:layout_height="27dp"
+                    android:gravity="center"
+                    android:text="Normal"
+                    android:textColor="#477A26"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_estado_normal"/>
+
+            </LinearLayout>
+
+
+            <!-- ================================= -->
+            <!-- YOGURT -->
+            <!-- ================================= -->
+
+            <LinearLayout
+                android:id="@+id/itemYogurt"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_marginTop="13dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="17dp"
+                android:paddingEnd="17dp"
+                android:background="@drawable/bg_categoria">
+
+
+
+                <LinearLayout
+                    android:id="@+id/infoYogurt"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txtYogurt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Yogurt natural"
+                        android:textColor="@color/negro"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/txtDetalleYogurt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="12 unidades disponibles · Ayer"
+                        android:textColor="#65655F"
+                        android:textSize="13sp"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/estadoYogurt"
+                    android:layout_width="84dp"
+                    android:layout_height="27dp"
+                    android:gravity="center"
+                    android:text="Stock bajo"
+                    android:textColor="#8B5718"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_estado_bajo"/>
+
+            </LinearLayout>
+
+
+            <!-- ================================= -->
+            <!-- MANTEQUILLA -->
+            <!-- ================================= -->
+
+            <LinearLayout
+                android:id="@+id/itemMantequilla"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_marginTop="13dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="17dp"
+                android:paddingEnd="17dp"
+                android:background="@drawable/bg_categoria">
+
+                <LinearLayout
+                    android:id="@+id/infoMantequilla"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txtMantequilla"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Mantequilla"
+                        android:textColor="@color/negro"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/txtDetalleMantequilla"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="900 g disponibles · Hace 2 días"
+                        android:textColor="#65655F"
+                        android:textSize="13sp"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/estadoMantequilla"
+                    android:layout_width="66dp"
+                    android:layout_height="27dp"
+                    android:gravity="center"
+                    android:text="Normal"
+                    android:textColor="#477A26"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_estado_normal"/>
+
+            </LinearLayout>
+
+
+            <!-- ================================= -->
+            <!-- CHOCOLATE -->
+            <!-- ================================= -->
+
+            <LinearLayout
+                android:id="@+id/itemChocolate"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_marginTop="13dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="17dp"
+                android:paddingEnd="17dp"
+                android:background="@drawable/bg_categoria">
+
+
+
+                <LinearLayout
+                    android:id="@+id/infoChocolate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txtChocolate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Chocolate en polvo"
+                        android:textColor="@color/negro"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/txtDetalleChocolate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="180 g disponibles · Hoy"
+                        android:textColor="#65655F"
+                        android:textSize="13sp"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/estadoChocolate"
+                    android:layout_width="84dp"
+                    android:layout_height="27dp"
+                    android:gravity="center"
+                    android:text="Stock bajo"
+                    android:textColor="#8B5718"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_estado_bajo"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+    <!-- ========================================= -->
+    <!-- BOTÓN REGISTRAR ENTRADA -->
+    <!-- ========================================= -->
+
+    <TextView
+        android:id="@+id/btnRegistrarEntrada"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="2dp"
+        android:gravity="center"
+        android:text="Registrar entrada"
+        android:textColor="#493C0B"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:background="@drawable/bg_manana_activo"
+        android:clickable="true"
+        android:focusable="true"/>
+
+
+    <!-- ========================================= -->
+    <!-- BARRA DE NAVEGACIÓN -->
+    <!-- ========================================= -->
+
+    <include
+        android:id="@+id/barra_navegacion"
+        layout="@layout/activity_barra_navegacion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

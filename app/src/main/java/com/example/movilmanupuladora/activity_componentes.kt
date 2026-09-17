@@ -1,0 +1,77 @@
+package com.example.psirae
+
+import android.content.Intent
+import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import com.example.psirae.databinding.ActivityComponentesBinding
+
+class activity_componentes : AppCompatActivity() {
+
+    private lateinit var binding: ActivityComponentesBinding
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+
+        // ==========================================
+        // BINDING
+        // ==========================================
+
+        binding = ActivityComponentesBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+
+        // ==========================================
+        // INSETS
+        // ==========================================
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+
+            val systemBars =
+                insets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            v.setPadding(
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                systemBars.bottom
+            )
+
+            insets
+        }
+
+
+        // ==========================================
+        // VER INGREDIENTES
+        // ==========================================
+
+        binding.btnVerIngredientes.setOnClickListener {
+
+            // Aquí colocas la Activity que quieres abrir.
+            //
+            // Ejemplo:
+            //
+            // startActivity(
+            //     Intent(this, IngredientesActivity::class.java)
+            // )
+        }
+
+
+        // ==========================================
+        // BARRA DE NAVEGACIÓN
+        // ==========================================
+
+        binding.barraNavegacion.navInicio.setOnClickListener {
+
+            startActivity(
+                Intent(this, MainActivity::class.java)
+            )
+
+            finish()
+        }
+    }
+}
+
