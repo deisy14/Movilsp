@@ -1,7 +1,5 @@
 package com.example.movilmanupuladora.data.api
 
-import android.content.Context
-import com.example.movilmanupuladora.utils.SessionManager
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -12,7 +10,7 @@ object RetrofitClient {
 
     private const val BASE_URL = "https://backend-sirae-pyim.onrender.com/api/"
 
-    // Mantenemos la variable en memoria para actualización rápida
+    // Variable en memoria para autorización con Bearer JWT
     var authToken: String? = null
 
     private val logging = HttpLoggingInterceptor().apply {

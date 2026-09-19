@@ -2,6 +2,7 @@ package com.example.movilmanupuladora.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.movilmanupuladora.data.api.RetrofitClient
 
 class SessionManager(context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
@@ -11,6 +12,23 @@ class SessionManager(context: Context) {
         private const val KEY_TOKEN = "auth_token"
         private const val KEY_USER_NAME = "user_name"
         private const val KEY_USER_ROLE = "user_role"
+
+        var currentToken: String?
+            get() = RetrofitClient.authToken
+            set(value) {
+                RetrofitClient.authToken = value
+            }
+
+        fun saveToken(context: Context, token: String?) {
+            currentToken = token
+            SessionManager(context).saveAuthToken(token ?: "")
+        }
+
+        fun getToken(context: Context): String? {
+            val token = SessionManager(context).fetchAuthToken()
+            currentToken = token
+            return token
+        }
     }
 
     /**
@@ -18,13 +36,18 @@ class SessionManager(context: Context) {
      */
     fun saveAuthToken(token: String) {
         prefs.edit().putString(KEY_TOKEN, token).apply()
+        RetrofitClient.authToken = token
     }
 
     /**
      * Recupera el token guardado en disco
      */
     fun fetchAuthToken(): String? {
-        return prefs.getString(KEY_TOKEN, null)
+        val token = prefs.getString(KEY_TOKEN, null)
+        if (!token.isNullOrEmpty()) {
+            RetrofitClient.authToken = token
+        }
+        return token
     }
 
     /**
@@ -38,10 +61,11 @@ class SessionManager(context: Context) {
     }
 
     /**
-     * Limpia completamente la sesión (ideal para el botón Cerrar Sesión)
+     * Limpia completamente la sesión
      */
     fun clearSession() {
         prefs.edit().clear().apply()
+        RetrofitClient.authToken = null
     }
 
     /**

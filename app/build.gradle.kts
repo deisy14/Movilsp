@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.movilmanupuladora"
-    compileSdk = 36 // Ajustado a SDK estable para evitar problemas de compatibilidad
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.movilmanupuladora"
@@ -19,7 +19,7 @@ android {
 
     buildFeatures {
         viewBinding = true
-        dataBinding = true // Habilitado para resolver 'Unresolved reference databinding'
+        dataBinding = true
     }
 
     buildTypes {
@@ -55,7 +55,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
 
     // Corrutinas para consumo asíncrono
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
 
     // Retrofit & Gson (Conexión API SIRAE)
     implementation("com.google.code.gson:gson:2.11.0")
@@ -63,8 +63,6 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
-
 
     // Pruebas
     testImplementation(libs.junit)
