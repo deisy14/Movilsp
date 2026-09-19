@@ -17,6 +17,7 @@ import com.example.movilmanupuladora.ui.manipuladora.AvisosActivity
 import com.example.movilmanupuladora.ui.manipuladora.ComponentesActivity
 import com.example.movilmanupuladora.ui.manipuladora.InventarioActivity
 import com.example.movilmanupuladora.ui.manipuladora.PerfilActivity
+import com.example.movilmanupuladora.ui.manipuladora.PreparacionActivity
 import com.example.movilmanupuladora.utils.SessionManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
@@ -259,10 +260,14 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // Acción: Botón "Elegir otro plato al azar"
+        // Acción: Botón "Ver pasos de preparación" -> Lleva a PreparacionActivity
         dialogBinding.btnOtroAleatorioModal.setOnClickListener {
             dialog.dismiss()
-            seleccionarPlatoAleatorioYMostrarDetalle()
+            val intent = Intent(this, PreparacionActivity::class.java).apply {
+                putExtra("id_plato", plato.idPlato)
+                putExtra("nombre_plato", plato.nombrePlato)
+            }
+            startActivity(intent)
         }
 
         dialog.show()

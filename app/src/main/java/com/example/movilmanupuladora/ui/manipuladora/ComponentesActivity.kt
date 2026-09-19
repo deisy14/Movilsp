@@ -16,7 +16,9 @@ import com.example.movilmanupuladora.data.model.DetallePlato
 import com.example.movilmanupuladora.data.model.PlatoResponse
 import com.example.movilmanupuladora.data.repository.MenuRepository
 import com.example.movilmanupuladora.databinding.ActivityComponentesBinding
+import com.example.movilmanupuladora.databinding.DialogRecetaComponenteBinding
 import com.example.movilmanupuladora.databinding.ItemComponentePlatoBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 
 class ComponentesActivity : AppCompatActivity() {
@@ -52,9 +54,9 @@ class ComponentesActivity : AppCompatActivity() {
             finish()
         }
 
-        // 4. Botón Ver Ingredientes
+        // 4. Botón Ver Pasos de Preparación
         binding.btnVerIngredientes.setOnClickListener {
-            val intent = Intent(this, IngredientesActivity::class.java)
+            val intent = Intent(this, PreparacionActivity::class.java)
             platoActual?.let { plato ->
                 intent.putExtra("id_plato", plato.idPlato)
                 intent.putExtra("nombre_plato", plato.nombrePlato)
@@ -216,8 +218,94 @@ class ComponentesActivity : AppCompatActivity() {
             // 3. Icono según el alimento
             itemBinding.imgComponente.setImageResource(obtenerIconoComponente(componenteTexto))
 
+            // 4. Click en el componente o en su clasificación (consumo de receta_componente)
+            val clickListenerReceta = View.OnClickListener {
+                mostrarDialogoRecetaComponente(componenteTexto, clasificacion, plato)
+            }
+            itemBinding.root.setOnClickListener(clickListenerReceta)
+            itemBinding.tvTipoComponente.setOnClickListener(clickListenerReceta)
+
             binding.contenedorComponentes.addView(itemBinding.root)
         }
+    }
+
+    /**
+     * Muestra el modal elegante de receta y detalles del componente (consumo de receta_componente)
+     */
+    private fun mostrarDialogoRecetaComponente(nombreComponente: String, tipoComponente: String, plato: PlatoResponse) {
+        val dialogBinding = DialogRecetaComponenteBinding.inflate(layoutInflater)
+
+        val nombreFormateado = nombreComponente.replaceFirstChar {
+            if (it.isLowerCase()) it.titlecase() else it.toString()
+        }
+
+        dialogBinding.tvTituloComponenteModal.text = nombreFormateado
+        dialogBinding.tvBadgeTipoModal.text = tipoComponente
+
+        val platoNombre = plato.nombrePlato?.split(" ")?.joinToString(" ") { palabra ->
+            palabra.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+        } ?: "Plato escolar"
+        dialogBinding.tvPlatoPerteneciente.text = platoNombre
+
+        // Insumos e ingredientes sugeridos de la receta según el componente
+        val n = nombreComponente.lowercase().trim()
+        val insumosTexto = when {
+            n.contains("pollo") -> "Pechuga o presa limpia, cebolla, ajo, pimentón, sal"
+            n.contains("carne") || n.contains("res") -> "Carne de res seleccionada, tomate, cebolla, sal, comino"
+            n.contains("chicharron") || n.contains("chicharrón") -> "Tocino carnudo en tiras, sal marina, adobo"
+            n.contains("frijol") || n.contains("fríjol") -> "Fríjol rojo/cargamanto, plátano picado, zanahoria, hogao"
+            n.contains("lenteja") -> "Lentejas seleccionadas, papa en cubos, zanahoria, guiso"
+            n.contains("arroz") -> "Arroz de grano entero, aceite vegetal, ajo, agua y sal"
+            n.contains("aguacate") -> "Aguacate fresco en rodajas, limón opcional"
+            n.contains("huevo") -> "Huevo fresco, tomate y cebolla picados finos"
+            n.contains("leche") -> "Leche entera pasteurizada, azúcar o canela"
+            n.contains("chocolate") -> "Pastilla o polvo de chocolate, leche y canela"
+            n.contains("azucar") || n.contains("azúcar") -> "Azúcar blanca o morena en porción medida"
+            n.contains("canela") -> "Canela en astillas aromática"
+            else -> "Insumos frescos certificados del programa de alimentación escolar"
+        }
+        dialogBinding.tvIngredientesComponente.text = insumosTexto
+
+        // Gramaje / porción según tipo
+        val porcionTexto = when (tipoComponente) {
+            "Proteína" -> "80g - 100g cocido por ración"
+            "Principio" -> "90g - 120g servido por ración"
+            "Cereal / Base" -> "80g - 100g de cereal cocido"
+            "Acompañante" -> "50g - 70g según tabla nutricional"
+            "Entrada" -> "150ml - 200ml de caldo / sopa"
+            "Bebida" -> "200ml vaso servido frío/tibio"
+            else -> "1 porción estandarizada institucional"
+        }
+        dialogBinding.tvPorcionComponente.text = porcionTexto
+
+        // Icono acorde
+        dialogBinding.imgComponenteModal.setImageResource(obtenerIconoComponente(nombreComponente))
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(dialogBinding.root)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        dialogBinding.btnCerrarModalComponente.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialogBinding.btnCerrarRecetaModal.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialogBinding.btnVerPasosModal.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(this, PreparacionActivity::class.java).apply {
+                putExtra("id_plato", plato.idPlato)
+                putExtra("nombre_plato", plato.nombrePlato)
+                putExtra("componente_seleccionado", nombreComponente)
+            }
+            startActivity(intent)
+        }
+
+        dialog.show()
     }
 
     /**
