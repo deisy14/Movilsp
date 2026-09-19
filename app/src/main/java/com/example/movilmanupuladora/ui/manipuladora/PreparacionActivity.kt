@@ -2,14 +2,14 @@ package com.example.movilmanupuladora.ui.manipuladora
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.movilmanupuladora.MainActivity
 import com.example.movilmanupuladora.R
@@ -24,11 +24,11 @@ class PreparacionActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_preparacion)
 
+        // Botón volver
         val btnVolver = findViewById<ImageView>(R.id.btnVolver)
-        btnVolver?.setOnClickListener {
-            finish()
-        }
+        btnVolver?.setOnClickListener { finish() }
 
+        // Botón marcar como preparado
         val btnMarcarPreparado = findViewById<Button>(R.id.btnMarcarPreparado)
         val preferencias = getSharedPreferences("SIRAE", MODE_PRIVATE)
         val preparado = preferencias.getBoolean("plato_preparado", false)
@@ -40,42 +40,31 @@ class PreparacionActivity : AppCompatActivity() {
         }
 
         btnMarcarPreparado?.setOnClickListener {
-            preferencias.edit()
-                .putBoolean("plato_preparado", true)
-                .apply()
-
+            preferencias.edit().putBoolean("plato_preparado", true).apply()
             btnMarcarPreparado.text = "✓   Preparado"
             btnMarcarPreparado.isEnabled = false
             btnMarcarPreparado.alpha = 0.6f
-
             Toast.makeText(this, "¡Plato marcado como preparado!", Toast.LENGTH_SHORT).show()
         }
 
+        // Barra de navegación
         findViewById<LinearLayout>(R.id.navInicio)?.setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
+            startActivity(Intent(this, MainActivity::class.java)); finish()
         }
-
         findViewById<LinearLayout>(R.id.navAsignadas)?.setOnClickListener {
-            startActivity(Intent(this, ComponentesActivity::class.java))
-            finish()
+            startActivity(Intent(this, ComponentesActivity::class.java)); finish()
         }
-
         findViewById<LinearLayout>(R.id.navInventario)?.setOnClickListener {
-            startActivity(Intent(this, InventarioActivity::class.java))
-            finish()
+            startActivity(Intent(this, InventarioActivity::class.java)); finish()
         }
-
         findViewById<LinearLayout>(R.id.navAvisos)?.setOnClickListener {
-            startActivity(Intent(this, AvisosActivity::class.java))
-            finish()
+            startActivity(Intent(this, AvisosActivity::class.java)); finish()
         }
-
         findViewById<LinearLayout>(R.id.navPerfil)?.setOnClickListener {
-            startActivity(Intent(this, PerfilActivity::class.java))
-            finish()
+            startActivity(Intent(this, PerfilActivity::class.java)); finish()
         }
 
+        // Cargar pasos desde el backend
         cargarPasos()
     }
 
@@ -84,18 +73,13 @@ class PreparacionActivity : AppCompatActivity() {
             try {
                 val response = RetrofitClient.apiService.obtenerPasosPreparacion()
 
-                if (response.isSuccessful && response.body() != null) {
+                if (response.isSuccessful && !response.body().isNullOrEmpty()) {
                     val listaPasos: List<pasos_preparacion> = response.body()!!
-
-                    Toast.makeText(
-                        this@PreparacionActivity,
-                        "Pasos recibidos desde SIRAE: ${listaPasos.size}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    mostrarPasos(listaPasos)
                 } else {
                     Toast.makeText(
                         this@PreparacionActivity,
-                        "Error HTTP: ${response.code()}",
+                        "Sin pasos registrados aún (HTTP ${response.code()})",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -108,4 +92,41 @@ class PreparacionActivity : AppCompatActivity() {
             }
         }
     }
-}
+
+    private fun mostrarPasos(pasos: List<pasos_preparacion>) {
+        val contenedor = findViewById<LinearLayout>(R.id.contenedorPasos) ?: return
+        contenedor.removeAllViews()
+
+        for (paso in pasos) {
+            // Fila horizontal: número + descripción
+            val fila = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                setPadding(0, 36, 0, 0)
+            }
+
+            // Círculo con el número del paso
+            val tvNumero = TextView(this).apply {
+                text = paso.numeroPaso
+                setTextColor(0xFFFFFFFF.toInt())
+                textSize = 14f
+                gravity = android.view.Gravity.CENTER
+                setBackgroundResource(R.drawable.bg_numero_paso)
+                layoutParams = LinearLayout.LayoutParams(72, 72)
+            }
+
+            // Descripción del paso
+            val tvDescripcion = TextView(this).apply {
+                text = paso.descripcionPaso
+                setTextColor(0xFF34443A.toInt())
+                textSize = 14f
+                layoutParams = LinearLayout.LayoutParams(
+                    0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
+                ).also { it.marginStart = 30 }
+            }
+
+            fila.addView(tvNumero)
+            fila.addView(tvDescripcion)
+            contenedor.addView(fila)
+        }
+    }
+}
