@@ -12,6 +12,10 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.MainActivity
+import androidx.lifecycle.lifecycleScope
+import com.example.movilmanupuladora.data.api.RetrofitClient
+import com.example.movilmanupuladora.data.model.LoginRequest
+import kotlinx.coroutines.launch
 
 class activity_login : AppCompatActivity() {
 
@@ -122,42 +126,62 @@ class activity_login : AppCompatActivity() {
 
 
             // ==========================================
-            // COMPROBAR CREDENCIALES
+            // COMPROBAR CREDENCIALES CON LA API
             // ==========================================
 
-            if (
-                correoIngresado == correoCorrecto &&
-                passwordIngresada == passwordCorrecta
-            ) {
+            lifecycleScope.launch {
+                try {
+                    val response = RetrofitClient.apiService.login(
+                        LoginRequest(correoIngresado, passwordIngresada)
+                    )
 
-                Toast.makeText(
-                    this,
-                    "Inicio de sesión exitoso",
-                    Toast.LENGTH_SHORT
-                ).show()
+                    if (response.isSuccessful && response.body() != null) {
+                        val loginResponse = response.body()!!
+                        
+                        // Guardar token JWT para que todas las peticiones a la API tengan permiso
+                        val token = loginResponse.authToken
+                        com.example.movilmanupuladora.utils.SessionManager.saveToken(this@activity_login, token)
 
+                        val nombreUsuario = loginResponse.usuario?.nombre ?: "Manipuladora"
+                        Toast.makeText(
+                            this@activity_login,
+                            "¡Bienvenido $nombreUsuario!",
+                            Toast.LENGTH_SHORT
+                        ).show()
 
-                // ======================================
-                // PASAR AL MAIN ACTIVITY
-                // ======================================
-
-                val intent = Intent(
-                    this,
-                    MainActivity::class.java
-                )
-
-                startActivity(intent)
-
-                // Evita volver al login con el botón atrás
-                finish()
-
-            } else {
-
-                Toast.makeText(
-                    this,
-                    "Correo o contraseña incorrectos",
-                    Toast.LENGTH_SHORT
-                ).show()
+                        val intent = Intent(this@activity_login, MainActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        // Respaldo de prueba local por si acaso
+                        if (correoIngresado == correoCorrecto && passwordIngresada == passwordCorrecta) {
+                            Toast.makeText(this@activity_login, "Inicio de sesión exitoso (Prueba)", Toast.LENGTH_SHORT).show()
+                            val intent = Intent(this@activity_login, MainActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                        } else {
+                            Toast.makeText(
+                                this@activity_login,
+                                "Correo o contraseña incorrectos",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                } catch (e: Exception) {
+                    // Si falla la red, también permitimos el usuario de prueba local
+                    if (correoIngresado == correoCorrecto && passwordIngresada == passwordCorrecta) {
+                        Toast.makeText(this@activity_login, "Inicio de sesión exitoso (Modo offline)", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(this@activity_login, MainActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        Toast.makeText(
+                            this@activity_login,
+                            "Error de conexión: ${e.localizedMessage}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
             }
         }
 

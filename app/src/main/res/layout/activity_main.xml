@@ -187,13 +187,16 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- TARJETA DEL PLATO SELECCIONADO -->
+        <!-- TARJETA DEL PLATO SELECCIONADO (BOTÓN INTERACTIVO) -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardPlatoSeleccionado"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="48dp"
             android:layout_marginTop="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
             app:cardBackgroundColor="#FFFFFF"
             app:cardCornerRadius="14dp"
             app:cardElevation="4dp"

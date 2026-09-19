@@ -37,10 +37,21 @@ data class LoginRequest(
 
 // Modelo para la respuesta de Login
 data class LoginResponse(
-    val token: String,
-    val refresh: String,
-    val usuario: UsuarioInfo
-)
+    @SerializedName("token")
+    val token: String? = null,
+
+    @SerializedName("access")
+    val access: String? = null,
+
+    @SerializedName("refresh")
+    val refresh: String? = null,
+
+    @SerializedName("usuario")
+    val usuario: UsuarioInfo? = null
+) {
+    val authToken: String?
+        get() = access ?: token
+}
 
 // Datos del usuario que entrega la respuesta del Login
 data class UsuarioInfo(
