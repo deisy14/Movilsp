@@ -27,10 +27,12 @@ class IngredientesActivity : AppCompatActivity() {
 
         // Barras del sistema
         val main = findViewById<View>(R.id.main)
-        ViewCompat.setOnApplyWindowInsetsListener(main) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+        main?.let { vMain ->
+            ViewCompat.setOnApplyWindowInsetsListener(vMain) { v, insets ->
+                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+                insets
+            }
         }
 
         // Botón volver
@@ -74,7 +76,7 @@ class IngredientesActivity : AppCompatActivity() {
 
         // Botón continuar a preparación
         val btnContinuarPreparacion = findViewById<Button>(R.id.btnContinuarPreparacion)
-        btnContinuarPreparacion.setOnClickListener {
+        btnContinuarPreparacion?.setOnClickListener {
             val intent = Intent(this, PreparacionActivity::class.java).apply {
                 putExtra("nombre_plato", nombrePlato)
                 putExtra("id_plato", intent.getIntExtra("id_plato", -1))
