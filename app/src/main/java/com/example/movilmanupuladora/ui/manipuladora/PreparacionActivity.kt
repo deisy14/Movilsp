@@ -74,7 +74,8 @@ class PreparacionActivity : AppCompatActivity() {
 
         val imgPlato = findViewById<ImageView>(R.id.imgPlatoPreparacion)
         val imgRes = when {
-            nombrePlato.contains("bandeja", ignoreCase = true) || nombrePlato.contains("frijol", ignoreCase = true) -> R.drawable.frijoles
+            nombrePlato.contains("bandeja", ignoreCase = true) -> R.drawable.bandeja_paisa
+            nombrePlato.contains("frijol", ignoreCase = true) -> R.drawable.frijoles
             nombrePlato.contains("chocolate", ignoreCase = true) -> R.drawable.chocolate
             nombrePlato.contains("huevo", ignoreCase = true) -> R.drawable.huevo_perico
             nombrePlato.contains("pollo", ignoreCase = true) -> R.drawable.apanado

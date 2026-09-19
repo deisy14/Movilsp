@@ -166,7 +166,7 @@ class ComponentesActivity : AppCompatActivity() {
 
         // Imagen destacada según el tipo de plato
         val imgRes = when {
-            plato.nombrePlato?.contains("bandeja", ignoreCase = true) == true -> com.example.movilmanupuladora.R.drawable.frijoles
+            plato.nombrePlato?.contains("bandeja", ignoreCase = true) == true -> com.example.movilmanupuladora.R.drawable.bandeja_paisa
             plato.nombrePlato?.contains("frijol", ignoreCase = true) == true -> com.example.movilmanupuladora.R.drawable.frijoles
             plato.nombrePlato?.contains("chocolate", ignoreCase = true) == true -> com.example.movilmanupuladora.R.drawable.chocolate
             plato.nombrePlato?.contains("huevo", ignoreCase = true) == true -> com.example.movilmanupuladora.R.drawable.huevo_perico
