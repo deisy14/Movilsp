@@ -10,6 +10,7 @@ import retrofit2.Response
 class UsuarioRepository(private val apiService: ApiService) {
 
     suspend fun login(correo: String, password: String): Response<LoginResponse> {
+        // Usamos el campo 'correo' de nuevo
         val request = LoginRequest(correo = correo, password = password)
         return apiService.login(request)
     }

@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class activity_comfrimacion : AppCompatActivity() {
+class ConfirmacionActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,7 +72,7 @@ class activity_comfrimacion : AppCompatActivity() {
 
             val intent = Intent(
                 this,
-                activity_menu_dia::class.java
+                MenuDiaActivity::class.java
             )
 
             intent.flags =

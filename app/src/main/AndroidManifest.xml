@@ -2,7 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- PERMISOS DE RED PARA LA API SIRAE -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -12,11 +14,13 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Movilmanupuladora">
+        android:theme="@style/Theme.Movilmanupuladora"
+        android:usesCleartextTraffic="true"
+        tools:targetApi="31">
 
-        <!-- Login es la pantalla de inicio (LAUNCHER) -->
+        <!-- PANTALLA PRINCIPAL / LOGIN (LAUNCHER) -->
         <activity
-            android:name=".ui.manipuladora.activity_login"
+            android:name=".ui.auth.LoginActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
@@ -25,52 +29,58 @@
             </intent-filter>
         </activity>
 
-        <!-- MainActivity (rueda de platos) -->
+        <!-- MainActivity (rueda de platos interactiva) -->
         <activity
             android:name=".MainActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
+        <!-- ACTIVIDADES DEL MÓDULO -->
         <activity
-            android:name=".ui.manipuladora.activity_turno"
+            android:name=".ui.auth.RegistroActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.manipuladora.barra_navegacion"
+            android:name=".ui.manipuladora.TurnoActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.manipuladora.activity_menu_dia"
+            android:name=".ui.manipuladora.PerfilActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.manipuladora.activity_componentes"
+            android:name=".ui.manipuladora.AvisosActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.manipuladora.activity_ingredientes"
+            android:name=".ui.manipuladora.MenuDiaActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.manipuladora.activity_preparacion"
+            android:name=".ui.manipuladora.InventarioActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.manipuladora.activity_comfrimacion"
+            android:name=".ui.manipuladora.ComponentesActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.manipuladora.inventario_activity"
+            android:name=".ui.manipuladora.PreparacionActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.manipuladora.avisos_Activity"
+            android:name=".ui.manipuladora.ConfirmacionActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.manipuladora.activity_perfil"
+            android:name=".ui.manipuladora.IngredientesActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora.BarraNavegacionActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
     </application>
 
 </manifest>

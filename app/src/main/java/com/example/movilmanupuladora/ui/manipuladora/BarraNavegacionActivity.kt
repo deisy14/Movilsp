@@ -9,7 +9,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.movilmanupuladora.databinding.ActivityBarraNavegacionBinding
 import com.example.movilmanupuladora.MainActivity
 
-class barra_navegacion : AppCompatActivity() {
+class BarraNavegacionActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityBarraNavegacionBinding
 
@@ -68,7 +68,7 @@ class barra_navegacion : AppCompatActivity() {
 
             val intent = Intent(
                 this,
-                barra_navegacion::class.java
+                BarraNavegacionActivity::class.java
             )
 
             startActivity(intent)
@@ -83,7 +83,7 @@ class barra_navegacion : AppCompatActivity() {
 
             val intent = Intent(
                 this,
-                inventario_activity::class.java
+                InventarioActivity::class.java
             )
 
             startActivity(intent)
@@ -98,7 +98,7 @@ class barra_navegacion : AppCompatActivity() {
 
             val intent = Intent(
                 this,
-                avisos_Activity::class.java
+                AvisosActivity::class.java
             )
 
             startActivity(intent)
@@ -113,7 +113,7 @@ class barra_navegacion : AppCompatActivity() {
 
             val intent = Intent(
                 this,
-                activity_perfil::class.java
+                PerfilActivity::class.java
             )
 
             startActivity(intent)

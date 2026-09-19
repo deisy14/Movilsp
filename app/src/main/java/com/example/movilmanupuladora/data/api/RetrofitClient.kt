@@ -1,31 +1,46 @@
 package com.example.movilmanupuladora.data.api
 
-import com.example.movilmanupuladora.utils.Constants
-import com.example.movilmanupuladora.utils.SessionManager
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
 
-    private val httpClient: OkHttpClient by lazy {
-        OkHttpClient.Builder()
-            .addInterceptor { chain ->
-                val requestBuilder = chain.request().newBuilder()
-                SessionManager.currentToken?.let { token ->
-                    requestBuilder.addHeader("Authorization", "Bearer $token")
-                }
-                chain.proceed(requestBuilder.build())
-            }
-            .build()
+    private const val BASE_URL = "https://backend-sirae-pyim.onrender.com/api/"
+
+    // Variable en memoria para autorización con Bearer JWT
+    var authToken: String? = null
+
+    private val logging = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY
     }
 
-    val apiService: ApiService by lazy {
-        Retrofit.Builder()
-            .baseUrl(Constants.BASE_URL)
-            .client(httpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(ApiService::class.java)
+    private val authInterceptor = Interceptor { chain ->
+        val request = chain.request()
+        val requestBuilder = request.newBuilder()
+
+        // No adjuntar token en login o registro inicial
+        val isAuthEndpoint = request.url.encodedPath.contains("auth/login") ||
+                (request.url.encodedPath.contains("usuarios") && request.method == "POST")
+
+        if (!isAuthEndpoint && !authToken.isNullOrEmpty()) {
+            requestBuilder.header("Authorization", "Bearer $authToken")
+        }
+
+        chain.proceed(requestBuilder.build())
     }
+
+    private val client = OkHttpClient.Builder()
+        .addInterceptor(logging)
+        .addInterceptor(authInterceptor)
+        .build()
+
+    val apiService: ApiService = Retrofit.Builder()
+        .baseUrl(BASE_URL)
+        .client(client)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+        .create(ApiService::class.java)
 }

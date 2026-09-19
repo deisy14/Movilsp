@@ -13,10 +13,10 @@ import com.example.movilmanupuladora.data.model.SeccionMenu
 import com.example.movilmanupuladora.data.repository.MenuRepository
 import com.example.movilmanupuladora.databinding.ActivityMainBinding
 import com.example.movilmanupuladora.databinding.DialogDetallePlatoBinding
-import com.example.movilmanupuladora.ui.manipuladora.activity_componentes
-import com.example.movilmanupuladora.ui.manipuladora.activity_perfil
-import com.example.movilmanupuladora.ui.manipuladora.avisos_Activity
-import com.example.movilmanupuladora.ui.manipuladora.inventario_activity
+import com.example.movilmanupuladora.ui.manipuladora.AvisosActivity
+import com.example.movilmanupuladora.ui.manipuladora.ComponentesActivity
+import com.example.movilmanupuladora.ui.manipuladora.InventarioActivity
+import com.example.movilmanupuladora.ui.manipuladora.PerfilActivity
 import com.example.movilmanupuladora.utils.SessionManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
@@ -81,15 +81,15 @@ class MainActivity : AppCompatActivity() {
 
         // 5. Barra de navegación inferior
         binding.barraNavegacion.navInventario.setOnClickListener {
-            startActivity(Intent(this, inventario_activity::class.java))
+            startActivity(Intent(this, InventarioActivity::class.java))
         }
 
         binding.barraNavegacion.navAvisos.setOnClickListener {
-            startActivity(Intent(this, avisos_Activity::class.java))
+            startActivity(Intent(this, AvisosActivity::class.java))
         }
 
         binding.barraNavegacion.navPerfil.setOnClickListener {
-            startActivity(Intent(this, activity_perfil::class.java))
+            startActivity(Intent(this, PerfilActivity::class.java))
         }
     }
 
@@ -181,7 +181,7 @@ class MainActivity : AppCompatActivity() {
         // Acción: Botón "Ver componentes e ingredientes"
         dialogBinding.btnVerComponentesModal.setOnClickListener {
             dialog.dismiss()
-            val intent = Intent(this, activity_componentes::class.java).apply {
+            val intent = Intent(this, ComponentesActivity::class.java).apply {
                 putExtra("id_plato", platoAleatorio.idPlato)
                 putExtra("id_seccion", platoAleatorio.idSeccion ?: -1)
                 putExtra("nombre_plato", platoAleatorio.nombrePlato)

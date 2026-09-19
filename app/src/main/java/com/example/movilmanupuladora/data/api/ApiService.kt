@@ -8,6 +8,11 @@ import com.example.movilmanupuladora.data.model.RegistroResponse
 import com.example.movilmanupuladora.data.model.Rol
 import com.example.movilmanupuladora.data.model.SeccionMenu
 import com.example.movilmanupuladora.data.model.Usuario
+import com.example.movilmanupuladora.data.model.grados
+import com.example.movilmanupuladora.data.model.gramaje
+import com.example.movilmanupuladora.data.model.inventario
+import com.example.movilmanupuladora.data.model.menus
+import com.example.movilmanupuladora.data.model.pasos_preparacion
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -17,34 +22,61 @@ import retrofit2.http.Path
 interface ApiService {
 
     // Roles
-    @GET("api/roles/")
+    @GET("roles/")
     suspend fun obtenerRoles(): Response<List<Rol>>
 
     // Autenticación
-    @POST("api/auth/login/")
+    @POST("auth/login/")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
 
-    @POST("api/usuarios/")
+    // Usuarios
+    @POST("usuarios/")
     suspend fun registrarUsuario(@Body usuario: Usuario): Response<RegistroResponse>
 
     // Secciones de Menú
-    @GET("api/secciones_menu/")
+    @GET("secciones_menu/")
     suspend fun obtenerSeccionesMenu(): Response<List<SeccionMenu>>
 
-    @GET("api/secciones_menu/{id}/")
+    @GET("secciones_menu/{id}/")
     suspend fun obtenerSeccionMenuPorId(@Path("id") id: Int): Response<SeccionMenu>
 
     // Platos
-    @GET("api/platos/")
+    @GET("platos/")
     suspend fun obtenerPlatos(): Response<List<PlatoResponse>>
 
-    @GET("api/platos/{id}/")
+    @GET("platos/{id}/")
     suspend fun obtenerPlatoPorId(@Path("id") id: Int): Response<PlatoResponse>
 
     // Detalle de Plato
-    @GET("api/detalle_plato/")
+    @GET("detalle_plato/")
     suspend fun obtenerDetallePlatos(): Response<List<DetallePlato>>
 
-    @GET("api/detalle_plato/{id}/")
+    @GET("detalle_plato/{id}/")
     suspend fun obtenerDetallePlatoPorId(@Path("id") id: Int): Response<DetallePlato>
+
+    // Inventario
+    @GET("inventario/")
+    suspend fun obtenerInventario(): Response<List<inventario>>
+
+    @POST("inventario/")
+    suspend fun crearInventario(@Body inventarioData: inventario): Response<inventario>
+
+    // Grados
+    @GET("grados/")
+    suspend fun obtenerGrados(): Response<List<grados>>
+
+    // Gramajes
+    @GET("gramajes/")
+    suspend fun obtenerGramajes(): Response<List<gramaje>>
+
+    @POST("gramajes/")
+    suspend fun crearGramaje(@Body gramajeData: gramaje): Response<gramaje>
+
+    // Pasos Preparación
+    @GET("pasos_preparacion/")
+    suspend fun obtenerPasosPreparacion(): Response<List<pasos_preparacion>>
+
+    // Menús
+    @GET("menus/")
+    suspend fun obtenerMenus(): Response<List<menus>>
 }

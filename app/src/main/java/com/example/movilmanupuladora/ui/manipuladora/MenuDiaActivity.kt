@@ -6,14 +6,22 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.databinding.ActivityMenuDiaBinding
+import com.example.movilmanupuladora.utils.SessionManager
 
-class activity_menu_dia : AppCompatActivity() {
+class MenuDiaActivity : AppCompatActivity() {
 
+    private lateinit var sessionManager: SessionManager
     private lateinit var binding: ActivityMenuDiaBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Restaurar token
+        sessionManager = SessionManager(this)
+        RetrofitClient.authToken = sessionManager.fetchAuthToken()
+
         enableEdgeToEdge()
 
         // Inicialización con ViewBinding
@@ -32,9 +40,9 @@ class activity_menu_dia : AppCompatActivity() {
             insets
         }
 
-        // Botón "Ver componentes" -> Navega a activity_componentes
+        // Botón "Ver componentes" -> Navega a ComponentesActivity
         binding.btnVerComponentes.setOnClickListener {
-            val intent = Intent(this, activity_componentes::class.java)
+            val intent = Intent(this, ComponentesActivity::class.java)
             startActivity(intent)
         }
     }

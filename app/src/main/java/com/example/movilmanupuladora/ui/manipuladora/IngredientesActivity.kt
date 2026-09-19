@@ -10,7 +10,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.movilmanupuladora.R
 
-class activity_ingredientes : AppCompatActivity() {
+class IngredientesActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,7 +50,7 @@ class activity_ingredientes : AppCompatActivity() {
 
             val intent = Intent(
                 this,
-                activity_preparacion::class.java
+                PreparacionActivity::class.java
             )
 
             startActivity(intent)

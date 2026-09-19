@@ -17,7 +17,7 @@ data class Usuario(
     @SerializedName("numero_documento")
     val numeroDocumento: String,
 
-    // ID del rol seleccionado al registrar (Ej: 11, 4, 10, etc.)
+    // ID del rol seleccionado al registrar
     val rol: Int? = null,
 
     val password: String? = null,

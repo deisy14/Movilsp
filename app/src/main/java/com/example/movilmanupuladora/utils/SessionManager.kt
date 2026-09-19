@@ -2,30 +2,79 @@ package com.example.movilmanupuladora.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.movilmanupuladora.data.api.RetrofitClient
 
-object SessionManager {
-    private const val PREF_NAME = "SIRAE_SESSION_PREF"
-    private const val KEY_JWT = "KEY_JWT_TOKEN"
+class SessionManager(context: Context) {
+    private val prefs: SharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
 
-    var currentToken: String? = null
+    companion object {
+        private const val PREF_NAME = "SIRAE_SESSION"
+        private const val KEY_TOKEN = "auth_token"
+        private const val KEY_USER_NAME = "user_name"
+        private const val KEY_USER_ROLE = "user_role"
 
-    fun saveToken(context: Context, token: String?) {
-        currentToken = token
-        val prefs: SharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putString(KEY_JWT, token).apply()
-    }
+        var currentToken: String?
+            get() = RetrofitClient.authToken
+            set(value) {
+                RetrofitClient.authToken = value
+            }
 
-    fun getToken(context: Context): String? {
-        if (currentToken == null) {
-            val prefs: SharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-            currentToken = prefs.getString(KEY_JWT, null)
+        fun saveToken(context: Context, token: String?) {
+            currentToken = token
+            SessionManager(context).saveAuthToken(token ?: "")
         }
-        return currentToken
+
+        fun getToken(context: Context): String? {
+            val token = SessionManager(context).fetchAuthToken()
+            currentToken = token
+            return token
+        }
     }
 
-    fun clear(context: Context) {
-        currentToken = null
-        val prefs: SharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        prefs.edit().clear().apply()
+    /**
+     * Guarda el token JWT de acceso entregado por el backend
+     */
+    fun saveAuthToken(token: String) {
+        prefs.edit().putString(KEY_TOKEN, token).apply()
+        RetrofitClient.authToken = token
     }
+
+    /**
+     * Recupera el token guardado en disco
+     */
+    fun fetchAuthToken(): String? {
+        val token = prefs.getString(KEY_TOKEN, null)
+        if (!token.isNullOrEmpty()) {
+            RetrofitClient.authToken = token
+        }
+        return token
+    }
+
+    /**
+     * Guarda el nombre y el rol del usuario autenticado
+     */
+    fun saveUserData(name: String, role: String?) {
+        val editor = prefs.edit()
+        editor.putString(KEY_USER_NAME, name)
+        editor.putString(KEY_USER_ROLE, role ?: "Sin Rol")
+        editor.apply()
+    }
+
+    /**
+     * Limpia completamente la sesión
+     */
+    fun clearSession() {
+        prefs.edit().clear().apply()
+        RetrofitClient.authToken = null
+    }
+
+    /**
+     * Verifica si hay un token activo guardado
+     */
+    fun isLoggedIn(): Boolean {
+        return !fetchAuthToken().isNullOrEmpty()
+    }
+
+    fun getUserName(): String? = prefs.getString(KEY_USER_NAME, null)
+    fun getUserRole(): String? = prefs.getString(KEY_USER_ROLE, null)
 }

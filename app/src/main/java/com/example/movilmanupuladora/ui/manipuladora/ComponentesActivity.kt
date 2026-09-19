@@ -14,13 +14,12 @@ import com.example.movilmanupuladora.MainActivity
 import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.model.DetallePlato
 import com.example.movilmanupuladora.data.model.PlatoResponse
-import com.example.movilmanupuladora.data.model.SeccionMenu
 import com.example.movilmanupuladora.data.repository.MenuRepository
 import com.example.movilmanupuladora.databinding.ActivityComponentesBinding
 import com.example.movilmanupuladora.databinding.ItemComponentePlatoBinding
 import kotlinx.coroutines.launch
 
-class activity_componentes : AppCompatActivity() {
+class ComponentesActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityComponentesBinding
     private val menuRepository = MenuRepository(RetrofitClient.apiService)
@@ -55,7 +54,7 @@ class activity_componentes : AppCompatActivity() {
 
         // 4. Botón Ver Ingredientes
         binding.btnVerIngredientes.setOnClickListener {
-            val intent = Intent(this, activity_ingredientes::class.java)
+            val intent = Intent(this, IngredientesActivity::class.java)
             platoActual?.let { plato ->
                 intent.putExtra("id_plato", plato.idPlato)
                 intent.putExtra("nombre_plato", plato.nombrePlato)
@@ -125,7 +124,6 @@ class activity_componentes : AppCompatActivity() {
                     detalleActual = detalles.firstOrNull { it.idPlato == idPlato }
 
                     detalleActual?.let { detalle ->
-                        // Si tiene estado de preparación en el backend, actualizar badge
                         detalle.estadoPreparacion?.let { estado ->
                             binding.tvBadgeEstado.text = estado
                         }
@@ -135,7 +133,7 @@ class activity_componentes : AppCompatActivity() {
             } catch (e: Exception) {
                 Log.e("Backend", "Error de conexión con el backend", e)
                 Toast.makeText(
-                    this@activity_componentes,
+                    this@ComponentesActivity,
                     "Conectando al backend SIRAE...",
                     Toast.LENGTH_SHORT
                 ).show()
@@ -147,16 +145,13 @@ class activity_componentes : AppCompatActivity() {
      * Muestra dinámicamente cada plato/componente usando ViewBinding (ItemComponentePlatoBinding)
      */
     private fun mostrarComponentes(platos: List<PlatoResponse>) {
-        // Limpiamos los elementos estáticos anteriores del contenedor
         binding.contenedorComponentes.removeAllViews()
 
         for (plato in platos) {
             val itemBinding = ItemComponentePlatoBinding.inflate(layoutInflater, binding.contenedorComponentes, false)
 
-            // Nombre del plato / preparación
             itemBinding.tvNombreComponente.text = plato.nombrePlato ?: "Sin nombre"
 
-            // Componente nutricional (ej: Proteína, Principio, Jugo, Sopa)
             val tipo = plato.componente
             if (!tipo.isNullOrEmpty()) {
                 itemBinding.tvTipoComponente.visibility = View.VISIBLE
@@ -165,7 +160,6 @@ class activity_componentes : AppCompatActivity() {
                 itemBinding.tvTipoComponente.visibility = View.GONE
             }
 
-            // Al hacer clic en un componente, podemos actualizar el plato principal seleccionado
             itemBinding.root.setOnClickListener {
                 platoActual = plato
                 binding.tvNombrePlato.text = plato.nombrePlato ?: "Plato sin nombre"

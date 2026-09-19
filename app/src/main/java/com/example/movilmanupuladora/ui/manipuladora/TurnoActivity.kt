@@ -11,7 +11,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.MainActivity
 
-class activity_turno : AppCompatActivity() {
+class TurnoActivity : AppCompatActivity() {
 
     private val handler = Handler(Looper.getMainLooper())
 
