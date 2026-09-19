@@ -9,12 +9,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.movilmanupuladora.R
-import com.example.psirae.MainActivity
+import com.example.movilmanupuladora.MainActivity
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class activity_comfrimacion : AppCompatActivity() {
+class ConfirmacionActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,7 +72,7 @@ class activity_comfrimacion : AppCompatActivity() {
 
             val intent = Intent(
                 this,
-                activity_menu_dia::class.java
+                MenuDiaActivity::class.java
             )
 
             intent.flags =

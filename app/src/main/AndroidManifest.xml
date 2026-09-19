@@ -1,6 +1,11 @@
- <?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.movilmanupuladora">
+
+    <!-- PERMISOS DE RED PARA LA API SIRAE -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -10,71 +15,55 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Movilmanupuladora">
+        android:theme="@style/Theme.Movilmanupuladora"
+        android:usesCleartextTraffic="true"
+        tools:targetApi="31">
+
+        <!-- PANTALLA PRINCIPAL / LOGIN -->
         <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:windowSoftInputMode="adjustResize">
+            android:name=".ui.auth.LoginActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".MainActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".activity_turno"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".activity_dashboard"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
 
+        <!-- OTRAS ACTIVIDADES DEL MÓDULO -->
         <activity
-            android:name=".barra_navegacion"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:name=".ui.auth.RegistroActivity"
+            android:exported="false" />
         <activity
-            android:name=".activity_menu_dia"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:name=".ui.manipuladora.TurnoActivity"
+            android:exported="false" />
         <activity
-            android:name=".activity_componentes"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:name=".ui.manipuladora.PerfilActivity"
+            android:exported="false" />
         <activity
-            android:name=".activity_ingredientes"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:name=".ui.manipuladora.AvisosActivity"
+            android:exported="false" />
         <activity
-            android:name=".activity_preparacion"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:name=".ui.manipuladora.MenuDiaActivity"
+            android:exported="false" />
         <activity
-            android:name=".activity_comfrimacion"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:name=".ui.manipuladora.InventarioActivity"
+            android:exported="false" />
         <activity
-            android:name=".activity_inventario"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:name=".ui.manipuladora.ComponentesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.manipuladora.PreparacionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.manipuladora.ConfirmacionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.manipuladora.IngredientesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.manipuladora.BarraNavegacionActivity"
+            android:exported="false" />
 
-        <activity
-            android:name=".inventario_activity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".avisos_Activity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".activity_perfil"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

@@ -8,11 +8,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.movilmanupuladora.R
+import com.example.movilmanupuladora.data.api.RetrofitClient
+import com.example.movilmanupuladora.utils.SessionManager
 
-class activity_menu_dia : AppCompatActivity() {
+class MenuDiaActivity : AppCompatActivity() {
+
+    private lateinit var sessionManager: SessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Restaurar token
+        sessionManager = SessionManager(this)
+        RetrofitClient.authToken = sessionManager.fetchAuthToken()
+
         enableEdgeToEdge()
         setContentView(R.layout.activity_menu_dia)
 
@@ -39,7 +48,7 @@ class activity_menu_dia : AppCompatActivity() {
 
             val intent = Intent(
                 this,
-                activity_preparacion::class.java
+                PreparacionActivity::class.java
             )
 
             startActivity(intent)

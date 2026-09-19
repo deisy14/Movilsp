@@ -2,31 +2,30 @@ package com.example.movilmanupuladora.ui.manipuladora
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.movilmanupuladora.R
-import com.example.psirae.MainActivity
+import com.example.movilmanupuladora.MainActivity
 
-class activity_perfil : AppCompatActivity() {
+class PreparacionActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        setContentView(R.layout.activity_perfil)
+        setContentView(R.layout.activity_preparacion)
 
         // ==========================================
         // INSETS DE LA PANTALLA
         // ==========================================
 
-        val main = findViewById<View>(R.id.main)
-
-        ViewCompat.setOnApplyWindowInsetsListener(main) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
 
             val systemBars =
                 insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -43,85 +42,72 @@ class activity_perfil : AppCompatActivity() {
 
 
         // ==========================================
-        // BOTONES DEL PERFIL
+        // BOTÓN VOLVER
         // ==========================================
 
-        val btnEditarPerfil =
-            findViewById<LinearLayout>(R.id.btnEditarPerfil)
+        val btnVolver =
+            findViewById<ImageView>(R.id.btnVolver)
 
-        val btnNotificaciones =
-            findViewById<LinearLayout>(R.id.btnNotificaciones)
-
-        val btnAyuda =
-            findViewById<LinearLayout>(R.id.btnAyuda)
-
-        val btnCerrarSesion =
-            findViewById<Button>(R.id.btnCerrarSesion)
-
-
-        // ==========================================
-        // EDITAR PERFIL
-        // ==========================================
-
-        btnEditarPerfil.setOnClickListener {
-
-            val intent = Intent(
-                this,
-                btnEditarPerfil::class.java
-            )
-
-            startActivity(intent)
-        }
-
-
-        // ==========================================
-        // NOTIFICACIONES
-        // ==========================================
-
-        btnNotificaciones.setOnClickListener {
-
-            val intent = Intent(
-                this,
-                avisos_Activity::class.java
-            )
-
-            startActivity(intent)
-        }
-
-
-        // ==========================================
-        // AYUDA Y SOPORTE
-        // ==========================================
-
-        btnAyuda.setOnClickListener {
-
-            val intent = Intent(
-                this,
-                btnAyuda::class.java
-            )
-
-            startActivity(intent)
-        }
-
-
-        // ==========================================
-        // CERRAR SESIÓN
-        // ==========================================
-
-        btnCerrarSesion.setOnClickListener {
-
-            val intent = Intent(
-                this,
-                activity_login::class.java
-            )
-
-            intent.flags =
-                Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_CLEAR_TASK
-
-            startActivity(intent)
+        btnVolver.setOnClickListener {
 
             finish()
+        }
+
+
+        // ==========================================
+        // BOTÓN MARCAR COMO PREPARADO
+        // ==========================================
+
+        val btnMarcarPreparado =
+            findViewById<Button>(R.id.btnMarcarPreparado)
+
+
+        // ==========================================
+        // CARGAR ESTADO GUARDADO
+        // ==========================================
+
+        val preferencias =
+            getSharedPreferences("SIRAE", MODE_PRIVATE)
+
+        val preparado =
+            preferencias.getBoolean("plato_preparado", false)
+
+
+        if (preparado) {
+
+            btnMarcarPreparado.text = "✓   Preparado"
+            btnMarcarPreparado.isEnabled = false
+
+            btnMarcarPreparado.alpha = 0.6f
+        }
+
+
+        // ==========================================
+        // MARCAR PREPARADO
+        // ==========================================
+
+        btnMarcarPreparado.setOnClickListener {
+
+            // Guardar estado
+            preferencias.edit()
+                .putBoolean("plato_preparado", true)
+                .apply()
+
+
+            // Cambiar apariencia
+            btnMarcarPreparado.text = "✓   Preparado"
+
+            btnMarcarPreparado.isEnabled = false
+
+            btnMarcarPreparado.alpha = 0.6f
+
+
+            // Mostrar mensaje
+            Toast.makeText(
+                this,
+                "¡Plato marcado como preparado!",
+                Toast.LENGTH_SHORT
+            ).show()
         }
 
 
@@ -151,10 +137,8 @@ class activity_perfil : AppCompatActivity() {
 
         navInicio.setOnClickListener {
 
-            val intent = Intent(
-                this,
-                MainActivity::class.java
-            )
+            val intent =
+                Intent(this, MainActivity::class.java)
 
             startActivity(intent)
             finish()
@@ -167,10 +151,8 @@ class activity_perfil : AppCompatActivity() {
 
         navAsignadas.setOnClickListener {
 
-            val intent = Intent(
-                this,
-                activity_componentes::class.java
-            )
+            val intent =
+                Intent(this, ComponentesActivity::class.java)
 
             startActivity(intent)
             finish()
@@ -183,10 +165,8 @@ class activity_perfil : AppCompatActivity() {
 
         navInventario.setOnClickListener {
 
-            val intent = Intent(
-                this,
-                inventario_activity::class.java
-            )
+            val intent =
+                Intent(this, InventarioActivity::class.java)
 
             startActivity(intent)
             finish()
@@ -199,10 +179,8 @@ class activity_perfil : AppCompatActivity() {
 
         navAvisos.setOnClickListener {
 
-            val intent = Intent(
-                this,
-                avisos_Activity::class.java
-            )
+            val intent =
+                Intent(this, AvisosActivity::class.java)
 
             startActivity(intent)
             finish()
@@ -215,8 +193,11 @@ class activity_perfil : AppCompatActivity() {
 
         navPerfil.setOnClickListener {
 
-            // Ya estamos en la pantalla de perfil.
+            val intent =
+                Intent(this, PerfilActivity::class.java)
 
+            startActivity(intent)
+            finish()
         }
     }
 }

@@ -7,9 +7,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.movilmanupuladora.databinding.ActivityAvisosBinding
-import com.example.psirae.MainActivity
+import com.example.movilmanupuladora.MainActivity
 
-class avisos_Activity : AppCompatActivity() {
+class AvisosActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAvisosBinding
 
@@ -70,7 +70,7 @@ class avisos_Activity : AppCompatActivity() {
         binding.barraNavegacion.navAsignadas.setOnClickListener {
 
             startActivity(
-                Intent(this, activity_componentes::class.java)
+                Intent(this, ComponentesActivity::class.java)
             )
 
             finish()
@@ -84,7 +84,7 @@ class avisos_Activity : AppCompatActivity() {
         binding.barraNavegacion.navInventario.setOnClickListener {
 
             startActivity(
-                Intent(this, inventario_activity::class.java)
+                Intent(this, InventarioActivity::class.java)
             )
 
             finish()
@@ -110,7 +110,7 @@ class avisos_Activity : AppCompatActivity() {
         binding.barraNavegacion.navPerfil.setOnClickListener {
 
             startActivity(
-                Intent(this, activity_perfil::class.java)
+                Intent(this, PerfilActivity::class.java)
             )
 
             finish()
