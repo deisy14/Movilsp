@@ -1,10 +1,13 @@
-package com.example.movilmanipuladora.data.api
+package com.example.movilmanupuladora.data.api
 
-import com.example.movilmanipuladora.data.model.LoginRequest
-import com.example.movilmanipuladora.data.model.LoginResponse
-import com.example.movilmanipuladora.data.model.RegistroResponse
-import com.example.movilmanipuladora.data.model.Rol
-import com.example.movilmanipuladora.data.model.Usuario
+import com.example.movilmanupuladora.data.model.LoginRequest
+import com.example.movilmanupuladora.data.model.LoginResponse
+import com.example.movilmanupuladora.data.model.RegistroResponse
+import com.example.movilmanupuladora.data.model.Usuario
+import com.example.movilmanupuladora.data.model.Rol
+import com.example.movilmanupuladora.data.model.grados
+import com.example.movilmanupuladora.data.model.gramaje
+import com.example.movilmanupuladora.data.model.inventario
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -12,14 +15,28 @@ import retrofit2.http.POST
 
 interface ApiService {
 
-    // Roles
-    @GET("api/roles/")
+    @GET("roles/")
     suspend fun obtenerRoles(): Response<List<Rol>>
 
-    // Autenticación
-    @POST("api/usuarios/login/") // Ajusta la ruta exacta del login si cambia en urls.py
+    // Restauramos usuarios/login/ que es la ruta que no daba 404
+    @POST("usuarios/login/")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
 
-    @POST("api/usuarios/registro/") // Ajusta la ruta exacta del registro si cambia en urls.py
+    @POST("usuarios/registro/")
     suspend fun registrarUsuario(@Body usuario: Usuario): Response<RegistroResponse>
+
+    @GET("inventario/")
+    suspend fun obtenerInventario(): Response<List<inventario>>
+
+    @POST("inventario/")
+    suspend fun crearInventario(@Body inventarioData: inventario): Response<inventario>
+
+    @GET("grados/")
+    suspend fun obtenerGrados(): Response<List<grados>>
+
+    @GET("gramajes/")
+    suspend fun obtenerGramajes(): Response<List<gramaje>>
+
+    @POST("gramajes/")
+    suspend fun crearGramaje(@Body gramajeData: gramaje): Response<gramaje>
 }

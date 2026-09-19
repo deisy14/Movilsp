@@ -1,4 +1,4 @@
-package com.example.movilmanipuladora.data.model
+package com.example.movilmanupuladora.data.model
 
 import com.google.gson.annotations.SerializedName
 
@@ -17,7 +17,7 @@ data class Usuario(
     @SerializedName("numero_documento")
     val numeroDocumento: String,
 
-    // ID del rol seleccionado al registrar (Ej: 11, 4, 10, etc.)
+    // ID del rol seleccionado al registrar
     val rol: Int? = null,
 
     val password: String? = null,
@@ -30,6 +30,7 @@ data class Usuario(
 )
 
 // Modelo para la petición de Login
+// Revertimos a 'correo' que era el original del proyecto
 data class LoginRequest(
     val correo: String,
     val password: String
@@ -37,9 +38,10 @@ data class LoginRequest(
 
 // Modelo para la respuesta de Login
 data class LoginResponse(
-    val token: String,
-    val refresh: String,
-    val usuario: UsuarioInfo
+    val token: String? = null,
+    val access: String? = null,
+    val refresh: String? = null,
+    val usuario: UsuarioInfo? = null
 )
 
 // Datos del usuario que entrega la respuesta del Login

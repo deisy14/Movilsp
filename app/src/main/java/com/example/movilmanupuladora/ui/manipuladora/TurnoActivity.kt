@@ -2,29 +2,38 @@ package com.example.movilmanupuladora.ui.manipuladora
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import android.widget.Button
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.movilmanupuladora.R
+import com.example.movilmanupuladora.MainActivity
 
-class activity_ingredientes : AppCompatActivity() {
+class TurnoActivity : AppCompatActivity() {
+
+    private val handler = Handler(Looper.getMainLooper())
+
+    private val irSiguientePantalla = Runnable {
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         enableEdgeToEdge()
-        setContentView(R.layout.activity_ingredientes)
+
+        setContentView(R.layout.activity_turno)
 
         // ==========================================
         // BARRAS DEL SISTEMA
         // ==========================================
 
-        val main = findViewById<View>(R.id.main)
-
-        ViewCompat.setOnApplyWindowInsetsListener(main) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(
+            findViewById(R.id.main)
+        ) { v, insets ->
 
             val systemBars =
                 insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -40,20 +49,20 @@ class activity_ingredientes : AppCompatActivity() {
         }
 
         // ==========================================
-        // BOTÓN CONTINUAR A PREPARACIÓN
+        // ESPERAR 15 SEGUNDOS
         // ==========================================
 
-        val btnContinuarPreparacion =
-            findViewById<Button>(R.id.btnContinuarPreparacion)
+        handler.postDelayed(
+            irSiguientePantalla,
+            15_000
+        )
+    }
 
-        btnContinuarPreparacion.setOnClickListener {
+    override fun onDestroy() {
+        super.onDestroy()
 
-            val intent = Intent(
-                this,
-                activity_preparacion::class.java
-            )
-
-            startActivity(intent)
-        }
+        // Evita ejecutar el cambio si la pantalla
+        // se cierra antes de los 15 segundos
+        handler.removeCallbacks(irSiguientePantalla)
     }
 }

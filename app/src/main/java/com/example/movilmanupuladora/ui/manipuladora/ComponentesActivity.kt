@@ -7,9 +7,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.movilmanupuladora.databinding.ActivityComponentesBinding
-import com.example.psirae.MainActivity
+import com.example.movilmanupuladora.MainActivity
 
-class activity_componentes : AppCompatActivity() {
+class ComponentesActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityComponentesBinding
 
@@ -52,12 +52,10 @@ class activity_componentes : AppCompatActivity() {
         binding.btnVerIngredientes.setOnClickListener {
 
             // Aquí colocas la Activity que quieres abrir.
-            //
-            // Ejemplo:
-            //
-            // startActivity(
-            //     Intent(this, IngredientesActivity::class.java)
-            // )
+            
+            startActivity(
+                 Intent(this, IngredientesActivity::class.java)
+            )
         }
 
 
