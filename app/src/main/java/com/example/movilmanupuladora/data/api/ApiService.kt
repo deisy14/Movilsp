@@ -20,11 +20,12 @@ interface ApiService {
     @GET("roles/")
     suspend fun obtenerRoles(): Response<List<Rol>>
 
-    // Restauramos usuarios/login/ que es la ruta que no daba 404
-    @POST("usuarios/login/")
+    // Ruta exacta de autenticación en Django/SimpleJWT
+    @POST("auth/login/")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
 
-    @POST("usuarios/registro/")
+    //  Si tu registro de usuarios está bajo /api/usuarios/
+    @POST("usuarios/")
     suspend fun registrarUsuario(@Body usuario: Usuario): Response<RegistroResponse>
 
     @GET("inventario/")
@@ -42,9 +43,13 @@ interface ApiService {
     @POST("gramajes/")
     suspend fun crearGramaje(@Body gramajeData: gramaje): Response<gramaje>
 
+
     @GET("pasos_preparacion/")
     suspend fun obtenerPasosPreparacion(): Response<List<pasos_preparacion>>
 
     @GET("menus/")
     suspend fun obtenerMenus(): Response<List<menus>>
 }
+
+
+

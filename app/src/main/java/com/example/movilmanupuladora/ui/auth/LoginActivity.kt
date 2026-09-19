@@ -27,6 +27,10 @@ class LoginActivity : AppCompatActivity() {
 
         sessionManager = SessionManager(this)
 
+        sessionManager.fetchAuthToken()?.let { savedToken ->
+            RetrofitClient.authToken = savedToken
+        }
+
         binding.btnIngresar.setOnClickListener {
             val correo = binding.txtCorreo.text.toString().trim()
             val password = binding.txtPassword.text.toString().trim()
@@ -38,7 +42,6 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
-
     private fun iniciarSesion(correo: String, pass: String) {
         lifecycleScope.launch {
             try {
@@ -46,15 +49,14 @@ class LoginActivity : AppCompatActivity() {
 
                 if (response.isSuccessful && response.body() != null) {
                     val loginRes = response.body()!!
-                    
-                    // Extraer token (puede venir como 'token' o 'access')
+
                     val token = loginRes.token ?: loginRes.access
-                    
+
                     if (token != null) {
                         RetrofitClient.authToken = token
                         sessionManager.saveAuthToken(token)
-                        
-                        loginRes.usuario?.let { 
+
+                        loginRes.usuario?.let {
                             sessionManager.saveUserData(it.nombre, it.rol)
                         }
 
@@ -66,8 +68,8 @@ class LoginActivity : AppCompatActivity() {
                     }
                 } else {
                     val errorBody = response.errorBody()?.string()
-                    val msg = try { JSONObject(errorBody ?: "").optString("detail", "Error de credenciales") } 
-                              catch (e: Exception) { "Error ${response.code()}" }
+                    val msg = try { JSONObject(errorBody ?: "").optString("detail", "Error de credenciales") }
+                    catch (e: Exception) { "Error ${response.code()}" }
                     Toast.makeText(this@LoginActivity, msg, Toast.LENGTH_LONG).show()
                 }
             } catch (e: Exception) {
@@ -75,4 +77,5 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
+
 }
