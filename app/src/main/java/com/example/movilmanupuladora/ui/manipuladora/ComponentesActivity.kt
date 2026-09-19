@@ -305,6 +305,16 @@ class ComponentesActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        dialogBinding.btnVerIngredientesModal.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(this, IngredientesActivity::class.java).apply {
+                putExtra("id_plato", plato.idPlato)
+                putExtra("nombre_plato", plato.nombrePlato)
+                putExtra("componente_seleccionado", nombreComponente)
+            }
+            startActivity(intent)
+        }
+
         dialog.show()
     }
 

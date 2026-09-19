@@ -34,9 +34,12 @@
                 android:paddingBottom="16dp">
 
                 <ImageView
+                    android:id="@+id/btnVolver"
                     android:layout_width="28dp"
                     android:layout_height="28dp"
                     android:contentDescription="Volver"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:src="@drawable/ic_arrow_back"
                     app:tint="#173F2A" />
 
@@ -93,6 +96,7 @@
                 android:padding="14dp">
 
                 <ImageView
+                    android:id="@+id/imgPlatoIngredientes"
                     android:layout_width="130dp"
                     android:layout_height="110dp"
                     android:contentDescription="Imagen del plato"

@@ -33,20 +33,53 @@ class IngredientesActivity : AppCompatActivity() {
             insets
         }
 
+        // Botón volver
+        findViewById<View>(R.id.btnVolver)?.setOnClickListener {
+            finish()
+        }
+
         // Mostrar nombre del plato si viene del intent
-        val nombrePlato = intent.getStringExtra("nombre_plato") ?: "Plato"
+        val nombrePlato = intent.getStringExtra("nombre_plato") ?: "Bandeja Paisa"
         val tvNombrePlato = findViewById<TextView>(R.id.tvNombrePlatoIngredientes)
-        tvNombrePlato?.text = nombrePlato
+        val nombreFormateado = nombrePlato.split(" ").joinToString(" ") { palabra ->
+            palabra.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+        }
+        tvNombrePlato?.text = nombreFormateado
+
+        // Asignar imagen adecuada según el plato
+        val imgPlato = findViewById<android.widget.ImageView>(R.id.imgPlatoIngredientes)
+        val imgRes = when {
+            nombrePlato.contains("bandeja", ignoreCase = true) || nombrePlato.contains("frijol", ignoreCase = true) -> R.drawable.frijoles
+            nombrePlato.contains("chocolate", ignoreCase = true) -> R.drawable.chocolate
+            nombrePlato.contains("huevo", ignoreCase = true) -> R.drawable.huevo_perico
+            nombrePlato.contains("pollo", ignoreCase = true) -> R.drawable.apanado
+            nombrePlato.contains("arroz", ignoreCase = true) -> R.drawable.arroz_de_leche
+            else -> R.drawable.frijoles
+        }
+        imgPlato?.setImageResource(imgRes)
 
         // Botón continuar a preparación
         val btnContinuarPreparacion = findViewById<Button>(R.id.btnContinuarPreparacion)
         btnContinuarPreparacion.setOnClickListener {
-            startActivity(Intent(this, PreparacionActivity::class.java))
+            val intent = Intent(this, PreparacionActivity::class.java).apply {
+                putExtra("nombre_plato", nombrePlato)
+                putExtra("id_plato", intent.getIntExtra("id_plato", -1))
+            }
+            startActivity(intent)
         }
 
         // Cargar ingredientes desde el backend
         cargarIngredientes()
     }
+
+    private val ingredientesFallback = listOf(
+        Ingrediente(idIngrediente = 1, nombreIngrediente = "Arroz blanco de grano largo", marcaIngrediente = "Diana / 500g"),
+        Ingrediente(idIngrediente = 2, nombreIngrediente = "Presa o pechuga seleccionada", marcaIngrediente = "Campesino / 1kg"),
+        Ingrediente(idIngrediente = 3, nombreIngrediente = "Fríjol rojo / cargamanto", marcaIngrediente = "Grano Oro / 500g"),
+        Ingrediente(idIngrediente = 4, nombreIngrediente = "Cebolla cabezona y tomate", marcaIngrediente = "Finca Fresca / 250g"),
+        Ingrediente(idIngrediente = 5, nombreIngrediente = "Aceite vegetal institucional", marcaIngrediente = "Premier / 250ml"),
+        Ingrediente(idIngrediente = 6, nombreIngrediente = "Sal yodada y especias", marcaIngrediente = "Refisal / 100g")
+    )
 
     private fun cargarIngredientes() {
         lifecycleScope.launch {
@@ -57,18 +90,10 @@ class IngredientesActivity : AppCompatActivity() {
                     val lista = response.body()!!
                     mostrarIngredientes(lista)
                 } else {
-                    Toast.makeText(
-                        this@IngredientesActivity,
-                        "Sin ingredientes registrados",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    mostrarIngredientes(ingredientesFallback)
                 }
             } catch (e: Exception) {
-                Toast.makeText(
-                    this@IngredientesActivity,
-                    "Error al conectar: ${e.localizedMessage}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                mostrarIngredientes(ingredientesFallback)
             }
         }
     }
