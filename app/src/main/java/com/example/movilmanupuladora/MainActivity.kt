@@ -156,6 +156,7 @@ class MainActivity : AppCompatActivity() {
         // Tarjeta 2
         plato2?.let { p ->
             binding.tvPlatoAnterior2.text = formatearNombrePlato(p.nombrePlato)
+            binding.imgMenuAnterior2.setImageResource(R.drawable.bandeja_paisa)
             binding.cardMenuAnterior2.setOnClickListener {
                 mostrarDialogoPlato(p)
             }
@@ -227,7 +228,7 @@ class MainActivity : AppCompatActivity() {
 
         // Asignar imagen acorde al plato
         val imgRes = when {
-            plato.nombrePlato?.contains("bandeja", ignoreCase = true) == true -> R.drawable.frijoles
+            plato.nombrePlato?.contains("bandeja", ignoreCase = true) == true -> R.drawable.bandeja_paisa
             plato.nombrePlato?.contains("frijol", ignoreCase = true) == true -> R.drawable.frijoles
             plato.nombrePlato?.contains("chocolate", ignoreCase = true) == true -> R.drawable.chocolate
             plato.nombrePlato?.contains("huevo", ignoreCase = true) == true -> R.drawable.huevo_perico

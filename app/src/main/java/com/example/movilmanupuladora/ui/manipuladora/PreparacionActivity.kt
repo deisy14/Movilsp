@@ -64,9 +64,36 @@ class PreparacionActivity : AppCompatActivity() {
             startActivity(Intent(this, PerfilActivity::class.java)); finish()
         }
 
+        // Mostrar nombre e imagen del plato si viene del intent
+        val nombrePlato = intent.getStringExtra("nombre_plato") ?: "Bandeja Paisa"
+        val tvNombre = findViewById<TextView>(R.id.tvNombrePlatoPreparacion)
+        val nombreFormateado = nombrePlato.split(" ").joinToString(" ") { palabra ->
+            palabra.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+        }
+        tvNombre?.text = nombreFormateado
+
+        val imgPlato = findViewById<ImageView>(R.id.imgPlatoPreparacion)
+        val imgRes = when {
+            nombrePlato.contains("bandeja", ignoreCase = true) -> R.drawable.bandeja_paisa
+            nombrePlato.contains("frijol", ignoreCase = true) -> R.drawable.frijoles
+            nombrePlato.contains("chocolate", ignoreCase = true) -> R.drawable.chocolate
+            nombrePlato.contains("huevo", ignoreCase = true) -> R.drawable.huevo_perico
+            nombrePlato.contains("pollo", ignoreCase = true) -> R.drawable.apanado
+            nombrePlato.contains("arroz", ignoreCase = true) -> R.drawable.arroz_de_leche
+            else -> R.drawable.frijoles
+        }
+        imgPlato?.setImageResource(imgRes)
+
         // Cargar pasos desde el backend
         cargarPasos()
     }
+
+    private val pasosFallback = listOf(
+        pasos_preparacion(idPlato = 1, numeroPaso = "1", descripcionPaso = "Lavar y desinfectar los ingredientes, utensilios y mesas de trabajo siguiendo el protocolo de bioseguridad."),
+        pasos_preparacion(idPlato = 1, numeroPaso = "2", descripcionPaso = "Cocinar y sellar la proteína y los principios a temperatura controlada (mínimo 75°C)."),
+        pasos_preparacion(idPlato = 1, numeroPaso = "3", descripcionPaso = "Verificar sazón, textura, cocción completa y temperatura antes del ensamble del plato."),
+        pasos_preparacion(idPlato = 1, numeroPaso = "4", descripcionPaso = "Porcionar y servir según las tablas de gramaje institucional del programa de alimentación escolar.")
+    )
 
     private fun cargarPasos() {
         lifecycleScope.launch {
@@ -77,18 +104,10 @@ class PreparacionActivity : AppCompatActivity() {
                     val listaPasos: List<pasos_preparacion> = response.body()!!
                     mostrarPasos(listaPasos)
                 } else {
-                    Toast.makeText(
-                        this@PreparacionActivity,
-                        "Sin pasos registrados aún (HTTP ${response.code()})",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    mostrarPasos(pasosFallback)
                 }
             } catch (e: Exception) {
-                Toast.makeText(
-                    this@PreparacionActivity,
-                    "Error de conexión: ${e.localizedMessage}",
-                    Toast.LENGTH_LONG
-                ).show()
+                mostrarPasos(pasosFallback)
             }
         }
     }

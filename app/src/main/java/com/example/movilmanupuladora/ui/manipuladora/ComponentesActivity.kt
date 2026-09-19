@@ -166,7 +166,7 @@ class ComponentesActivity : AppCompatActivity() {
 
         // Imagen destacada según el tipo de plato
         val imgRes = when {
-            plato.nombrePlato?.contains("bandeja", ignoreCase = true) == true -> com.example.movilmanupuladora.R.drawable.frijoles
+            plato.nombrePlato?.contains("bandeja", ignoreCase = true) == true -> com.example.movilmanupuladora.R.drawable.bandeja_paisa
             plato.nombrePlato?.contains("frijol", ignoreCase = true) == true -> com.example.movilmanupuladora.R.drawable.frijoles
             plato.nombrePlato?.contains("chocolate", ignoreCase = true) == true -> com.example.movilmanupuladora.R.drawable.chocolate
             plato.nombrePlato?.contains("huevo", ignoreCase = true) == true -> com.example.movilmanupuladora.R.drawable.huevo_perico
@@ -266,6 +266,21 @@ class ComponentesActivity : AppCompatActivity() {
         }
         dialogBinding.tvIngredientesComponente.text = insumosTexto
 
+        // Condimentos e ingredientes que le dan sabor al plato
+        val sazonTexto = when {
+            n.contains("pollo") -> "Sal yodada (Refisal), orégano seco molido (El Rey), ajo macerado, cebolla, pimentón"
+            n.contains("carne") || n.contains("res") -> "Sal marina (Refisal), comino criollo, orégano, ajo fresco, tomate y cebolla"
+            n.contains("chicharron") || n.contains("chicharrón") -> "Sal marina yodada gruesa (Refisal), bicarbonato y toque de ajo"
+            n.contains("frijol") || n.contains("fríjol") -> "Sal yodada, comino molido (El Rey), hogao criollo, cebolla y ajo"
+            n.contains("lenteja") -> "Sal marina, comino, orégano, ajo picado, sofrito de tomate y cebolla"
+            n.contains("arroz") -> "Sal yodada (Refisal), aceite vegetal (Premier), ajo picado y cebolla cabezona"
+            n.contains("aguacate") -> "Pizca de sal marina (Refisal) y gotas de limón fresco al gusto"
+            n.contains("huevo") -> "Sal yodada, mantequilla o aceite, tomate maduro y cebolla en rama"
+            n.contains("leche") || n.contains("chocolate") -> "Canela aromática en astilla, azúcar medida y cacao"
+            else -> "Sal marina yodada (Refisal), orégano molido, ajo y especias naturales"
+        }
+        dialogBinding.tvSazonIngredientes.text = sazonTexto
+
         // Gramaje / porción según tipo
         val porcionTexto = when (tipoComponente) {
             "Proteína" -> "80g - 100g cocido por ración"
@@ -298,6 +313,16 @@ class ComponentesActivity : AppCompatActivity() {
         dialogBinding.btnVerPasosModal.setOnClickListener {
             dialog.dismiss()
             val intent = Intent(this, PreparacionActivity::class.java).apply {
+                putExtra("id_plato", plato.idPlato)
+                putExtra("nombre_plato", plato.nombrePlato)
+                putExtra("componente_seleccionado", nombreComponente)
+            }
+            startActivity(intent)
+        }
+
+        dialogBinding.btnVerIngredientesModal.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(this, IngredientesActivity::class.java).apply {
                 putExtra("id_plato", plato.idPlato)
                 putExtra("nombre_plato", plato.nombrePlato)
                 putExtra("componente_seleccionado", nombreComponente)
