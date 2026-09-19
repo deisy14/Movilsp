@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -18,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.MainActivity
 import com.example.movilmanupuladora.data.api.RetrofitClient
+import com.example.movilmanupuladora.data.model.Ingrediente
 import com.example.movilmanupuladora.data.model.inventario
 import com.example.movilmanupuladora.data.repository.InventarioRepository
 import com.example.movilmanupuladora.utils.SessionManager
@@ -25,14 +27,11 @@ import kotlinx.coroutines.launch
 
 class InventarioActivity : AppCompatActivity() {
 
-    private lateinit var itemLeche: LinearLayout
-    private lateinit var itemQueso: LinearLayout
-    private lateinit var itemYogurt: LinearLayout
-    private lateinit var itemMantequilla: LinearLayout
-    private lateinit var itemChocolate: LinearLayout
-    
+    private lateinit var contenedorInventario: LinearLayout
     private val inventarioRepository = InventarioRepository(RetrofitClient.apiService)
     private var listaInventario: List<inventario> = emptyList()
+    // Mapa id_ingrediente -> Ingrediente para cruzar datos
+    private var mapaIngredientes: Map<Int, Ingrediente> = emptyMap()
     private lateinit var sessionManager: SessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,12 +45,8 @@ class InventarioActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_inventario)
 
-        // PRODUCTOS
-        itemLeche = findViewById(R.id.itemLeche)
-        itemQueso = findViewById(R.id.itemQueso)
-        itemYogurt = findViewById(R.id.itemYogurt)
-        itemMantequilla = findViewById(R.id.itemMantequilla)
-        itemChocolate = findViewById(R.id.itemChocolate)
+        // CONTENEDOR DONDE SE DIBUJARÁN LOS PRODUCTOS
+        contenedorInventario = findViewById(R.id.contenedorInventario)
 
         // BUSCADOR
         val edtBuscar = findViewById<EditText>(R.id.edtBuscarIngrediente)
@@ -69,13 +64,10 @@ class InventarioActivity : AppCompatActivity() {
         val btnFrutas = findViewById<TextView>(R.id.btnFrutas)
         val btnVerduras = findViewById<TextView>(R.id.btnVerduras)
 
-        btnLacteos.setOnClickListener {
-            activarCategoria(btnLacteos)
-            mostrarLacteos()
-        }
-        btnProteina.setOnClickListener { activarCategoria(btnProteina); ocultarProductos() }
-        btnFrutas.setOnClickListener { activarCategoria(btnFrutas); ocultarProductos() }
-        btnVerduras.setOnClickListener { activarCategoria(btnVerduras); ocultarProductos() }
+        btnLacteos.setOnClickListener { activarCategoria(btnLacteos) }
+        btnProteina.setOnClickListener { activarCategoria(btnProteina) }
+        btnFrutas.setOnClickListener { activarCategoria(btnFrutas) }
+        btnVerduras.setOnClickListener { activarCategoria(btnVerduras) }
 
         // REGISTRAR ENTRADA
         val btnRegistrarEntrada = findViewById<TextView>(R.id.btnRegistrarEntrada)
@@ -93,45 +85,88 @@ class InventarioActivity : AppCompatActivity() {
     private fun cargarDatosDeInventario() {
         lifecycleScope.launch {
             try {
-                val response = inventarioRepository.obtenerInventario()
-                if (response.isSuccessful && response.body() != null) {
-                    listaInventario = response.body()!!
-                    Toast.makeText(this@InventarioActivity, "Inventario cargado: ${listaInventario.size} productos", Toast.LENGTH_SHORT).show()
-                    // Aquí se podría mapear a una lista dinámica
+                // A) Cargar ingredientes PRIMERO para tener el mapa de nombres listo
+                val resIngredientes = inventarioRepository.obtenerIngredientes()
+                if (resIngredientes.isSuccessful && resIngredientes.body() != null) {
+                    mapaIngredientes = resIngredientes.body()!!.associateBy { it.idIngrediente }
+                }
+
+                // B) Cargar el inventario
+                val resInventario = inventarioRepository.obtenerInventario()
+                if (resInventario.isSuccessful && resInventario.body() != null) {
+                    listaInventario = resInventario.body()!!
+                    mostrarInventario(listaInventario)
+                } else {
+                    Toast.makeText(this@InventarioActivity, "Sin datos de inventario", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(this@InventarioActivity, "Error al cargar inventario", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@InventarioActivity, "Error al conectar con el servidor", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun mostrarInventario(lista: List<inventario>) {
+        contenedorInventario.removeAllViews()
+
+        for (item in lista) {
+            val itemView = LayoutInflater.from(this).inflate(R.layout.item_inventario, contenedorInventario, false)
+
+            val txtNombre = itemView.findViewById<TextView>(R.id.txtNombreProducto)
+            val txtDetalle = itemView.findViewById<TextView>(R.id.txtDetalleProducto)
+            val txtEstado = itemView.findViewById<TextView>(R.id.txtEstadoProducto)
+
+            // Buscar el nombre del ingrediente cruzando con la lista de ingredientes
+            val ingrediente = item.idIngrediente?.let { mapaIngredientes[it] }
+            val nombreItem = ingrediente?.nombreIngrediente
+                ?: item.nombre
+                ?: "Ingrediente #${item.idIngrediente ?: item.idInventario}"
+
+            // Mostrar la marca si existe
+            val marcaTexto = if (!ingrediente?.marcaIngrediente.isNullOrEmpty()) {
+                " · ${ingrediente?.marcaIngrediente}"
+            } else ""
+
+            // Cantidad y unidad (la API devuelve "15.00" como texto, hay que convertirlo)
+            val cantidadItem = item.cantidadActual?.toDoubleOrNull()
+                ?: item.cantidad
+                ?: 0.0
+            val unidadItem = item.unidad_medida ?: "uds"
+
+            txtNombre.text = "$nombreItem$marcaTexto"
+            txtDetalle.text = "$cantidadItem $unidadItem disponibles"
+
+            // Estado según stock_minimo
+            val stockMin = item.stockMinimo?.toDoubleOrNull() ?: 10.0
+            if (cantidadItem <= stockMin) {
+                txtEstado.text = "Stock bajo"
+                txtEstado.setTextColor(Color.parseColor("#8B5718"))
+                txtEstado.setBackgroundResource(R.drawable.bg_estado_bajo)
+            } else {
+                txtEstado.text = "Normal"
+                txtEstado.setTextColor(Color.parseColor("#477A26"))
+                txtEstado.setBackgroundResource(R.drawable.bg_estado_normal)
+            }
+
+            contenedorInventario.addView(itemView)
         }
     }
 
     private fun filtrarInventario(texto: String) {
         val busqueda = texto.lowercase().trim()
         if (busqueda.isEmpty()) {
-            mostrarLacteos()
+            mostrarInventario(listaInventario)
             return
         }
-        itemLeche.visibility = if ("leche".contains(busqueda)) View.VISIBLE else View.GONE
-        itemQueso.visibility = if ("queso".contains(busqueda)) View.VISIBLE else View.GONE
-        itemYogurt.visibility = if ("yogurt".contains(busqueda)) View.VISIBLE else View.GONE
-        itemMantequilla.visibility = if ("mantequilla".contains(busqueda)) View.VISIBLE else View.GONE
-        itemChocolate.visibility = if ("chocolate".contains(busqueda)) View.VISIBLE else View.GONE
-    }
 
-    private fun mostrarLacteos() {
-        itemLeche.visibility = View.VISIBLE
-        itemQueso.visibility = View.VISIBLE
-        itemYogurt.visibility = View.VISIBLE
-        itemMantequilla.visibility = View.VISIBLE
-        itemChocolate.visibility = View.VISIBLE
-    }
+        val filtrados = listaInventario.filter { item ->
+            val ingrediente = item.idIngrediente?.let { mapaIngredientes[it] }
+            val nombre = ingrediente?.nombreIngrediente
+                ?: item.nombre
+                ?: "Ingrediente #${item.idIngrediente ?: item.idInventario}"
+            nombre.lowercase().contains(busqueda)
+        }
 
-    private fun ocultarProductos() {
-        itemLeche.visibility = View.GONE
-        itemQueso.visibility = View.GONE
-        itemYogurt.visibility = View.GONE
-        itemMantequilla.visibility = View.GONE
-        itemChocolate.visibility = View.GONE
+        mostrarInventario(filtrados)
     }
 
     private fun activarCategoria(categoriaSeleccionada: TextView) {
