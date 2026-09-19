@@ -1,6 +1,7 @@
 package com.example.movilmanupuladora.data.api
 
 import com.example.movilmanupuladora.data.model.DetallePlato
+import com.example.movilmanupuladora.data.model.Ingrediente
 import com.example.movilmanupuladora.data.model.LoginRequest
 import com.example.movilmanupuladora.data.model.LoginResponse
 import com.example.movilmanupuladora.data.model.PlatoResponse
@@ -60,6 +61,10 @@ interface ApiService {
 
     @POST("inventario/")
     suspend fun crearInventario(@Body inventarioData: inventario): Response<inventario>
+
+    // Ingredientes
+    @GET("ingredientes/")
+    suspend fun obtenerIngredientes(): Response<List<Ingrediente>>
 
     // Grados
     @GET("grados/")
