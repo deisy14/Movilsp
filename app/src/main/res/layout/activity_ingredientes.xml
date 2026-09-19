@@ -114,6 +114,17 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tvComponenteSubtitulo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Componente seleccionado"
+                    android:textColor="#176B35"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -134,11 +145,29 @@
             <!-- LISTA DE INGREDIENTES -->
             <!-- =============================== -->
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Tabla de ingredientes y sazón"
+                android:textColor="#173F2A"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="Nombre, marca y función de sabor para dar sazón al plato:"
+                android:textColor="#65736A"
+                android:textSize="13sp" />
+
             <!-- Lista de ingredientes dinámica desde el backend -->
             <LinearLayout
                 android:id="@+id/contenedorIngredientes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
                 android:orientation="vertical" />
 
 

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:background="@drawable/bg_fila_lista"
+    android:orientation="vertical"
+    android:padding="14dp">
+
+    <!-- Fila superior: Punto/Icono, Nombre y Marca -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <View
+            android:id="@+id/indicadorIngrediente"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:background="@drawable/bg_punto_lista" />
+
+        <TextView
+            android:id="@+id/tvNombreIngrediente"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:text="Nombre del ingrediente"
+            android:textColor="#173F2A"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvMarcaIngrediente"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/etiqueta_amarilla"
+            android:paddingStart="10dp"
+            android:paddingTop="3dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="3dp"
+            android:text="Refisal / 500g"
+            android:textColor="#855800"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- Fila inferior: Descripción / función en el sabor y preparación -->
+    <TextView
+        android:id="@+id/tvDescripcionIngrediente"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="22dp"
+        android:layout_marginTop="6dp"
+        android:text="Sazón y realce de sabor para cocción y adobos"
+        android:textColor="#5A6B60"
+        android:textSize="12sp" />
+
+</LinearLayout>
