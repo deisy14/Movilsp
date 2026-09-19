@@ -35,21 +35,19 @@ class MainActivity : AppCompatActivity() {
     // Plato actualmente seleccionado
     private var platoActualSeleccionado: PlatoResponse? = null
 
-    // Platos base de respaldo (para que responda de inmediato mientras Render despierta de reposo)
+    // Platos base de respaldo con los registros reales de la BD SIRAE
     private val platosBaseRespaldo = listOf(
-        PlatoResponse(idPlato = 1, idSeccion = 2, nombrePlato = "Sopa de Frijoles", componente = "Principio"),
-        PlatoResponse(idPlato = 2, idSeccion = 2, nombrePlato = "Arroz con Pollo", componente = "Proteína"),
-        PlatoResponse(idPlato = 3, idSeccion = 2, nombrePlato = "Carne Molida Guisada", componente = "Proteína"),
-        PlatoResponse(idPlato = 4, idSeccion = 2, nombrePlato = "Lentejas Caseras", componente = "Principio"),
-        PlatoResponse(idPlato = 5, idSeccion = 1, nombrePlato = "Chocolate Caliente", componente = "Bebida"),
-        PlatoResponse(idPlato = 6, idSeccion = 1, nombrePlato = "Huevos Pericos", componente = "Proteína"),
-        PlatoResponse(idPlato = 7, idSeccion = 3, nombrePlato = "Yogurt con Galleta", componente = "Refrigerio")
+        PlatoResponse(idPlato = 4, idSeccion = 2, nombrePlato = "Bandeja Paisa", componente = "carne molida, chicharron, aguacate, arroz, frijol"),
+        PlatoResponse(idPlato = 1, idSeccion = 3, nombrePlato = "Arroz a la Valenciana", componente = "proteina"),
+        PlatoResponse(idPlato = 2, idSeccion = 3, nombrePlato = "Arroz con Pollo", componente = "pollo"),
+        PlatoResponse(idPlato = 3, idSeccion = 3, nombrePlato = "Arroz con Pollo Especial", componente = "Principal"),
+        PlatoResponse(idPlato = 5, idSeccion = 4, nombrePlato = "Café con Pan", componente = "no se")
     )
 
     private val seccionesRespaldo = listOf(
         SeccionMenu(idSeccion = 1, idJornada = 1, nombreSeccion = "Desayuno"),
         SeccionMenu(idSeccion = 2, idJornada = 1, nombreSeccion = "Almuerzo"),
-        SeccionMenu(idSeccion = 3, idJornada = 1, nombreSeccion = "Refrigerio")
+        SeccionMenu(idSeccion = 3, idJornada = 1, nombreSeccion = "Merienda")
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,6 +64,7 @@ class MainActivity : AppCompatActivity() {
         listaSecciones = seccionesRespaldo
         platoActualSeleccionado = listaPlatos.first()
         actualizarTarjetaPlato(platoActualSeleccionado!!)
+        configurarMenusAnteriores()
 
         // 2. Cargar datos reales de la base de datos de Django en Render
         cargarDatosDesdeBackend()
@@ -73,8 +72,8 @@ class MainActivity : AppCompatActivity() {
         // 3. Control de giro manual de la ruleta
         configurarGiroRuleta()
 
-        // 4. Botón "Sopa de Frijoles" (cardPlatoSeleccionado):
-        // Al tocarlo, selecciona un plato ALEATORIAMENTE y muestra el modal personalizado elegante
+        // 4. Botón del plato central seleccionado:
+        // Al tocarlo, selecciona un plato ALEATORIAMENTE y muestra el modal elegante
         binding.cardPlatoSeleccionado.setOnClickListener {
             seleccionarPlatoAleatorioYMostrarDetalle()
         }
@@ -105,6 +104,7 @@ class MainActivity : AppCompatActivity() {
                     listaPlatos = resPlatos.body()!!
                     platoActualSeleccionado = listaPlatos.first()
                     actualizarTarjetaPlato(platoActualSeleccionado!!)
+                    configurarMenusAnteriores()
                     Log.d("BACKEND_SIRAE", "Platos recibidos de la BD: ${listaPlatos.size}")
                 } else {
                     Log.d("BACKEND_SIRAE", "Código respuesta platos: ${resPlatos.code()}")
@@ -129,42 +129,112 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Selecciona un plato aleatorio de la lista y despliega el diseño visual personalizado
+     * Asigna platos reales de la base de datos a las tarjetas de "Menús anteriores"
+     * y configura el click para abrir el diálogo con su receta/componentes
+     */
+    private fun configurarMenusAnteriores() {
+        if (listaPlatos.isEmpty()) return
+
+        val plato1 = listaPlatos.firstOrNull { it.nombrePlato?.contains("pollo", ignoreCase = true) == true }
+            ?: listaPlatos.getOrNull(0)
+
+        val plato2 = listaPlatos.firstOrNull { it.nombrePlato?.contains("bandeja", ignoreCase = true) == true }
+            ?: listaPlatos.getOrNull(1)
+
+        val plato3 = listaPlatos.firstOrNull { it.nombrePlato?.contains("valenciana", ignoreCase = true) == true || it.nombrePlato?.contains("lenteja", ignoreCase = true) == true }
+            ?: listaPlatos.getOrNull(2) ?: listaPlatos.lastOrNull()
+
+        // Tarjeta 1
+        plato1?.let { p ->
+            binding.tvPlatoAnterior1.text = formatearNombrePlato(p.nombrePlato)
+            binding.cardMenuAnterior1.setOnClickListener {
+                mostrarDialogoPlato(p)
+            }
+        }
+
+        // Tarjeta 2
+        plato2?.let { p ->
+            binding.tvPlatoAnterior2.text = formatearNombrePlato(p.nombrePlato)
+            binding.cardMenuAnterior2.setOnClickListener {
+                mostrarDialogoPlato(p)
+            }
+        }
+
+        // Tarjeta 3
+        plato3?.let { p ->
+            binding.tvPlatoAnterior3.text = formatearNombrePlato(p.nombrePlato)
+            binding.cardMenuAnterior3.setOnClickListener {
+                mostrarDialogoPlato(p)
+            }
+        }
+    }
+
+    private fun formatearNombrePlato(nombre: String?): String {
+        return nombre?.split(" ")?.joinToString(" ") { palabra ->
+            palabra.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+        } ?: "Plato del día"
+    }
+
+    /**
+     * Selecciona un plato aleatorio de la lista y despliega el diálogo visual
      */
     private fun seleccionarPlatoAleatorioYMostrarDetalle() {
-        // Animación de pulsación táctil
         binding.cardPlatoSeleccionado.animate()
             .scaleX(1.04f).scaleY(1.04f).setDuration(80)
             .withEndAction {
                 binding.cardPlatoSeleccionado.animate().scaleX(1f).scaleY(1f).setDuration(80).start()
             }.start()
 
-        // 1. Escoger plato ALEATORIO
         val platoAleatorio = listaPlatos.random()
-        platoActualSeleccionado = platoAleatorio
-        actualizarTarjetaPlato(platoAleatorio)
+        mostrarDialogoPlato(platoAleatorio)
+    }
 
-        // 2. Buscar información relacionada (sección, detalle, componente)
-        val seccion = listaSecciones.firstOrNull { it.idSeccion == platoAleatorio.idSeccion }
-        val nombreSeccion = seccion?.nombreSeccion ?: "Almuerzo"
+    /**
+     * Muestra el modal elegante de SIRAE con los datos del plato, su sección, componentes y detalle
+     */
+    private fun mostrarDialogoPlato(plato: PlatoResponse) {
+        platoActualSeleccionado = plato
+        actualizarTarjetaPlato(plato)
 
-        val detalle = listaDetalles.firstOrNull { it.idPlato == platoAleatorio.idPlato }
+        // 1. Buscar información relacionada (sección, detalle, componentes)
+        val seccion = listaSecciones.firstOrNull { it.idSeccion == plato.idSeccion }
+        val nombreSeccion = seccion?.nombreSeccion ?: when (plato.idSeccion) {
+            1 -> "Desayuno"
+            2 -> "Almuerzo"
+            3 -> "Merienda"
+            else -> "Almuerzo"
+        }
+
+        val detalle = listaDetalles.firstOrNull { it.idPlato == plato.idPlato }
         val porcion = detalle?.porcionPorNino ?: "100g aprox."
         val totalPreparar = detalle?.totalAPreparar ?: "50"
         val unidad = detalle?.unidadTotal ?: "porciones"
         val estado = detalle?.estadoPreparacion ?: "Asignado"
-        val componenteTipo = platoAleatorio.componente ?: "Principio"
+        val componenteTipo = if (!plato.componente.isNullOrEmpty()) plato.componente else "Principio y Proteína"
 
-        // 3. Inflar el diseño personalizado con ViewBinding (DialogDetallePlatoBinding)
+        // 2. Inflar el diseño personalizado con ViewBinding (DialogDetallePlatoBinding)
         val dialogBinding = DialogDetallePlatoBinding.inflate(layoutInflater)
 
-        // Asignar los datos del backend a las vistas del diseño
-        dialogBinding.tvTituloPlatoModal.text = platoAleatorio.nombrePlato ?: "Plato sin nombre"
+        // Asignar los datos a la tarjeta
+        val nombreFormateado = formatearNombrePlato(plato.nombrePlato)
+        dialogBinding.tvTituloPlatoModal.text = nombreFormateado
         dialogBinding.tvSeccionModal.text = nombreSeccion
         dialogBinding.tvComponenteModal.text = componenteTipo
         dialogBinding.tvPorcionModal.text = porcion
         dialogBinding.tvTotalPrepararModal.text = "$totalPreparar $unidad"
         dialogBinding.tvBadgeEstadoModal.text = estado
+
+        // Asignar imagen acorde al plato
+        val imgRes = when {
+            plato.nombrePlato?.contains("bandeja", ignoreCase = true) == true -> R.drawable.frijoles
+            plato.nombrePlato?.contains("frijol", ignoreCase = true) == true -> R.drawable.frijoles
+            plato.nombrePlato?.contains("chocolate", ignoreCase = true) == true -> R.drawable.chocolate
+            plato.nombrePlato?.contains("huevo", ignoreCase = true) == true -> R.drawable.huevo_perico
+            plato.nombrePlato?.contains("pollo", ignoreCase = true) == true -> R.drawable.apanado
+            plato.nombrePlato?.contains("arroz", ignoreCase = true) == true -> R.drawable.arroz_de_leche
+            else -> R.drawable.frijoles
+        }
+        dialogBinding.imgPlatoModal.setImageResource(imgRes)
 
         // Crear el diálogo con fondo transparente para destacar la tarjeta con bordes dorados
         val dialog = MaterialAlertDialogBuilder(this)
@@ -178,13 +248,13 @@ class MainActivity : AppCompatActivity() {
             dialog.dismiss()
         }
 
-        // Acción: Botón "Ver componentes e ingredientes"
+        // Acción: Botón "Ver componentes e ingredientes" -> Lleva a ComponentesActivity con este plato
         dialogBinding.btnVerComponentesModal.setOnClickListener {
             dialog.dismiss()
             val intent = Intent(this, ComponentesActivity::class.java).apply {
-                putExtra("id_plato", platoAleatorio.idPlato)
-                putExtra("id_seccion", platoAleatorio.idSeccion ?: -1)
-                putExtra("nombre_plato", platoAleatorio.nombrePlato)
+                putExtra("id_plato", plato.idPlato)
+                putExtra("id_seccion", plato.idSeccion ?: -1)
+                putExtra("nombre_plato", plato.nombrePlato)
             }
             startActivity(intent)
         }
