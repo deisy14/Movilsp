@@ -272,10 +272,14 @@
 
             <!-- TARJETA 1 -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardMenuAnterior1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginHorizontal="4dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="2dp"
@@ -299,6 +303,7 @@
                         app:strokeWidth="1.5dp">
 
                         <ImageView
+                            android:id="@+id/imgMenuAnterior1"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:contentDescription="Arroz con pollo"
@@ -307,6 +312,7 @@
                     </com.google.android.material.card.MaterialCardView>
 
                     <TextView
+                        android:id="@+id/tvFechaAnterior1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
@@ -315,6 +321,7 @@
                         android:textSize="10sp" />
 
                     <TextView
+                        android:id="@+id/tvPlatoAnterior1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
@@ -330,10 +337,14 @@
 
             <!-- TARJETA 2 -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardMenuAnterior2"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginHorizontal="4dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="2dp"
@@ -357,14 +368,16 @@
                         app:strokeWidth="1.5dp">
 
                         <ImageView
+                            android:id="@+id/imgMenuAnterior2"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:contentDescription="Pasta con carne"
+                            android:contentDescription="Bandeja paisa"
                             android:scaleType="centerCrop"
                             android:src="@drawable/apanado" />
                     </com.google.android.material.card.MaterialCardView>
 
                     <TextView
+                        android:id="@+id/tvFechaAnterior2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
@@ -373,11 +386,12 @@
                         android:textSize="10sp" />
 
                     <TextView
+                        android:id="@+id/tvPlatoAnterior2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text="Pasta con carne"
+                        android:text="Bandeja paisa"
                         android:textColor="#1D2939"
                         android:textSize="11sp"
                         android:textStyle="bold" />
@@ -388,10 +402,14 @@
 
             <!-- TARJETA 3 -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardMenuAnterior3"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginHorizontal="4dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="2dp"
@@ -415,6 +433,7 @@
                         app:strokeWidth="1.5dp">
 
                         <ImageView
+                            android:id="@+id/imgMenuAnterior3"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:contentDescription="Lentejas"
@@ -423,6 +442,7 @@
                     </com.google.android.material.card.MaterialCardView>
 
                     <TextView
+                        android:id="@+id/tvFechaAnterior3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
@@ -431,6 +451,7 @@
                         android:textSize="10sp" />
 
                     <TextView
+                        android:id="@+id/tvPlatoAnterior3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"

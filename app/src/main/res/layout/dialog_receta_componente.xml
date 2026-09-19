@@ -16,9 +16,7 @@
         android:orientation="vertical"
         android:padding="22dp">
 
-        <!-- =============================== -->
         <!-- ENCABEZADO CON BOTÓN CERRAR -->
-        <!-- =============================== -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -29,13 +27,13 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="SIRAE • Menú Diario"
+                android:text="SIRAE • Receta del Componente"
                 android:textColor="#176B35"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
             <ImageView
-                android:id="@+id/btnCerrarModal"
+                android:id="@+id/btnCerrarModalComponente"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
@@ -46,10 +44,7 @@
 
         </LinearLayout>
 
-
-        <!-- =============================== -->
-        <!-- IMAGEN / AVATAR DEL PLATO -->
-        <!-- =============================== -->
+        <!-- AVATAR / ICONO DEL COMPONENTE -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -64,30 +59,30 @@
                 android:padding="6dp">
 
                 <ImageView
-                    android:id="@+id/imgPlatoModal"
+                    android:id="@+id/imgComponenteModal"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:contentDescription="Imagen del plato"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/frijoles" />
+                    android:contentDescription="Imagen del componente"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/apanado" />
 
             </FrameLayout>
 
-            <!-- NOMBRE DEL PLATO -->
+            <!-- NOMBRE DEL COMPONENTE -->
             <TextView
-                android:id="@+id/tvTituloPlatoModal"
+                android:id="@+id/tvTituloComponenteModal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="10dp"
                 android:gravity="center"
-                android:text="Nombre del Plato"
+                android:text="Nombre Componente"
                 android:textColor="#173F2A"
                 android:textSize="21sp"
                 android:textStyle="bold" />
 
-            <!-- BADGE DE ESTADO -->
+            <!-- BADGE DE CLASIFICACIÓN (PROTEÍNA, PRINCIPIO, ETC.) -->
             <TextView
-                android:id="@+id/tvBadgeEstadoModal"
+                android:id="@+id/tvBadgeTipoModal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
@@ -96,97 +91,18 @@
                 android:paddingTop="4dp"
                 android:paddingEnd="16dp"
                 android:paddingBottom="4dp"
-                android:text="Asignado"
+                android:text="Proteína"
                 android:textColor="#FFFFFF"
                 android:textSize="11sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
 
-
-        <!-- =============================== -->
-        <!-- CHIPS DE SECCIÓN Y COMPONENTE -->
-        <!-- =============================== -->
+        <!-- DETALLE DE LA RECETA DEL COMPONENTE -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:orientation="horizontal">
-
-            <!-- SECCIÓN -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="6dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_fila_lista"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="📂 Sección"
-                    android:textColor="#65736A"
-                    android:textSize="11sp" />
-
-                <TextView
-                    android:id="@+id/tvSeccionModal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:text="Almuerzo"
-                    android:textColor="#173F2A"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <!-- COMPONENTE -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_fila_lista"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🥗 Componente"
-                    android:textColor="#65736A"
-                    android:textSize="11sp" />
-
-                <TextView
-                    android:id="@+id/tvComponenteModal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:ellipsize="end"
-                    android:maxLines="3"
-                    android:text="Proteína"
-                    android:textColor="#176B35"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-
-        <!-- =============================== -->
-        <!-- TARJETA DETALLE DE PREPARACIÓN -->
-        <!-- =============================== -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
             android:background="@drawable/bg_fila_lista"
             android:orientation="vertical"
             android:padding="14dp">
@@ -194,7 +110,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="📋 Detalle de Preparación"
+                android:text="🥗 Detalle de Receta / Insumos"
                 android:textColor="#173F2A"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -206,7 +122,7 @@
                 android:layout_marginBottom="8dp"
                 android:background="#EDEDED" />
 
-            <!-- FILA: PORCIÓN -->
+            <!-- FILA: PLATO ASOCIADO -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -216,22 +132,50 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Porción por niño:"
+                    android:text="Plato:"
                     android:textColor="#65736A"
                     android:textSize="12sp" />
 
                 <TextView
-                    android:id="@+id/tvPorcionModal"
+                    android:id="@+id/tvPlatoPerteneciente"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="100g aprox."
+                    android:text="Arroz con Pollo"
                     android:textColor="#1D2939"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
             </LinearLayout>
 
-            <!-- FILA: TOTAL A PREPARAR -->
+            <!-- FILA: INGREDIENTES / INSUMOS -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.8"
+                    android:text="Insumos base:"
+                    android:textColor="#65736A"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tvIngredientesComponente"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.2"
+                    android:gravity="end"
+                    android:text="Presa fresca, condimento y sal"
+                    android:textColor="#176B35"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- FILA: GRAMAJE / PORCIÓN -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -242,16 +186,16 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Total a preparar:"
+                    android:text="Porción estimada:"
                     android:textColor="#65736A"
                     android:textSize="12sp" />
 
                 <TextView
-                    android:id="@+id/tvTotalPrepararModal"
+                    android:id="@+id/tvPorcionComponente"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="50 porciones"
-                    android:textColor="#176B35"
+                    android:text="80g - 100g por ración"
+                    android:textColor="#1D2939"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
@@ -259,40 +203,34 @@
 
         </LinearLayout>
 
-
-        <!-- =============================== -->
-        <!-- BOTONES DE ACCIÓN -->
-        <!-- =============================== -->
-
-        <!-- BOTÓN PRINCIPAL: VER COMPONENTES -->
+        <!-- BOTÓN VER PASOS DE PREPARACIÓN -->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnVerComponentesModal"
+            android:id="@+id/btnVerPasosModal"
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="16dp"
             android:backgroundTint="#FFD928"
-            android:text="Ver componentes  ›"
+            android:text="Ver pasos de preparación  ›"
             android:textAllCaps="false"
             android:textColor="#173F2A"
             android:textSize="14sp"
             android:textStyle="bold"
             app:cornerRadius="15dp" />
 
-        <!-- BOTÓN SECUNDARIO: VER PASOS DE PREPARACIÓN -->
+        <!-- BOTÓN CERRAR -->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnOtroAleatorioModal"
+            android:id="@+id/btnCerrarRecetaModal"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="46dp"
             android:layout_marginTop="8dp"
-            android:text="Ver pasos de preparación  ›"
+            android:text="Cerrar"
             android:textAllCaps="false"
-            android:textColor="#176B35"
+            android:textColor="#65736A"
             android:textSize="13sp"
-            android:textStyle="bold"
             app:cornerRadius="15dp"
-            app:strokeColor="#176B35"
-            app:strokeWidth="1.5dp" />
+            app:strokeColor="#D0D5DD"
+            app:strokeWidth="1dp" />
 
     </LinearLayout>
 
