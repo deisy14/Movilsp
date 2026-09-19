@@ -8,6 +8,8 @@ import com.example.movilmanupuladora.data.model.Rol
 import com.example.movilmanupuladora.data.model.grados
 import com.example.movilmanupuladora.data.model.gramaje
 import com.example.movilmanupuladora.data.model.inventario
+import com.example.movilmanupuladora.data.model.menus
+import com.example.movilmanupuladora.data.model.pasos_preparacion
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -40,4 +42,14 @@ interface ApiService {
 
     @POST("gramajes/")
     suspend fun crearGramaje(@Body gramajeData: gramaje): Response<gramaje>
+
+
+    @GET("pasos_preparacion/")
+    suspend fun obtenerPasosPreparacion(): Response<List<pasos_preparacion>>
+
+    @GET("menus/")
+    suspend fun obtenerMenus(): Response<List<menus>>
 }
+
+
+
