@@ -1,5 +1,7 @@
 package com.example.movilmanupuladora.data.api
 
+import android.content.Context
+import com.example.movilmanupuladora.utils.SessionManager
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -9,8 +11,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitClient {
 
     private const val BASE_URL = "https://backend-sirae-pyim.onrender.com/api/"
-    
-    // Token en memoria para las peticiones actuales
+
+    // Mantenemos la variable en memoria para actualización rápida
     var authToken: String? = null
 
     private val logging = HttpLoggingInterceptor().apply {
@@ -20,13 +22,15 @@ object RetrofitClient {
     private val authInterceptor = Interceptor { chain ->
         val request = chain.request()
         val requestBuilder = request.newBuilder()
-        
-        // Evitamos enviar token en login
-        if (!request.url.encodedPath.contains("login") && authToken != null) {
-            // Cambiamos a "Bearer" que es el estándar de SimpleJWT/Django
+
+        // No adjuntar token en login o registro inicial
+        val isAuthEndpoint = request.url.encodedPath.contains("auth/login") ||
+                (request.url.encodedPath.contains("usuarios") && request.method == "POST")
+
+        if (!isAuthEndpoint && !authToken.isNullOrEmpty()) {
             requestBuilder.header("Authorization", "Bearer $authToken")
         }
-        
+
         chain.proceed(requestBuilder.build())
     }
 
