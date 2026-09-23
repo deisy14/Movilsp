@@ -2,27 +2,24 @@ package com.example.movilmanupuladora.ui.manipuladora
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.movilmanupuladora.databinding.ActivityAvisosBinding
+import com.example.movilmanupuladora.databinding.ActivityEditarPerfilBinding
 
-class AvisosActivity : AppCompatActivity() {
+class EditarPerfilActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityAvisosBinding
+    private lateinit var binding: ActivityEditarPerfilBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
 
-        // ==========================================
-        // VIEW BINDING
-        // ==========================================
-
-        binding = ActivityAvisosBinding.inflate(layoutInflater)
+        binding = ActivityEditarPerfilBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
 
         // ==========================================
         // INSETS
@@ -43,12 +40,62 @@ class AvisosActivity : AppCompatActivity() {
             insets
         }
 
+        // ==========================================
+        // GUARDAR CAMBIOS
+        // ==========================================
+
+        binding.btnGuardarCambios.setOnClickListener {
+
+            val nombre =
+                binding.edtNombre.text.toString().trim()
+
+            val telefono =
+                binding.edtTelefono.text.toString().trim()
+
+            val correo =
+                binding.edtCorreo.text.toString().trim()
+
+            if (nombre.isEmpty()) {
+
+                binding.edtNombre.error =
+                    "Ingresa tu nombre"
+
+                binding.edtNombre.requestFocus()
+
+                return@setOnClickListener
+            }
+
+            if (correo.isEmpty()) {
+
+                binding.edtCorreo.error =
+                    "Ingresa tu correo"
+
+                binding.edtCorreo.requestFocus()
+
+                return@setOnClickListener
+            }
+
+            Toast.makeText(
+                this,
+                "Perfil actualizado correctamente",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            finish()
+        }
+
+        // ==========================================
+        // CANCELAR
+        // ==========================================
+
+        binding.btnCancelar.setOnClickListener {
+            finish()
+        }
 
         // ==========================================
         // BARRA DE NAVEGACIÓN
         // ==========================================
 
-        // INICIO
         binding.barraNavegacion.navInicio.setOnClickListener {
 
             startActivity(
@@ -58,8 +105,6 @@ class AvisosActivity : AppCompatActivity() {
             finish()
         }
 
-
-        // ASIGNADAS
         binding.barraNavegacion.navAsignadas.setOnClickListener {
 
             startActivity(
@@ -69,8 +114,6 @@ class AvisosActivity : AppCompatActivity() {
             finish()
         }
 
-
-        // INVENTARIO
         binding.barraNavegacion.navInventario.setOnClickListener {
 
             startActivity(
@@ -80,14 +123,15 @@ class AvisosActivity : AppCompatActivity() {
             finish()
         }
 
-
-        // AVISOS
         binding.barraNavegacion.navAvisos.setOnClickListener {
-            // Ya estamos en Avisos.
+
+            startActivity(
+                Intent(this, AvisosActivity::class.java)
+            )
+
+            finish()
         }
 
-
-        // PERFIL
         binding.barraNavegacion.navPerfil.setOnClickListener {
 
             startActivity(
@@ -98,4 +142,3 @@ class AvisosActivity : AppCompatActivity() {
         }
     }
 }
-

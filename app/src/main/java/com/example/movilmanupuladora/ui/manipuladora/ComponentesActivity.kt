@@ -4,13 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import com.example.movilmanupuladora.MainActivity
+import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.model.DetallePlato
 import com.example.movilmanupuladora.data.model.PlatoResponse
@@ -24,7 +23,9 @@ import kotlinx.coroutines.launch
 class ComponentesActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityComponentesBinding
-    private val menuRepository = MenuRepository(RetrofitClient.apiService)
+
+    private val menuRepository =
+        MenuRepository(RetrofitClient.apiService)
 
     private var platoActual: PlatoResponse? = null
     private var detalleActual: DetallePlato? = null
@@ -33,274 +34,620 @@ class ComponentesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // 1. Inicializar ViewBinding
         binding = ActivityComponentesBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 2. Insets de pantalla
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            val systemBars =
+                insets.getInsets(WindowInsetsCompat.Type.systemBars())
+
             v.setPadding(
                 systemBars.left,
                 systemBars.top,
                 systemBars.right,
                 systemBars.bottom
             )
+
             insets
         }
 
-        // 3. Botón volver
+        // VOLVER
         binding.btnVolver.setOnClickListener {
             finish()
         }
 
-        // 4. Botón Ver Pasos de Preparación
+        // VER PASOS DE PREPARACIÓN
         binding.btnVerIngredientes.setOnClickListener {
-            val intent = Intent(this, PreparacionActivity::class.java)
+
             platoActual?.let { plato ->
+
+                val intent =
+                    Intent(this, PreparacionActivity::class.java)
+
                 intent.putExtra("id_plato", plato.idPlato)
                 intent.putExtra("nombre_plato", plato.nombrePlato)
+
+                startActivity(intent)
             }
-            startActivity(intent)
         }
 
-        // 5. Barra de navegación inferior
-        binding.barraNavegacion.navInicio.setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
-        }
+        configurarBarraNavegacion()
 
-        // 6. Cargar datos del Backend (Secciones, Platos, Detalle del Plato)
-        val idPlatoIntent = intent.getIntExtra("id_plato", -1)
-        val idSeccionIntent = intent.getIntExtra("id_seccion", -1)
-        val nombrePlatoIntent = intent.getStringExtra("nombre_plato")
-        cargarDatosBackend(idPlatoIntent, idSeccionIntent, nombrePlatoIntent)
+        val idPlato =
+            intent.getIntExtra("id_plato", -1)
+
+        val idSeccion =
+            intent.getIntExtra("id_seccion", -1)
+
+        val nombrePlato =
+            intent.getStringExtra("nombre_plato")
+
+        cargarDatosBackend(
+            idPlato,
+            idSeccion,
+            nombrePlato
+        )
     }
 
-    // Datos de respaldo con los registros reales de la base de datos SIRAE
+    // ==========================================
+    // DATOS DE RESPALDO
+    // ==========================================
+
     private val platosBaseRespaldo = listOf(
-        PlatoResponse(idPlato = 4, idSeccion = 2, nombrePlato = "bandeja paisa", componente = "carne molida, chicharron, aguacate, arroz, frijol"),
-        PlatoResponse(idPlato = 1, idSeccion = 3, nombrePlato = "arroz a la valenciana", componente = "proteina"),
-        PlatoResponse(idPlato = 2, idSeccion = 3, nombrePlato = "arroz con pollo", componente = "pollo"),
-        PlatoResponse(idPlato = 3, idSeccion = 3, nombrePlato = "Arroz con Pollo Especial", componente = "Principal"),
-        PlatoResponse(idPlato = 5, idSeccion = 4, nombrePlato = "cafe con pan", componente = "no se")
+
+        PlatoResponse(
+            idPlato = 4,
+            idSeccion = 2,
+            nombrePlato = "bandeja paisa",
+            componente = "carne molida, chicharron, aguacate, arroz, frijol"
+        ),
+
+        PlatoResponse(
+            idPlato = 1,
+            idSeccion = 3,
+            nombrePlato = "arroz a la valenciana",
+            componente = "proteina"
+        ),
+
+        PlatoResponse(
+            idPlato = 2,
+            idSeccion = 3,
+            nombrePlato = "arroz con pollo",
+            componente = "pollo"
+        ),
+
+        PlatoResponse(
+            idPlato = 3,
+            idSeccion = 3,
+            nombrePlato = "Arroz con Pollo Especial",
+            componente = "Principal"
+        ),
+
+        PlatoResponse(
+            idPlato = 5,
+            idSeccion = 4,
+            nombrePlato = "cafe con pan",
+            componente = "no se"
+        )
     )
 
-    private fun cargarDatosBackend(idPlatoBuscado: Int, idSeccionBuscada: Int, nombrePlatoBuscado: String?) {
+    // ==========================================
+    // CONSUMO BACKEND
+    // ==========================================
+
+    private fun cargarDatosBackend(
+        idPlatoBuscado: Int,
+        idSeccionBuscada: Int,
+        nombrePlatoBuscado: String?
+    ) {
+
         lifecycleScope.launch {
+
             try {
-                // A) Consumir Secciones de Menú
+
+                // SECCIONES
                 var seccionNombre: String? = null
-                val resSecciones = menuRepository.obtenerSeccionesMenu()
+
+                val resSecciones =
+                    menuRepository.obtenerSeccionesMenu()
+
                 if (resSecciones.isSuccessful) {
-                    val secciones = resSecciones.body() ?: emptyList()
-                    val seccionEncontrada = if (idSeccionBuscada != -1) {
-                        secciones.firstOrNull { it.idSeccion == idSeccionBuscada }
+
+                    val secciones =
+                        resSecciones.body() ?: emptyList()
+
+                    val seccionEncontrada =
+                        if (idSeccionBuscada != -1) {
+
+                            secciones.firstOrNull {
+                                it.idSeccion == idSeccionBuscada
+                            }
+
+                        } else {
+
+                            secciones.firstOrNull()
+                        }
+
+                    seccionNombre =
+                        seccionEncontrada?.nombreSeccion
+                }
+
+                // PLATOS
+                val resPlatos =
+                    menuRepository.obtenerPlatos()
+
+                val listaPlatos =
+                    if (
+                        resPlatos.isSuccessful &&
+                        !resPlatos.body().isNullOrEmpty()
+                    ) {
+
+                        resPlatos.body()!!
+
                     } else {
-                        secciones.firstOrNull()
+
+                        platosBaseRespaldo
                     }
-                    seccionNombre = seccionEncontrada?.nombreSeccion
-                }
 
-                // B) Consumir Platos
-                val resPlatos = menuRepository.obtenerPlatos()
-                val listaPlatos = if (resPlatos.isSuccessful && !resPlatos.body().isNullOrEmpty()) {
-                    resPlatos.body()!!
-                } else {
-                    platosBaseRespaldo
-                }
-
-                // Seleccionar plato: por ID, por Nombre, o buscar preferentemente "bandeja paisa"
+                // SELECCIONAR PLATO
                 platoActual = when {
-                    idPlatoBuscado != -1 -> listaPlatos.firstOrNull { it.idPlato == idPlatoBuscado }
-                    !nombrePlatoBuscado.isNullOrEmpty() -> listaPlatos.firstOrNull { it.nombrePlato.equals(nombrePlatoBuscado, ignoreCase = true) }
-                    else -> null
-                } ?: listaPlatos.firstOrNull { it.nombrePlato?.contains("bandeja", ignoreCase = true) == true }
-                  ?: listaPlatos.firstOrNull()
 
-                // Actualizar interfaz del plato
+                    idPlatoBuscado != -1 ->
+                        listaPlatos.firstOrNull {
+                            it.idPlato == idPlatoBuscado
+                        }
+
+                    !nombrePlatoBuscado.isNullOrEmpty() ->
+                        listaPlatos.firstOrNull {
+                            it.nombrePlato.equals(
+                                nombrePlatoBuscado,
+                                ignoreCase = true
+                            )
+                        }
+
+                    else -> null
+                }
+                    ?: listaPlatos.firstOrNull {
+                        it.nombrePlato?.contains(
+                            "bandeja",
+                            ignoreCase = true
+                        ) == true
+                    }
+                            ?: listaPlatos.firstOrNull()
+
+                // MOSTRAR PLATO
                 platoActual?.let { plato ->
-                    actualizarUiPlato(plato, seccionNombre)
+
+                    actualizarUiPlato(
+                        plato,
+                        seccionNombre
+                    )
+
                     mostrarComponentesDelPlato(plato)
                 }
 
-                // C) Consumir Detalle de Platos (porciones, total a preparar y estado)
-                val resDetalles = menuRepository.obtenerDetallePlatos()
-                if (resDetalles.isSuccessful) {
-                    val detalles = resDetalles.body() ?: emptyList()
-                    val idPlato = platoActual?.idPlato
-                    detalleActual = detalles.firstOrNull { it.idPlato == idPlato }
+                // DETALLE
+                val resDetalles =
+                    menuRepository.obtenerDetallePlatos()
 
-                    detalleActual?.let { detalle ->
-                        detalle.estadoPreparacion?.let { estado ->
-                            binding.tvBadgeEstado.text = estado
+                if (resDetalles.isSuccessful) {
+
+                    val detalles =
+                        resDetalles.body() ?: emptyList()
+
+                    detalleActual =
+                        detalles.firstOrNull {
+                            it.idPlato == platoActual?.idPlato
                         }
+
+                    detalleActual?.estadoPreparacion?.let {
+                        binding.tvBadgeEstado.text = it
                     }
                 }
 
             } catch (e: Exception) {
-                Log.e("Backend", "Error de conexión con el backend", e)
-                // Usar respaldo en caso de fallo de red
-                platoActual = platosBaseRespaldo.firstOrNull { it.nombrePlato?.contains("bandeja", ignoreCase = true) == true }
-                    ?: platosBaseRespaldo.first()
-                actualizarUiPlato(platoActual!!, "Almuerzo")
-                mostrarComponentesDelPlato(platoActual!!)
+
+                Log.e(
+                    "Backend",
+                    "Error de conexión con el backend",
+                    e
+                )
+
+                platoActual =
+                    platosBaseRespaldo.first()
+
+                actualizarUiPlato(
+                    platoActual!!,
+                    "Almuerzo"
+                )
+
+                mostrarComponentesDelPlato(
+                    platoActual!!
+                )
             }
         }
     }
 
-    private fun actualizarUiPlato(plato: PlatoResponse, seccionNombre: String?) {
-        val nombreFormateado = plato.nombrePlato?.split(" ")?.joinToString(" ") { palabra ->
-            palabra.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
-        } ?: "Plato sin nombre"
+    // ==========================================
+    // ACTUALIZAR PLATO
+    // ==========================================
 
-        binding.tvNombrePlato.text = nombreFormateado
+    private fun actualizarUiPlato(
+        plato: PlatoResponse,
+        seccionNombre: String?
+    ) {
 
-        val seccion = seccionNombre ?: when (plato.idSeccion) {
-            1 -> "Desayuno"
-            2 -> "Almuerzo"
-            3 -> "Merienda"
-            else -> "Almuerzo"
-        }
-        binding.tvTituloSeccion.text = "Componentes del $seccion"
+        val nombreFormateado =
+            plato.nombrePlato
+                ?.split(" ")
+                ?.joinToString(" ") { palabra ->
 
-        // Imagen destacada según el tipo de plato
-        val imgRes = when {
-            plato.nombrePlato?.contains("bandeja", ignoreCase = true) == true -> com.example.movilmanupuladora.R.drawable.bandeja_paisa
-            plato.nombrePlato?.contains("frijol", ignoreCase = true) == true -> com.example.movilmanupuladora.R.drawable.frijoles
-            plato.nombrePlato?.contains("chocolate", ignoreCase = true) == true -> com.example.movilmanupuladora.R.drawable.chocolate
-            plato.nombrePlato?.contains("huevo", ignoreCase = true) == true -> com.example.movilmanupuladora.R.drawable.huevo_perico
-            plato.nombrePlato?.contains("pollo", ignoreCase = true) == true -> com.example.movilmanupuladora.R.drawable.apanado
-            plato.nombrePlato?.contains("arroz", ignoreCase = true) == true -> com.example.movilmanupuladora.R.drawable.arroz_de_leche
-            else -> com.example.movilmanupuladora.R.drawable.frijoles
-        }
+                    palabra.replaceFirstChar {
+                        if (it.isLowerCase())
+                            it.titlecase()
+                        else
+                            it.toString()
+                    }
+                }
+                ?: "Plato sin nombre"
+
+        binding.tvNombrePlato.text =
+            nombreFormateado
+
+        val seccion =
+            seccionNombre
+                ?: when (plato.idSeccion) {
+
+                    1 -> "Desayuno"
+                    2 -> "Almuerzo"
+                    3 -> "Merienda"
+
+                    else -> "Almuerzo"
+                }
+
+        binding.tvTituloSeccion.text =
+            "Componentes del $seccion"
+
+        val imgRes =
+            when {
+
+                plato.nombrePlato?.contains(
+                    "bandeja",
+                    true
+                ) == true ->
+                    R.drawable.bandeja_paisa
+
+                plato.nombrePlato?.contains(
+                    "frijol",
+                    true
+                ) == true ->
+                    R.drawable.frijoles
+
+                plato.nombrePlato?.contains(
+                    "chocolate",
+                    true
+                ) == true ->
+                    R.drawable.chocolate
+
+                plato.nombrePlato?.contains(
+                    "huevo",
+                    true
+                ) == true ->
+                    R.drawable.huevo_perico
+
+                plato.nombrePlato?.contains(
+                    "pollo",
+                    true
+                ) == true ->
+                    R.drawable.apanado
+
+                plato.nombrePlato?.contains(
+                    "arroz",
+                    true
+                ) == true ->
+                    R.drawable.arroz_de_leche
+
+                else ->
+                    R.drawable.frijoles
+            }
+
         binding.imgPlato.setImageResource(imgRes)
     }
 
-    /**
-     * Extrae y muestra por separado los componentes individuales del plato seleccionado,
-     * indicando al frente su clasificación (Proteína, Principio, Acompañante, Cereal / Base, etc.)
-     */
-    private fun mostrarComponentesDelPlato(plato: PlatoResponse) {
+    // ==========================================
+    // COMPONENTES
+    // ==========================================
+
+    private fun mostrarComponentesDelPlato(
+        plato: PlatoResponse
+    ) {
+
         binding.contenedorComponentes.removeAllViews()
 
-        val rawComponentes = plato.componente?.trim() ?: ""
-        val listaComponentes = if (rawComponentes.contains(",")) {
-            rawComponentes.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-        } else if (rawComponentes.isNotEmpty()) {
-            listOf(rawComponentes)
-        } else {
-            // Componentes por defecto para platos conocidos si la base de datos no tuviera desglose
-            when {
-                plato.nombrePlato?.contains("bandeja", ignoreCase = true) == true ->
-                    listOf("carne molida", "chicharron", "aguacate", "arroz", "frijol")
-                plato.nombrePlato?.contains("pollo", ignoreCase = true) == true ->
-                    listOf("pechuga de pollo", "arroz", "principio de arveja", "ensalada")
-                else ->
-                    listOf("Componente principal")
+        val rawComponentes =
+            plato.componente?.trim() ?: ""
+
+        val listaComponentes =
+
+            if (rawComponentes.contains(",")) {
+
+                rawComponentes
+                    .split(",")
+                    .map { it.trim() }
+                    .filter { it.isNotEmpty() }
+
+            } else if (rawComponentes.isNotEmpty()) {
+
+                listOf(rawComponentes)
+
+            } else {
+
+                listOf("Componente principal")
             }
-        }
 
         for (componenteTexto in listaComponentes) {
-            val itemBinding = ItemComponentePlatoBinding.inflate(layoutInflater, binding.contenedorComponentes, false)
 
-            // 1. Nombre del componente con mayúscula inicial
-            val nombreCapitalizado = componenteTexto.replaceFirstChar {
-                if (it.isLowerCase()) it.titlecase() else it.toString()
-            }
-            itemBinding.tvNombreComponente.text = nombreCapitalizado
+            val itemBinding =
+                ItemComponentePlatoBinding.inflate(
+                    layoutInflater,
+                    binding.contenedorComponentes,
+                    false
+                )
 
-            // 2. Clasificación al frente (Proteína, Principio, Acompañante, Entrada, Bebida, etc.)
-            val clasificacion = clasificarComponente(componenteTexto)
-            itemBinding.tvTipoComponente.text = clasificacion
-            itemBinding.tvTipoComponente.visibility = View.VISIBLE
+            val nombreCapitalizado =
+                componenteTexto.replaceFirstChar {
 
-            // 3. Icono según el alimento
-            itemBinding.imgComponente.setImageResource(obtenerIconoComponente(componenteTexto))
+                    if (it.isLowerCase())
+                        it.titlecase()
+                    else
+                        it.toString()
+                }
 
-            // 4. Click en el componente o en su clasificación (consumo de receta_componente)
-            val clickListenerReceta = View.OnClickListener {
-                mostrarDialogoRecetaComponente(componenteTexto, clasificacion, plato)
-            }
-            itemBinding.root.setOnClickListener(clickListenerReceta)
-            itemBinding.tvTipoComponente.setOnClickListener(clickListenerReceta)
+            itemBinding.tvNombreComponente.text =
+                nombreCapitalizado
 
-            binding.contenedorComponentes.addView(itemBinding.root)
+            val clasificacion =
+                clasificarComponente(
+                    componenteTexto
+                )
+
+            itemBinding.tvTipoComponente.text =
+                clasificacion
+
+            itemBinding.tvTipoComponente.visibility =
+                View.VISIBLE
+
+            itemBinding.imgComponente.setImageResource(
+                obtenerIconoComponente(
+                    componenteTexto
+                )
+            )
+
+            val clickListener =
+                View.OnClickListener {
+
+                    mostrarDialogoRecetaComponente(
+                        componenteTexto,
+                        clasificacion,
+                        plato
+                    )
+                }
+
+            itemBinding.root.setOnClickListener(
+                clickListener
+            )
+
+            itemBinding.tvTipoComponente.setOnClickListener(
+                clickListener
+            )
+
+            binding.contenedorComponentes.addView(
+                itemBinding.root
+            )
         }
     }
 
-    /**
-     * Muestra el modal elegante de receta y detalles del componente (consumo de receta_componente)
-     */
-    private fun mostrarDialogoRecetaComponente(nombreComponente: String, tipoComponente: String, plato: PlatoResponse) {
-        val dialogBinding = DialogRecetaComponenteBinding.inflate(layoutInflater)
+    // ==========================================
+    // CLASIFICACIÓN
+    // ==========================================
 
-        val nombreFormateado = nombreComponente.replaceFirstChar {
-            if (it.isLowerCase()) it.titlecase() else it.toString()
+    private fun clasificarComponente(
+        nombre: String
+    ): String {
+
+        val n =
+            nombre.lowercase().trim()
+
+        return when {
+
+            n.contains("carne") ||
+                    n.contains("pollo") ||
+                    n.contains("pescado") ||
+                    n.contains("huevo") ||
+                    n.contains("chicharron") ||
+                    n.contains("chicharrón") ||
+                    n.contains("proteina") ||
+                    n.contains("proteína") ->
+                "Proteína"
+
+            n.contains("frijol") ||
+                    n.contains("fríjol") ||
+                    n.contains("lenteja") ||
+                    n.contains("garbanzo") ||
+                    n.contains("arveja") ||
+                    n.contains("principio") ->
+                "Principio"
+
+            n.contains("aguacate") ||
+                    n.contains("ensalada") ||
+                    n.contains("verdura") ||
+                    n.contains("platano") ||
+                    n.contains("plátano") ||
+                    n.contains("patacon") ||
+                    n.contains("patacón") ||
+                    n.contains("acompañ") ->
+                "Acompañante"
+
+            n.contains("arroz") ||
+                    n.contains("pasta") ||
+                    n.contains("arepa") ||
+                    n.contains("pan") ||
+                    n.contains("yuca") ||
+                    n.contains("papa") ||
+                    n.contains("cereal") ||
+                    n.contains("base") ->
+                "Cereal / Base"
+
+            n.contains("sopa") ||
+                    n.contains("crema") ||
+                    n.contains("caldo") ||
+                    n.contains("consome") ||
+                    n.contains("consomé") ||
+                    n.contains("ajiaco") ||
+                    n.contains("sancocho") ->
+                "Entrada"
+
+            n.contains("jugo") ||
+                    n.contains("leche") ||
+                    n.contains("chocolate") ||
+                    n.contains("cafe") ||
+                    n.contains("café") ||
+                    n.contains("avena") ||
+                    n.contains("colada") ||
+                    n.contains("limonada") ->
+                "Bebida"
+
+            n.contains("postre") ||
+                    n.contains("fruta") ||
+                    n.contains("gelatina") ||
+                    n.contains("bocadillo") ->
+                "Postre"
+
+            else ->
+                "Componente"
         }
+    }
 
-        dialogBinding.tvTituloComponenteModal.text = nombreFormateado
-        dialogBinding.tvBadgeTipoModal.text = tipoComponente
+    // ==========================================
+    // ICONOS
+    // ==========================================
 
-        val platoNombre = plato.nombrePlato?.split(" ")?.joinToString(" ") { palabra ->
-            palabra.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
-        } ?: "Plato escolar"
-        dialogBinding.tvPlatoPerteneciente.text = platoNombre
+    private fun obtenerIconoComponente(
+        nombre: String
+    ): Int {
 
-        // Insumos e ingredientes sugeridos de la receta según el componente
-        val n = nombreComponente.lowercase().trim()
-        val insumosTexto = when {
-            n.contains("pollo") -> "Pechuga o presa limpia, cebolla, ajo, pimentón, sal"
-            n.contains("carne") || n.contains("res") -> "Carne de res seleccionada, tomate, cebolla, sal, comino"
-            n.contains("chicharron") || n.contains("chicharrón") -> "Tocino carnudo en tiras, sal marina, adobo"
-            n.contains("frijol") || n.contains("fríjol") -> "Fríjol rojo/cargamanto, plátano picado, zanahoria, hogao"
-            n.contains("lenteja") -> "Lentejas seleccionadas, papa en cubos, zanahoria, guiso"
-            n.contains("arroz") -> "Arroz de grano entero, aceite vegetal, ajo, agua y sal"
-            n.contains("aguacate") -> "Aguacate fresco en rodajas, limón opcional"
-            n.contains("huevo") -> "Huevo fresco, tomate y cebolla picados finos"
-            n.contains("leche") -> "Leche entera pasteurizada, azúcar o canela"
-            n.contains("chocolate") -> "Pastilla o polvo de chocolate, leche y canela"
-            n.contains("azucar") || n.contains("azúcar") -> "Azúcar blanca o morena en porción medida"
-            n.contains("canela") -> "Canela en astillas aromática"
-            else -> "Insumos frescos certificados del programa de alimentación escolar"
+        val n =
+            nombre.lowercase().trim()
+
+        return when {
+
+            n.contains("leche") ->
+                R.drawable.ic_leche
+
+            n.contains("chocolate") ->
+                R.drawable.ic_chocolate_polvo
+
+            n.contains("azucar") ||
+                    n.contains("azúcar") ->
+                R.drawable.ic_azucar
+
+            n.contains("canela") ->
+                R.drawable.ic_canela
+
+            n.contains("frijol") ||
+                    n.contains("fríjol") ||
+                    n.contains("lenteja") ->
+                R.drawable.frijoles
+
+            n.contains("huevo") ->
+                R.drawable.huevo_perico
+
+            n.contains("pollo") ||
+                    n.contains("carne") ||
+                    n.contains("chicharron") ||
+                    n.contains("chicharrón") ->
+                R.drawable.apanado
+
+            n.contains("arroz") ->
+                R.drawable.arroz_de_leche
+
+            else ->
+                R.drawable.ic_plato_asignado
         }
-        dialogBinding.tvIngredientesComponente.text = insumosTexto
+    }
 
-        // Condimentos e ingredientes que le dan sabor al plato
-        val sazonTexto = when {
-            n.contains("pollo") -> "Sal yodada (Refisal), orégano seco molido (El Rey), ajo macerado, cebolla, pimentón"
-            n.contains("carne") || n.contains("res") -> "Sal marina (Refisal), comino criollo, orégano, ajo fresco, tomate y cebolla"
-            n.contains("chicharron") || n.contains("chicharrón") -> "Sal marina yodada gruesa (Refisal), bicarbonato y toque de ajo"
-            n.contains("frijol") || n.contains("fríjol") -> "Sal yodada, comino molido (El Rey), hogao criollo, cebolla y ajo"
-            n.contains("lenteja") -> "Sal marina, comino, orégano, ajo picado, sofrito de tomate y cebolla"
-            n.contains("arroz") -> "Sal yodada (Refisal), aceite vegetal (Premier), ajo picado y cebolla cabezona"
-            n.contains("aguacate") -> "Pizca de sal marina (Refisal) y gotas de limón fresco al gusto"
-            n.contains("huevo") -> "Sal yodada, mantequilla o aceite, tomate maduro y cebolla en rama"
-            n.contains("leche") || n.contains("chocolate") -> "Canela aromática en astilla, azúcar medida y cacao"
-            else -> "Sal marina yodada (Refisal), orégano molido, ajo y especias naturales"
-        }
-        dialogBinding.tvSazonIngredientes.text = sazonTexto
+    // ==========================================
+    // MODAL
+    // ==========================================
 
-        // Gramaje / porción según tipo
-        val porcionTexto = when (tipoComponente) {
-            "Proteína" -> "80g - 100g cocido por ración"
-            "Principio" -> "90g - 120g servido por ración"
-            "Cereal / Base" -> "80g - 100g de cereal cocido"
-            "Acompañante" -> "50g - 70g según tabla nutricional"
-            "Entrada" -> "150ml - 200ml de caldo / sopa"
-            "Bebida" -> "200ml vaso servido frío/tibio"
-            else -> "1 porción estandarizada institucional"
-        }
-        dialogBinding.tvPorcionComponente.text = porcionTexto
+    private fun mostrarDialogoRecetaComponente(
+        nombreComponente: String,
+        tipoComponente: String,
+        plato: PlatoResponse
+    ) {
 
-        // Icono acorde
-        dialogBinding.imgComponenteModal.setImageResource(obtenerIconoComponente(nombreComponente))
+        val dialogBinding =
+            DialogRecetaComponenteBinding.inflate(
+                layoutInflater
+            )
 
-        val dialog = MaterialAlertDialogBuilder(this)
-            .setView(dialogBinding.root)
-            .create()
+        dialogBinding.tvTituloComponenteModal.text =
+            nombreComponente.replaceFirstChar {
+                if (it.isLowerCase())
+                    it.titlecase()
+                else
+                    it.toString()
+            }
 
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialogBinding.tvBadgeTipoModal.text =
+            tipoComponente
+
+        dialogBinding.tvPlatoPerteneciente.text =
+            plato.nombrePlato ?: "Plato escolar"
+
+        dialogBinding.tvIngredientesComponente.text =
+            "Ingredientes del componente"
+
+        dialogBinding.tvSazonIngredientes.text =
+            "Sazón y condimentos"
+
+        dialogBinding.tvPorcionComponente.text =
+            when (tipoComponente) {
+
+                "Proteína" ->
+                    "80g - 100g por ración"
+
+                "Principio" ->
+                    "90g - 120g por ración"
+
+                "Cereal / Base" ->
+                    "80g - 100g por ración"
+
+                "Acompañante" ->
+                    "50g - 70g por ración"
+
+                "Bebida" ->
+                    "200ml por ración"
+
+                else ->
+                    "1 porción institucional"
+            }
+
+        dialogBinding.imgComponenteModal.setImageResource(
+            obtenerIconoComponente(
+                nombreComponente
+            )
+        )
+
+        val dialog =
+            MaterialAlertDialogBuilder(this)
+                .setView(dialogBinding.root)
+                .create()
+
+        dialog.window?.setBackgroundDrawableResource(
+            android.R.color.transparent
+        )
 
         dialogBinding.btnCerrarModalComponente.setOnClickListener {
             dialog.dismiss()
@@ -311,82 +658,108 @@ class ComponentesActivity : AppCompatActivity() {
         }
 
         dialogBinding.btnVerPasosModal.setOnClickListener {
+
             dialog.dismiss()
-            val intent = Intent(this, PreparacionActivity::class.java).apply {
-                putExtra("id_plato", plato.idPlato)
-                putExtra("nombre_plato", plato.nombrePlato)
-                putExtra("componente_seleccionado", nombreComponente)
-            }
-            startActivity(intent)
+
+            startActivity(
+                Intent(
+                    this,
+                    PreparacionActivity::class.java
+                ).apply {
+
+                    putExtra(
+                        "id_plato",
+                        plato.idPlato
+                    )
+
+                    putExtra(
+                        "nombre_plato",
+                        plato.nombrePlato
+                    )
+
+                    putExtra(
+                        "componente_seleccionado",
+                        nombreComponente
+                    )
+                }
+            )
         }
 
         dialogBinding.btnVerIngredientesModal.setOnClickListener {
+
             dialog.dismiss()
-            val intent = Intent(this, IngredientesActivity::class.java).apply {
-                putExtra("id_plato", plato.idPlato)
-                putExtra("nombre_plato", plato.nombrePlato)
-                putExtra("componente_seleccionado", nombreComponente)
-            }
-            startActivity(intent)
+
+            startActivity(
+                Intent(
+                    this,
+                    IngredientesActivity::class.java
+                ).apply {
+
+                    putExtra(
+                        "id_plato",
+                        plato.idPlato
+                    )
+
+                    putExtra(
+                        "nombre_plato",
+                        plato.nombrePlato
+                    )
+
+                    putExtra(
+                        "componente_seleccionado",
+                        nombreComponente
+                    )
+                }
+            )
         }
 
         dialog.show()
     }
 
-    /**
-     * Clasifica un componente dentro de las categorías de nutrición y menú escolar/típico
-     */
-    private fun clasificarComponente(nombre: String): String {
-        val n = nombre.lowercase().trim()
-        return when {
-            n.contains("carne") || n.contains("chicharron") || n.contains("chicharrón") ||
-            n.contains("pollo") || n.contains("pescado") || n.contains("huevo") ||
-            n.contains("res") || n.contains("cerdo") || n.contains("atun") || n.contains("atún") ||
-            n.contains("proteina") || n.contains("proteína") -> "Proteína"
+    // ==========================================
+    // BARRA DE NAVEGACIÓN
+    // ==========================================
 
-            n.contains("frijol") || n.contains("fríjol") || n.contains("lenteja") ||
-            n.contains("garbanzo") || n.contains("arveja") || n.contains("blanquillo") ||
-            n.contains("principio") -> "Principio"
+    private fun configurarBarraNavegacion() {
 
-            n.contains("aguacate") || n.contains("ensalada") || n.contains("verdura") ||
-            n.contains("tajada") || n.contains("platano") || n.contains("plátano") ||
-            n.contains("patacon") || n.contains("patacón") || n.contains("hogao") ||
-            n.contains("ahogado") || n.contains("acompañ") -> "Acompañante"
+        binding.barraNavegacion.navInicio.setOnClickListener {
 
-            n.contains("arroz") || n.contains("pasta") || n.contains("espagueti") ||
-            n.contains("arepa") || n.contains("pan") || n.contains("yuca") ||
-            n.contains("papa") || n.contains("cereal") || n.contains("base") -> "Cereal / Base"
+            startActivity(
+                Intent(this, MainActivity::class.java)
+            )
 
-            n.contains("sopa") || n.contains("crema") || n.contains("caldo") ||
-            n.contains("consome") || n.contains("consomé") || n.contains("ajiaco") ||
-            n.contains("sancocho") || n.contains("entrada") -> "Entrada"
-
-            n.contains("jugo") || n.contains("leche") || n.contains("chocolate") ||
-            n.contains("cafe") || n.contains("café") || n.contains("avena") ||
-            n.contains("colada") || n.contains("limonada") || n.contains("bebida") -> "Bebida"
-
-            n.contains("postre") || n.contains("fruta") || n.contains("gelatina") ||
-            n.contains("bocadillo") -> "Postre"
-
-            else -> "Componente"
+            finish()
         }
-    }
 
-    /**
-     * Selecciona el recurso drawable más adecuado para cada componente
-     */
-    private fun obtenerIconoComponente(nombre: String): Int {
-        val n = nombre.lowercase().trim()
-        return when {
-            n.contains("leche") -> com.example.movilmanupuladora.R.drawable.ic_leche
-            n.contains("chocolate") -> com.example.movilmanupuladora.R.drawable.ic_chocolate_polvo
-            n.contains("azucar") || n.contains("azúcar") -> com.example.movilmanupuladora.R.drawable.ic_azucar
-            n.contains("canela") -> com.example.movilmanupuladora.R.drawable.ic_canela
-            n.contains("frijol") || n.contains("fríjol") || n.contains("lenteja") -> com.example.movilmanupuladora.R.drawable.frijoles
-            n.contains("huevo") -> com.example.movilmanupuladora.R.drawable.huevo_perico
-            n.contains("pollo") || n.contains("carne") || n.contains("chicharron") || n.contains("chicharrón") -> com.example.movilmanupuladora.R.drawable.apanado
-            n.contains("arroz") -> com.example.movilmanupuladora.R.drawable.arroz_de_leche
-            else -> com.example.movilmanupuladora.R.drawable.ic_plato_asignado
+        binding.barraNavegacion.navAsignadas.setOnClickListener {
+            // Ya estamos en Asignadas
+        }
+
+        binding.barraNavegacion.navInventario.setOnClickListener {
+
+            startActivity(
+                Intent(this, InventarioActivity::class.java)
+            )
+
+            finish()
+        }
+
+        binding.barraNavegacion.navAvisos.setOnClickListener {
+
+            startActivity(
+                Intent(this, AvisosActivity::class.java)
+            )
+
+            finish()
+        }
+
+        binding.barraNavegacion.navPerfil.setOnClickListener {
+
+            startActivity(
+                Intent(this, PerfilActivity::class.java)
+            )
+
+            finish()
         }
     }
 }

@@ -8,37 +8,52 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.movilmanupuladora.R
-import com.example.movilmanupuladora.MainActivity
+import com.example.movilmanupuladora.databinding.ActivityTurnoBinding
 
 class TurnoActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityTurnoBinding
 
     private val handler = Handler(Looper.getMainLooper())
 
     private val irSiguientePantalla = Runnable {
-        val intent = Intent(this, MainActivity::class.java)
+
+        val intent = Intent(
+            this,
+            MainActivity::class.java
+        )
+
         startActivity(intent)
         finish()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
 
-        setContentView(R.layout.activity_turno)
+        // =====================================================
+        // VIEW BINDING
+        // =====================================================
 
-        // ==========================================
+        binding = ActivityTurnoBinding.inflate(layoutInflater)
+
+        setContentView(binding.root)
+
+        // =====================================================
         // BARRAS DEL SISTEMA
-        // ==========================================
+        // =====================================================
 
         ViewCompat.setOnApplyWindowInsetsListener(
-            findViewById(R.id.main)
-        ) { v, insets ->
+            binding.main
+        ) { view, insets ->
 
             val systemBars =
-                insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                insets.getInsets(
+                    WindowInsetsCompat.Type.systemBars()
+                )
 
-            v.setPadding(
+            view.setPadding(
                 systemBars.left,
                 systemBars.top,
                 systemBars.right,
@@ -48,9 +63,9 @@ class TurnoActivity : AppCompatActivity() {
             insets
         }
 
-        // ==========================================
-        // ESPERAR 15 SEGUNDOS
-        // ==========================================
+        // =====================================================
+        // CONTINUAR AUTOMÁTICAMENTE
+        // =====================================================
 
         handler.postDelayed(
             irSiguientePantalla,
@@ -61,8 +76,10 @@ class TurnoActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
 
-        // Evita ejecutar el cambio si la pantalla
-        // se cierra antes de los 15 segundos
-        handler.removeCallbacks(irSiguientePantalla)
+        // Evita que la navegación se ejecute
+        // si la Activity se destruye antes.
+        handler.removeCallbacks(
+            irSiguientePantalla
+        )
     }
 }

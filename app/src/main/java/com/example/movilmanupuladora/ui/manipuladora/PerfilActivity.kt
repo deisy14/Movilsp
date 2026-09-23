@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.movilmanupuladora.R
-import com.example.movilmanupuladora.MainActivity
 import com.example.movilmanupuladora.ui.auth.LoginActivity
 
 class PerfilActivity : AppCompatActivity() {
@@ -42,7 +41,6 @@ class PerfilActivity : AppCompatActivity() {
             insets
         }
 
-
         // ==========================================
         // BOTONES DEL PERFIL
         // ==========================================
@@ -59,21 +57,16 @@ class PerfilActivity : AppCompatActivity() {
         val btnCerrarSesion =
             findViewById<Button>(R.id.btnCerrarSesion)
 
-
         // ==========================================
         // EDITAR PERFIL
         // ==========================================
 
         btnEditarPerfil.setOnClickListener {
 
-            val intent = Intent(
-                this,
-                btnEditarPerfil::class.java
+            startActivity(
+                Intent(this, EditarPerfilActivity::class.java)
             )
-
-            startActivity(intent)
         }
-
 
         // ==========================================
         // NOTIFICACIONES
@@ -81,14 +74,10 @@ class PerfilActivity : AppCompatActivity() {
 
         btnNotificaciones.setOnClickListener {
 
-            val intent = Intent(
-                this,
-                AvisosActivity::class.java
+            startActivity(
+                Intent(this, AvisosActivity::class.java)
             )
-
-            startActivity(intent)
         }
-
 
         // ==========================================
         // AYUDA Y SOPORTE
@@ -96,14 +85,10 @@ class PerfilActivity : AppCompatActivity() {
 
         btnAyuda.setOnClickListener {
 
-            val intent = Intent(
-                this,
-                btnAyuda::class.java
+            startActivity(
+                Intent(this, AyudaActivity::class.java)
             )
-
-            startActivity(intent)
         }
-
 
         // ==========================================
         // CERRAR SESIÓN
@@ -125,7 +110,6 @@ class PerfilActivity : AppCompatActivity() {
             finish()
         }
 
-
         // ==========================================
         // BARRA DE NAVEGACIÓN
         // ==========================================
@@ -145,22 +129,18 @@ class PerfilActivity : AppCompatActivity() {
         val navPerfil =
             findViewById<LinearLayout>(R.id.navPerfil)
 
-
         // ==========================================
         // INICIO
         // ==========================================
 
         navInicio.setOnClickListener {
 
-            val intent = Intent(
-                this,
-                MainActivity::class.java
+            startActivity(
+                Intent(this, MainActivity::class.java)
             )
 
-            startActivity(intent)
             finish()
         }
-
 
         // ==========================================
         // ASIGNADAS
@@ -168,15 +148,12 @@ class PerfilActivity : AppCompatActivity() {
 
         navAsignadas.setOnClickListener {
 
-            val intent = Intent(
-                this,
-                ComponentesActivity::class.java
+            startActivity(
+                Intent(this, ComponentesActivity::class.java)
             )
 
-            startActivity(intent)
             finish()
         }
-
 
         // ==========================================
         // INVENTARIO
@@ -184,15 +161,12 @@ class PerfilActivity : AppCompatActivity() {
 
         navInventario.setOnClickListener {
 
-            val intent = Intent(
-                this,
-                InventarioActivity::class.java
+            startActivity(
+                Intent(this, InventarioActivity::class.java)
             )
 
-            startActivity(intent)
             finish()
         }
-
 
         // ==========================================
         // AVISOS
@@ -200,15 +174,12 @@ class PerfilActivity : AppCompatActivity() {
 
         navAvisos.setOnClickListener {
 
-            val intent = Intent(
-                this,
-                AvisosActivity::class.java
+            startActivity(
+                Intent(this, AvisosActivity::class.java)
             )
 
-            startActivity(intent)
             finish()
         }
-
 
         // ==========================================
         // PERFIL
@@ -216,8 +187,8 @@ class PerfilActivity : AppCompatActivity() {
 
         navPerfil.setOnClickListener {
 
-            // Ya estamos en la pantalla de perfil.
-
+            // Ya estamos en Perfil.
         }
     }
 }
+

@@ -2,7 +2,6 @@ package com.example.movilmanupuladora.ui.manipuladora
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -11,7 +10,6 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.movilmanupuladora.MainActivity
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.model.pasos_preparacion
@@ -148,4 +146,4 @@ class PreparacionActivity : AppCompatActivity() {
             contenedor.addView(fila)
         }
     }
-}
+}
