@@ -13,6 +13,8 @@ class EditarPerfilActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityEditarPerfilBinding
 
+    private val sessionManager by lazy { com.example.movilmanupuladora.utils.SessionManager(this) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -26,59 +28,64 @@ class EditarPerfilActivity : AppCompatActivity() {
         // ==========================================
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-
-            val systemBars =
-                insets.getInsets(WindowInsetsCompat.Type.systemBars())
-
-            v.setPadding(
-                systemBars.left,
-                systemBars.top,
-                systemBars.right,
-                systemBars.bottom
-            )
-
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
         // ==========================================
-        // GUARDAR CAMBIOS
+        // CARGAR DATOS INSTITUCIONALES (SOLO LECTURA)
+        // ==========================================
+
+        val nombreGuardado = sessionManager.getUserName() ?: "Manipuladora PAE"
+        val correoGuardado = sessionManager.getUserEmail() ?: "manipuladora@sirae.gov.co"
+        val telefonoGuardado = sessionManager.getUserPhone() ?: "310 450 8920"
+        val cargoGuardado = sessionManager.getUserRole() ?: "Manipuladora de alimentos institucional"
+
+        binding.edtNombre.setText(nombreGuardado)
+        binding.edtCorreo.setText(correoGuardado)
+        binding.edtTelefono.setText(telefonoGuardado)
+
+        // Iniciales para el avatar
+        val iniciales = nombreGuardado.split(" ")
+            .filter { it.isNotEmpty() }
+            .take(2)
+            .joinToString("") { it.first().uppercase() }
+            .ifEmpty { "MP" }
+        binding.txtAvatar.text = iniciales
+
+        // ==========================================
+        // ACTUALIZAR CONTRASEÑA Y CONTACTO
         // ==========================================
 
         binding.btnGuardarCambios.setOnClickListener {
+            val passNueva = binding.edtPasswordNueva.text.toString().trim()
+            val passConfirmar = binding.edtPasswordConfirmar.text.toString().trim()
+            val telefono = binding.edtTelefono.text.toString().trim()
 
-            val nombre =
-                binding.edtNombre.text.toString().trim()
+            // Si ingresó contraseña nueva, validar coincidencia y longitud
+            if (passNueva.isNotEmpty() || passConfirmar.isNotEmpty()) {
+                if (passNueva.length < 6) {
+                    binding.edtPasswordNueva.error = "La contraseña debe tener al menos 6 caracteres"
+                    binding.edtPasswordNueva.requestFocus()
+                    return@setOnClickListener
+                }
 
-            val telefono =
-                binding.edtTelefono.text.toString().trim()
-
-            val correo =
-                binding.edtCorreo.text.toString().trim()
-
-            if (nombre.isEmpty()) {
-
-                binding.edtNombre.error =
-                    "Ingresa tu nombre"
-
-                binding.edtNombre.requestFocus()
-
-                return@setOnClickListener
+                if (passNueva != passConfirmar) {
+                    binding.edtPasswordConfirmar.error = "Las contraseñas no coinciden"
+                    binding.edtPasswordConfirmar.requestFocus()
+                    return@setOnClickListener
+                }
             }
 
-            if (correo.isEmpty()) {
-
-                binding.edtCorreo.error =
-                    "Ingresa tu correo"
-
-                binding.edtCorreo.requestFocus()
-
-                return@setOnClickListener
+            if (telefono.isNotEmpty()) {
+                sessionManager.saveUserPhone(telefono)
             }
 
             Toast.makeText(
                 this,
-                "Perfil actualizado correctamente",
-                Toast.LENGTH_SHORT
+                "✓ Contraseña y datos de contacto actualizados correctamente",
+                Toast.LENGTH_LONG
             ).show()
 
             finish()

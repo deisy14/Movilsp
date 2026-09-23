@@ -62,6 +62,21 @@ interface ApiService {
     @POST("inventario/")
     suspend fun crearInventario(@Body inventarioData: inventario): Response<inventario>
 
+    @retrofit2.http.PUT("inventario/{id}/")
+    suspend fun actualizarInventario(@Path("id") id: Int, @Body inventarioData: inventario): Response<inventario>
+
+    // Unidades de Medida
+    @GET("unidades_medida/")
+    suspend fun obtenerUnidadesMedida(): Response<List<com.example.movilmanupuladora.data.model.UnidadMedida>>
+
+    // Notificaciones / Avisos
+    @GET("notificaciones/")
+    suspend fun obtenerNotificaciones(): Response<List<com.example.movilmanupuladora.data.model.Notificacion>>
+
+    // Turnos
+    @GET("turnos/")
+    suspend fun obtenerTurnos(): Response<List<com.example.movilmanupuladora.data.model.Turno>>
+
     // Ingredientes
     @GET("ingredientes/")
     suspend fun obtenerIngredientes(): Response<List<Ingrediente>>

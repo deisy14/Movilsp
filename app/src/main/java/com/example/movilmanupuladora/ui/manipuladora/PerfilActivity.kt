@@ -14,6 +14,8 @@ import com.example.movilmanupuladora.ui.auth.LoginActivity
 
 class PerfilActivity : AppCompatActivity() {
 
+    private val sessionManager by lazy { com.example.movilmanupuladora.utils.SessionManager(this) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -40,6 +42,23 @@ class PerfilActivity : AppCompatActivity() {
 
             insets
         }
+
+        // ==========================================
+        // CARGAR DATOS DEL USUARIO LOGUEADO
+        // ==========================================
+
+        val nombre = sessionManager.getUserName() ?: "María José Rojas"
+        val cargo = sessionManager.getUserRole() ?: "Manipuladora · Turno mañana"
+
+        findViewById<android.widget.TextView>(R.id.txtNombreUsuario)?.text = nombre
+        findViewById<android.widget.TextView>(R.id.txtCargoUsuario)?.text = "$cargo · Sede Institucional"
+
+        val iniciales = nombre.split(" ")
+            .filter { it.isNotEmpty() }
+            .take(2)
+            .joinToString("") { it.first().uppercase() }
+            .ifEmpty { "MJ" }
+        findViewById<android.widget.TextView>(R.id.txtAvatar)?.text = iniciales
 
         // ==========================================
         // BOTONES DEL PERFIL
@@ -95,7 +114,7 @@ class PerfilActivity : AppCompatActivity() {
         // ==========================================
 
         btnCerrarSesion.setOnClickListener {
-
+            sessionManager.clearSession()
             val intent = Intent(
                 this,
                 LoginActivity::class.java

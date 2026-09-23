@@ -8,6 +8,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import com.example.movilmanupuladora.databinding.ActivityTurnoBinding
 
 class TurnoActivity : AppCompatActivity() {
@@ -64,13 +66,47 @@ class TurnoActivity : AppCompatActivity() {
         }
 
         // =====================================================
+        // CARGAR DATOS DEL TURNO DESDE EL BACKEND
+        // =====================================================
+
+        cargarTurno()
+
+        // Permitir tocar la tarjeta para continuar sin esperar
+        binding.cardTurno.setOnClickListener {
+            handler.removeCallbacks(irSiguientePantalla)
+            irSiguientePantalla.run()
+        }
+
+        // =====================================================
         // CONTINUAR AUTOMÁTICAMENTE
         // =====================================================
 
         handler.postDelayed(
             irSiguientePantalla,
-            15_000
+            8_000
         )
+    }
+
+    private fun cargarTurno() {
+        lifecycleScope.launch {
+            try {
+                val res = com.example.movilmanupuladora.data.api.RetrofitClient.apiService.obtenerTurnos()
+                if (res.isSuccessful && !res.body().isNullOrEmpty()) {
+                    val turno = res.body()!!.first()
+                    val nombre = turno.nombreTurno ?: "Mañana"
+                    val hInicio = turno.horaInicio ?: "6:00 a. m."
+                    val hFin = turno.horaFin ?: "2:00 p. m."
+                    binding.txtTituloTurno.text = "Turno $nombre"
+                    binding.txtMensajeTurno.text = "Horario asignado: $hInicio - $hFin · Ingresando..."
+                } else {
+                    binding.txtTituloTurno.text = "Turno Mañana"
+                    binding.txtMensajeTurno.text = "Horario asignado: 6:00 a. m. - 2:00 p. m. · Ingresando..."
+                }
+            } catch (e: Exception) {
+                binding.txtTituloTurno.text = "Turno Mañana"
+                binding.txtMensajeTurno.text = "Horario asignado: 6:00 a. m. - 2:00 p. m. · Ingresando..."
+            }
+        }
     }
 
     override fun onDestroy() {
