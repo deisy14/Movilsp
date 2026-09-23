@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.movilmanupuladora.R
-import com.example.movilmanupuladora.MainActivity
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

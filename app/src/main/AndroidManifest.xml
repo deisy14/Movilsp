@@ -31,7 +31,7 @@
 
         <!-- MainActivity (rueda de platos interactiva) -->
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.manipuladora.MainActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
@@ -80,6 +80,15 @@
             android:name=".ui.manipuladora.BarraNavegacionActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora.RegistrarEntradaActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.manipuladora.EditarPerfilActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.manipuladora.AyudaActivity"
+            android:exported="false" />
 
     </application>
 

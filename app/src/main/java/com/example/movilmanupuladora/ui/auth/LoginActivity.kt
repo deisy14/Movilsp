@@ -2,13 +2,16 @@ package com.example.movilmanupuladora.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.content.Context
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.movilmanupuladora.MainActivity
 import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.repository.UsuarioRepository
 import com.example.movilmanupuladora.databinding.ActivityLoginBinding
+import com.example.movilmanupuladora.ui.manipuladora.TurnoActivity
 import com.example.movilmanupuladora.utils.SessionManager
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -16,78 +19,283 @@ import org.json.JSONObject
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
-    private val usuarioRepository = UsuarioRepository(RetrofitClient.apiService)
+
+    private val usuarioRepository =
+        UsuarioRepository(RetrofitClient.apiService)
+
     private lateinit var sessionManager: SessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         sessionManager = SessionManager(this)
 
+        // =====================================================
+        // RECUPERAR TOKEN GUARDADO
+        // =====================================================
+
         sessionManager.fetchAuthToken()?.let { savedToken ->
             RetrofitClient.authToken = savedToken
         }
 
-        binding.btnIngresar.setOnClickListener {
-            val correo = binding.txtCorreo.text.toString().trim()
-            val password = binding.txtPassword.text.toString().trim()
+        // =====================================================
+        // BOTÓN INGRESAR
+        // =====================================================
 
-            if (correo.isNotEmpty() && password.isNotEmpty()) {
-                iniciarSesion(correo, password)
-            } else {
-                Toast.makeText(this, "Ingresa tus datos", Toast.LENGTH_SHORT).show()
+        binding.btnIngresar.setOnClickListener {
+
+            val correo = binding.txtCorreo.text
+                .toString()
+                .trim()
+
+            val password = binding.txtPassword.text
+                .toString()
+                .trim()
+
+            if (correo.isEmpty()) {
+                binding.txtCorreo.requestFocus()
+                binding.txtCorreo.error = "Ingresa tu correo"
+                return@setOnClickListener
+            }
+
+            if (password.isEmpty()) {
+                binding.txtPassword.requestFocus()
+                binding.txtPassword.error = "Ingresa tu contraseña"
+                return@setOnClickListener
+            }
+
+            ocultarTeclado()
+
+            iniciarSesion(correo, password)
+        }
+    }
+
+    // =========================================================
+    // LOGIN
+    // =========================================================
+
+    private fun iniciarSesion(
+        correo: String,
+        pass: String
+    ) {
+
+        mostrarCargando(true)
+
+        lifecycleScope.launch {
+
+            try {
+
+                val response = usuarioRepository.login(correo, pass)
+
+                if (response.isSuccessful && response.body() != null) {
+
+                    val loginRes = response.body()!!
+
+                    val token = loginRes.authToken
+
+                    if (token != null) {
+
+                        // =====================================
+                        // GUARDAR TOKEN
+                        // =====================================
+
+                        RetrofitClient.authToken = token
+
+                        sessionManager.saveAuthToken(token)
+
+                        // =====================================
+                        // GUARDAR DATOS DEL USUARIO
+                        // =====================================
+
+                        loginRes.usuario?.let { usuario ->
+
+                            sessionManager.saveUserData(
+                                usuario.nombre,
+                                usuario.rol
+                            )
+                        }
+
+                        // =====================================
+                        // MENSAJE
+                        // =====================================
+
+                        Toast.makeText(
+                            this@LoginActivity,
+                            "¡Bienvenido ${loginRes.usuario?.nombre ?: ""}!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        // =====================================
+                        // IR AL MAIN
+                        // =====================================
+
+                        startActivity(
+                            Intent(
+                                this@LoginActivity,
+                                TurnoActivity::class.java
+                            )
+                        )
+
+                        finish()
+
+                    } else {
+
+                        mostrarCargando(false)
+
+                        Toast.makeText(
+                            this@LoginActivity,
+                            "Error: Token no recibido",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+
+                } else {
+
+                    // =========================================
+                    // MODO DE PRUEBA LOCAL
+                    // =========================================
+
+                    if (
+                        correo == "manipuladora@gmail.com" &&
+                        pass == "123456789"
+                    ) {
+
+                        Toast.makeText(
+                            this@LoginActivity,
+                            "Inicio de sesión (Modo prueba)",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        startActivity(
+                            Intent(
+                                this@LoginActivity,
+                                TurnoActivity::class.java
+                            )
+                        )
+
+                        finish()
+
+                        return@launch
+                    }
+
+                    // =========================================
+                    // ERROR DEL BACKEND
+                    // =========================================
+
+                    mostrarCargando(false)
+
+                    val errorBody =
+                        response.errorBody()?.string()
+
+                    val msg = try {
+
+                        JSONObject(
+                            errorBody ?: ""
+                        ).optString(
+                            "detail",
+                            "Error de credenciales"
+                        )
+
+                    } catch (e: Exception) {
+
+                        "Error ${response.code()}"
+                    }
+
+                    Toast.makeText(
+                        this@LoginActivity,
+                        msg,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+            } catch (e: Exception) {
+
+                // =============================================
+                // MODO OFFLINE DE PRUEBA
+                // =============================================
+
+                if (
+                    correo == "manipuladora@gmail.com" &&
+                    pass == "123456789"
+                ) {
+
+                    Toast.makeText(
+                        this@LoginActivity,
+                        "Inicio de sesión (Modo offline)",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    startActivity(
+                        Intent(
+                            this@LoginActivity,
+                            TurnoActivity::class.java
+                        )
+                    )
+
+                    finish()
+
+                    return@launch
+                }
+
+                // =============================================
+                // ERROR DE RED
+                // =============================================
+
+                mostrarCargando(false)
+
+                Toast.makeText(
+                    this@LoginActivity,
+                    "Error de red: ${e.localizedMessage}",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }
 
-    private fun iniciarSesion(correo: String, pass: String) {
-        lifecycleScope.launch {
-            try {
-                val response = usuarioRepository.login(correo, pass)
+    // =========================================================
+    // ESTADO DEL BOTÓN
+    // =========================================================
 
-                if (response.isSuccessful && response.body() != null) {
-                    val loginRes = response.body()!!
-                    val token = loginRes.authToken
+    private fun mostrarCargando(cargando: Boolean) {
 
-                    if (token != null) {
-                        RetrofitClient.authToken = token
-                        sessionManager.saveAuthToken(token)
+        binding.btnIngresar.isEnabled = !cargando
 
-                        loginRes.usuario?.let {
-                            sessionManager.saveUserData(it.nombre, it.rol)
-                        }
+        if (cargando) {
 
-                        Toast.makeText(this@LoginActivity, "¡Bienvenido ${loginRes.usuario?.nombre ?: ""}!", Toast.LENGTH_SHORT).show()
-                        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                        finish()
-                    } else {
-                        Toast.makeText(this@LoginActivity, "Error: Token no recibido", Toast.LENGTH_SHORT).show()
-                    }
-                } else {
-                    // Respaldo de prueba local
-                    if (correo == "manipuladora@gmail.com" && pass == "123456789") {
-                        Toast.makeText(this@LoginActivity, "Inicio de sesión (Modo prueba)", Toast.LENGTH_SHORT).show()
-                        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                        finish()
-                        return@launch
-                    }
+            binding.btnIngresar.text = "Ingresando..."
 
-                    val errorBody = response.errorBody()?.string()
-                    val msg = try { JSONObject(errorBody ?: "").optString("detail", "Error de credenciales") }
-                    catch (e: Exception) { "Error ${response.code()}" }
-                    Toast.makeText(this@LoginActivity, msg, Toast.LENGTH_LONG).show()
-                }
-            } catch (e: Exception) {
-                if (correo == "manipuladora@gmail.com" && pass == "123456789") {
-                    Toast.makeText(this@LoginActivity, "Inicio de sesión (Modo offline)", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                    finish()
-                    return@launch
-                }
-                Toast.makeText(this@LoginActivity, "Error de red: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
-            }
+            binding.txtCorreo.isEnabled = false
+            binding.txtPassword.isEnabled = false
+            binding.txtOlvide.isEnabled = false
+            binding.txtAdministrador.isEnabled = false
+
+        } else {
+
+            binding.btnIngresar.text = "Ingresar"
+
+            binding.txtCorreo.isEnabled = true
+            binding.txtPassword.isEnabled = true
+            binding.txtOlvide.isEnabled = true
+            binding.txtAdministrador.isEnabled = true
         }
+    }
+
+    // =========================================================
+    // OCULTAR TECLADO
+    // =========================================================
+
+    private fun ocultarTeclado() {
+
+        val imm =
+            getSystemService(Context.INPUT_METHOD_SERVICE)
+                    as InputMethodManager
+
+        imm.hideSoftInputFromWindow(
+            binding.root.windowToken,
+            0
+        )
     }
 }
