@@ -158,53 +158,11 @@ class AvisosActivity : AppCompatActivity() {
     }
 
     private fun configurarBarraNavegacion() {
-        binding.barraNavegacion.navInicio.setOnClickListener {
-
-            startActivity(
-                Intent(this, MainActivity::class.java)
-            )
-
-            finish()
-        }
-
-
-        // ASIGNADAS
-        binding.barraNavegacion.navAsignadas.setOnClickListener {
-
-            startActivity(
-                Intent(this, ComponentesActivity::class.java)
-            )
-
-            finish()
-        }
-
-
-        // INVENTARIO
-        binding.barraNavegacion.navInventario.setOnClickListener {
-
-            startActivity(
-                Intent(this, InventarioActivity::class.java)
-            )
-
-            finish()
-        }
-
-
-        // AVISOS
-        binding.barraNavegacion.navAvisos.setOnClickListener {
-            // Ya estamos en Avisos.
-        }
-
-
-        // PERFIL
-        binding.barraNavegacion.navPerfil.setOnClickListener {
-
-            startActivity(
-                Intent(this, PerfilActivity::class.java)
-            )
-
-            finish()
-        }
+        com.example.movilmanupuladora.utils.NavigationHelper.setupBarraNavegacion(
+            this,
+            binding.barraNavegacion,
+            com.example.movilmanupuladora.utils.NavigationHelper.Tab.AVISOS
+        )
     }
 }
 

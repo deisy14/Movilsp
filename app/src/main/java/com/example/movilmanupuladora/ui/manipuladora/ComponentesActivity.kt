@@ -721,45 +721,10 @@ class ComponentesActivity : AppCompatActivity() {
     // ==========================================
 
     private fun configurarBarraNavegacion() {
-
-        binding.barraNavegacion.navInicio.setOnClickListener {
-
-            startActivity(
-                Intent(this, MainActivity::class.java)
-            )
-
-            finish()
-        }
-
-        binding.barraNavegacion.navAsignadas.setOnClickListener {
-            // Ya estamos en Asignadas
-        }
-
-        binding.barraNavegacion.navInventario.setOnClickListener {
-
-            startActivity(
-                Intent(this, InventarioActivity::class.java)
-            )
-
-            finish()
-        }
-
-        binding.barraNavegacion.navAvisos.setOnClickListener {
-
-            startActivity(
-                Intent(this, AvisosActivity::class.java)
-            )
-
-            finish()
-        }
-
-        binding.barraNavegacion.navPerfil.setOnClickListener {
-
-            startActivity(
-                Intent(this, PerfilActivity::class.java)
-            )
-
-            finish()
-        }
+        com.example.movilmanupuladora.utils.NavigationHelper.setupBarraNavegacion(
+            this,
+            binding.barraNavegacion,
+            com.example.movilmanupuladora.utils.NavigationHelper.Tab.ASIGNADAS
+        )
     }
 }

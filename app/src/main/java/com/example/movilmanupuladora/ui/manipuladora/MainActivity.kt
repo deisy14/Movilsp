@@ -103,43 +103,14 @@ class MainActivity : AppCompatActivity() {
         // ==========================================
         // BARRA DE NAVEGACIÓN
         // ==========================================
+        // BARRA DE NAVEGACIÓN
+        // ==========================================
 
-        // INICIO
-        binding.barraNavegacion.navInicio.setOnClickListener {
-            // Ya estamos en Inicio
-        }
-
-        // ASIGNADAS
-        binding.barraNavegacion.navAsignadas.setOnClickListener {
-
-            startActivity(
-                Intent(this, ComponentesActivity::class.java)
-            )
-        }
-
-        // INVENTARIO
-        binding.barraNavegacion.navInventario.setOnClickListener {
-
-            startActivity(
-                Intent(this, InventarioActivity::class.java)
-            )
-        }
-
-        // AVISOS
-        binding.barraNavegacion.navAvisos.setOnClickListener {
-
-            startActivity(
-                Intent(this, AvisosActivity::class.java)
-            )
-        }
-
-        // PERFIL
-        binding.barraNavegacion.navPerfil.setOnClickListener {
-
-            startActivity(
-                Intent(this, PerfilActivity::class.java)
-            )
-        }
+        com.example.movilmanupuladora.utils.NavigationHelper.setupBarraNavegacion(
+            this,
+            binding.barraNavegacion,
+            com.example.movilmanupuladora.utils.NavigationHelper.Tab.INICIO
+        )
     }
 
     /**
