@@ -45,7 +45,7 @@ class MenuDiaActivity : AppCompatActivity() {
 
         // Botón "Ver componentes" -> Navega a ComponentesActivity
         binding.btnVerComponentes.setOnClickListener {
-            val intent = Intent(this, ComponentesActivity::class.java)
+            val intent = Intent(this, AsignadasActivity::class.java)
             startActivity(intent)
         }
 
@@ -186,4 +186,4 @@ class MenuDiaActivity : AppCompatActivity() {
             }
         }
     }
-}
+}

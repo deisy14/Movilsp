@@ -23,7 +23,8 @@ class CircularWheelView @JvmOverloads constructor(
         val width = width.toFloat()
         val height = height.toFloat()
 
-        val radius = width.coerceAtMost(height) / 2f * 0.85f
+        val radius =
+            width.coerceAtMost(height) / 2f * 0.85f
 
         canvas.drawCircle(
             width / 2f,

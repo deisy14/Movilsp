@@ -63,7 +63,7 @@ class AvisosActivity : AppCompatActivity() {
         binding.barraNavegacion.navAsignadas.setOnClickListener {
 
             startActivity(
-                Intent(this, ComponentesActivity::class.java)
+                Intent(this, AsignadasActivity::class.java)
             )
 
             finish()
