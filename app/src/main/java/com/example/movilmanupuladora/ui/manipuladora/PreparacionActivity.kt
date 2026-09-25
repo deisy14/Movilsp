@@ -50,7 +50,7 @@ class PreparacionActivity : AppCompatActivity() {
             startActivity(Intent(this, MainActivity::class.java)); finish()
         }
         findViewById<LinearLayout>(R.id.navAsignadas)?.setOnClickListener {
-            startActivity(Intent(this, ComponentesActivity::class.java)); finish()
+            startActivity(Intent(this, AsignadasActivity::class.java)); finish()
         }
         findViewById<LinearLayout>(R.id.navInventario)?.setOnClickListener {
             startActivity(Intent(this, InventarioActivity::class.java)); finish()
