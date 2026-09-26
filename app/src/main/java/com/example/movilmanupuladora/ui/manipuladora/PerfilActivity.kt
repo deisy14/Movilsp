@@ -14,6 +14,8 @@ import com.example.movilmanupuladora.ui.auth.LoginActivity
 
 class PerfilActivity : AppCompatActivity() {
 
+    private val sessionManager by lazy { com.example.movilmanupuladora.utils.SessionManager(this) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -40,6 +42,23 @@ class PerfilActivity : AppCompatActivity() {
 
             insets
         }
+
+        // ==========================================
+        // CARGAR DATOS DEL USUARIO LOGUEADO
+        // ==========================================
+
+        val nombre = sessionManager.getUserName() ?: "María José Rojas"
+        val cargo = sessionManager.getUserRole() ?: "Manipuladora · Turno mañana"
+
+        findViewById<android.widget.TextView>(R.id.txtNombreUsuario)?.text = nombre
+        findViewById<android.widget.TextView>(R.id.txtCargoUsuario)?.text = "$cargo · Sede Institucional"
+
+        val iniciales = nombre.split(" ")
+            .filter { it.isNotEmpty() }
+            .take(2)
+            .joinToString("") { it.first().uppercase() }
+            .ifEmpty { "MJ" }
+        findViewById<android.widget.TextView>(R.id.txtAvatar)?.text = iniciales
 
         // ==========================================
         // BOTONES DEL PERFIL
@@ -95,7 +114,7 @@ class PerfilActivity : AppCompatActivity() {
         // ==========================================
 
         btnCerrarSesion.setOnClickListener {
-
+            sessionManager.clearSession()
             val intent = Intent(
                 this,
                 LoginActivity::class.java
@@ -114,80 +133,14 @@ class PerfilActivity : AppCompatActivity() {
         // BARRA DE NAVEGACIÓN
         // ==========================================
 
-        val navInicio =
-            findViewById<LinearLayout>(R.id.navInicio)
-
-        val navAsignadas =
-            findViewById<LinearLayout>(R.id.navAsignadas)
-
-        val navInventario =
-            findViewById<LinearLayout>(R.id.navInventario)
-
-        val navAvisos =
-            findViewById<LinearLayout>(R.id.navAvisos)
-
-        val navPerfil =
-            findViewById<LinearLayout>(R.id.navPerfil)
-
-        // ==========================================
-        // INICIO
-        // ==========================================
-
-        navInicio.setOnClickListener {
-
-            startActivity(
-                Intent(this, MainActivity::class.java)
+        val barraView = findViewById<android.view.View>(R.id.barraNavegacion)
+        if (barraView != null) {
+            val barraBinding = com.example.movilmanupuladora.databinding.ActivityBarraNavegacionBinding.bind(barraView)
+            com.example.movilmanupuladora.utils.NavigationHelper.setupBarraNavegacion(
+                this,
+                barraBinding,
+                com.example.movilmanupuladora.utils.NavigationHelper.Tab.PERFIL
             )
-
-            finish()
-        }
-
-        // ==========================================
-        // ASIGNADAS
-        // ==========================================
-
-        navAsignadas.setOnClickListener {
-
-            startActivity(
-                Intent(this, AsignadasActivity::class.java)
-            )
-
-            finish()
-        }
-
-        // ==========================================
-        // INVENTARIO
-        // ==========================================
-
-        navInventario.setOnClickListener {
-
-            startActivity(
-                Intent(this, InventarioActivity::class.java)
-            )
-
-            finish()
-        }
-
-        // ==========================================
-        // AVISOS
-        // ==========================================
-
-        navAvisos.setOnClickListener {
-
-            startActivity(
-                Intent(this, AvisosActivity::class.java)
-            )
-
-            finish()
-        }
-
-        // ==========================================
-        // PERFIL
-        // ==========================================
-
-        navPerfil.setOnClickListener {
-
-            // Ya estamos en Perfil.
         }
     }
 }

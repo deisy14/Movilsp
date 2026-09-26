@@ -101,6 +101,17 @@
             </LinearLayout>
 
 
+            <!-- NOTA INSTITUCIONAL -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_banner_aprobado"
+                android:padding="12dp"
+                android:text="🔒 Nombre, documento y correo son asignados por el Administrador del PAE y no pueden modificarse. Solo puedes actualizar tu contraseña de acceso y teléfono."
+                android:textColor="#176B35"
+                android:textSize="12sp" />
+
             <!-- ================================= -->
             <!-- NOMBRE -->
             <!-- ================================= -->
@@ -108,8 +119,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
-                android:text="Nombre completo"
+                android:layout_marginTop="18dp"
+                android:text="Nombre completo (Solo lectura)"
                 android:textColor="#3F3F3A"
                 android:textSize="14sp"
                 android:textStyle="bold"/>
@@ -120,14 +131,14 @@
                 android:layout_height="52dp"
                 android:layout_marginTop="7dp"
                 android:background="@drawable/bg_input"
+                android:enabled="false"
+                android:focusable="false"
                 android:hint="Nombre completo"
                 android:paddingStart="15dp"
                 android:paddingEnd="15dp"
                 android:singleLine="true"
-                android:text="María José Rojas"
-                android:textColor="#3F3F3A"
-                android:textColorHint="#999991"
-                android:textSize="15sp"/>
+                android:textColor="#77776F"
+                android:textSize="14sp"/>
 
 
             <!-- ================================= -->
@@ -137,8 +148,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                android:text="Correo electrónico"
+                android:layout_marginTop="16dp"
+                android:text="Correo institucional (Solo lectura)"
                 android:textColor="#3F3F3A"
                 android:textSize="14sp"
                 android:textStyle="bold"/>
@@ -149,15 +160,15 @@
                 android:layout_height="52dp"
                 android:layout_marginTop="7dp"
                 android:background="@drawable/bg_input"
-                android:hint="Correo electrónico"
+                android:enabled="false"
+                android:focusable="false"
+                android:hint="Correo institucional"
                 android:inputType="textEmailAddress"
                 android:paddingStart="15dp"
                 android:paddingEnd="15dp"
                 android:singleLine="true"
-                android:text="mariajose@sirae.com"
-                android:textColor="#3F3F3A"
-                android:textColorHint="#999991"
-                android:textSize="15sp"/>
+                android:textColor="#77776F"
+                android:textSize="14sp"/>
 
 
             <!-- ================================= -->
@@ -167,8 +178,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                android:text="Teléfono"
+                android:layout_marginTop="16dp"
+                android:text="Teléfono de contacto"
                 android:textColor="#3F3F3A"
                 android:textSize="14sp"
                 android:textStyle="bold"/>
@@ -191,28 +202,55 @@
 
 
             <!-- ================================= -->
-            <!-- CARGO -->
+            <!-- SECCIÓN: CAMBIAR CONTRASEÑA -->
             <!-- ================================= -->
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                android:text="Cargo"
+                android:layout_marginTop="20dp"
+                android:text="Nueva contraseña"
                 android:textColor="#3F3F3A"
                 android:textSize="14sp"
                 android:textStyle="bold"/>
 
-            <TextView
-                android:id="@+id/txtCargo"
+            <EditText
+                android:id="@+id/edtPasswordNueva"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:layout_marginTop="7dp"
                 android:background="@drawable/bg_input"
-                android:gravity="center_vertical"
+                android:hint="Ingresa la nueva contraseña"
+                android:inputType="textPassword"
                 android:paddingStart="15dp"
-                android:text="Auxiliar de cocina"
-                android:textColor="#77776F"
+                android:paddingEnd="15dp"
+                android:singleLine="true"
+                android:textColor="#3F3F3A"
+                android:textColorHint="#999991"
+                android:textSize="15sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="Confirmar nueva contraseña"
+                android:textColor="#3F3F3A"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+
+            <EditText
+                android:id="@+id/edtPasswordConfirmar"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="7dp"
+                android:background="@drawable/bg_input"
+                android:hint="Repite la nueva contraseña"
+                android:inputType="textPassword"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp"
+                android:singleLine="true"
+                android:textColor="#3F3F3A"
+                android:textColorHint="#999991"
                 android:textSize="15sp"/>
 
 
@@ -229,7 +267,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center"
-                android:text="Guardar cambios"
+                android:text="Actualizar contraseña"
                 android:textColor="#493C0B"
                 android:textSize="16sp"
                 android:textStyle="bold"/>

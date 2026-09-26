@@ -66,22 +66,26 @@
             <!-- TÍTULO -->
             <!-- ================================= -->
 
+            <!-- ================================= -->
+            <!-- TÍTULO -->
+            <!-- ================================= -->
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
-                android:text="Registrar entrada"
+                android:layout_marginTop="24dp"
+                android:text="Recepción de Insumos"
                 android:textColor="#3F3F3A"
-                android:textSize="27sp"
+                android:textSize="26sp"
                 android:textStyle="bold"/>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="Registra los ingredientes que ingresan al inventario."
+                android:text="Verifica y chulea el cargamento entregado por el supervisor cada 20 días."
                 android:textColor="#686862"
-                android:textSize="14sp"/>
+                android:textSize="13sp"/>
 
 
             <!-- ================================= -->
@@ -91,7 +95,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="20dp"
                 android:background="@drawable/bg_card"
                 android:orientation="vertical"
                 android:padding="18dp">
@@ -101,77 +105,95 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ingrediente"
+                    android:text="Insumo o ingrediente entregado"
                     android:textColor="#3F3F3A"
                     android:textSize="14sp"
                     android:textStyle="bold"/>
 
-                <EditText
-                    android:id="@+id/edtIngrediente"
+                <Spinner
+                    android:id="@+id/spnIngrediente"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/bg_busqueda"
-                    android:hint="Ej. Arroz"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp"
-                    android:singleLine="true"
-                    android:textColor="#3F3F3A"
-                    android:textColorHint="#96968F"
-                    android:textSize="15sp"/>
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp" />
 
-
-                <!-- CANTIDAD -->
-
+                <!-- INFORMACIÓN DE CANTIDAD ENVIADA -->
                 <TextView
+                    android:id="@+id/txtCantidadEsperada"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:text="Cantidad"
-                    android:textColor="#3F3F3A"
-                    android:textSize="14sp"
-                    android:textStyle="bold"/>
+                    android:layout_marginTop="12dp"
+                    android:text="📦 Cantidad programada: 50 lb"
+                    android:textColor="#176B35"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
 
-                <EditText
-                    android:id="@+id/edtCantidad"
+                <!-- CHULEAR: ¿LLEGÓ COMPLETO? -->
+                <CheckBox
+                    android:id="@+id/chkLlegoCompleto"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="8dp"
-                    android:background="@drawable/bg_busqueda"
-                    android:hint="Ej. 20"
-                    android:inputType="numberDecimal"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp"
-                    android:singleLine="true"
-                    android:textColor="#3F3F3A"
-                    android:textColorHint="#96968F"
-                    android:textSize="15sp"/>
-
-
-                <!-- UNIDAD -->
-
-                <TextView
-                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:text="Unidad de medida"
-                    android:textColor="#3F3F3A"
+                    android:layout_marginTop="14dp"
+                    android:checked="true"
+                    android:text="✓ Llegó completo tal cual lo enviado"
+                    android:textColor="#1D2939"
                     android:textSize="14sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
-                <EditText
-                    android:id="@+id/edtUnidad"
+                <!-- SECCIÓN FALTANTE (SI NO LLEGA COMPLETO) -->
+                <LinearLayout
+                    android:id="@+id/layoutAjusteFaltante"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="8dp"
-                    android:background="@drawable/bg_busqueda"
-                    android:hint="Ej. kg, litros, unidades"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp"
-                    android:singleLine="true"
-                    android:textColor="#3F3F3A"
-                    android:textColorHint="#96968F"
-                    android:textSize="15sp"/>
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Cantidad que realmente llegó"
+                        android:textColor="#B42318"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/edtCantidadReal"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_busqueda"
+                        android:hint="Ej. 45"
+                        android:inputType="numberDecimal"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:textColor="#3F3F3A"
+                        android:textSize="15sp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Reporte de faltante o novedad"
+                        android:textColor="#3F3F3A"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/edtNovedadFaltante"
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_busqueda"
+                        android:gravity="top|start"
+                        android:hint="Ej. Faltaron 5 libras por empaque roto en transporte"
+                        android:padding="12dp"
+                        android:textColor="#3F3F3A"
+                        android:textSize="13sp"/>
+
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -183,7 +205,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
+                android:layout_marginTop="16dp"
                 android:background="@drawable/bg_banner_aprobado"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
@@ -203,7 +225,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
-                    android:text="Verifica la cantidad antes de registrar la entrada."
+                    android:text="Al confirmar, se actualizará el stock verificado en el sistema PAE institucional."
                     android:textColor="#34443A"
                     android:textSize="12sp"/>
 
@@ -218,13 +240,14 @@
                 android:id="@+id/btnGuardarEntrada"
                 android:layout_width="match_parent"
                 android:layout_height="54dp"
-                android:layout_marginTop="22dp"
+                android:layout_marginTop="20dp"
                 android:backgroundTint="#FFD928"
-                android:text="Registrar entrada"
+                android:text="Confirmar recepción de insumos  ›"
                 android:textAllCaps="false"
-                android:textColor="#493C0B"
-                android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:textColor="#3D3A20"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:cornerRadius="14dp"/>
 
 
             <View

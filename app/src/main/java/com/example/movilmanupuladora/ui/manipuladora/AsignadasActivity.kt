@@ -223,25 +223,10 @@ class AsignadasActivity : AppCompatActivity() {
      * Navegación inferior.
      */
     private fun configurarNavegacion() {
-
-        binding.barraNavegacion.navAsignadas.setOnClickListener {
-            // Ya estamos en Asignadas
-        }
-
-        binding.barraNavegacion.navInicio.setOnClickListener {
-            finish()
-        }
-
-        binding.barraNavegacion.navInventario.setOnClickListener {
-            // Mantener navegación existente
-        }
-
-        binding.barraNavegacion.navAvisos.setOnClickListener {
-            // Mantener navegación existente
-        }
-
-        binding.barraNavegacion.navPerfil.setOnClickListener {
-            // Mantener navegación existente
-        }
+        com.example.movilmanupuladora.utils.NavigationHelper.setupBarraNavegacion(
+            this,
+            binding.barraNavegacion,
+            com.example.movilmanupuladora.utils.NavigationHelper.Tab.ASIGNADAS
+        )
     }
 }

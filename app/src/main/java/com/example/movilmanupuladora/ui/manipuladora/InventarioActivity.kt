@@ -42,6 +42,12 @@ class InventarioActivity : AppCompatActivity() {
         binding = ActivityInventarioBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
         // ==========================================
         // SESIÓN / TOKEN
         // ==========================================
@@ -363,51 +369,11 @@ class InventarioActivity : AppCompatActivity() {
     // =========================================================
 
     private fun configurarBarraNavegacion() {
-
-        // INICIO
-        binding.barraNavegacion.navInicio.setOnClickListener {
-
-            startActivity(
-                Intent(this, MainActivity::class.java)
-            )
-
-            finish()
-        }
-
-        // ASIGNADAS
-        binding.barraNavegacion.navAsignadas.setOnClickListener {
-
-            startActivity(
-                Intent(this, AsignadasActivity::class.java)
-            )
-
-            finish()
-        }
-
-        // INVENTARIO
-        binding.barraNavegacion.navInventario.setOnClickListener {
-            // Ya estamos aquí
-        }
-
-        // AVISOS
-        binding.barraNavegacion.navAvisos.setOnClickListener {
-
-            startActivity(
-                Intent(this, AvisosActivity::class.java)
-            )
-
-            finish()
-        }
-
-        // PERFIL
-        binding.barraNavegacion.navPerfil.setOnClickListener {
-
-            startActivity(
-                Intent(this, PerfilActivity::class.java)
-            )
-
-            finish()
-        }
+        com.example.movilmanupuladora.utils.NavigationHelper.setupBarraNavegacion(
+            this,
+            binding.barraNavegacion,
+            com.example.movilmanupuladora.utils.NavigationHelper.Tab.INVENTARIO
+        )
     }
 }
 

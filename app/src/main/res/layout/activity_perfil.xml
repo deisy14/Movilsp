@@ -141,35 +141,6 @@
             <!-- INFORMACIÓN DEL TURNO -->
             <!-- ================================= -->
 
-            <LinearLayout
-                android:id="@+id/cardTurnoActual"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"
-                android:background="@drawable/bg_card"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:id="@+id/txtEtiquetaTurno"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Turno actual"
-                    android:textColor="#96968F"
-                    android:textSize="13sp"/>
-
-                <TextView
-                    android:id="@+id/txtHorarioTurno"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:text="Mañana · 6:00 a. m. - 2:00 p. m."
-                    android:textColor="#3F3F3A"
-                    android:textSize="15sp"
-                    android:textStyle="bold"/>
-
-            </LinearLayout>
-
 
             <!-- ================================= -->
             <!-- OPCIONES -->
@@ -281,6 +252,35 @@
             <!-- ================================= -->
             <!-- AYUDA -->
             <!-- ================================= -->
+
+            <LinearLayout
+                android:id="@+id/cardTurnoActual"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:background="@drawable/bg_card"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/txtEtiquetaTurno"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Turno actual"
+                    android:textColor="#96968F"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/txtHorarioTurno"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="Mañana · 6:00 a. m. - 2:00 p. m."
+                    android:textColor="#3F3F3A"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/btnAyuda"

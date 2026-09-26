@@ -13,6 +13,9 @@ class SessionManager(context: Context) {
         private const val KEY_USER_NAME = "user_name"
         private const val KEY_USER_ROLE = "user_role"
 
+        private const val KEY_USER_EMAIL = "user_email"
+        private const val KEY_USER_PHONE = "user_phone"
+
         var currentToken: String?
             get() = RetrofitClient.authToken
             set(value) {
@@ -51,13 +54,20 @@ class SessionManager(context: Context) {
     }
 
     /**
-     * Guarda el nombre y el rol del usuario autenticado
+     * Guarda el nombre, correo y rol del usuario autenticado
      */
-    fun saveUserData(name: String, role: String?) {
+    fun saveUserData(name: String, role: String?, email: String? = null) {
         val editor = prefs.edit()
         editor.putString(KEY_USER_NAME, name)
-        editor.putString(KEY_USER_ROLE, role ?: "Sin Rol")
+        editor.putString(KEY_USER_ROLE, role ?: "Manipuladora PAE")
+        if (!email.isNullOrEmpty()) {
+            editor.putString(KEY_USER_EMAIL, email)
+        }
         editor.apply()
+    }
+
+    fun saveUserPhone(phone: String) {
+        prefs.edit().putString(KEY_USER_PHONE, phone).apply()
     }
 
     /**
@@ -77,4 +87,6 @@ class SessionManager(context: Context) {
 
     fun getUserName(): String? = prefs.getString(KEY_USER_NAME, null)
     fun getUserRole(): String? = prefs.getString(KEY_USER_ROLE, null)
+    fun getUserEmail(): String? = prefs.getString(KEY_USER_EMAIL, null)
+    fun getUserPhone(): String? = prefs.getString(KEY_USER_PHONE, null)
 }

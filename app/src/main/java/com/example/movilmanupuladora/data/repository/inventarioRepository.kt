@@ -17,4 +17,8 @@ class InventarioRepository(private val apiService: ApiService) {
     suspend fun obtenerIngredientes(): Response<List<Ingrediente>> {
         return apiService.obtenerIngredientes()
     }
+
+    suspend fun actualizarInventario(id: Int, inventarioData: inventario): Response<inventario> {
+        return apiService.actualizarInventario(id, inventarioData)
+    }
 }
