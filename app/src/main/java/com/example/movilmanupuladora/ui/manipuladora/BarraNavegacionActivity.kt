@@ -55,7 +55,7 @@ class BarraNavegacionActivity : AppCompatActivity() {
 
         binding.navAsignadas.setOnClickListener {
             startActivity(
-                Intent(this, ComponentesActivity::class.java)
+                Intent(this, AsignadasActivity::class.java)
             )
             finish()
         }

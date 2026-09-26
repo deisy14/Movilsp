@@ -233,4 +233,4 @@ class RegistrarEntradaActivity : AppCompatActivity() {
             com.example.movilmanupuladora.utils.NavigationHelper.Tab.INVENTARIO
         )
     }
-}
+}

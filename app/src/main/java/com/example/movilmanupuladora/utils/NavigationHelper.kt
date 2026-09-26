@@ -6,8 +6,8 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
 import com.example.movilmanupuladora.databinding.ActivityBarraNavegacionBinding
+import com.example.movilmanupuladora.ui.manipuladora.AsignadasActivity
 import com.example.movilmanupuladora.ui.manipuladora.AvisosActivity
-import com.example.movilmanupuladora.ui.manipuladora.ComponentesActivity
 import com.example.movilmanupuladora.ui.manipuladora.InventarioActivity
 import com.example.movilmanupuladora.ui.manipuladora.MainActivity
 import com.example.movilmanupuladora.ui.manipuladora.PerfilActivity
@@ -95,7 +95,7 @@ object NavigationHelper {
 
         binding.navAsignadas.setOnClickListener {
             if (tabActual != Tab.ASIGNADAS) {
-                val intent = Intent(activity, ComponentesActivity::class.java)
+                val intent = Intent(activity, AsignadasActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
                 activity.finish()
