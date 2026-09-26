@@ -103,8 +103,6 @@ class MainActivity : AppCompatActivity() {
         // ==========================================
         // BARRA DE NAVEGACIÓN
         // ==========================================
-        // BARRA DE NAVEGACIÓN
-        // ==========================================
 
         com.example.movilmanupuladora.utils.NavigationHelper.setupBarraNavegacion(
             this,
