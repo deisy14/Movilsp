@@ -10,6 +10,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.example.movilmanupuladora.data.api.RetrofitClient
+import com.example.movilmanupuladora.data.repository.MenuRepository
+import kotlinx.coroutines.launch
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -33,6 +37,9 @@ class CalendarioMenuActivity : AppCompatActivity() {
     // =========================================================
 
     private var diaSeleccionado: Calendar? = null
+
+    private val menuRepository = MenuRepository(RetrofitClient.apiService)
+    private val listaMenus = mutableListOf<com.example.movilmanupuladora.data.model.menus>()
 
 
     // =========================================================
@@ -70,6 +77,7 @@ class CalendarioMenuActivity : AppCompatActivity() {
         configurarNavegacionInferior()
 
         mostrarMesActual()
+        cargarMenusDelBackend()
     }
 
 
@@ -413,36 +421,32 @@ class CalendarioMenuActivity : AppCompatActivity() {
 
     private fun mostrarInformacionDia() {
 
-        val fecha =
-            diaSeleccionado ?: return
+        val fecha = diaSeleccionado ?: return
 
-        val formato =
-            SimpleDateFormat(
-                "EEEE, dd 'de' MMMM 'de' yyyy",
-                Locale("es", "ES")
-            )
+        val formato = SimpleDateFormat(
+            "EEEE, dd 'de' MMMM 'de' yyyy",
+            Locale("es", "ES")
+        )
+        val formatoIso = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val fechaIso = formatoIso.format(fecha.time)
 
-        val textoFecha =
-            formato.format(fecha.time)
-                .replaceFirstChar {
-                    it.uppercase()
-                }
+        val textoFecha = formato.format(fecha.time).replaceFirstChar { it.uppercase() }
 
-        binding.txtTituloDia.text =
-            textoFecha
+        binding.txtTituloDia.text = textoFecha
+        binding.txtFechaSeleccionada.text = textoFecha
 
-        binding.txtFechaSeleccionada.text =
-            textoFecha
+        val menuDia = listaMenus.find { it.fecha == fechaIso }
+        if (menuDia != null) {
+            val infoNutricional = menuDia.informacion_nutricional ?: "Estándar PAE"
+            val ninos = menuDia.ninos_presentes ?: 0
+            val estado = menuDia.estado ?: "Planificado"
 
-        // -----------------------------------------------------
-        // POR AHORA SE MUESTRA EL ESTADO GUARDADO LOCALMENTE
-        // -----------------------------------------------------
-
-        binding.txtPlatoManana.text =
-            "Mañana: Sin plato programado"
-
-        binding.txtPlatoTarde.text =
-            "Tarde: Sin plato programado"
+            binding.txtPlatoManana.text = "Mañana: Menú #${menuDia.id_menu} ($estado)"
+            binding.txtPlatoTarde.text = "Información: $infoNutricional ($ninos niños)"
+        } else {
+            binding.txtPlatoManana.text = "Mañana: Sin menú programado en el servidor"
+            binding.txtPlatoTarde.text = "Tarde: Sin menú programado en el servidor"
+        }
     }
 
 
@@ -612,5 +616,25 @@ class CalendarioMenuActivity : AppCompatActivity() {
             binding.dia41,
             binding.dia42
         )
+    }
+
+    // =========================================================
+    // CARGAR MENÚS DEL BACKEND
+    // =========================================================
+
+    private fun cargarMenusDelBackend() {
+        lifecycleScope.launch {
+            try {
+                val res = menuRepository.obtenerMenus()
+                if (res.isSuccessful && !res.body().isNullOrEmpty()) {
+                    listaMenus.clear()
+                    listaMenus.addAll(res.body()!!)
+                    actualizarSeleccionVisual()
+                    mostrarInformacionDia()
+                }
+            } catch (e: Exception) {
+                // Modo offline si falla la conexión
+            }
+        }
     }
 }

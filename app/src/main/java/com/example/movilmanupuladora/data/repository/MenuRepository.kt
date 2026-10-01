@@ -34,4 +34,8 @@ class MenuRepository(private val apiService: ApiService) {
     suspend fun obtenerDetallePlatoPorId(id: Int): Response<DetallePlato> {
         return apiService.obtenerDetallePlatoPorId(id)
     }
+
+    suspend fun obtenerMenus(): Response<List<com.example.movilmanupuladora.data.model.menus>> {
+        return apiService.obtenerMenus()
+    }
 }

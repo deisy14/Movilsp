@@ -95,4 +95,15 @@ class SessionManager(context: Context) {
     fun getUserRole(): String? = prefs.getString(KEY_USER_ROLE, null)
     fun getUserEmail(): String? = prefs.getString(KEY_USER_EMAIL, null)
     fun getUserPhone(): String? = prefs.getString(KEY_USER_PHONE, null)
+
+    fun savePlatoSeleccionado(nombre: String, id: Int? = null) {
+        val editor = prefs.edit().putString("plato_seleccionado_nombre", nombre)
+        if (id != null) {
+            editor.putInt("plato_seleccionado_id", id)
+        }
+        editor.apply()
+    }
+
+    fun getPlatoSeleccionadoNombre(): String = prefs.getString("plato_seleccionado_nombre", "Arroz con pollo") ?: "Arroz con pollo"
+    fun getPlatoSeleccionadoId(): Int = prefs.getInt("plato_seleccionado_id", -1)
 }
