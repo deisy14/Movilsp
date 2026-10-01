@@ -1,7 +1,8 @@
-package com.example.manipuladorajefe
+package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
+import com.example.movilmanupuladora.R
 
 fun AppCompatActivity.configurarNavegacionInferior() {
     findViewById<android.view.View>(R.id.navInicio)?.setOnClickListener {

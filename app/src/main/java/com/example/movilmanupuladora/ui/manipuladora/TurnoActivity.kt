@@ -83,7 +83,7 @@ class TurnoActivity : AppCompatActivity() {
 
         handler.postDelayed(
             irSiguientePantalla,
-            8_000
+            2_500
         )
     }
 

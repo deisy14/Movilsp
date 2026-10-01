@@ -1,4 +1,4 @@
-package com.example.manipuladorajefe
+package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
 import android.app.AlertDialog
 import android.content.res.ColorStateList
@@ -13,7 +13,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.manipuladorajefe.databinding.ActivityAsistenciaJefaBinding
+import com.example.manipuladorajefe.AsistenciaManager
+import com.example.movilmanupuladora.databinding.ActivityAsistenciaJefaBinding
+import com.example.movilmanupuladora.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

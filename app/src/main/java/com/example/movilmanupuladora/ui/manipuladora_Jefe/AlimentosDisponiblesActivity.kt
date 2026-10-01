@@ -8,7 +8,8 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.manipuladorajefe.databinding.ActivityAlimentosDisponiblesBinding
+import com.example.movilmanupuladora.databinding.ActivityAlimentosDisponiblesBinding
+import com.example.movilmanupuladora.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

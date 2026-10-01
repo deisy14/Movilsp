@@ -46,20 +46,14 @@ class PreparacionActivity : AppCompatActivity() {
         }
 
         // Barra de navegación
-        findViewById<LinearLayout>(R.id.navInicio)?.setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java)); finish()
-        }
-        findViewById<LinearLayout>(R.id.navAsignadas)?.setOnClickListener {
-            startActivity(Intent(this, AsignadasActivity::class.java)); finish()
-        }
-        findViewById<LinearLayout>(R.id.navInventario)?.setOnClickListener {
-            startActivity(Intent(this, InventarioActivity::class.java)); finish()
-        }
-        findViewById<LinearLayout>(R.id.navAvisos)?.setOnClickListener {
-            startActivity(Intent(this, AvisosActivity::class.java)); finish()
-        }
-        findViewById<LinearLayout>(R.id.navPerfil)?.setOnClickListener {
-            startActivity(Intent(this, PerfilActivity::class.java)); finish()
+        val barraView = findViewById<android.view.View>(R.id.barraNavegacion)
+        if (barraView != null) {
+            val barraBinding = com.example.movilmanupuladora.databinding.ActivityBarraNavegacionBinding.bind(barraView)
+            com.example.movilmanupuladora.utils.NavigationHelper.setupBarraNavegacion(
+                this,
+                barraBinding,
+                com.example.movilmanupuladora.utils.NavigationHelper.Tab.ASIGNADAS
+            )
         }
 
         // Mostrar nombre e imagen del plato si viene del intent

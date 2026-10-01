@@ -5,7 +5,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.manipuladorajefe.databinding.ActivityDetallePreparacionBinding
+import com.example.movilmanupuladora.databinding.ActivityDetallePreparacionBinding
+import com.example.movilmanupuladora.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
