@@ -1,24 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4B41F"
+    android:background="#F6F6EF"
     tools:context=".ui.manipuladora.AsignadasActivity">
 
-    <!-- ===================================================== -->
-    <!-- ENCABEZADO                                             -->
-    <!-- ===================================================== -->
-
+    <!-- ENCABEZADO -->
     <LinearLayout
         android:id="@+id/layoutHeaderAsignadas"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="52dp"
+        android:layout_marginTop="48dp"
         android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -27,9 +23,9 @@
             android:id="@+id/tvTituloAsignadas"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ASIGNADAS"
+            android:text="MIS TAREAS ASIGNADAS"
             android:textColor="#111111"
-            android:textSize="23sp"
+            android:textSize="22sp"
             android:textStyle="bold" />
 
         <TextView
@@ -37,653 +33,534 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
-            android:text="LUNES / 7 / JUN / 2026"
+            android:text="JUEVES / 1 / OCT / 2026"
             android:textColor="#222222"
-            android:textSize="13sp" />
+            android:textSize="12sp" />
 
     </LinearLayout>
 
-
-    <!-- ===================================================== -->
-    <!-- CONTENEDOR BLANCO                                     -->
-    <!-- ===================================================== -->
-
+    <!-- CONTENEDOR BLANCO -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/contenedorAsignadas"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="18dp"
         android:background="@drawable/fondo_blanco_superior"
-        android:clipToPadding="false"
-        android:paddingStart="18dp"
-        android:paddingTop="22dp"
-        android:paddingEnd="18dp"
-        android:paddingBottom="100dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:paddingStart="16dp"
+        android:paddingTop="20dp"
+        android:paddingEnd="16dp"
+        app:layout_constraintBottom_toTopOf="@id/barra_navegacion"
         app:layout_constraintTop_toBottomOf="@id/layoutHeaderAsignadas">
-
-
-        <!-- ================================================= -->
-        <!-- TITULO                                             -->
-        <!-- ================================================= -->
-
-        <TextView
-            android:id="@+id/tvSubtituloAsignadas"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Manipuladoras asignadas"
-            android:textColor="#111111"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-
-        <TextView
-            android:id="@+id/tvInfoAsignadas"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
-            android:text="Selecciona una manipuladora para ver su asignación."
-            android:textColor="#667085"
-            android:textSize="11sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvSubtituloAsignadas" />
-
-
-        <!-- ================================================= -->
-        <!-- SCROLL DE MANIPULADORAS                            -->
-        <!-- ================================================= -->
 
         <ScrollView
             android:id="@+id/scrollAsignadas"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:fillViewport="true"
             android:overScrollMode="never"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvInfoAsignadas">
+            android:scrollbars="none">
 
             <LinearLayout
-                android:id="@+id/contenedorManipuladoras"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingBottom="24dp">
 
-
-                <!-- ================================================= -->
-                <!-- FILA 1                                             -->
-                <!-- ================================================= -->
-
-                <LinearLayout
+                <!-- TARJETA PLATO ASIGNADO DEL DÍA -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardMiPlatoAsignado"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:strokeColor="#E7B84A"
+                    app:strokeWidth="2dp">
 
-                    <!-- SOFIA -->
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardManipuladora1"
-                        android:layout_width="0dp"
-                        android:layout_height="230dp"
-                        android:layout_margin="5dp"
-                        android:layout_weight="1"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground"
-                        app:cardBackgroundColor="#FFFFFF"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="3dp"
-                        app:strokeColor="#E7B84A"
-                        app:strokeWidth="2dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical"
-                            android:padding="10dp">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="100dp"
-                                android:layout_height="100dp"
-                                app:cardBackgroundColor="#FFFFFF"
-                                app:cardCornerRadius="50dp"
-                                app:cardElevation="3dp"
-                                app:strokeColor="#E7B84A"
-                                app:strokeWidth="2dp">
-
-                                <ImageView
-                                    android:id="@+id/imgManipuladora1"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:contentDescription="Foto de Sofía"
-                                    android:scaleType="centerCrop"
-                                    android:src="@drawable/ic_person" />
-
-                            </com.google.android.material.card.MaterialCardView>
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
 
                             <TextView
-                                android:id="@+id/tvNombreManipuladora1"
-                                android:layout_width="wrap_content"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="Manipuladora: Sofía"
-                                android:textColor="#111111"
-                                android:textSize="13sp"
+                                android:layout_weight="1"
+                                android:text="PREPARACIÓN ASIGNADA HOY"
+                                android:textColor="#596B35"
+                                android:textSize="11sp"
                                 android:textStyle="bold" />
 
                             <TextView
-                                android:id="@+id/tvPlatoManipuladora1"
+                                android:id="@+id/badgeEstadoTurno"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp"
-                                android:background="#596B35"
+                                android:background="@drawable/bg_badge_asignado"
                                 android:paddingStart="10dp"
                                 android:paddingTop="4dp"
                                 android:paddingEnd="10dp"
                                 android:paddingBottom="4dp"
-                                android:text="Ensaladas"
-                                android:textColor="#FFFFFF"
+                                android:text="Ingredientes Listos"
+                                android:textColor="#111111"
                                 android:textSize="10sp"
                                 android:textStyle="bold" />
 
-                            <TextView
-                                android:id="@+id/tvEstadoManipuladora1"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="Preferencia del cliente"
-                                android:textColor="#333333"
-                                android:textSize="10sp" />
-
-                            <ProgressBar
-                                android:id="@+id/progresoManipuladora1"
-                                style="?android:attr/progressBarStyleHorizontal"
-                                android:layout_width="match_parent"
-                                android:layout_height="6dp"
-                                android:layout_marginTop="6dp"
-                                android:max="100"
-                                android:progress="65" />
-
                         </LinearLayout>
-
-                    </com.google.android.material.card.MaterialCardView>
-
-
-                    <!-- DIEGO -->
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardManipuladora2"
-                        android:layout_width="0dp"
-                        android:layout_height="230dp"
-                        android:layout_margin="5dp"
-                        android:layout_weight="1"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground"
-                        app:cardBackgroundColor="#FFFFFF"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="3dp"
-                        app:strokeColor="#E7B84A"
-                        app:strokeWidth="2dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical"
-                            android:padding="10dp">
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
 
                             <com.google.android.material.card.MaterialCardView
-                                android:layout_width="100dp"
-                                android:layout_height="100dp"
-                                app:cardBackgroundColor="#FFFFFF"
-                                app:cardCornerRadius="50dp"
-                                app:cardElevation="3dp"
+                                android:layout_width="72dp"
+                                android:layout_height="72dp"
+                                app:cardCornerRadius="36dp"
+                                app:cardElevation="2dp"
                                 app:strokeColor="#E7B84A"
-                                app:strokeWidth="2dp">
+                                app:strokeWidth="1.5dp">
 
                                 <ImageView
-                                    android:id="@+id/imgManipuladora2"
+                                    android:id="@+id/imgMiPlato"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:contentDescription="Foto de Diego"
+                                    android:contentDescription="Plato Asignado"
                                     android:scaleType="centerCrop"
-                                    android:src="@drawable/ic_person" />
+                                    android:src="@drawable/pollo_guisado" />
 
                             </com.google.android.material.card.MaterialCardView>
 
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="14dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tvNombreMiPlato"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Pollo Guisado Criollo"
+                                    android:textColor="#111111"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvDetalleMiPlato"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:text="Turno Mañana • 50 Raciones PAE"
+                                    android:textColor="#667085"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:id="@+id/tvComponenteMiPlato"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Componente: Proteína + Guiso"
+                                    android:textColor="#596B35"
+                                    android:textSize="11sp"
+                                    android:textStyle="bold" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <!-- ACCIONES RÁPIDAS DE PREPARACIÓN -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:orientation="horizontal">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnVerInsumos"
+                                style="@style/Widget.Material3.Button.OutlinedButton"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="6dp"
+                                android:layout_weight="1"
+                                android:text="Ver Insumos"
+                                android:textColor="#111111"
+                                android:textSize="11sp"
+                                app:strokeColor="#E7B84A" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnIniciarPreparacionTask"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:layout_weight="1"
+                                android:backgroundTint="#F4B41F"
+                                android:text="Preparar"
+                                android:textColor="#111111"
+                                android:textSize="11sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- BOTÓN / ACCESO AL EQUIPO DE TRABAJO -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardVerEquipo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardBackgroundColor="#F8FAFC"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="1dp"
+                    app:strokeColor="#CBD5E1"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="12dp">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/ic_people"
+                            app:tint="#D4A017"
+                            android:contentDescription="Icono equipo" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
                             <TextView
-                                android:id="@+id/tvNombreManipuladora2"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="Manipularora: Daniela"
-                                android:textColor="#111111"
+                                android:text="Equipo de Cocina y Operarias"
+                                android:textColor="#1E293B"
                                 android:textSize="13sp"
                                 android:textStyle="bold" />
 
                             <TextView
-                                android:id="@+id/tvPlatoManipuladora2"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp"
-                                android:background="#B7DDE5"
-                                android:paddingStart="10dp"
-                                android:paddingTop="4dp"
-                                android:paddingEnd="10dp"
-                                android:paddingBottom="4dp"
-                                android:text="Ceviche"
-                                android:textColor="#111111"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/tvEstadoManipuladora2"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="Ingredientes listos"
-                                android:textColor="#333333"
-                                android:textSize="10sp" />
-
-                            <ProgressBar
-                                android:id="@+id/progresoManipuladora2"
-                                style="?android:attr/progressBarStyleHorizontal"
-                                android:layout_width="match_parent"
-                                android:layout_height="6dp"
-                                android:layout_marginTop="6dp"
-                                android:max="100"
-                                android:progress="80" />
+                                android:text="Ver compañeras asignadas al turno de hoy"
+                                android:textColor="#64748B"
+                                android:textSize="11sp" />
 
                         </LinearLayout>
 
-                    </com.google.android.material.card.MaterialCardView>
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_arrow_forward"
+                            app:tint="#64748B"
+                            android:contentDescription="Flecha ver mas" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- LISTA DE CHECKLIST DE TAREAS -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="Checklist de Tareas del Turno"
+                    android:textColor="#111111"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Sigue las pautas de inocuidad y control del programa escolar PAE."
+                    android:textColor="#667085"
+                    android:textSize="11sp" />
+
+                <!-- SECCIÓN EQUIPO CONTENEDOR (OCULTO/MOSTRABLE) -->
+                <LinearLayout
+                    android:id="@+id/layoutEquipoOperarias"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Compañeras del Turno:"
+                        android:textColor="#596B35"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <!-- LISTA HORIZONTAL O CARDS DE OPERARIAS -->
+                    <LinearLayout
+                        android:id="@+id/contenedorListaOperarias"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:orientation="vertical" />
 
                 </LinearLayout>
 
-
-                <!-- ================================================= -->
-                <!-- FILA 2                                             -->
-                <!-- ================================================= -->
-
-                <LinearLayout
+                <!-- TAREA 1 -->
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_marginTop="12dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="#E2E8F0"
+                    app:strokeWidth="1dp">
 
-                    <!-- ELENA -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="12dp">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardManipuladora3"
-                        android:layout_width="0dp"
-                        android:layout_height="230dp"
-                        android:layout_margin="5dp"
-                        android:layout_weight="1"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground"
-                        app:cardBackgroundColor="#FFFFFF"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="3dp"
-                        app:strokeColor="#E7B84A"
-                        app:strokeWidth="2dp">
+                        <CheckBox
+                            android:id="@+id/chkTarea1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true" />
 
                         <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical"
-                            android:padding="10dp">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="100dp"
-                                android:layout_height="100dp"
-                                app:cardCornerRadius="50dp"
-                                app:strokeColor="#E7B84A"
-                                app:strokeWidth="2dp">
-
-                                <ImageView
-                                    android:id="@+id/imgManipuladora3"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:contentDescription="Foto de Elena"
-                                    android:scaleType="centerCrop"
-                                    android:src="@drawable/ic_person" />
-
-                            </com.google.android.material.card.MaterialCardView>
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
                             <TextView
-                                android:id="@+id/tvNombreManipuladora3"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="Manupuladora: Elena"
-                                android:textColor="#111111"
+                                android:text="Recepción y pesado de insumos"
+                                android:textColor="#1E293B"
                                 android:textSize="13sp"
                                 android:textStyle="bold" />
 
                             <TextView
-                                android:id="@+id/tvPlatoManipuladora3"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp"
-                                android:background="#F6D5C5"
-                                android:paddingStart="10dp"
-                                android:paddingTop="4dp"
-                                android:paddingEnd="10dp"
-                                android:paddingBottom="4dp"
-                                android:text="Postres"
-                                android:textColor="#111111"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/tvEstadoManipuladora3"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="Ingredientes listos"
-                                android:textColor="#333333"
-                                android:textSize="10sp" />
-
-                            <ProgressBar
-                                android:id="@+id/progresoManipuladora3"
-                                style="?android:attr/progressBarStyleHorizontal"
-                                android:layout_width="match_parent"
-                                android:layout_height="6dp"
-                                android:layout_marginTop="6dp"
-                                android:max="100"
-                                android:progress="45" />
+                                android:text="Verificar materia prima recibida con inventario"
+                                android:textColor="#64748B"
+                                android:textSize="11sp" />
 
                         </LinearLayout>
 
-                    </com.google.android.material.card.MaterialCardView>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="✓ Listo"
+                            android:textColor="#16A34A"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
 
+                    </LinearLayout>
 
-                    <!-- MARA -->
+                </com.google.android.material.card.MaterialCardView>
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardManipuladora4"
-                        android:layout_width="0dp"
-                        android:layout_height="230dp"
-                        android:layout_margin="5dp"
-                        android:layout_weight="1"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground"
-                        app:cardBackgroundColor="#FFFFFF"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="3dp"
-                        app:strokeColor="#E7B84A"
-                        app:strokeWidth="2dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical"
-                            android:padding="10dp">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="100dp"
-                                android:layout_height="100dp"
-                                app:cardCornerRadius="50dp"
-                                app:strokeColor="#E7B84A"
-                                app:strokeWidth="2dp">
-
-                                <ImageView
-                                    android:id="@+id/imgManipuladora4"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:contentDescription="Foto de Mara"
-                                    android:scaleType="centerCrop"
-                                    android:src="@drawable/ic_person" />
-
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <TextView
-                                android:id="@+id/tvNombreManipuladora4"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="Manipuladora: Mara"
-                                android:textColor="#111111"
-                                android:textSize="13sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/tvPlatoManipuladora4"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp"
-                                android:background="#C9A36A"
-                                android:paddingStart="10dp"
-                                android:paddingTop="4dp"
-                                android:paddingEnd="10dp"
-                                android:paddingBottom="4dp"
-                                android:text="Asados"
-                                android:textColor="#FFFFFF"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/tvEstadoManipuladora4"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="Ingredientes listos"
-                                android:textColor="#333333"
-                                android:textSize="10sp" />
-
-                            <ProgressBar
-                                android:id="@+id/progresoManipuladora4"
-                                style="?android:attr/progressBarStyleHorizontal"
-                                android:layout_width="match_parent"
-                                android:layout_height="6dp"
-                                android:layout_marginTop="6dp"
-                                android:max="100"
-                                android:progress="60" />
-
-                        </LinearLayout>
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                </LinearLayout>
-
-
-                <!-- ================================================= -->
-                <!-- FILA 3                                             -->
-                <!-- ================================================= -->
-
-                <LinearLayout
+                <!-- TAREA 2 -->
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_marginTop="8dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="#E2E8F0"
+                    app:strokeWidth="1dp">
 
-                    <!-- RIARO -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="12dp">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardManipuladora5"
-                        android:layout_width="0dp"
-                        android:layout_height="230dp"
-                        android:layout_margin="5dp"
-                        android:layout_weight="1"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground"
-                        app:cardBackgroundColor="#FFFFFF"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="3dp"
-                        app:strokeColor="#E7B84A"
-                        app:strokeWidth="2dp">
+                        <CheckBox
+                            android:id="@+id/chkTarea2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true" />
 
                         <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical"
-                            android:padding="10dp">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="100dp"
-                                android:layout_height="100dp"
-                                app:cardCornerRadius="50dp"
-                                app:strokeColor="#E7B84A"
-                                app:strokeWidth="2dp">
-
-                                <ImageView
-                                    android:id="@+id/imgManipuladora5"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:contentDescription="Foto de Riaro"
-                                    android:scaleType="centerCrop"
-                                    android:src="@drawable/ic_person" />
-
-                            </com.google.android.material.card.MaterialCardView>
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
                             <TextView
-                                android:id="@+id/tvNombreManipuladora5"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="Manipuladora:Vanesa"
-                                android:textColor="#111111"
+                                android:text="Desinfección de estación y utensilios"
+                                android:textColor="#1E293B"
                                 android:textSize="13sp"
                                 android:textStyle="bold" />
 
                             <TextView
-                                android:id="@+id/tvPlatoManipuladora5"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp"
-                                android:background="#596B35"
-                                android:paddingStart="10dp"
-                                android:paddingTop="4dp"
-                                android:paddingEnd="10dp"
-                                android:paddingBottom="4dp"
-                                android:text="Principal"
-                                android:textColor="#FFFFFF"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/tvEstadoManipuladora5"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="En preparación"
-                                android:textColor="#333333"
-                                android:textSize="10sp" />
-
-                            <ProgressBar
-                                android:id="@+id/progresoManipuladora5"
-                                style="?android:attr/progressBarStyleHorizontal"
-                                android:layout_width="match_parent"
-                                android:layout_height="6dp"
-                                android:layout_marginTop="6dp"
-                                android:max="100"
-                                android:progress="30" />
+                                android:text="Aplicación de protocolo BPM y bioseguridad"
+                                android:textColor="#64748B"
+                                android:textSize="11sp" />
 
                         </LinearLayout>
 
-                    </com.google.android.material.card.MaterialCardView>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="✓ Listo"
+                            android:textColor="#16A34A"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
 
+                    </LinearLayout>
 
-                    <!-- BORON -->
+                </com.google.android.material.card.MaterialCardView>
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardManipuladora6"
-                        android:layout_width="0dp"
-                        android:layout_height="230dp"
-                        android:layout_margin="5dp"
-                        android:layout_weight="1"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground"
-                        app:cardBackgroundColor="#FFFFFF"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="3dp"
-                        app:strokeColor="#E7B84A"
-                        app:strokeWidth="2dp">
+                <!-- TAREA 3 -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="#E2E8F0"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="12dp">
+
+                        <CheckBox
+                            android:id="@+id/chkTarea3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false" />
 
                         <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical"
-                            android:padding="10dp">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="100dp"
-                                android:layout_height="100dp"
-                                app:cardCornerRadius="50dp"
-                                app:strokeColor="#E7B84A"
-                                app:strokeWidth="2dp">
-
-                                <ImageView
-                                    android:id="@+id/imgManipuladora6"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:contentDescription="Foto de Boron"
-                                    android:scaleType="centerCrop"
-                                    android:src="@drawable/ic_person" />
-
-                            </com.google.android.material.card.MaterialCardView>
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
                             <TextView
-                                android:id="@+id/tvNombreManipuladora6"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="Manipuladora: Dayana"
-                                android:textColor="#111111"
+                                android:text="Alistamiento e ingredientes (Mise en place)"
+                                android:textColor="#1E293B"
                                 android:textSize="13sp"
                                 android:textStyle="bold" />
 
                             <TextView
-                                android:id="@+id/tvPlatoManipuladora6"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp"
-                                android:background="#E7B84A"
-                                android:paddingStart="10dp"
-                                android:paddingTop="4dp"
-                                android:paddingEnd="10dp"
-                                android:paddingBottom="4dp"
-                                android:text="Principal"
-                                android:textColor="#111111"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/tvEstadoManipuladora6"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="Ingredientes listos"
-                                android:textColor="#333333"
-                                android:textSize="10sp" />
-
-                            <ProgressBar
-                                android:id="@+id/progresoManipuladora6"
-                                style="?android:attr/progressBarStyleHorizontal"
-                                android:layout_width="match_parent"
-                                android:layout_height="6dp"
-                                android:layout_marginTop="6dp"
-                                android:max="100"
-                                android:progress="90" />
+                                android:text="Picado, sazón y porcionado preliminar"
+                                android:textColor="#64748B"
+                                android:textSize="11sp" />
 
                         </LinearLayout>
 
-                    </com.google.android.material.card.MaterialCardView>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="En Proceso"
+                            android:textColor="#D97706"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
 
-                </LinearLayout>
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- TAREA 4 -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="#E2E8F0"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="12dp">
+
+                        <CheckBox
+                            android:id="@+id/chkTarea4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Cocción y preparación del plato principal"
+                                android:textColor="#1E293B"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Temperatura controlada y tiempo de cocción"
+                                android:textColor="#64748B"
+                                android:textSize="11sp" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Pendiente"
+                            android:textColor="#64748B"
+                            android:textSize="11sp" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
 
             </LinearLayout>
 
@@ -691,11 +568,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-    <!-- ===================================================== -->
-    <!-- BARRA DE NAVEGACIÓN                                   -->
-    <!-- ===================================================== -->
-
+    <!-- BARRA DE NAVEGACIÓN -->
     <include
         android:id="@+id/barra_navegacion"
         layout="@layout/activity_barra_navegacion"
