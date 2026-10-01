@@ -108,7 +108,8 @@ class InicioJefaActivity : AppCompatActivity() {
 
     private fun configurarPantalla() {
 
-        binding.txtSaludo.text = "Hola, Jefa"
+        val nombre = com.example.movilmanupuladora.utils.SessionManager(this).getUserName() ?: "Jefa"
+        binding.txtSaludo.text = "Hola, $nombre"
 
         actualizarFecha()
 
