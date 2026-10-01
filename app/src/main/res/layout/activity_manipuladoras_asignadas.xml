@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blanco"
+    android:fillViewport="true"
+    tools:context=".ManipuladorasAsignadasActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- ================================================= -->
+        <!-- ENCABEZADO                                       -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <ImageButton
+                android:id="@+id/btnCerrar"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/bg_icono_circular"
+                android:contentDescription="Volver"
+                android:padding="10dp"
+                android:src="@drawable/ic_arrow_back"
+                android:tint="@color/negro_principal" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtTitulo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Manipuladoras asignadas"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/txtJornada"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="Jornada: Mañana"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- INFORMACIÓN                                      -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:id="@+id/cardInformacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_card_resumen"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Responsables de la preparación"
+                android:textColor="@color/negro_principal"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtDescripcion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Revisa las manipuladoras asignadas para esta preparación."
+                android:textColor="@color/gris_texto"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- RESUMEN                                           -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:id="@+id/cardResumen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_card_resumen"
+            android:gravity="center_vertical"
+            android:padding="16dp">
+
+            <ImageView
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/bg_icono_amarillo"
+                android:contentDescription="Cantidad de manipuladoras"
+                android:padding="9dp"
+                android:src="@drawable/ic_nav_manipuladoras"
+                android:tint="@color/negro_principal" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Manipuladoras asignadas"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/txtCantidadManipuladoras"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="0 manipuladoras"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- TÍTULO LISTA                                     -->
+        <!-- ================================================= -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:text="Personal asignado"
+            android:textColor="@color/negro_principal"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+
+        <!-- ================================================= -->
+        <!-- MANIPULADORA 1                                   -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:id="@+id/cardManipuladora1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_card_resumen"
+            android:gravity="center_vertical"
+            android:padding="14dp">
+
+            <ImageView
+                android:id="@+id/imgManipuladora1"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_icono_verde"
+                android:contentDescription="Manipuladora"
+                android:padding="10dp"
+                android:src="@drawable/ic_nav_perfil"
+                android:tint="@color/negro_principal" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtNombreManipuladora1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="María González"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/txtRolManipuladora1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="Manipuladora de alimentos"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/txtEstadoManipuladora1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_estado_disponible"
+                android:paddingStart="10dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="5dp"
+                android:text="Asignada"
+                android:textColor="@color/negro_principal"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- MANIPULADORA 2                                   -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:id="@+id/cardManipuladora2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_card_resumen"
+            android:gravity="center_vertical"
+            android:padding="14dp">
+
+            <ImageView
+                android:id="@+id/imgManipuladora2"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_icono_amarillo"
+                android:contentDescription="Manipuladora"
+                android:padding="10dp"
+                android:src="@drawable/ic_nav_perfil"
+                android:tint="@color/negro_principal" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtNombreManipuladora2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Laura Martínez"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/txtRolManipuladora2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="Manipuladora de alimentos"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/txtEstadoManipuladora2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_estado_disponible"
+                android:paddingStart="10dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="5dp"
+                android:text="Asignada"
+                android:textColor="@color/negro_principal"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- MANIPULADORA 3                                   -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:id="@+id/cardManipuladora3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_card_resumen"
+            android:gravity="center_vertical"
+            android:padding="14dp">
+
+            <ImageView
+                android:id="@+id/imgManipuladora3"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_icono_verde"
+                android:contentDescription="Manipuladora"
+                android:padding="10dp"
+                android:src="@drawable/ic_nav_perfil"
+                android:tint="@color/negro_principal" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtNombreManipuladora3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ana Rodríguez"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/txtRolManipuladora3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="Manipuladora de alimentos"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/txtEstadoManipuladora3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_estado_disponible"
+                android:paddingStart="10dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="5dp"
+                android:text="Asignada"
+                android:textColor="@color/negro_principal"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- BOTÓN AGREGAR                                    -->
+        <!-- ================================================= -->
+
+        <Button
+            android:id="@+id/btnAgregarManipuladora"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="@color/amarillo_principal"
+            android:text="Agregar manipuladora"
+            android:textColor="@color/blanco"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+
+        <!-- ================================================= -->
+        <!-- CONFIRMAR                                        -->
+        <!-- ================================================= -->
+
+        <Button
+            android:id="@+id/btnConfirmarAsignacion"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="@color/negro_principal"
+            android:text="Confirmar asignación"
+            android:textColor="@color/blanco"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+
+        <!-- ================================================= -->
+        <!-- CANCELAR                                         -->
+        <!-- ================================================= -->
+
+        <Button
+            android:id="@+id/btnCancelar"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/gris_claro"
+            android:text="Cancelar"
+            android:textColor="@color/negro_principal"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+</ScrollView>

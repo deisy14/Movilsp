@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/barraNavegacionJefa"
+    android:layout_width="match_parent"
+    android:layout_height="68dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:background="@drawable/bg_barra_navegacion"
+    android:elevation="10dp"
+    android:paddingStart="6dp"
+    android:paddingEnd="6dp"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp">
+
+    <!-- ===================================================== -->
+    <!-- INICIO                                                -->
+    <!-- ===================================================== -->
+
+    <LinearLayout
+        android:id="@+id/navInicio"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless">
+
+        <ImageView
+            android:id="@+id/iconNavInicio"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/ic_nav_inicio"
+            android:tint="@color/negro_principal"
+            android:contentDescription="Inicio"/>
+
+        <TextView
+            android:id="@+id/txtNavInicio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Inicio"
+            android:textColor="@color/negro_principal"
+            android:textSize="11sp"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
+
+
+    <!-- ===================================================== -->
+    <!-- INVENTARIO                                             -->
+    <!-- ===================================================== -->
+
+    <LinearLayout
+        android:id="@+id/navInventario"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless">
+
+        <ImageView
+            android:id="@+id/iconNavInventario"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/ic_nav_inventario"
+            android:tint="@color/negro_principal"
+            android:contentDescription="Inventario"/>
+
+        <TextView
+            android:id="@+id/txtNavInventario"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Inventario"
+            android:textColor="@color/negro_principal"
+            android:textSize="11sp"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
+
+
+    <!-- ===================================================== -->
+    <!-- PREPARACIONES                                          -->
+    <!-- ===================================================== -->
+
+    <LinearLayout
+        android:id="@+id/navPreparaciones"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless">
+
+        <ImageView
+            android:id="@+id/iconNavPreparaciones"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/ic_nav_preparaciones"
+            android:tint="@color/negro_principal"
+            android:contentDescription="Preparaciones"/>
+
+        <TextView
+            android:id="@+id/txtNavPreparaciones"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Preparaciones"
+            android:textColor="@color/negro_principal"
+            android:textSize="11sp"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
+
+
+    <!-- ===================================================== -->
+    <!-- MANIPULADORAS                                          -->
+    <!-- ===================================================== -->
+
+    <LinearLayout
+        android:id="@+id/navManipuladoras"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless">
+
+        <ImageView
+            android:id="@+id/iconNavManipuladoras"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/ic_nav_manipuladoras"
+            android:tint="@color/negro_principal"
+            android:contentDescription="Manipuladoras"/>
+
+        <TextView
+            android:id="@+id/txtNavManipuladoras"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Manipuladoras"
+            android:textColor="@color/negro_principal"
+            android:textSize="11sp"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
+
+
+    <!-- ===================================================== -->
+    <!-- PERFIL                                                 -->
+    <!-- ===================================================== -->
+
+    <LinearLayout
+        android:id="@+id/navPerfil"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless">
+
+        <ImageView
+            android:id="@+id/iconNavPerfil"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/ic_nav_perfil"
+            android:tint="@color/negro_principal"
+            android:contentDescription="Perfil"/>
+
+        <TextView
+            android:id="@+id/txtNavPerfil"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Perfil"
+            android:textColor="@color/negro_principal"
+            android:textSize="11sp"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
+
+</LinearLayout>

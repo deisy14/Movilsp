@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blanco"
+    android:fillViewport="true"
+    tools:context=".IniciarPreparacionActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- ================================================= -->
+        <!-- ENCABEZADO                                       -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <ImageButton
+                android:id="@+id/btnCerrar"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/bg_icono_circular"
+                android:contentDescription="Volver"
+                android:padding="10dp"
+                android:src="@drawable/ic_arrow_back"
+                android:tint="@color/negro_principal" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtTitulo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Iniciar preparación"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/txtJornada"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="Jornada: Mañana"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- ESTADO                                            -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:id="@+id/cardEstadoPreparacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_card_resumen"
+            android:gravity="center_vertical"
+            android:padding="16dp">
+
+            <ImageView
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/bg_icono_amarillo"
+                android:contentDescription="Estado"
+                android:padding="9dp"
+                android:src="@drawable/ic_food"
+                android:tint="@color/negro_principal" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Estado de preparación"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/txtEstadoPreparacion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="Pendiente"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- MENÚ DEL DÍA                                      -->
+        <!-- ================================================= -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:text="Menú del día"
+            android:textColor="@color/negro_principal"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+
+        <LinearLayout
+            android:id="@+id/cardMenuDia"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_card_resumen"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/txtNombreMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Arroz con pollo"
+                android:textColor="@color/negro_principal"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtDescripcionMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Preparación principal de la jornada"
+                android:textColor="@color/gris_texto"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- CANTIDAD DE NIÑOS                                -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:id="@+id/cardCantidadNinos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_card_resumen"
+            android:gravity="center_vertical"
+            android:padding="16dp">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_icono_verde"
+                android:contentDescription="Niños"
+                android:padding="9dp"
+                android:src="@drawable/ic_nav_manipuladoras"
+                android:tint="@color/negro_principal" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Niños registrados"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/txtCantidadNinos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="0 niños"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- ALIMENTOS NECESARIOS                              -->
+        <!-- ================================================= -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:text="Alimentos necesarios"
+            android:textColor="@color/negro_principal"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+
+        <LinearLayout
+            android:id="@+id/cardAlimentosNecesarios"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_card_resumen"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/txtAlimentosNecesarios"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Arroz  •  12 kg&#10;Pollo  •  18 kg&#10;Verduras  •  8 kg"
+                android:textColor="@color/negro_principal"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- MANIPULADORAS ASIGNADAS                          -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:id="@+id/cardManipuladoras"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_card_resumen"
+            android:gravity="center_vertical"
+            android:padding="16dp">
+
+            <ImageView
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/bg_icono_amarillo"
+                android:contentDescription="Manipuladoras"
+                android:padding="9dp"
+                android:src="@drawable/ic_nav_manipuladoras"
+                android:tint="@color/negro_principal" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Manipuladoras asignadas"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/txtCantidadManipuladoras"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="0 manipuladoras"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/btnVerManipuladoras"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/bg_icono_circular"
+                android:contentDescription="Ver manipuladoras asignadas"
+                android:padding="9dp"
+                android:src="@drawable/ic_arrow_forward"
+                android:tint="@color/negro_principal" />
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- OBSERVACIONES                                    -->
+        <!-- ================================================= -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:text="Observaciones"
+            android:textColor="@color/negro_principal"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/edtObservaciones"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_campo"
+            android:gravity="top|start"
+            android:hint="Escribe una observación si es necesario..."
+            android:inputType="textCapSentences|textMultiLine"
+            android:padding="14dp"
+            android:textColor="@color/negro_principal"
+            android:textColorHint="@color/gris_texto"
+            android:textSize="14sp" />
+
+
+        <!-- ================================================= -->
+        <!-- BOTÓN INICIAR                                    -->
+        <!-- ================================================= -->
+
+        <Button
+            android:id="@+id/btnIniciarPreparacion"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="@color/amarillo_principal"
+            android:text="Iniciar preparación"
+            android:textColor="@color/blanco"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+
+        <!-- ================================================= -->
+        <!-- CANCELAR                                         -->
+        <!-- ================================================= -->
+
+        <Button
+            android:id="@+id/btnCancelar"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/gris_claro"
+            android:text="Cancelar"
+            android:textColor="@color/negro_principal"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+</ScrollView>

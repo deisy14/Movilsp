@@ -1,0 +1,568 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:orientation="vertical"
+
+    android:background="@color/blanco">
+
+
+    <!-- ===================================================== -->
+    <!-- CONTENIDO                                             -->
+    <!-- ===================================================== -->
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:orientation="vertical"
+
+            android:padding="20dp">
+
+
+            <!-- ================================================= -->
+            <!-- ENCABEZADO                                        -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:gravity="center_vertical">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+
+                    android:layout_weight="1"
+
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txtTituloPerfil"
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:text="Mi perfil"
+
+                        android:textColor="@color/negro_principal"
+
+                        android:textSize="26sp"
+
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/txtSubtituloPerfil"
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginTop="4dp"
+
+                        android:text="Información de la Jefa"
+
+                        android:textColor="@color/gris_texto"
+
+                        android:textSize="13sp"/>
+
+                </LinearLayout>
+
+
+                <ImageView
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+
+                    android:padding="10dp"
+
+                    android:background="@drawable/bg_icono_circular"
+
+                    android:src="@drawable/ic_nav_perfil"
+
+                    android:tint="@color/negro_principal"
+
+                    android:contentDescription="Perfil"/>
+
+            </LinearLayout>
+
+
+            <!-- ================================================= -->
+            <!-- TARJETA PERFIL                                    -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginTop="24dp"
+
+                android:orientation="vertical"
+
+                android:padding="20dp"
+
+                android:background="@drawable/bg_card_resumen">
+
+
+                <!-- FOTO / ICONO -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:gravity="center"
+
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/imgPerfil"
+
+                        android:layout_width="86dp"
+                        android:layout_height="86dp"
+
+                        android:padding="18dp"
+
+                        android:background="@drawable/bg_icono_circular"
+
+                        android:src="@drawable/ic_nav_perfil"
+
+                        android:tint="@color/negro_principal"
+
+                        android:contentDescription="Foto de perfil"/>
+
+                    <TextView
+                        android:id="@+id/txtNombreJefa"
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginTop="12dp"
+
+                        android:text="Jefa"
+
+                        android:textColor="@color/negro_principal"
+
+                        android:textSize="21sp"
+
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/txtCargo"
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginTop="4dp"
+
+                        android:text="Jefa de cocina"
+
+                        android:textColor="@color/gris_texto"
+
+                        android:textSize="13sp"/>
+
+                </LinearLayout>
+
+
+                <!-- ================================================= -->
+                <!-- DATOS                                             -->
+                <!-- ================================================= -->
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="8dp"
+
+                    android:background="@color/gris_claro"/>
+
+
+                <!-- NOMBRE -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="58dp"
+
+                    android:gravity="center_vertical"
+
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+
+                        android:padding="9dp"
+
+                        android:background="@drawable/bg_icono_circular"
+
+                        android:src="@drawable/ic_nav_perfil"
+
+                        android:tint="@color/negro_principal"
+
+                        android:contentDescription="Nombre"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+
+                        android:layout_weight="1"
+
+                        android:layout_marginStart="12dp"
+
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:text="Nombre"
+
+                            android:textColor="@color/gris_texto"
+
+                            android:textSize="12sp"/>
+
+                        <TextView
+                            android:id="@+id/txtNombre"
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:layout_marginTop="2dp"
+
+                            android:text="Jefa"
+
+                            android:textColor="@color/negro_principal"
+
+                            android:textSize="15sp"
+
+                            android:textStyle="bold"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+                <!-- CORREO -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="58dp"
+
+                    android:gravity="center_vertical"
+
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+
+                        android:padding="9dp"
+
+                        android:background="@drawable/bg_icono_circular"
+
+                        android:src="@drawable/ic_email"
+
+                        android:tint="@color/negro_principal"
+
+                        android:contentDescription="Correo"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+
+                        android:layout_weight="1"
+
+                        android:layout_marginStart="12dp"
+
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:text="Correo electrónico"
+
+                            android:textColor="@color/gris_texto"
+
+                            android:textSize="12sp"/>
+
+                        <TextView
+                            android:id="@+id/txtCorreo"
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:layout_marginTop="2dp"
+
+                            android:text="jefa@ejemplo.com"
+
+                            android:textColor="@color/negro_principal"
+
+                            android:textSize="15sp"
+
+                            android:textStyle="bold"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+                <!-- TELÉFONO -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="58dp"
+
+                    android:gravity="center_vertical"
+
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+
+                        android:padding="9dp"
+
+                        android:background="@drawable/bg_icono_circular"
+
+                        android:src="@drawable/ic_phone"
+
+                        android:tint="@color/negro_principal"
+
+                        android:contentDescription="Teléfono"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+
+                        android:layout_weight="1"
+
+                        android:layout_marginStart="12dp"
+
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:text="Teléfono"
+
+                            android:textColor="@color/gris_texto"
+
+                            android:textSize="12sp"/>
+
+                        <TextView
+                            android:id="@+id/txtTelefono"
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:layout_marginTop="2dp"
+
+                            android:text="000 000 0000"
+
+                            android:textColor="@color/negro_principal"
+
+                            android:textSize="15sp"
+
+                            android:textStyle="bold"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <!-- ================================================= -->
+            <!-- CONFIGURACIÓN                                     -->
+            <!-- ================================================= -->
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_marginTop="24dp"
+
+                android:text="Configuración"
+
+                android:textColor="@color/negro_principal"
+
+                android:textSize="18sp"
+
+                android:textStyle="bold"/>
+
+
+            <!-- EDITAR PERFIL -->
+
+            <LinearLayout
+                android:id="@+id/btnEditarPerfil"
+
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+
+                android:layout_marginTop="10dp"
+
+                android:gravity="center_vertical"
+
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+
+                android:background="@drawable/bg_card_resumen"
+
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+
+                    android:padding="8dp"
+
+                    android:background="@drawable/bg_icono_circular"
+
+                    android:src="@drawable/ic_editar"
+
+                    android:tint="@color/negro_principal"
+
+                    android:contentDescription="Editar perfil"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+
+                    android:layout_weight="1"
+
+                    android:layout_marginStart="12dp"
+
+                    android:text="Editar perfil"
+
+                    android:textColor="@color/negro_principal"
+
+                    android:textSize="15sp"
+
+                    android:textStyle="bold"/>
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+
+                    android:src="@drawable/ic_arrow_forward"
+
+                    android:tint="@color/gris_texto"
+
+                    android:contentDescription="Abrir"/>
+
+            </LinearLayout>
+
+
+            <!-- NOTIFICACIONES -->
+
+            <LinearLayout
+                android:id="@+id/btnConfiguracionNotificaciones"
+
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+
+                android:layout_marginTop="8dp"
+
+                android:gravity="center_vertical"
+
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+
+                android:background="@drawable/bg_card_resumen"
+
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+
+                    android:padding="8dp"
+
+                    android:background="@drawable/bg_icono_circular"
+
+                    android:src="@drawable/ic_notificaciones"
+
+                    android:tint="@color/negro_principal"
+
+                    android:contentDescription="Notificaciones"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+
+                    android:layout_weight="1"
+
+                    android:layout_marginStart="12dp"
+
+                    android:text="Notificaciones"
+
+                    android:textColor="@color/negro_principal"
+
+                    android:textSize="15sp"
+
+                    android:textStyle="bold"/>
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+
+                    android:src="@drawable/ic_arrow_forward"
+
+                    android:tint="@color/gris_texto"
+
+                    android:contentDescription="Abrir"/>
+
+            </LinearLayout>
+
+
+            <!-- CERRAR SESIÓN -->
+
+            <Button
+                android:id="@+id/btnCerrarSesion"
+
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+
+                android:layout_marginTop="20dp"
+
+                android:text="Cerrar sesión"
+
+                android:textColor="@color/blanco"
+
+                android:textSize="15sp"
+
+                android:textStyle="bold"
+
+                android:backgroundTint="@color/negro_principal"/>
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+    <!-- ===================================================== -->
+    <!-- BARRA DE NAVEGACIÓN                                  -->
+    <!-- ===================================================== -->
+
+    <include
+        layout="@layout/barra_navegacion_jefa"
+        android:layout_width="match_parent"
+        android:layout_height="88dp"/>
+
+
+</LinearLayout>

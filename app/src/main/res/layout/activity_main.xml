@@ -179,7 +179,7 @@
                         android:layout_height="match_parent"
                         android:contentDescription="Almuerzo"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/frijoles" />
+                        android:src="@drawable/huevo_perico" />
 
                 </com.google.android.material.card.MaterialCardView>
 

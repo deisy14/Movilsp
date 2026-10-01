@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutMisPreparaciones"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/blanco">
+
+    <!-- ===================================================== -->
+    <!-- ENCABEZADO                                             -->
+    <!-- ===================================================== -->
+
+    <LinearLayout
+        android:id="@+id/headerMisPreparaciones"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="14dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtSaludoManipuladora"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mis preparaciones"
+                android:textColor="@color/negro_principal"
+                android:textSize="22sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/txtFechaPreparaciones"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="Hoy"
+                android:textColor="@color/gris_texto"
+                android:textSize="13sp"/>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/iconoCocina"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_icono_amarillo"
+            android:padding="10dp"
+            android:src="@drawable/ic_food"
+            android:tint="@color/negro_principal"
+            android:contentDescription="Preparaciones"/>
+
+    </LinearLayout>
+
+
+    <!-- ===================================================== -->
+    <!-- JORNADA                                               -->
+    <!-- ===================================================== -->
+
+    <LinearLayout
+        android:id="@+id/contenedorJornada"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_jornada"
+        android:orientation="horizontal"
+        android:padding="4dp">
+
+        <TextView
+            android:id="@+id/btnJornadaManana"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_jornada_seleccionada"
+            android:gravity="center"
+            android:text="MAÑANA"
+            android:textColor="@color/blanco"
+            android:textSize="12sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/btnJornadaTarde"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_jornada_no_seleccionada"
+            android:gravity="center"
+            android:text="TARDE"
+            android:textColor="@color/negro_principal"
+            android:textSize="12sp"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
+
+
+    <!-- ===================================================== -->
+    <!-- RESUMEN                                                -->
+    <!-- ===================================================== -->
+
+    <LinearLayout
+        android:id="@+id/cardResumenPreparaciones"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="18dp"
+        android:background="@drawable/bg_card_resumen"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="15dp">
+
+        <ImageView
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_icono_verde"
+            android:padding="10dp"
+            android:src="@drawable/ic_food"
+            android:tint="@color/negro_principal"
+            android:contentDescription="Preparaciones"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mis platos de hoy"
+                android:textColor="@color/gris_texto"
+                android:textSize="12sp"/>
+
+            <TextView
+                android:id="@+id/txtCantidadPreparaciones"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="0 preparaciones"
+                android:textColor="@color/negro_principal"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <!-- ===================================================== -->
+    <!-- TITULO LISTA                                           -->
+    <!-- ===================================================== -->
+
+    <TextView
+        android:id="@+id/txtTituloListaPreparaciones"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="22dp"
+        android:text="Preparaciones asignadas"
+        android:textColor="@color/negro_principal"
+        android:textSize="17sp"
+        android:textStyle="bold"/>
+
+
+    <!-- ===================================================== -->
+    <!-- LISTA DE PREPARACIONES                                  -->
+    <!-- ===================================================== -->
+
+    <ScrollView
+        android:id="@+id/scrollPreparaciones"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"
+        android:fillViewport="true"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/contenedorPreparaciones"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="25dp">
+
+
+            <!-- ================================================= -->
+            <!-- PREPARACIÓN 1                                     -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:id="@+id/cardPreparacion1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_card_resumen"
+                android:orientation="vertical"
+                android:padding="15dp">
+
+                <!-- CABECERA -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/imgPreparacion1"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:background="@drawable/bg_icono_amarillo"
+                        android:padding="11dp"
+                        android:src="@drawable/ic_food"
+                        android:tint="@color/negro_principal"
+                        android:contentDescription="Plato"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/txtNombrePreparacion1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Arroz con pollo"
+                            android:textColor="@color/negro_principal"
+                            android:textSize="16sp"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:id="@+id/txtDetallePreparacion1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:text="Preparación asignada"
+                            android:textColor="@color/gris_texto"
+                            android:textSize="12sp"/>
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/txtEstadoPreparacion1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_estado"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="5dp"
+                        android:text="Pendiente"
+                        android:textColor="@color/negro_principal"
+                        android:textSize="10sp"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+
+
+                <!-- SEPARADOR -->
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@color/gris_borde"/>
+
+
+                <!-- ESTADOS -->
+
+                <LinearLayout
+                    android:id="@+id/contenedorEstados1"
+                    android:layout_width="match_parent"
+                    android:layout_height="42dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/estadoPendiente1"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="Pendiente"
+                        android:textColor="@color/gris_texto"
+                        android:textSize="11sp"/>
+
+                    <TextView
+                        android:id="@+id/estadoEnPreparacion1"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="En preparación"
+                        android:textColor="@color/gris_texto"
+                        android:textSize="11sp"/>
+
+                    <TextView
+                        android:id="@+id/estadoCompletado1"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="Completado"
+                        android:textColor="@color/gris_texto"
+                        android:textSize="11sp"/>
+
+                </LinearLayout>
+
+
+                <!-- BOTÓN -->
+
+                <TextView
+                    android:id="@+id/btnAccionPreparacion1"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_boton_amarillo"
+                    android:gravity="center"
+                    android:text="Hacer preparación"
+                    android:textColor="@color/blanco"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
+
+
+            <!-- ================================================= -->
+            <!-- PREPARACIÓN 2                                     -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:id="@+id/cardPreparacion2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_card_resumen"
+                android:orientation="vertical"
+                android:padding="15dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/imgPreparacion2"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:background="@drawable/bg_icono_verde"
+                        android:padding="11dp"
+                        android:src="@drawable/ic_food"
+                        android:tint="@color/negro_principal"
+                        android:contentDescription="Plato"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/txtNombrePreparacion2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ensalada"
+                            android:textColor="@color/negro_principal"
+                            android:textSize="16sp"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:id="@+id/txtDetallePreparacion2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:text="Preparación asignada"
+                            android:textColor="@color/gris_texto"
+                            android:textSize="12sp"/>
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/txtEstadoPreparacion2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_estado"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="5dp"
+                        android:text="Pendiente"
+                        android:textColor="@color/negro_principal"
+                        android:textSize="10sp"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@color/gris_borde"/>
+
+
+                <LinearLayout
+                    android:id="@+id/contenedorEstados2"
+                    android:layout_width="match_parent"
+                    android:layout_height="42dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/estadoPendiente2"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="Pendiente"
+                        android:textColor="@color/gris_texto"
+                        android:textSize="11sp"/>
+
+                    <TextView
+                        android:id="@+id/estadoEnPreparacion2"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="En preparación"
+                        android:textColor="@color/gris_texto"
+                        android:textSize="11sp"/>
+
+                    <TextView
+                        android:id="@+id/estadoCompletado2"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="Completado"
+                        android:textColor="@color/gris_texto"
+                        android:textSize="11sp"/>
+
+                </LinearLayout>
+
+
+                <TextView
+                    android:id="@+id/btnAccionPreparacion2"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_boton_amarillo"
+                    android:gravity="center"
+                    android:text="Hacer preparación"
+                    android:textColor="@color/blanco"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
+
+
+            <!-- ================================================= -->
+            <!-- MENSAJE SIN PREPARACIONES                         -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:id="@+id/layoutSinPreparaciones"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="30dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="55dp"
+                    android:layout_height="55dp"
+                    android:src="@drawable/ic_food"
+                    android:tint="@color/gris_texto"
+                    android:contentDescription="Sin preparaciones"/>
+
+                <TextView
+                    android:id="@+id/txtSinPreparaciones"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="No tienes preparaciones asignadas"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>
