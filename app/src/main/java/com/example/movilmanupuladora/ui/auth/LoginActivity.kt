@@ -171,9 +171,9 @@ class LoginActivity : AppCompatActivity() {
 
                     if (
                         (correo.contains("jefe", ignoreCase = true) || correo.contains("jefa", ignoreCase = true)) &&
-                        pass == "123456789"
+                        (pass == "123456789" || pass == "Sirae12345")
                     ) {
-                        sessionManager.saveUserData("Jefa de Cocina", "JefaManipuladoras", correo)
+                        sessionManager.saveUserData("Jefa de Cocina", "Jefa de manipuladora", correo)
                         Toast.makeText(
                             this@LoginActivity,
                             "Inicio de sesión Jefa (Modo prueba)",
@@ -191,8 +191,8 @@ class LoginActivity : AppCompatActivity() {
                     }
 
                     if (
-                        correo == "manipuladora@gmail.com" &&
-                        pass == "123456789"
+                        (correo == "manipuladora@gmail.com" || correo == "manipuladora@sirae.com") &&
+                        (pass == "123456789" || pass == "Sirae12345")
                     ) {
                         sessionManager.saveUserData("María Manipuladora", "Manipuladora", correo)
                         Toast.makeText(
