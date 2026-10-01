@@ -114,8 +114,10 @@ class LoginActivity : AppCompatActivity() {
                         loginRes.usuario?.let { usuario ->
 
                             sessionManager.saveUserData(
-                                usuario.nombre,
-                                usuario.rol
+                                name = usuario.nombre,
+                                role = usuario.rol,
+                                email = usuario.correo,
+                                idUsuario = usuario.idUsuario
                             )
                         }
 

@@ -102,6 +102,11 @@ class InicioJefaActivity : AppCompatActivity() {
         actualizarPantalla()
     }
 
+    override fun onResume() {
+        super.onResume()
+        actualizarResumen()
+    }
+
     // =========================================================
     // CONFIGURACIÓN INICIAL
     // =========================================================
@@ -538,7 +543,12 @@ class InicioJefaActivity : AppCompatActivity() {
         // Estos valores posteriormente pueden venir
         // de Firebase.
 
-        val cantidadNinos = 120
+        val guardados = if (jornadaSeleccionada == Jornada.MANANA) {
+            AsistenciaManager.obtenerManana(this)
+        } else {
+            AsistenciaManager.obtenerTarde(this)
+        }
+        val cantidadNinos = if (guardados > 0) guardados else 120
 
         binding.txtNinos.text =
             "$cantidadNinos niños"

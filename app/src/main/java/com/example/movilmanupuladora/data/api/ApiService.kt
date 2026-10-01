@@ -99,4 +99,24 @@ interface ApiService {
     // Menús
     @GET("menus/")
     suspend fun obtenerMenus(): Response<List<menus>>
+
+    // Asistencia Diaria
+    @GET("asistencia-diaria/")
+    suspend fun obtenerAsistenciaDiaria(): Response<List<com.example.movilmanupuladora.data.model.AsistenciaDiaria>>
+
+    @POST("asistencia-diaria/")
+    suspend fun registrarAsistenciaDiaria(
+        @Body asistencia: com.example.movilmanupuladora.data.model.AsistenciaDiaria
+    ): Response<com.example.movilmanupuladora.data.model.AsistenciaDiaria>
+
+    @retrofit2.http.PUT("asistencia-diaria/{id}/")
+    suspend fun actualizarAsistenciaDiaria(
+        @Path("id") id: Int,
+        @Body asistencia: com.example.movilmanupuladora.data.model.AsistenciaDiaria
+    ): Response<com.example.movilmanupuladora.data.model.AsistenciaDiaria>
+
+    @retrofit2.http.DELETE("asistencia-diaria/{id}/")
+    suspend fun eliminarAsistenciaDiaria(
+        @Path("id") id: Int
+    ): Response<Unit>
 }
