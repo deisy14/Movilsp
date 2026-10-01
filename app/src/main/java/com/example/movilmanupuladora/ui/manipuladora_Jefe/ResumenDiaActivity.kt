@@ -1,4 +1,4 @@
-package com.example.manipuladorajefe
+package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,7 +7,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.manipuladorajefe.databinding.ActivityResumenDiaBinding
+import com.example.manipuladorajefe.AsistenciaManager
+import com.example.manipuladorajefe.InventarioManager
+import com.example.manipuladorajefe.ManipuladorasManager
+import com.example.manipuladorajefe.PreparacionesManager
+import com.example.movilmanupuladora.R
+import com.example.movilmanupuladora.databinding.ActivityResumenDiaBinding
+
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

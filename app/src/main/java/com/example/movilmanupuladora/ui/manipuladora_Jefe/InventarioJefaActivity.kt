@@ -1,4 +1,4 @@
-package com.example.manipuladorajefe
+package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
 import android.app.AlertDialog
 import android.content.Intent
@@ -6,7 +6,14 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.manipuladorajefe.databinding.ActivityInventarioJefaBinding
+import com.example.manipuladorajefe.AlimentoInventario
+import com.example.manipuladorajefe.AsistenciaManager
+import com.example.manipuladorajefe.InventarioManager
+
+
+import com.example.movilmanupuladora.R
+import com.example.movilmanupuladora.databinding.ActivityInventarioJefaBinding
+
 
 class InventarioJefaActivity : AppCompatActivity() {
 

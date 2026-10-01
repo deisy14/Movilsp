@@ -1,9 +1,11 @@
-package com.example.manipuladorajefe
+package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.manipuladorajefe.databinding.ActivityRegistrarEntregaBinding
+import com.example.manipuladorajefe.InventarioManager
+import com.example.movilmanupuladora.databinding.ActivityRegistrarEntregaBinding
+
 
 class RegistrarEntregaActivity : AppCompatActivity() {
 

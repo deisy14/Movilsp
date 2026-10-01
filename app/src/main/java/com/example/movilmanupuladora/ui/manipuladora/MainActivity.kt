@@ -133,6 +133,17 @@ class MainActivity : AppCompatActivity() {
         // Token de sesión
         SessionManager.getToken(this)
 
+        // Configurar saludo y fecha dinámica
+        val sessionMgr = SessionManager(this)
+        val nombreUser = sessionMgr.getUserName() ?: "Manipuladora"
+        binding.tvSaludo.text = "¡BIENVENIDA, ${nombreUser.uppercase()}!"
+
+        val fechaHoyFormatted = java.text.SimpleDateFormat(
+            "EEEE / d / MMM / yyyy",
+            java.util.Locale("es", "CO")
+        ).format(java.util.Date()).uppercase()
+        binding.tvFecha.text = fechaHoyFormatted
+
         // -----------------------------------------------------
         // DATOS INICIALES
         // -----------------------------------------------------
@@ -628,39 +639,16 @@ class MainActivity : AppCompatActivity() {
                 ?: ""
 
         return when {
-
-            // BANDEJA PAISA
-            nombre.contains("bandeja") ->
-                R.drawable.bandeja_paisa
-
-            // FRIJOLES
-            nombre.contains("frijol") ->
-                R.drawable.frijoles
-
-            // CHOCOLATE
-            nombre.contains("chocolate") ->
-                R.drawable.chocolate
-
-            // HUEVO
-            nombre.contains("huevo") ->
-                R.drawable.huevo_perico
-
-            // POLLO
-            nombre.contains("pollo") ->
-                R.drawable.apanado
-
-            // ARROZ
-            nombre.contains("arroz") ->
-                R.drawable.arroz_de_leche
-
-            // CAFÉ
-            nombre.contains("café") ||
-                    nombre.contains("cafe") ->
-                R.drawable.apanado
-
-            // IMAGEN POR DEFECTO
-            else ->
-                R.drawable.frijoles
+            nombre.contains("bandeja") -> R.drawable.bandeja_paisa
+            nombre.contains("frijol") -> R.drawable.frijoles
+            nombre.contains("chocolate") -> R.drawable.chocolate
+            nombre.contains("huevo") -> R.drawable.huevo_perico
+            nombre.contains("pasta") || nombre.contains("carne") -> R.drawable.pasta_carne
+            nombre.contains("lenteja") -> R.drawable.lentejas_arroz
+            nombre.contains("pollo") -> R.drawable.pollo_guisado
+            nombre.contains("arroz") -> R.drawable.arroz_de_leche
+            nombre.contains("café") || nombre.contains("cafe") || nombre.contains("pan") -> R.drawable.comida_desayuno
+            else -> R.drawable.comida_almuerzo
         }
     }
 
@@ -713,16 +701,9 @@ class MainActivity : AppCompatActivity() {
         // -----------------------------------------------------
 
         plato1?.let { p ->
-
-            binding.tvPlatoAnterior1.text =
-                formatearNombrePlato(
-                    p.nombrePlato
-                )
-
-            binding.cardMenuAnterior1.setOnClickListener {
-
-                mostrarDialogoPlato(p)
-            }
+            binding.tvPlatoAnterior1.text = formatearNombrePlato(p.nombrePlato)
+            binding.imgMenuAnterior1.setImageResource(obtenerImagenPlato(p))
+            binding.cardMenuAnterior1.setOnClickListener { mostrarDialogoPlato(p) }
         }
 
         // -----------------------------------------------------
@@ -730,20 +711,9 @@ class MainActivity : AppCompatActivity() {
         // -----------------------------------------------------
 
         plato2?.let { p ->
-
-            binding.tvPlatoAnterior2.text =
-                formatearNombrePlato(
-                    p.nombrePlato
-                )
-
-            binding.imgMenuAnterior2.setImageResource(
-                R.drawable.bandeja_paisa
-            )
-
-            binding.cardMenuAnterior2.setOnClickListener {
-
-                mostrarDialogoPlato(p)
-            }
+            binding.tvPlatoAnterior2.text = formatearNombrePlato(p.nombrePlato)
+            binding.imgMenuAnterior2.setImageResource(obtenerImagenPlato(p))
+            binding.cardMenuAnterior2.setOnClickListener { mostrarDialogoPlato(p) }
         }
 
         // -----------------------------------------------------
@@ -751,16 +721,9 @@ class MainActivity : AppCompatActivity() {
         // -----------------------------------------------------
 
         plato3?.let { p ->
-
-            binding.tvPlatoAnterior3.text =
-                formatearNombrePlato(
-                    p.nombrePlato
-                )
-
-            binding.cardMenuAnterior3.setOnClickListener {
-
-                mostrarDialogoPlato(p)
-            }
+            binding.tvPlatoAnterior3.text = formatearNombrePlato(p.nombrePlato)
+            binding.imgMenuAnterior3.setImageResource(obtenerImagenPlato(p))
+            binding.cardMenuAnterior3.setOnClickListener { mostrarDialogoPlato(p) }
         }
     }
 
@@ -930,67 +893,32 @@ class MainActivity : AppCompatActivity() {
         }
 
         // -----------------------------------------------------
-        // COMPONENTES
+        // COMPONENTES / INSUMOS
         // -----------------------------------------------------
 
-        dialogBinding.btnVerComponentesModal
-            .setOnClickListener {
-
-                dialog.dismiss()
-
-                val intent =
-                    Intent(
-                        this,
-                        AsignadasActivity::class.java
-                    ).apply {
-
-                        putExtra(
-                            "id_plato",
-                            plato.idPlato
-                        )
-
-                        putExtra(
-                            "id_seccion",
-                            plato.idSeccion ?: -1
-                        )
-
-                        putExtra(
-                            "nombre_plato",
-                            plato.nombrePlato
-                        )
-                    }
-
-                startActivity(intent)
+        dialogBinding.btnVerComponentesModal.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(this, IngredientesActivity::class.java).apply {
+                putExtra("id_plato", plato.idPlato)
+                putExtra("id_seccion", plato.idSeccion ?: -1)
+                putExtra("nombre_plato", plato.nombrePlato)
+                putExtra("componente_seleccionado", plato.componente)
             }
+            startActivity(intent)
+        }
 
         // -----------------------------------------------------
         // PREPARACIÓN
         // -----------------------------------------------------
 
-        dialogBinding.btnOtroAleatorioModal
-            .setOnClickListener {
-
-                dialog.dismiss()
-
-                val intent =
-                    Intent(
-                        this,
-                        PreparacionActivity::class.java
-                    ).apply {
-
-                        putExtra(
-                            "id_plato",
-                            plato.idPlato
-                        )
-
-                        putExtra(
-                            "nombre_plato",
-                            plato.nombrePlato
-                        )
-                    }
-
-                startActivity(intent)
+        dialogBinding.btnOtroAleatorioModal.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(this, PreparacionActivity::class.java).apply {
+                putExtra("id_plato", plato.idPlato)
+                putExtra("nombre_plato", plato.nombrePlato)
             }
+            startActivity(intent)
+        }
 
         dialog.show()
     }

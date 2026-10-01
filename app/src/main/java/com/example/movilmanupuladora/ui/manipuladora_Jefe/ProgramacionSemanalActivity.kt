@@ -1,4 +1,4 @@
-package com.example.manipuladorajefe
+package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
 import android.app.AlertDialog
 import android.os.Bundle
@@ -8,7 +8,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.manipuladorajefe.databinding.ActivityProgramacionSemanalBinding
+import com.example.movilmanupuladora.databinding.ActivityProgramacionSemanalBinding
+
 
 class ProgramacionSemanalActivity : AppCompatActivity() {
 
