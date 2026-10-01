@@ -12,6 +12,7 @@ import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.repository.UsuarioRepository
 import com.example.movilmanupuladora.databinding.ActivityLoginBinding
 import com.example.movilmanupuladora.ui.manipuladora.TurnoActivity
+import com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity
 import com.example.movilmanupuladora.utils.SessionManager
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -129,13 +130,23 @@ class LoginActivity : AppCompatActivity() {
                         ).show()
 
                         // =====================================
-                        // IR AL MAIN
+                        // DETERMINAR ROL Y REDIRIGIR
                         // =====================================
+
+                        val rol = (loginRes.usuario?.rol ?: "").lowercase()
+                        val email = (loginRes.usuario?.correo ?: correo).lowercase()
+                        val esJefa = rol.contains("jefa") || rol.contains("jefe") || email.contains("jefe") || email.contains("jefa")
+
+                        val destino = if (esJefa) {
+                            InicioJefaActivity::class.java
+                        } else {
+                            TurnoActivity::class.java
+                        }
 
                         startActivity(
                             Intent(
                                 this@LoginActivity,
-                                TurnoActivity::class.java
+                                destino
                             )
                         )
 
@@ -159,10 +170,31 @@ class LoginActivity : AppCompatActivity() {
                     // =========================================
 
                     if (
+                        (correo.contains("jefe", ignoreCase = true) || correo.contains("jefa", ignoreCase = true)) &&
+                        pass == "123456789"
+                    ) {
+                        sessionManager.saveUserData("Jefa de Cocina", "JefaManipuladoras", correo)
+                        Toast.makeText(
+                            this@LoginActivity,
+                            "Inicio de sesión Jefa (Modo prueba)",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        startActivity(
+                            Intent(
+                                this@LoginActivity,
+                                InicioJefaActivity::class.java
+                            )
+                        )
+                        finish()
+                        return@launch
+                    }
+
+                    if (
                         correo == "manipuladora@gmail.com" &&
                         pass == "123456789"
                     ) {
-
+                        sessionManager.saveUserData("María Manipuladora", "Manipuladora", correo)
                         Toast.makeText(
                             this@LoginActivity,
                             "Inicio de sesión (Modo prueba)",
