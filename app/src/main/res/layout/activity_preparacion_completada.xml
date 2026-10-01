@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blanco"
+    android:fillViewport="true"
+    tools:context=".PreparacionCompletadaActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- ================================================= -->
+        <!-- ENCABEZADO                                       -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <ImageButton
+                android:id="@+id/btnCerrar"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/bg_icono_circular"
+                android:contentDescription="Volver"
+                android:padding="10dp"
+                android:src="@drawable/ic_arrow_back"
+                android:tint="@color/negro_principal" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtTitulo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Preparación completada"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/txtJornada"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="Jornada: Mañana"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- CONFIRMACIÓN                                     -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:id="@+id/cardConfirmacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:background="@drawable/bg_card_resumen"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <ImageView
+                android:id="@+id/imgConfirmacion"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:background="@drawable/bg_icono_verde"
+                android:contentDescription="Preparación completada"
+                android:padding="16dp"
+                android:src="@drawable/ic_check"
+                android:tint="@color/negro_principal" />
+
+            <TextView
+                android:id="@+id/txtMensajeCompletada"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:text="Preparación completada correctamente"
+                android:textColor="@color/negro_principal"
+                android:textSize="19sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtDescripcionCompletada"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="La preparación ha sido registrada para la jornada."
+                android:textColor="@color/gris_texto"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- RESUMEN DE PREPARACIÓN                           -->
+        <!-- ================================================= -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:text="Resumen de la preparación"
+            android:textColor="@color/negro_principal"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+
+        <!-- ================================================= -->
+        <!-- MENÚ                                             -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:id="@+id/cardMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_card_resumen"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Menú preparado"
+                android:textColor="@color/gris_texto"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/txtNombreMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Arroz con pollo"
+                android:textColor="@color/negro_principal"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- NIÑOS ATENDIDOS                                  -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:id="@+id/cardNinos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_card_resumen"
+            android:gravity="center_vertical"
+            android:padding="16dp">
+
+            <ImageView
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/bg_icono_amarillo"
+                android:contentDescription="Niños atendidos"
+                android:padding="9dp"
+                android:src="@drawable/ic_nav_manipuladoras"
+                android:tint="@color/negro_principal" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Niños atendidos"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/txtNinosAtendidos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="0 niños"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- MANIPULADORAS                                    -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:id="@+id/cardManipuladoras"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_card_resumen"
+            android:gravity="center_vertical"
+            android:padding="16dp">
+
+            <ImageView
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/bg_icono_verde"
+                android:contentDescription="Manipuladoras"
+                android:padding="9dp"
+                android:src="@drawable/ic_nav_manipuladoras"
+                android:tint="@color/negro_principal" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Manipuladoras participantes"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/txtManipuladoras"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="0 manipuladoras"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- TIEMPO                                           -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:id="@+id/cardTiempo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_card_resumen"
+            android:gravity="center_vertical"
+            android:padding="16dp">
+
+            <ImageView
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/bg_icono_amarillo"
+                android:contentDescription="Tiempo de preparación"
+                android:padding="9dp"
+                android:src="@drawable/ic_nav_inicio"
+                android:tint="@color/negro_principal" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tiempo de preparación"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/txtTiempoPreparacion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="00:00"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- ALIMENTOS UTILIZADOS                             -->
+        <!-- ================================================= -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:text="Alimentos utilizados"
+            android:textColor="@color/negro_principal"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/cardAlimentos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_card_resumen"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/txtAlimentos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Arroz  •  12 kg&#10;Pollo  •  18 kg&#10;Verduras  •  8 kg"
+                android:textColor="@color/negro_principal"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- OBSERVACIONES                                    -->
+        <!-- ================================================= -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:text="Observaciones"
+            android:textColor="@color/negro_principal"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtObservaciones"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_card_resumen"
+            android:padding="16dp"
+            android:text="Sin observaciones"
+            android:textColor="@color/gris_texto"
+            android:textSize="14sp" />
+
+
+        <!-- ================================================= -->
+        <!-- BOTÓN VOLVER A PREPARACIONES                     -->
+        <!-- ================================================= -->
+
+        <Button
+            android:id="@+id/btnVolverPreparaciones"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="@color/amarillo_principal"
+            android:text="Volver a preparaciones"
+            android:textColor="@color/blanco"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+
+        <!-- ================================================= -->
+        <!-- BOTÓN INICIO                                     -->
+        <!-- ================================================= -->
+
+        <Button
+            android:id="@+id/btnVolverInicio"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/gris_claro"
+            android:text="Ir al inicio"
+            android:textColor="@color/negro_principal"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+</ScrollView>

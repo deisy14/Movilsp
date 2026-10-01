@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    android:orientation="vertical"
+
+    android:padding="24dp"
+
+    android:background="@color/blanco">
+
+
+    <!-- ================================================= -->
+    <!-- TÍTULO                                            -->
+    <!-- ================================================= -->
+
+    <TextView
+        android:id="@+id/txtTituloDialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:text="Registrar asistencia"
+        android:textColor="@color/negro_principal"
+        android:textSize="20sp"
+        android:textStyle="bold"/>
+
+
+    <!-- ================================================= -->
+    <!-- DESCRIPCIÓN                                       -->
+    <!-- ================================================= -->
+
+    <TextView
+        android:id="@+id/txtDescripcionDialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="8dp"
+
+        android:text="Ingresa la cantidad de niños que asistirán en esta jornada."
+        android:textColor="@color/gris_texto"
+        android:textSize="13sp"/>
+
+
+    <!-- ================================================= -->
+    <!-- JORNADA                                           -->
+    <!-- ================================================= -->
+
+    <TextView
+        android:id="@+id/txtJornadaDialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="20dp"
+
+        android:text="Jornada: Mañana"
+        android:textColor="@color/negro_principal"
+        android:textSize="14sp"
+        android:textStyle="bold"/>
+
+
+    <!-- ================================================= -->
+    <!-- CAMPO CANTIDAD                                    -->
+    <!-- ================================================= -->
+
+    <EditText
+        android:id="@+id/edtCantidadAsistencia"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+
+        android:layout_marginTop="12dp"
+
+        android:background="@drawable/bg_edittext"
+
+        android:hint="Ejemplo: 120"
+        android:inputType="number"
+        android:maxLines="1"
+
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+
+        android:textColor="@color/negro_principal"
+        android:textColorHint="@color/gris_texto"
+
+        android:textSize="18sp"/>
+
+
+    <!-- ================================================= -->
+    <!-- BOTONES                                           -->
+    <!-- ================================================= -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+
+        android:layout_marginTop="22dp"
+
+        android:orientation="horizontal">
+
+
+        <Button
+            android:id="@+id/btnCancelarAsistencia"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="1"
+
+            android:text="Cancelar"
+            android:textColor="@color/negro_principal"
+            android:textSize="13sp"
+
+            android:backgroundTint="@color/gris_claro"/>
+
+
+        <Space
+            android:layout_width="10dp"
+            android:layout_height="match_parent"/>
+
+
+        <Button
+            android:id="@+id/btnGuardarAsistencia"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="1"
+
+            android:text="Guardar"
+            android:textColor="@color/blanco"
+            android:textSize="13sp"
+            android:textStyle="bold"
+
+            android:backgroundTint="@color/amarillo_principal"/>
+
+    </LinearLayout>
+
+</LinearLayout>

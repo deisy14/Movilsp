@@ -1,0 +1,740 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/blanco">
+
+    <!-- ===================================================== -->
+    <!-- CONTENIDO PRINCIPAL                                   -->
+    <!-- ===================================================== -->
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- ================================================= -->
+            <!-- ENCABEZADO                                         -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical">
+
+                <ImageButton
+                    android:id="@+id/btnVolver"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_icono_circular"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_arrow_back"
+                    android:tint="@color/negro_principal"
+                    android:contentDescription="Volver"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Alimentos disponibles"
+                        android:textColor="@color/negro_principal"
+                        android:textSize="22sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/txtFecha"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="Hoy"
+                        android:textColor="@color/gris_texto"
+                        android:textSize="12sp"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <!-- ================================================= -->
+            <!-- INFORMACIÓN                                       -->
+            <!-- ================================================= -->
+
+            <TextView
+                android:id="@+id/txtDescripcion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="Consulta los alimentos disponibles en el inventario para preparar el menú."
+                android:textColor="@color/gris_texto"
+                android:textSize="13sp"/>
+
+
+            <!-- ================================================= -->
+            <!-- BUSCADOR                                          -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="18dp"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_campo"
+                android:paddingStart="14dp"
+                android:paddingEnd="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⌕"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="22sp"/>
+
+                <EditText
+                    android:id="@+id/edtBuscarAlimento"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:background="@android:color/transparent"
+                    android:hint="Buscar alimento..."
+                    android:inputType="text"
+                    android:singleLine="true"
+                    android:textColor="@color/negro_principal"
+                    android:textColorHint="@color/gris_texto"
+                    android:textSize="14sp"/>
+
+                <TextView
+                    android:id="@+id/btnFiltro"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:gravity="center"
+                    android:text="☰"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="18sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:contentDescription="Filtrar alimentos"/>
+
+            </LinearLayout>
+
+
+            <!-- ================================================= -->
+            <!-- FILTROS                                           -->
+            <!-- ================================================= -->
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/btnFiltroTodos"
+                        android:layout_width="wrap_content"
+                        android:layout_height="38dp"
+                        android:gravity="center"
+                        android:paddingStart="18dp"
+                        android:paddingEnd="18dp"
+                        android:text="Todos"
+                        android:textColor="@color/blanco"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:background="@color/amarillo_principal"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <TextView
+                        android:id="@+id/btnFiltroGranos"
+                        android:layout_width="wrap_content"
+                        android:layout_height="38dp"
+                        android:layout_marginStart="8dp"
+                        android:gravity="center"
+                        android:paddingStart="18dp"
+                        android:paddingEnd="18dp"
+                        android:text="Granos"
+                        android:textColor="@color/negro_principal"
+                        android:textSize="12sp"
+                        android:background="@color/gris_claro"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <TextView
+                        android:id="@+id/btnFiltroProteinas"
+                        android:layout_width="wrap_content"
+                        android:layout_height="38dp"
+                        android:layout_marginStart="8dp"
+                        android:gravity="center"
+                        android:paddingStart="18dp"
+                        android:paddingEnd="18dp"
+                        android:text="Proteínas"
+                        android:textColor="@color/negro_principal"
+                        android:textSize="12sp"
+                        android:background="@color/gris_claro"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <TextView
+                        android:id="@+id/btnFiltroOtros"
+                        android:layout_width="wrap_content"
+                        android:layout_height="38dp"
+                        android:layout_marginStart="8dp"
+                        android:gravity="center"
+                        android:paddingStart="18dp"
+                        android:paddingEnd="18dp"
+                        android:text="Otros"
+                        android:textColor="@color/negro_principal"
+                        android:textSize="12sp"
+                        android:background="@color/gris_claro"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                </LinearLayout>
+
+            </HorizontalScrollView>
+
+
+            <!-- ================================================= -->
+            <!-- TITULO LISTA                                      -->
+            <!-- ================================================= -->
+
+            <TextView
+                android:id="@+id/txtTituloLista"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:text="Productos disponibles"
+                android:textColor="@color/negro_principal"
+                android:textSize="17sp"
+                android:textStyle="bold"/>
+
+
+            <!-- ================================================= -->
+            <!-- ARROZ                                             -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:id="@+id/itemArroz"
+                android:layout_width="match_parent"
+                android:layout_height="76dp"
+                android:layout_marginTop="12dp"
+                android:gravity="center_vertical"
+                android:padding="10dp"
+                android:background="@drawable/bg_card_resumen"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="46dp"
+                    android:layout_height="46dp"
+                    android:padding="9dp"
+                    android:background="@drawable/bg_icono_verde"
+                    android:src="@drawable/ic_food"
+                    android:contentDescription="Arroz"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txtArroz"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Arroz"
+                        android:textColor="@color/negro_principal"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/txtCantidadArroz"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="25 kg"
+                        android:textColor="@color/gris_texto"
+                        android:textSize="12sp"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/txtEstadoArroz"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:gravity="center"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="Disponible"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:background="@color/gris_claro"/>
+
+                <TextView
+                    android:layout_width="32dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="›"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="25sp"/>
+
+            </LinearLayout>
+
+
+            <!-- ================================================= -->
+            <!-- FRIJOL                                            -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:id="@+id/itemFrijol"
+                android:layout_width="match_parent"
+                android:layout_height="76dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                android:padding="10dp"
+                android:background="@drawable/bg_card_resumen"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="46dp"
+                    android:layout_height="46dp"
+                    android:padding="9dp"
+                    android:background="@drawable/bg_icono_amarillo"
+                    android:src="@drawable/ic_food"
+                    android:contentDescription="Frijol"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txtFrijol"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Frijol"
+                        android:textColor="@color/negro_principal"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/txtCantidadFrijol"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="18 kg"
+                        android:textColor="@color/gris_texto"
+                        android:textSize="12sp"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/txtEstadoFrijol"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:gravity="center"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="Disponible"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:background="@color/gris_claro"/>
+
+                <TextView
+                    android:layout_width="32dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="›"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="25sp"/>
+
+            </LinearLayout>
+
+
+            <!-- ================================================= -->
+            <!-- POLLO                                             -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:id="@+id/itemPollo"
+                android:layout_width="match_parent"
+                android:layout_height="76dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                android:padding="10dp"
+                android:background="@drawable/bg_card_resumen"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="46dp"
+                    android:layout_height="46dp"
+                    android:padding="9dp"
+                    android:background="@drawable/bg_icono_amarillo"
+                    android:src="@drawable/ic_food"
+                    android:contentDescription="Pollo"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txtPollo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Pollo"
+                        android:textColor="@color/negro_principal"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/txtCantidadPollo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="24 kg"
+                        android:textColor="@color/gris_texto"
+                        android:textSize="12sp"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/txtEstadoPollo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:gravity="center"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="Disponible"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:background="@color/gris_claro"/>
+
+                <TextView
+                    android:layout_width="32dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="›"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="25sp"/>
+
+            </LinearLayout>
+
+
+            <!-- ================================================= -->
+            <!-- VERDURAS                                          -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:id="@+id/itemVerduras"
+                android:layout_width="match_parent"
+                android:layout_height="76dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                android:padding="10dp"
+                android:background="@drawable/bg_card_resumen"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="46dp"
+                    android:layout_height="46dp"
+                    android:padding="9dp"
+                    android:background="@drawable/bg_icono_verde"
+                    android:src="@drawable/ic_food"
+                    android:contentDescription="Verduras"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txtVerduras"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Verduras"
+                        android:textColor="@color/negro_principal"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/txtCantidadVerduras"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="10 kg"
+                        android:textColor="@color/gris_texto"
+                        android:textSize="12sp"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/txtEstadoVerduras"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:gravity="center"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="Disponible"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:background="@color/gris_claro"/>
+
+                <TextView
+                    android:layout_width="32dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="›"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="25sp"/>
+
+            </LinearLayout>
+
+
+            <!-- ================================================= -->
+            <!-- ACEITE                                             -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:id="@+id/itemAceite"
+                android:layout_width="match_parent"
+                android:layout_height="76dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                android:padding="10dp"
+                android:background="@drawable/bg_card_resumen"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="46dp"
+                    android:layout_height="46dp"
+                    android:padding="9dp"
+                    android:background="@drawable/bg_icono_amarillo"
+                    android:src="@drawable/ic_food"
+                    android:contentDescription="Aceite"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txtAceite"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Aceite"
+                        android:textColor="@color/negro_principal"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/txtCantidadAceite"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="5 L"
+                        android:textColor="@color/gris_texto"
+                        android:textSize="12sp"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/txtEstadoAceite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:gravity="center"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="Disponible"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:background="@color/gris_claro"/>
+
+                <TextView
+                    android:layout_width="32dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="›"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="25sp"/>
+
+            </LinearLayout>
+
+
+            <!-- ================================================= -->
+            <!-- LECHE                                             -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:id="@+id/itemLeche"
+                android:layout_width="match_parent"
+                android:layout_height="76dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                android:padding="10dp"
+                android:background="@drawable/bg_card_resumen"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="46dp"
+                    android:layout_height="46dp"
+                    android:padding="9dp"
+                    android:background="@drawable/bg_icono_verde"
+                    android:src="@drawable/ic_food"
+                    android:contentDescription="Leche"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txtLeche"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Leche"
+                        android:textColor="@color/negro_principal"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/txtCantidadLeche"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="20 L"
+                        android:textColor="@color/gris_texto"
+                        android:textSize="12sp"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/txtEstadoLeche"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:gravity="center"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="Disponible"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:background="@color/gris_claro"/>
+
+                <TextView
+                    android:layout_width="32dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="›"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="25sp"/>
+
+            </LinearLayout>
+
+
+            <!-- ================================================= -->
+            <!-- MENSAJE INFORMATIVO                               -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:id="@+id/contenedorInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:padding="14dp"
+                android:orientation="horizontal"
+                android:background="@drawable/bg_card_resumen">
+
+                <TextView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:gravity="center"
+                    android:text="i"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/txtMensajeSeleccion"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="Selecciona los alimentos que deseas considerar para generar las opciones de menú."
+                    android:textColor="@color/gris_texto"
+                    android:textSize="12sp"/>
+
+            </LinearLayout>
+
+
+            <!-- ================================================= -->
+            <!-- CONTINUAR                                         -->
+            <!-- ================================================= -->
+
+            <Button
+                android:id="@+id/btnContinuar"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="18dp"
+                android:layout_marginBottom="10dp"
+                android:text="Continuar"
+                android:textColor="@color/blanco"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:backgroundTint="@color/amarillo_principal"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+    <!-- ===================================================== -->
+    <!-- BARRA DE NAVEGACIÓN                                   -->
+    <!-- ===================================================== -->
+
+    <!-- La barra inferior la incluiremos cuando terminemos
+         de comprobar este XML y usemos exactamente el nombre
+         del archivo de navegación que ya creaste. -->
+
+</LinearLayout>

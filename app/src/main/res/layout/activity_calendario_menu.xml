@@ -1,0 +1,812 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blanco"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- ================================================= -->
+        <!-- ENCABEZADO                                        -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <ImageButton
+                android:id="@+id/btnCerrar"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/bg_icono_circular"
+                android:contentDescription="Volver"
+                android:padding="10dp"
+                android:src="@drawable/ic_arrow_back"
+                android:tint="@color/negro_principal" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtTitulo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Calendario"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/txtSubtitulo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="Consulta y programa los menús"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- ACCIONES PRINCIPALES                              -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="22dp"
+            android:background="@drawable/bg_card_resumen"
+            android:padding="4dp">
+
+            <Button
+                android:id="@+id/btnHistorial"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:backgroundTint="@color/amarillo_principal"
+                android:text="Historial"
+                android:textColor="@color/blanco"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnProgramar"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:backgroundTint="@color/gris_claro"
+                android:text="Programar"
+                android:textColor="@color/negro_principal"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- MES                                                -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical">
+
+            <ImageButton
+                android:id="@+id/btnMesAnterior"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/bg_icono_circular"
+                android:contentDescription="Mes anterior"
+                android:padding="9dp"
+                android:src="@drawable/ic_arrow_back"
+                android:tint="@color/negro_principal" />
+
+            <TextView
+                android:id="@+id/txtMesActual"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Septiembre 2026"
+                android:textColor="@color/negro_principal"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/btnMesSiguiente"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/bg_icono_circular"
+                android:contentDescription="Mes siguiente"
+                android:padding="9dp"
+                android:rotation="180"
+                android:src="@drawable/ic_arrow_back"
+                android:tint="@color/negro_principal" />
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- CALENDARIO                                        -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:id="@+id/contenedorCalendario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card_resumen"
+            android:padding="12dp">
+
+            <!-- DÍAS DE LA SEMANA -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="L"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="M"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="M"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="J"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="V"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="S"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="D"
+                    android:textColor="@color/gris_texto"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+
+            <!-- FILA 1 -->
+
+            <LinearLayout
+                android:id="@+id/filaSemana1"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/dia1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia2"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia3"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia4"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia5"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia6"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia7"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+
+            <!-- FILA 2 -->
+
+            <LinearLayout
+                android:id="@+id/filaSemana2"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/dia8"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia9"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia10"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia11"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia12"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia13"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia14"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+
+            <!-- FILA 3 -->
+
+            <LinearLayout
+                android:id="@+id/filaSemana3"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/dia15"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia16"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia17"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia18"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia19"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia20"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia21"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+
+            <!-- FILA 4 -->
+
+            <LinearLayout
+                android:id="@+id/filaSemana4"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/dia22"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia23"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia24"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia25"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia26"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia27"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia28"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+
+            <!-- FILA 5 -->
+
+            <LinearLayout
+                android:id="@+id/filaSemana5"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/dia29"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia30"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia31"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia32"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia33"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia34"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia35"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+
+            <!-- FILA 6 -->
+
+            <LinearLayout
+                android:id="@+id/filaSemana6"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/dia36"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia37"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia38"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia39"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia40"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia41"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/dia42"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/gris_texto"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- DETALLE DEL DÍA SELECCIONADO                      -->
+        <!-- ================================================= -->
+
+        <TextView
+            android:id="@+id/txtTituloDia"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Selecciona un día"
+            android:textColor="@color/negro_principal"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/cardDiaSeleccionado"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_card_resumen"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/txtFechaSeleccionada"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fecha"
+                android:textColor="@color/gris_texto"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/txtPlatoManana"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Mañana: Sin plato programado"
+                android:textColor="@color/negro_principal"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtPlatoTarde"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Tarde: Sin plato programado"
+                android:textColor="@color/negro_principal"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- PROGRAMAR SEMANA                                  -->
+        <!-- ================================================= -->
+
+        <Button
+            android:id="@+id/btnProgramarSemana"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="22dp"
+            android:backgroundTint="@color/amarillo_principal"
+            android:text="Programar menú de la semana"
+            android:textColor="@color/blanco"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+
+        <!-- ================================================= -->
+        <!-- HISTORIAL DEL DÍA                                 -->
+        <!-- ================================================= -->
+
+        <Button
+            android:id="@+id/btnVerDetalleDia"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="@color/gris_claro"
+            android:text="Ver detalle del día"
+            android:textColor="@color/negro_principal"
+            android:textSize="13sp" />
+
+    </LinearLayout>
+
+</ScrollView>

@@ -43,4 +43,19 @@
     <!-- NEGRO -->
     <color name="negro">#000000</color>
 
+
+    <!-- Colores definidos en el diseño -->
+    <color name="amarillo_principal">#D9A700</color>
+    <color name="negro_principal">#111111</color>
+    <color name="verde_claro">#E5FED0</color>
+    <color name="verde_prinpipal">#3E6B21</color>
+    <color name="rojo_principal">#E53935</color>
+
+    <!-- Colores auxiliares -->
+
+    <color name="gris_texto">#666666</color>
+    <color name="gris_claro">#F5F5F5</color>
+    <color name="amarillo_dorado_suave">#D8B84C</color>
+
+
 </resources>

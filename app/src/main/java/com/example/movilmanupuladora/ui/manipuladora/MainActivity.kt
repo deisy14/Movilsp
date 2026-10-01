@@ -49,7 +49,6 @@ class MainActivity : AppCompatActivity() {
         "Merienda"
     )
 
-    // Índice de la sección actualmente seleccionada
     private var seccionSeleccionada = 0
 
     // =========================================================
@@ -58,6 +57,7 @@ class MainActivity : AppCompatActivity() {
 
     private val platosBaseRespaldo = listOf(
 
+        // ALMUERZO
         PlatoResponse(
             idPlato = 4,
             idSeccion = 2,
@@ -66,6 +66,7 @@ class MainActivity : AppCompatActivity() {
                 "carne molida, chicharron, aguacate, arroz, frijol"
         ),
 
+        // MERIENDA
         PlatoResponse(
             idPlato = 1,
             idSeccion = 3,
@@ -87,6 +88,7 @@ class MainActivity : AppCompatActivity() {
             componente = "Principal"
         ),
 
+        // DESAYUNO
         PlatoResponse(
             idPlato = 5,
             idSeccion = 4,
@@ -132,7 +134,7 @@ class MainActivity : AppCompatActivity() {
         SessionManager.getToken(this)
 
         // -----------------------------------------------------
-        // Datos iniciales
+        // DATOS INICIALES
         // -----------------------------------------------------
 
         listaPlatos = platosBaseRespaldo
@@ -149,19 +151,19 @@ class MainActivity : AppCompatActivity() {
         configurarMenusAnteriores()
 
         // -----------------------------------------------------
-        // Backend
+        // BACKEND
         // -----------------------------------------------------
 
         cargarDatosDesdeBackend()
 
         // -----------------------------------------------------
-        // Ruleta
+        // RULETA
         // -----------------------------------------------------
 
         configurarGiroRuleta()
 
         // -----------------------------------------------------
-        // Tarjeta del plato
+        // TARJETA DEL PLATO
         // -----------------------------------------------------
 
         binding.cardPlatoSeleccionado.setOnClickListener {
@@ -402,52 +404,55 @@ class MainActivity : AppCompatActivity() {
     }
 
     // =========================================================
-    // ACTUALIZAR RULETA
+    // ACTUALIZAR RULETA - SOLO IMÁGENES
     // =========================================================
 
     private fun actualizarRuleta() {
-
-        val desayuno =
-            obtenerPlatoPorSeccion("Desayuno")
-
-        val almuerzo =
-            obtenerPlatoPorSeccion("Almuerzo")
-
-        val merienda =
-            obtenerPlatoPorSeccion("Merienda")
 
         // -----------------------------------------------------
         // DESAYUNO
         // -----------------------------------------------------
 
-        desayuno?.let {
+        val desayuno =
+            obtenerPlatoPorSeccion("Desayuno")
 
-            binding.imgRuletaDesayuno.setImageResource(
-                obtenerImagenPlato(it)
-            )
-        }
+        binding.imgRuletaDesayuno.setImageResource(
+            if (desayuno != null) {
+                obtenerImagenPlato(desayuno)
+            } else {
+                R.drawable.apanado
+            }
+        )
 
         // -----------------------------------------------------
         // ALMUERZO
         // -----------------------------------------------------
 
-        almuerzo?.let {
+        val almuerzo =
+            obtenerPlatoPorSeccion("Almuerzo")
 
-            binding.imgRuletaAlmuerzo.setImageResource(
-                obtenerImagenPlato(it)
-            )
-        }
+        binding.imgRuletaAlmuerzo.setImageResource(
+            if (almuerzo != null) {
+                obtenerImagenPlato(almuerzo)
+            } else {
+                R.drawable.bandeja_paisa
+            }
+        )
 
         // -----------------------------------------------------
         // MERIENDA
         // -----------------------------------------------------
 
-        merienda?.let {
+        val merienda =
+            obtenerPlatoPorSeccion("Merienda")
 
-            binding.imgRuletaMerienda.setImageResource(
-                obtenerImagenPlato(it)
-            )
-        }
+        binding.imgRuletaMerienda.setImageResource(
+            if (merienda != null) {
+                obtenerImagenPlato(merienda)
+            } else {
+                R.drawable.arroz_de_leche
+            }
+        )
     }
 
     // =========================================================
@@ -519,7 +524,7 @@ class MainActivity : AppCompatActivity() {
             }
 
         // -----------------------------------------------------
-        // Primero usamos el ID real de la sección
+        // PRIMERO USAMOS EL ID REAL DE LA SECCIÓN
         // -----------------------------------------------------
 
         if (seccion != null) {
@@ -538,10 +543,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         // -----------------------------------------------------
-        // Respaldo por nombre
+        // RESPALDO POR NOMBRE
         // -----------------------------------------------------
 
         return when {
+
+            // -------------------------------------------------
+            // DESAYUNO
+            // -------------------------------------------------
 
             nombreSeccion.equals(
                 "Desayuno",
@@ -561,6 +570,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+            // -------------------------------------------------
+            // ALMUERZO
+            // -------------------------------------------------
+
             nombreSeccion.equals(
                 "Almuerzo",
                 ignoreCase = true
@@ -574,6 +587,10 @@ class MainActivity : AppCompatActivity() {
                     ) == true
                 }
             }
+
+            // -------------------------------------------------
+            // MERIENDA
+            // -------------------------------------------------
 
             nombreSeccion.equals(
                 "Merienda",
@@ -612,28 +629,36 @@ class MainActivity : AppCompatActivity() {
 
         return when {
 
+            // BANDEJA PAISA
             nombre.contains("bandeja") ->
                 R.drawable.bandeja_paisa
 
+            // FRIJOLES
             nombre.contains("frijol") ->
                 R.drawable.frijoles
 
+            // CHOCOLATE
             nombre.contains("chocolate") ->
                 R.drawable.chocolate
 
+            // HUEVO
             nombre.contains("huevo") ->
                 R.drawable.huevo_perico
 
+            // POLLO
             nombre.contains("pollo") ->
                 R.drawable.apanado
 
+            // ARROZ
             nombre.contains("arroz") ->
                 R.drawable.arroz_de_leche
 
+            // CAFÉ
             nombre.contains("café") ||
                     nombre.contains("cafe") ->
                 R.drawable.apanado
 
+            // IMAGEN POR DEFECTO
             else ->
                 R.drawable.frijoles
         }
