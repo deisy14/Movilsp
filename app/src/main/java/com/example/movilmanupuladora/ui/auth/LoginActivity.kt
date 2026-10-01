@@ -166,74 +166,18 @@ class LoginActivity : AppCompatActivity() {
                 } else {
 
                     // =========================================
-                    // MODO DE PRUEBA LOCAL
-                    // =========================================
-
-                    if (
-                        (correo.contains("jefe", ignoreCase = true) || correo.contains("jefa", ignoreCase = true)) &&
-                        (pass == "123456789" || pass == "Sirae12345")
-                    ) {
-                        sessionManager.saveUserData("Jefa de Cocina", "Jefa de manipuladora", correo)
-                        Toast.makeText(
-                            this@LoginActivity,
-                            "Inicio de sesión Jefa (Modo prueba)",
-                            Toast.LENGTH_SHORT
-                        ).show()
-
-                        startActivity(
-                            Intent(
-                                this@LoginActivity,
-                                InicioJefaActivity::class.java
-                            )
-                        )
-                        finish()
-                        return@launch
-                    }
-
-                    if (
-                        (correo == "manipuladora@gmail.com" || correo == "manipuladora@sirae.com") &&
-                        (pass == "123456789" || pass == "Sirae12345")
-                    ) {
-                        sessionManager.saveUserData("María Manipuladora", "Manipuladora", correo)
-                        Toast.makeText(
-                            this@LoginActivity,
-                            "Inicio de sesión (Modo prueba)",
-                            Toast.LENGTH_SHORT
-                        ).show()
-
-                        startActivity(
-                            Intent(
-                                this@LoginActivity,
-                                TurnoActivity::class.java
-                            )
-                        )
-
-                        finish()
-
-                        return@launch
-                    }
-
-                    // =========================================
                     // ERROR DEL BACKEND
                     // =========================================
 
                     mostrarCargando(false)
 
-                    val errorBody =
-                        response.errorBody()?.string()
+                    val errorBody = response.errorBody()?.string()
 
                     val msg = try {
-
-                        JSONObject(
-                            errorBody ?: ""
-                        ).optString(
-                            "detail",
-                            "Error de credenciales"
-                        )
-
+                        val json = JSONObject(errorBody ?: "")
+                        json.optString("detail", json.optString("error", "Credenciales incorrectas"))
                     } catch (e: Exception) {
-
-                        "Error ${response.code()}"
+                        "Error ${response.code()}: No se pudo iniciar sesión"
                     }
 
                     Toast.makeText(
@@ -244,43 +188,11 @@ class LoginActivity : AppCompatActivity() {
                 }
 
             } catch (e: Exception) {
-
-                // =============================================
-                // MODO OFFLINE DE PRUEBA
-                // =============================================
-
-                if (
-                    correo == "manipuladora@gmail.com" &&
-                    pass == "123456789"
-                ) {
-
-                    Toast.makeText(
-                        this@LoginActivity,
-                        "Inicio de sesión (Modo offline)",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
-                    startActivity(
-                        Intent(
-                            this@LoginActivity,
-                            TurnoActivity::class.java
-                        )
-                    )
-
-                    finish()
-
-                    return@launch
-                }
-
-                // =============================================
-                // ERROR DE RED
-                // =============================================
-
                 mostrarCargando(false)
 
                 Toast.makeText(
                     this@LoginActivity,
-                    "Error de red: ${e.localizedMessage}",
+                    "Error de red: ${e.localizedMessage ?: "No se pudo conectar al servidor"}",
                     Toast.LENGTH_LONG
                 ).show()
             }
