@@ -1,10 +1,10 @@
-package com.example.manipuladorajefe
+package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.manipuladorajefe.databinding.ActivityLoginJefaBinding
+import com.example.movilmanupuladora.databinding.ActivityLoginJefaBinding
 
 class LoginJefaActivity : AppCompatActivity() {
 

@@ -1,11 +1,11 @@
-package com.example.manipuladorajefe
+package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.manipuladorajefe.databinding.ActivityDetallePreparacionBinding
+import com.example.movilmanupuladora.databinding.ActivityDetallePreparacionBinding
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

@@ -1,4 +1,6 @@
-package com.example.manipuladorajefe
+package com.example.movilmanupuladora.ui.manipuladora_Jefe
+
+import com.example.movilmanupuladora.R
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,7 +10,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.manipuladorajefe.databinding.ActivityAlimentosDisponiblesBinding
+import com.example.movilmanupuladora.databinding.ActivityAlimentosDisponiblesBinding
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

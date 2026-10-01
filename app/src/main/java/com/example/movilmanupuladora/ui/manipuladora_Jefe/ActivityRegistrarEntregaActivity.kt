@@ -1,4 +1,6 @@
-package com.example.manipuladorajefe
+package com.example.movilmanupuladora.ui.manipuladora_Jefe
+
+import com.example.movilmanupuladora.R
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge

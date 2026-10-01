@@ -1,4 +1,4 @@
-package com.example.manipuladorajefe
+package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
 import android.os.Bundle
 import android.widget.Toast
@@ -6,7 +6,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.manipuladorajefe.databinding.PopupNotificacionesBinding
+import com.example.movilmanupuladora.databinding.PopupNotificacionesBinding
 
 class PopupNotificacionesActivity : AppCompatActivity() {
 

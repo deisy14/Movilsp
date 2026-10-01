@@ -1,4 +1,6 @@
-package com.example.manipuladorajefe
+package com.example.movilmanupuladora.ui.manipuladora_Jefe
+
+import com.example.movilmanupuladora.R
 
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -11,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.manipuladorajefe.databinding.ActivityCalendarioMenuBinding
+import com.example.movilmanupuladora.databinding.ActivityCalendarioMenuBinding
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
