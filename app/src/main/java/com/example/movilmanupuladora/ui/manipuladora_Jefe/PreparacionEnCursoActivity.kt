@@ -9,7 +9,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.movilmanupuladora.databinding.ActivityPreparacionEnCursoBinding
 
-
 class PreparacionEnCursoActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPreparacionEnCursoBinding

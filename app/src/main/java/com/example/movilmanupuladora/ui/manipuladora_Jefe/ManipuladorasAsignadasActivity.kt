@@ -6,7 +6,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.movilmanupuladora.databinding.ActivityManipuladorasAsignadasBinding
 
-
 class ManipuladorasAsignadasActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityManipuladorasAsignadasBinding

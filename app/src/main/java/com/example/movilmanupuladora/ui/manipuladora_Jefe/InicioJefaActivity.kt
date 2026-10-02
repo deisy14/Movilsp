@@ -1,18 +1,23 @@
 package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
+import com.example.movilmanupuladora.R
+
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-
-
-
+import androidx.lifecycle.lifecycleScope
+import com.example.movilmanupuladora.data.api.RetrofitClient
+import com.example.movilmanupuladora.data.repository.MenuRepository
 import com.example.movilmanupuladora.databinding.ActivityInicioJefaBinding
-import com.example.movilmanupuladora.R
+import com.example.movilmanupuladora.utils.SessionManager
+import kotlinx.coroutines.launch
 
 class InicioJefaActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityInicioJefaBinding
+    private lateinit var sessionManager: SessionManager
+    private val menuRepository = MenuRepository(RetrofitClient.apiService)
 
     // =========================================================
     // JORNADA
@@ -25,46 +30,24 @@ class InicioJefaActivity : AppCompatActivity() {
     // =========================================================
 
     data class Plato(
+        val id: Int? = null,
         val nombre: String,
-        val imagen: Int
+        val componente: String? = null,
+        val imagen: Int = R.drawable.pollo_guisado
     )
 
-    private val platosManana = listOf(
-        Plato(
-            "Pollo guisado",
-            R.drawable.pollo_guisado
-        ),
-        Plato(
-            "Arroz con pollo",
-            R.drawable.pollo_guisado
-        ),
-        Plato(
-            "Lentejas con arroz",
-            R.drawable.pollo_guisado
-        ),
-        Plato(
-            "Pasta con pollo",
-            R.drawable.pollo_guisado
-        )
+    private val platosManana = mutableListOf(
+        Plato(id = 5, nombre = "Arroz con pollo", componente = "Pollo"),
+        Plato(id = 6, nombre = "Café con pan", componente = "Desayuno"),
+        Plato(id = 7, nombre = "Bandeja paisa", componente = "Frijoles y carne"),
+        Plato(id = 10, nombre = "Carne asada", componente = "Proteína")
     )
 
-    private val platosTarde = listOf(
-        Plato(
-            "Arroz con pollo",
-            R.drawable.pollo_guisado
-        ),
-        Plato(
-            "Lentejas con arroz",
-            R.drawable.pollo_guisado
-        ),
-        Plato(
-            "Pasta con pollo",
-            R.drawable.pollo_guisado
-        ),
-        Plato(
-            "Pollo guisado",
-            R.drawable.pollo_guisado
-        )
+    private val platosTarde = mutableListOf(
+        Plato(id = 4, nombre = "Arroz a la valenciana", componente = "Arroz y verduras"),
+        Plato(id = 2, nombre = "Arroz con Pollo Especial", componente = "Pollo especial"),
+        Plato(id = 7, nombre = "Bandeja paisa", componente = "Carne y arroz"),
+        Plato(id = 10, nombre = "Carne asada", componente = "Proteína")
     )
 
     private var posicionPlato = 0
@@ -98,10 +81,17 @@ class InicioJefaActivity : AppCompatActivity() {
         binding = ActivityInicioJefaBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        sessionManager = SessionManager(this)
         configurarPantalla()
         configurarEventos()
         configurarNavegacionInferior()
         actualizarPantalla()
+        cargarPlatosYMenusDelBackend()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        actualizarResumen()
     }
 
     // =========================================================
@@ -110,7 +100,8 @@ class InicioJefaActivity : AppCompatActivity() {
 
     private fun configurarPantalla() {
 
-        binding.txtSaludo.text = "Hola, Jefa"
+        val nombre = com.example.movilmanupuladora.utils.SessionManager(this).getUserName() ?: "Jefa"
+        binding.txtSaludo.text = "Hola, $nombre"
 
         actualizarFecha()
 
@@ -465,6 +456,7 @@ class InicioJefaActivity : AppCompatActivity() {
         val plato = platos[posicionPlato]
 
         platoSeleccionado = true
+        sessionManager.savePlatoSeleccionado(plato.nombre, plato.id)
 
         binding.txtNombrePlato.text =
             plato.nombre
@@ -539,7 +531,12 @@ class InicioJefaActivity : AppCompatActivity() {
         // Estos valores posteriormente pueden venir
         // de Firebase.
 
-        val cantidadNinos = 120
+        val guardados = if (jornadaSeleccionada == Jornada.MANANA) {
+            AsistenciaManager.obtenerManana(this)
+        } else {
+            AsistenciaManager.obtenerTarde(this)
+        }
+        val cantidadNinos = if (guardados > 0) guardados else 120
 
         binding.txtNinos.text =
             "$cantidadNinos niños"
@@ -855,5 +852,63 @@ class InicioJefaActivity : AppCompatActivity() {
             mensaje,
             Toast.LENGTH_SHORT
         ).show()
+    }
+
+    // =========================================================
+    // CARGAR PLATOS Y MENÚS DEL BACKEND
+    // =========================================================
+
+    private fun cargarPlatosYMenusDelBackend() {
+        lifecycleScope.launch {
+            try {
+                val platosRes = menuRepository.obtenerPlatos()
+                if (platosRes.isSuccessful && !platosRes.body().isNullOrEmpty()) {
+                    val lista = platosRes.body()!!
+                    val tempManana = mutableListOf<Plato>()
+                    val tempTarde = mutableListOf<Plato>()
+
+                    for (p in lista) {
+                        val nombre = p.nombrePlato ?: "Plato del día"
+                        val plato = Plato(
+                            id = p.idPlato,
+                            nombre = nombre,
+                            componente = p.componente
+                        )
+                        when (p.idSeccion) {
+                            1 -> tempManana.add(plato)
+                            3 -> tempTarde.add(plato)
+                            else -> {
+                                tempManana.add(plato)
+                                tempTarde.add(plato)
+                            }
+                        }
+                    }
+
+                    if (tempManana.isNotEmpty()) {
+                        platosManana.clear()
+                        platosManana.addAll(tempManana)
+                    }
+                    if (tempTarde.isNotEmpty()) {
+                        platosTarde.clear()
+                        platosTarde.addAll(tempTarde)
+                    }
+
+                    actualizarPlato()
+                }
+
+                val menuRes = menuRepository.obtenerMenus()
+                if (menuRes.isSuccessful && !menuRes.body().isNullOrEmpty()) {
+                    val fechaHoy = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+                    val menuHoy = menuRes.body()!!.find { it.fecha == fechaHoy } ?: menuRes.body()!!.last()
+                    menuHoy.informacion_nutricional?.let { info ->
+                        if (info.isNotBlank()) {
+                            binding.txtSubtituloIA.text = "Sugerencia IA: $info"
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                // Conserva los platos precargados si hay fallo de red
+            }
+        }
     }
 }
