@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
 
-    private const val BASE_URL = "https://backend-sirae-pyim.onrender.com/api/"
+    private const val BASE_URL = "https://backend-sirae-t9zi.onrender.com/api/"
 
     // Mantenemos la variable en memoria para actualización rápida
     var authToken: String? = null
@@ -23,7 +23,6 @@ object RetrofitClient {
         val request = chain.request()
         val requestBuilder = request.newBuilder()
 
-        // No adjuntar token en login o registro inicial
         val isAuthEndpoint = request.url.encodedPath.contains("auth/login") ||
                 (request.url.encodedPath.contains("usuarios") && request.method == "POST")
 

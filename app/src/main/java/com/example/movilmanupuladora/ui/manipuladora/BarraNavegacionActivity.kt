@@ -13,21 +13,12 @@ class BarraNavegacionActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityBarraNavegacionBinding
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Inicializar Binding
         binding = ActivityBarraNavegacionBinding.inflate(layoutInflater)
-
-        // Mostrar el XML
         setContentView(binding.root)
-
-
-        // ==========================================
-        // INSETS
-        // ==========================================
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
 
@@ -44,79 +35,46 @@ class BarraNavegacionActivity : AppCompatActivity() {
             insets
         }
 
-
-        // ==========================================
-        // INICIO
-        // ==========================================
-
         binding.navInicio.setOnClickListener {
-
             val intent = Intent(
                 this,
                 MainActivity::class.java
             )
-
             startActivity(intent)
         }
-
-
-        // ==========================================
-        // ASIGNADAS
-        // ==========================================
 
         binding.navAsignadas.setOnClickListener {
-
             val intent = Intent(
                 this,
-                BarraNavegacionActivity::class.java
+                ComponentesActivity::class.java
             )
-
             startActivity(intent)
         }
 
-
-        // ==========================================
-        // INVENTARIO
-        // ==========================================
-
         binding.navInventario.setOnClickListener {
-
             val intent = Intent(
                 this,
                 InventarioActivity::class.java
             )
-
             startActivity(intent)
         }
 
-
-        // ==========================================
-        // AVISOS
-        // ==========================================
-
         binding.navAvisos.setOnClickListener {
-
             val intent = Intent(
                 this,
                 AvisosActivity::class.java
             )
-
             startActivity(intent)
         }
 
-
-        // ==========================================
-        // PERFIL
-        // ==========================================
-
         binding.navPerfil.setOnClickListener {
-
             val intent = Intent(
                 this,
                 PerfilActivity::class.java
             )
-
             startActivity(intent)
         }
     }
+
+
 }

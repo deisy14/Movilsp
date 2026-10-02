@@ -1,3 +1,4 @@
+
 package com.example.movilmanupuladora.data.model
 
 import com.google.gson.annotations.SerializedName

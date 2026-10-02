@@ -26,6 +26,27 @@ interface ApiService {
     @POST("usuarios/")
     suspend fun registrarUsuario(@Body usuario: Usuario): Response<RegistroResponse>
 
+   
+    @GET("secciones_menu/")
+    suspend fun obtenerSeccionesMenu(): Response<List<SeccionMenu>>
+        @GET("secciones_menu/{id}/")
+    suspend fun obtenerSeccionMenuPorId(@Path("id") id: Int): Response<SeccionMenu>
+
+    // Platos
+    @GET("platos/")
+    suspend fun obtenerPlatos(): Response<List<PlatoResponse>>
+
+    @GET("platos/{id}/")
+    suspend fun obtenerPlatoPorId(@Path("id") id: Int): Response<PlatoResponse>
+
+    // Detalle de Plato
+    @GET("detalle_plato/")
+    suspend fun obtenerDetallePlatos(): Response<List<DetallePlato>>
+
+    @GET("detalle_plato/{id}/")
+    suspend fun obtenerDetallePlatoPorId(@Path("id") id: Int): Response<DetallePlato>
+
+    
     @GET("inventario/")
     suspend fun obtenerInventario(): Response<List<inventario>>
 

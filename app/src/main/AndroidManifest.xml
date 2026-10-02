@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.movilmanupuladora">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- PERMISOS DE RED PARA LA API SIRAE -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
@@ -19,49 +17,64 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
 
-        <!-- PANTALLA PRINCIPAL / LOGIN -->
         <activity
             android:name=".ui.auth.LoginActivity"
-            android:exported="true">
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
-        <!-- OTRAS ACTIVIDADES DEL MÓDULO -->
         <activity
             android:name=".ui.auth.RegistroActivity"
             android:exported="false" />
-        <activity
-            android:name=".ui.manipuladora.TurnoActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.manipuladora.PerfilActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.manipuladora.AvisosActivity"
-            android:exported="false" />
+
         <activity
             android:name=".ui.manipuladora.MenuDiaActivity"
             android:exported="false" />
+
         <activity
             android:name=".ui.manipuladora.InventarioActivity"
             android:exported="false" />
-        <activity
-            android:name=".ui.manipuladora.ComponentesActivity"
-            android:exported="false" />
+
         <activity
             android:name=".ui.manipuladora.PreparacionActivity"
             android:exported="false" />
-        <activity
-            android:name=".ui.manipuladora.ConfirmacionActivity"
-            android:exported="false" />
+
         <activity
             android:name=".ui.manipuladora.IngredientesActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".ui.manipuladora.ConfirmacionActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.manipuladora.PerfilActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.manipuladora.TurnoActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.manipuladora.AvisosActivity"
+            android:exported="false" />
+
         <activity
             android:name=".ui.manipuladora.BarraNavegacionActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.manipuladora.ComponentesActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".MainActivity"
             android:exported="false" />
 
     </application>
