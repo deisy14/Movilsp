@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.databinding.ActivityAsignadasBinding
@@ -19,7 +18,8 @@ class AsignadasActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAsignadasBinding
 
     private var idPlato: Int = -1
-    private var nombrePlato: String = "Pollo Guisado Criollo"
+    private var nombrePlato: String = "Arroz con Pollo"
+    private var componenteAsignado: String = "Sopas, Sazón y Proteína"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,9 +27,12 @@ class AsignadasActivity : AppCompatActivity() {
         binding = ActivityAsignadasBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Obtener posibles extras enviadas desde MainActivity o Turno
+        // Obtener extras enviadas desde MainActivity o Turno
         if (intent.hasExtra("nombre_plato")) {
-            nombrePlato = intent.getStringExtra("nombre_plato") ?: "Pollo Guisado Criollo"
+            nombrePlato = intent.getStringExtra("nombre_plato") ?: "Arroz con Pollo"
+        }
+        if (intent.hasExtra("componente_seleccionado")) {
+            componenteAsignado = intent.getStringExtra("componente_seleccionado") ?: "Sopas, Sazón y Proteína"
         }
         idPlato = intent.getIntExtra("id_plato", -1)
 
@@ -40,25 +43,23 @@ class AsignadasActivity : AppCompatActivity() {
     }
 
     private fun configurarEncabezadoYPlato() {
-        // Fecha actual formateada
-        val fechaHoy = SimpleDateFormat("EEEE / d / MMM / yyyy", Locale("es", "CO"))
+        val fechaHoy = SimpleDateFormat("EEEE / d / MMM / yyyy", Locale.forLanguageTag("es-CO"))
             .format(Date())
             .uppercase()
         binding.tvFechaAsignadas.text = fechaHoy
 
-        // Nombre de plato formateado
         val nombreFormateado = nombrePlato.split(" ").joinToString(" ") { palabra ->
             palabra.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
         }
         binding.tvNombreMiPlato.text = nombreFormateado
+        binding.tvComponenteMiPlato.text = "Te toca: $componenteAsignado"
 
-        // Imagen del plato
         val imgRes = when {
             nombrePlato.contains("bandeja", ignoreCase = true) -> R.drawable.bandeja_paisa
             nombrePlato.contains("frijol", ignoreCase = true) -> R.drawable.frijoles
             nombrePlato.contains("chocolate", ignoreCase = true) -> R.drawable.chocolate
             nombrePlato.contains("huevo", ignoreCase = true) -> R.drawable.huevo_perico
-            nombrePlato.contains("pollo", ignoreCase = true) -> R.drawable.pollo_guisado
+            nombrePlato.contains("pollo", ignoreCase = true) -> R.drawable.arroz_pollo
             nombrePlato.contains("arroz", ignoreCase = true) -> R.drawable.arroz_de_leche
             else -> R.drawable.comida_almuerzo
         }
@@ -66,25 +67,27 @@ class AsignadasActivity : AppCompatActivity() {
     }
 
     private fun configurarAcciones() {
-        // Ir a ver insumos / ingredientes
+        // Ir a ver insumos e ingredientes específicos de este plato
         binding.btnVerInsumos.setOnClickListener {
             val intent = Intent(this, IngredientesActivity::class.java).apply {
                 putExtra("id_plato", idPlato)
                 putExtra("nombre_plato", nombrePlato)
+                putExtra("componente_seleccionado", componenteAsignado)
             }
             startActivity(intent)
         }
 
-        // Ir a inicio de preparación
+        // Iniciar preparación de la parte que le tocó a la manipuladora
         binding.btnIniciarPreparacionTask.setOnClickListener {
             val intent = Intent(this, PreparacionActivity::class.java).apply {
                 putExtra("id_plato", idPlato)
                 putExtra("nombre_plato", nombrePlato)
+                putExtra("componente_seleccionado", componenteAsignado)
             }
             startActivity(intent)
         }
 
-        // Mostrar / Ocultar equipo de trabajo
+        // Mostrar / Ocultar distribución del equipo de cocineras
         binding.cardVerEquipo.setOnClickListener {
             if (binding.layoutEquipoOperarias.visibility == View.VISIBLE) {
                 binding.layoutEquipoOperarias.visibility = View.GONE
@@ -92,37 +95,15 @@ class AsignadasActivity : AppCompatActivity() {
                 binding.layoutEquipoOperarias.visibility = View.VISIBLE
             }
         }
-
-        // Listeners para los checkboxes de la lista de verificación
-        binding.chkTarea1.setOnCheckedChangeListener { _, isChecked ->
-            val msg = if (isChecked) "Tarea completada: Recepción de insumos" else "Tarea marcada pendiente"
-            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
-        }
-
-        binding.chkTarea2.setOnCheckedChangeListener { _, isChecked ->
-            val msg = if (isChecked) "Tarea completada: Desinfección" else "Tarea marcada pendiente"
-            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
-        }
-
-        binding.chkTarea3.setOnCheckedChangeListener { _, isChecked ->
-            val msg = if (isChecked) "Tarea completada: Mise en place" else "Tarea en proceso"
-            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
-        }
-
-        binding.chkTarea4.setOnCheckedChangeListener { _, isChecked ->
-            val msg = if (isChecked) "Tarea completada: Cocción" else "Tarea pendiente"
-            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
-        }
     }
 
     private fun configurarListaOperarias() {
         val operarias = listOf(
             Pair("Sofía Rojas", "Ensaladas y Frutas • Ingredientes listos"),
-            Pair("Daniela Gómez", "Ceviche y Principios • Ingredientes listos"),
-            Pair("Elena Pérez", "Postres y Bebidas • En preparación"),
-            Pair("Mara Silva", "Asados y Proteína • Ingredientes listos"),
-            Pair("Vanesa Castro", "Acompañamientos • En preparación"),
-            Pair("Dayana López", "Sopas y Sazón • Finalizado")
+            Pair("Daniela Gómez", "Principio y Granos • En alistamiento"),
+            Pair("Elena Pérez", "Postres y Bebidas • Listo"),
+            Pair("Mara Silva", "Sopas, Sazón y Proteína • Tu parte asignada"),
+            Pair("Vanesa Castro", "Acompañamientos • En alistamiento")
         )
 
         binding.contenedorListaOperarias.removeAllViews()

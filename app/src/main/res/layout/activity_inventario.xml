@@ -1,222 +1,245 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#FAFAF7"
-    android:paddingStart="22dp"
-    android:paddingEnd="22dp"
-    android:paddingTop="30dp">
+    android:background="#FAF9F5"
+    tools:context=".ui.manipuladora.InventarioActivity">
 
-    <!-- ========================================= -->
-    <!-- ENCABEZADO -->
-    <!-- ========================================= -->
-
+    <!-- ENCABEZADO Y TÍTULO -->
     <LinearLayout
         android:id="@+id/headerInventario"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="28dp"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/txtSirae"
+            android:id="@+id/txtTituloInventario"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="SIRAE"
-            android:textColor="#5F7435"
-            android:textSize="21sp"
-            android:textStyle="bold"/>
+            android:text="INVENTARIO DE COCINA"
+            android:textColor="#1B3317"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtSubtituloInventario"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Existencias e insumos en tiempo real"
+            android:textColor="#3D5C37"
+            android:textSize="12sp" />
 
     </LinearLayout>
 
-    <!-- ========================================= -->
-    <!-- TITULO -->
-    <!-- ========================================= -->
-
+    <!-- LOGO SIRAE PEQUEÑO -->
     <TextView
-        android:id="@+id/txtTituloInventario"
+        android:id="@+id/txtSirae"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:text="Inventario"
-        android:textColor="@color/negro"
-        android:textSize="24sp"
-        android:textStyle="bold"/>
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/bg_pill_yellow"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="4dp"
+        android:text="SIRAE PAE"
+        android:textColor="#7A5500"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/headerInventario"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/headerInventario" />
 
-    <TextView
-        android:id="@+id/txtSubtituloInventario"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:text="Existencias disponibles en cocina"
-        android:textColor="#686862"
-        android:textSize="15sp"/>
-
-    <!-- ========================================= -->
-    <!-- BUSCADOR -->
-    <!-- ========================================= -->
-
-    <LinearLayout
+    <!-- BUSCADOR MODERNO -->
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/contenedorBusqueda"
-        android:layout_width="match_parent"
-        android:layout_height="46dp"
-        android:layout_marginTop="17dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingStart="15dp"
-        android:paddingEnd="15dp"
-        android:background="@drawable/bg_busqueda">
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="20dp"
+        app:cardBackgroundColor="#FFFFFF"
+        app:cardCornerRadius="14dp"
+        app:cardElevation="2dp"
+        app:strokeColor="#E2E8F0"
+        app:strokeWidth="1dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headerInventario">
 
-        <ImageView
-            android:id="@+id/icBuscar"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:src="@drawable/ic_search"
-            android:contentDescription="Buscar"/>
-
-        <EditText
-            android:id="@+id/edtBuscarIngrediente"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_marginStart="10dp"
-            android:background="@null"
-            android:hint="Buscar ingrediente"
-            android:singleLine="true"
-            android:textColor="#555550"
-            android:textColorHint="#96968F"
-            android:textSize="15sp"/>
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="14dp">
 
-    </LinearLayout>
+            <ImageView
+                android:id="@+id/icBuscar"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:contentDescription="Buscar"
+                android:src="@drawable/ic_search"
+                app:tint="#64748B" />
 
-    <!-- ========================================= -->
-    <!-- CATEGORIAS -->
-    <!-- ========================================= -->
+            <EditText
+                android:id="@+id/edtBuscarIngrediente"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:background="@null"
+                android:hint="Buscar insumo o ingrediente..."
+                android:importantForAutofill="no"
+                android:inputType="text"
+                android:singleLine="true"
+                android:textColor="#1B3317"
+                android:textColorHint="#94A3B8"
+                android:textSize="14sp" />
 
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- BARRAS DE CATEGORÍAS EN CAPSULAS -->
     <HorizontalScrollView
         android:id="@+id/scrollCategorias"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginTop="10dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="12dp"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingHorizontal="20dp"
         android:scrollbars="none"
-        android:overScrollMode="never">
+        app:layout_constraintTop_toBottomOf="@id/contenedorBusqueda">
 
         <LinearLayout
             android:id="@+id/contenedorCategorias"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/btnLacteos"
-                android:layout_width="92dp"
-                android:layout_height="35dp"
-                android:gravity="center"
-                android:text="Lácteos"
-                android:textColor="#3F3B28"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:background="@drawable/bg_categoria_activa"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:background="@drawable/bg_pill_yellow"
                 android:clickable="true"
-                android:focusable="true"/>
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:text="Lácteos"
+                android:textColor="#7A5500"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/btnProteina"
-                android:layout_width="94dp"
-                android:layout_height="35dp"
-                android:layout_marginStart="10dp"
-                android:gravity="center"
-                android:text="Proteína"
-                android:textColor="#6C6A63"
-                android:textSize="14sp"
-                android:background="@drawable/bg_categoria"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_tag_plato"
                 android:clickable="true"
-                android:focusable="true"/>
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:text="Proteína"
+                android:textColor="#1B3317"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/btnFrutas"
-                android:layout_width="81dp"
-                android:layout_height="35dp"
-                android:layout_marginStart="10dp"
-                android:gravity="center"
-                android:text="Frutas"
-                android:textColor="#6C6A63"
-                android:textSize="14sp"
-                android:background="@drawable/bg_categoria"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_tag_plato"
                 android:clickable="true"
-                android:focusable="true"/>
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:text="Frutas"
+                android:textColor="#1B3317"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/btnVerduras"
-                android:layout_width="97dp"
-                android:layout_height="35dp"
-                android:layout_marginStart="10dp"
-                android:gravity="center"
-                android:text="Verduras"
-                android:textColor="#6C6A63"
-                android:textSize="14sp"
-                android:background="@drawable/bg_categoria"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_tag_plato"
                 android:clickable="true"
-                android:focusable="true"/>
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:text="Verduras"
+                android:textColor="#1B3317"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
     </HorizontalScrollView>
 
-    <!-- ========================================= -->
-    <!-- LISTA -->
-    <!-- ========================================= -->
-
-    <ScrollView
+    <!-- LISTA DE INSUMOS DE INVENTARIO -->
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollInventario"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_marginTop="12dp"
+        android:fillViewport="true"
+        android:overScrollMode="never"
         android:scrollbars="none"
-        android:fillViewport="true">
+        app:layout_constraintBottom_toTopOf="@+id/btnRegistrarEntrada"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scrollCategorias">
 
         <LinearLayout
             android:id="@+id/contenedorInventario"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"/>
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingBottom="16dp" />
 
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
-    <!-- ========================================= -->
-    <!-- REGISTRAR ENTRADA -->
-    <!-- ========================================= -->
-
-    <TextView
+    <!-- BOTÓN REGISTRAR ENTRADA -->
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnRegistrarEntrada"
-        android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="2dp"
-        android:gravity="center"
-        android:text="Registrar entrada"
-        android:textColor="#493C0B"
-        android:textSize="16sp"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="12dp"
+        android:backgroundTint="#F2BF15"
+        android:text="+ Registrar Entrada de Insumos"
+        android:textColor="#1B3317"
+        android:textSize="13sp"
         android:textStyle="bold"
-        android:background="@drawable/bg_manana_activo"
-        android:clickable="true"
-        android:focusable="true"/>
+        app:cornerRadius="12dp"
+        app:layout_constraintBottom_toTopOf="@id/barra_navegacion"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- ========================================= -->
-    <!-- BARRA -->
-    <!-- ========================================= -->
-
+    <!-- BARRA DE NAVEGACIÓN -->
     <include
         android:id="@+id/barra_navegacion"
         layout="@layout/activity_barra_navegacion"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-</LinearLayout>
-
+</androidx.constraintlayout.widget.ConstraintLayout>

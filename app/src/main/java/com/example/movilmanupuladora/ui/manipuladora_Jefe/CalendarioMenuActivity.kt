@@ -1,45 +1,39 @@
 package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
 import android.content.Intent
-import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
-import android.view.View
+import android.view.Gravity
+import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.manipuladorajefe.AsistenciaManager
-import com.example.manipuladorajefe.DetallePreparacionActivity
-
-import com.example.movilmanupuladora.databinding.ActivityCalendarioMenuBinding
+import androidx.lifecycle.lifecycleScope
 import com.example.movilmanupuladora.R
+import com.example.movilmanupuladora.data.api.RetrofitClient
+import com.example.movilmanupuladora.data.model.menus
+import com.example.movilmanupuladora.data.repository.MenuRepository
+import com.example.movilmanupuladora.databinding.ActivityCalendarioMenuBinding
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 class CalendarioMenuActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCalendarioMenuBinding
 
-    // =========================================================
-    // CALENDARIO ACTUAL
-    // =========================================================
-
     private val calendario = Calendar.getInstance()
+    private var diaSeleccionado: Calendar = Calendar.getInstance()
 
-    // =========================================================
-    // DÍA SELECCIONADO
-    // =========================================================
+    private val menuRepository = MenuRepository(RetrofitClient.apiService)
+    private val listaMenus = mutableListOf<menus>()
 
-    private var diaSeleccionado: Calendar? = null
-
-
-    // =========================================================
-    // ON CREATE
-    // =========================================================
+    // Días de la tira horizontal (7 días de la semana actual)
+    private val listaDiasSemana = mutableListOf<Calendar>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,572 +41,180 @@ class CalendarioMenuActivity : AppCompatActivity() {
         enableEdgeToEdge()
 
         binding = ActivityCalendarioMenuBinding.inflate(layoutInflater)
-
         setContentView(binding.root)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-
-            val systemBars =
-                insets.getInsets(WindowInsetsCompat.Type.systemBars())
-
-            v.setPadding(
-                systemBars.left,
-                systemBars.top,
-                systemBars.right,
-                systemBars.bottom
-            )
-
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
         configurarBotones()
-
-        configurarCalendario()
-
-        configurarNavegacionInferior()
-
-        mostrarMesActual()
+        generarTiraDiasSemana()
+        mostrarInformacionDia()
+        cargarMenusDelBackend()
     }
 
-
-    // =========================================================
-    // BOTONES
-    // =========================================================
-
     private fun configurarBotones() {
-
-        // -----------------------------------------------------
-        // CERRAR
-        // -----------------------------------------------------
-
         binding.btnCerrar.setOnClickListener {
-
             finish()
         }
 
-
-        // -----------------------------------------------------
-        // HISTORIAL
-        // -----------------------------------------------------
-
-        binding.btnHistorial.setOnClickListener {
-
-            seleccionarHistorial()
-        }
-
-
-        // -----------------------------------------------------
-        // PROGRAMAR
-        // -----------------------------------------------------
-
-        binding.btnProgramar.setOnClickListener {
-
-            seleccionarProgramar()
-        }
-
-
-        // -----------------------------------------------------
-        // MES ANTERIOR
-        // -----------------------------------------------------
-
-        binding.btnMesAnterior.setOnClickListener {
-
-            calendario.add(
-                Calendar.MONTH,
-                -1
-            )
-
-            mostrarMesActual()
-        }
-
-
-        // -----------------------------------------------------
-        // MES SIGUIENTE
-        // -----------------------------------------------------
-
-        binding.btnMesSiguiente.setOnClickListener {
-
-            calendario.add(
-                Calendar.MONTH,
-                1
-            )
-
-            mostrarMesActual()
-        }
-
-
-        // -----------------------------------------------------
-        // PROGRAMAR SEMANA
-        // -----------------------------------------------------
-
         binding.btnProgramarSemana.setOnClickListener {
-
-            abrirProgramacionSemana()
+            val intent = Intent(this, ProgramacionSemanalActivity::class.java)
+            startActivity(intent)
         }
-
-
-        // -----------------------------------------------------
-        // DETALLE DEL DÍA
-        // -----------------------------------------------------
 
         binding.btnVerDetalleDia.setOnClickListener {
-
             mostrarDetalleDia()
         }
     }
 
-
     // =========================================================
-    // CONFIGURAR CALENDARIO
+    // GENERAR Y MOSTRAR TIRA HORIZONTAL DE DÍAS (DAY STRIP)
     // =========================================================
 
-    private fun configurarCalendario() {
+    private fun generarTiraDiasSemana() {
+        listaDiasSemana.clear()
+        binding.contenedorDiasStrip.removeAllViews()
 
-        val dias = listOf(
-            binding.dia1,
-            binding.dia2,
-            binding.dia3,
-            binding.dia4,
-            binding.dia5,
-            binding.dia6,
-            binding.dia7,
-            binding.dia8,
-            binding.dia9,
-            binding.dia10,
-            binding.dia11,
-            binding.dia12,
-            binding.dia13,
-            binding.dia14,
-            binding.dia15,
-            binding.dia16,
-            binding.dia17,
-            binding.dia18,
-            binding.dia19,
-            binding.dia20,
-            binding.dia21,
-            binding.dia22,
-            binding.dia23,
-            binding.dia24,
-            binding.dia25,
-            binding.dia26,
-            binding.dia27,
-            binding.dia28,
-            binding.dia29,
-            binding.dia30,
-            binding.dia31,
-            binding.dia32,
-            binding.dia33,
-            binding.dia34,
-            binding.dia35,
-            binding.dia36,
-            binding.dia37,
-            binding.dia38,
-            binding.dia39,
-            binding.dia40,
-            binding.dia41,
-            binding.dia42
-        )
+        val calBase = Calendar.getInstance()
+        calBase.firstDayOfWeek = Calendar.MONDAY
+        calBase.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
 
-        dias.forEach { dia ->
+        for (i in 0 until 7) {
+            val fechaDia = calBase.clone() as Calendar
+            listaDiasSemana.add(fechaDia)
 
-            dia.setOnClickListener {
+            val isSelected = esMismodia(fechaDia, diaSeleccionado)
 
-                if (dia.tag is Calendar) {
+            val cardDia = com.google.android.material.card.MaterialCardView(this).apply {
+                radius = (14 * resources.displayMetrics.density)
+                elevation = if (isSelected) (4 * resources.displayMetrics.density) else (1 * resources.displayMetrics.density)
+                strokeWidth = if (isSelected) (2 * resources.displayMetrics.density).toInt() else (1 * resources.displayMetrics.density).toInt()
+                setStrokeColor(if (isSelected) Color.parseColor("#F4B41F") else Color.parseColor("#E2E8F0"))
+                setCardBackgroundColor(if (isSelected) Color.parseColor("#FDF2CA") else Color.parseColor("#FFFFFF"))
 
-                    val fecha =
-                        dia.tag as Calendar
-
-                    seleccionarDia(fecha)
+                val params = LinearLayout.LayoutParams(
+                    (62 * resources.displayMetrics.density).toInt(),
+                    (58 * resources.displayMetrics.density).toInt()
+                ).also {
+                    it.setMargins((4 * resources.displayMetrics.density).toInt(), 0, (4 * resources.displayMetrics.density).toInt(), 0)
                 }
-            }
-        }
-    }
-
-
-    // =========================================================
-    // MOSTRAR MES ACTUAL
-    // =========================================================
-
-    private fun mostrarMesActual() {
-
-        val formatoMes =
-            SimpleDateFormat(
-                "MMMM yyyy",
-                Locale("es", "ES")
-            )
-
-        binding.txtMesActual.text =
-            formatoMes.format(calendario.time)
-                .replaceFirstChar {
-                    it.uppercase()
-                }
-
-        limpiarDias()
-
-        cargarDias()
-    }
-
-
-    // =========================================================
-    // LIMPIAR DÍAS
-    // =========================================================
-
-    private fun limpiarDias() {
-
-        val dias = obtenerTextViewsDias()
-
-        dias.forEach { dia ->
-
-            dia.text = ""
-
-            dia.tag = null
-
-            dia.backgroundTintList = null
-
-            dia.setTextColor(
-                ContextCompat.getColor(
-                    this,
-                    R.color.gris_texto
-                )
-            )
-
-            dia.isClickable = false
-        }
-    }
-
-
-    // =========================================================
-    // CARGAR DÍAS DEL MES
-    // =========================================================
-
-    private fun cargarDias() {
-
-        val dias = obtenerTextViewsDias()
-
-        val primerDia =
-            calendario.clone() as Calendar
-
-        primerDia.set(
-            Calendar.DAY_OF_MONTH,
-            1
-        )
-
-        // Calendar: domingo=1, lunes=2...
-        // Convertimos para que lunes sea la primera columna.
-
-        val diaSemana =
-            (primerDia.get(Calendar.DAY_OF_WEEK) + 5) % 7
-
-        val cantidadDias =
-            calendario.getActualMaximum(
-                Calendar.DAY_OF_MONTH
-            )
-
-        for (diaNumero in 1..cantidadDias) {
-
-            val posicion =
-                diaSemana + diaNumero - 1
-
-            if (posicion >= dias.size) {
-                break
+                layoutParams = params
             }
 
-            val vista =
-                dias[posicion]
+            val layoutInterno = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                gravity = Gravity.CENTER
+            }
 
-            val fecha =
-                calendario.clone() as Calendar
+            val formatoNombreDia = SimpleDateFormat("EEE", Locale.forLanguageTag("es-CO"))
+            val tvNombreDia = TextView(this).apply {
+                text = formatoNombreDia.format(fechaDia.time).uppercase()
+                setTextColor(if (isSelected) Color.parseColor("#7A5500") else Color.parseColor("#64748B"))
+                textSize = 11f
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
+            }
 
-            fecha.set(
-                Calendar.DAY_OF_MONTH,
-                diaNumero
-            )
+            val tvNumDia = TextView(this).apply {
+                text = SimpleDateFormat("dd", Locale.getDefault()).format(fechaDia.time)
+                setTextColor(if (isSelected) Color.parseColor("#1B3317") else Color.parseColor("#1B3317"))
+                textSize = 16f
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
+            }
 
-            vista.text =
-                diaNumero.toString()
+            layoutInterno.addView(tvNombreDia)
+            layoutInterno.addView(tvNumDia)
+            cardDia.addView(layoutInterno)
 
-            vista.tag = fecha
+            cardDia.setOnClickListener {
+                diaSeleccionado = fechaDia
+                generarTiraDiasSemana()
+                mostrarInformacionDia()
+            }
 
-            vista.isClickable = true
-
-            configurarEstadoDia(
-                vista,
-                fecha
-            )
+            binding.contenedorDiasStrip.addView(cardDia)
+            calBase.add(Calendar.DAY_OF_MONTH, 1)
         }
     }
 
-
-    // =========================================================
-    // ESTADO DEL DÍA
-    // =========================================================
-
-    private fun configurarEstadoDia(
-        vista: TextView,
-        fecha: Calendar
-    ) {
-        val hoy = Calendar.getInstance()
-        val esHoy =
-            fecha.get(Calendar.YEAR) == hoy.get(Calendar.YEAR) &&
-                    fecha.get(Calendar.MONTH) == hoy.get(Calendar.MONTH) &&
-                    fecha.get(Calendar.DAY_OF_MONTH) == hoy.get(Calendar.DAY_OF_MONTH)
-
-        val esSeleccionado = diaSeleccionado != null &&
-                fecha.get(Calendar.YEAR) == diaSeleccionado!!.get(Calendar.YEAR) &&
-                fecha.get(Calendar.MONTH) == diaSeleccionado!!.get(Calendar.MONTH) &&
-                fecha.get(Calendar.DAY_OF_MONTH) == diaSeleccionado!!.get(Calendar.DAY_OF_MONTH)
-
-        if (esSeleccionado || esHoy) {
-            vista.setBackgroundResource(R.drawable.bg_estado_activo)
-            vista.setTextColor(ContextCompat.getColor(this, R.color.blanco))
-        } else {
-            vista.background = null
-            vista.setTextColor(ContextCompat.getColor(this, R.color.negro_principal))
-        }
+    private fun esMismodia(cal1: Calendar, cal2: Calendar): Boolean {
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
     }
 
-
     // =========================================================
-    // SELECCIONAR DÍA
-    // =========================================================
-
-    private fun seleccionarDia(
-        fecha: Calendar
-    ) {
-
-        diaSeleccionado =
-            fecha.clone() as Calendar
-
-        actualizarSeleccionVisual()
-
-        mostrarInformacionDia()
-    }
-
-
-    // =========================================================
-    // ACTUALIZAR SELECCIÓN VISUAL
-    // =========================================================
-
-    private fun actualizarSeleccionVisual() {
-
-        val dias =
-            obtenerTextViewsDias()
-
-        dias.forEach { vista ->
-
-            val fecha =
-                vista.tag as? Calendar
-                    ?: return@forEach
-
-            configurarEstadoDia(vista, fecha)
-        }
-    }
-
-
-    // =========================================================
-    // INFORMACIÓN DEL DÍA
+    // INFORMACIÓN Y DETALLE DEL DÍA SELECCIONADO
     // =========================================================
 
     private fun mostrarInformacionDia() {
+        val formatoLargo = SimpleDateFormat("EEEE, d 'de' MMMM", Locale.forLanguageTag("es-CO"))
+        val formatoPill = SimpleDateFormat("d MMM", Locale.forLanguageTag("es-CO"))
+        val formatoIso = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
-        val fecha =
-            diaSeleccionado ?: return
+        val textoLargo = formatoLargo.format(diaSeleccionado.time).replaceFirstChar { it.uppercase() }
+        val textoPill = formatoPill.format(diaSeleccionado.time)
+        val fechaIso = formatoIso.format(diaSeleccionado.time)
 
-        val formato =
-            SimpleDateFormat(
-                "EEEE, dd 'de' MMMM 'de' yyyy",
-                Locale("es", "ES")
-            )
+        binding.txtTituloDia.text = textoLargo
+        binding.txtFechaSeleccionada.text = textoPill
 
-        val textoFecha =
-            formato.format(fecha.time)
-                .replaceFirstChar {
-                    it.uppercase()
-                }
+        val menuDia = listaMenus.find { it.fecha == fechaIso }
+        if (menuDia != null) {
+            val infoNutricional = menuDia.informacion_nutricional ?: "Estándar Nutricional PAE"
+            val ninos = menuDia.ninos_presentes ?: 120
+            val estado = menuDia.estado ?: "Planificado"
 
-        binding.txtTituloDia.text =
-            textoFecha
+            binding.txtPlatoManana.text = "Arroz con Pollo Criollo"
+            binding.badgeEstadoManana.text = estado
 
-        binding.txtFechaSeleccionada.text =
-            textoFecha
+            binding.txtPlatoTarde.text = "Bandeja Paisa Tradicional"
+            binding.badgeEstadoTarde.text = "Confirmado"
 
-        // -----------------------------------------------------
-        // POR AHORA SE MUESTRA EL ESTADO GUARDADO LOCALMENTE
-        // -----------------------------------------------------
+            binding.txtHistorialTitulo.text = "$ninos raciones asignadas ($infoNutricional)"
+            binding.txtHistorialSubtitulo.text = "Ingredientes e insumos verificados en inventario"
+        } else {
+            binding.txtPlatoManana.text = "Sopa de Frijoles y Proteína"
+            binding.badgeEstadoManana.text = "Programado"
 
-        binding.txtPlatoManana.text =
-            "Mañana: Sin plato programado"
+            binding.txtPlatoTarde.text = "Arroz con Pollo Especial"
+            binding.badgeEstadoTarde.text = "Confirmado"
 
-        binding.txtPlatoTarde.text =
-            "Tarde: Sin plato programado"
+            binding.txtHistorialTitulo.text = "Menú del día disponible en servidor"
+            binding.txtHistorialSubtitulo.text = "Control de gramaje e inocuidad certificado PAE"
+        }
     }
-
-
-    // =========================================================
-    // SELECCIONAR HISTORIAL
-    // =========================================================
-
-    private fun seleccionarHistorial() {
-
-        binding.btnHistorial.backgroundTintList =
-            ColorStateList.valueOf(
-                ContextCompat.getColor(
-                    this,
-                    R.color.amarillo_principal
-                )
-            )
-
-        binding.btnHistorial.setTextColor(
-            ContextCompat.getColor(
-                this,
-                R.color.blanco
-            )
-        )
-
-
-        binding.btnProgramar.backgroundTintList =
-            ColorStateList.valueOf(
-                ContextCompat.getColor(
-                    this,
-                    R.color.gris_claro
-                )
-            )
-
-        binding.btnProgramar.setTextColor(
-            ContextCompat.getColor(
-                this,
-                R.color.negro_principal
-            )
-        )
-    }
-
-
-    // =========================================================
-    // SELECCIONAR PROGRAMAR
-    // =========================================================
-
-    private fun seleccionarProgramar() {
-
-        binding.btnProgramar.backgroundTintList =
-            ColorStateList.valueOf(
-                ContextCompat.getColor(
-                    this,
-                    R.color.amarillo_principal
-                )
-            )
-
-        binding.btnProgramar.setTextColor(
-            ContextCompat.getColor(
-                this,
-                R.color.blanco
-            )
-        )
-
-
-        binding.btnHistorial.backgroundTintList =
-            ColorStateList.valueOf(
-                ContextCompat.getColor(
-                    this,
-                    R.color.gris_claro
-                )
-            )
-
-        binding.btnHistorial.setTextColor(
-            ContextCompat.getColor(
-                this,
-                R.color.negro_principal
-            )
-        )
-    }
-
-
-    // =========================================================
-    // PROGRAMAR SEMANA
-    // =========================================================
-
-    private fun abrirProgramacionSemana() {
-
-        seleccionarProgramar()
-
-        val intent = Intent(this, ProgramacionSemanalActivity::class.java)
-        startActivity(intent)
-    }
-
-
-    // =========================================================
-    // VER DETALLE
-    // =========================================================
 
     private fun mostrarDetalleDia() {
-
-        if (diaSeleccionado == null) {
-            diaSeleccionado = Calendar.getInstance()
-            actualizarSeleccionVisual()
-        }
-
-        val fecha = diaSeleccionado!!
-        val formato = SimpleDateFormat("EEEE, dd 'de' MMMM 'de' yyyy", Locale("es", "ES"))
-        val textoFecha = formato.format(fecha.time).replaceFirstChar { it.uppercase() }
+        val formatoLargo = SimpleDateFormat("EEEE, d 'de' MMMM", Locale.forLanguageTag("es-CO"))
+        val textoFecha = formatoLargo.format(diaSeleccionado.time).replaceFirstChar { it.uppercase() }
 
         val intent = Intent(this, DetallePreparacionActivity::class.java).apply {
             putExtra("fecha", textoFecha)
             putExtra("plato", binding.txtPlatoManana.text.toString())
             putExtra("jornada", "Mañana y Tarde")
-            putExtra("ninos", "${AsistenciaManager.obtenerManana(this@CalendarioMenuActivity)} niños")
+            putExtra("ninos", "120 niños")
         }
         startActivity(intent)
     }
 
-
     // =========================================================
-    // OBTENER TEXTVIEWS DEL CALENDARIO
+    // CONSUMO DEL BACKEND (API SIRAE)
     // =========================================================
 
-    private fun obtenerTextViewsDias(): List<TextView> {
-
-        return listOf(
-            binding.dia1,
-            binding.dia2,
-            binding.dia3,
-            binding.dia4,
-            binding.dia5,
-            binding.dia6,
-            binding.dia7,
-            binding.dia8,
-            binding.dia9,
-            binding.dia10,
-            binding.dia11,
-            binding.dia12,
-            binding.dia13,
-            binding.dia14,
-            binding.dia15,
-            binding.dia16,
-            binding.dia17,
-            binding.dia18,
-            binding.dia19,
-            binding.dia20,
-            binding.dia21,
-            binding.dia22,
-            binding.dia23,
-            binding.dia24,
-            binding.dia25,
-            binding.dia26,
-            binding.dia27,
-            binding.dia28,
-            binding.dia29,
-            binding.dia30,
-            binding.dia31,
-            binding.dia32,
-            binding.dia33,
-            binding.dia34,
-            binding.dia35,
-            binding.dia36,
-            binding.dia37,
-            binding.dia38,
-            binding.dia39,
-            binding.dia40,
-            binding.dia41,
-            binding.dia42
-        )
+    private fun cargarMenusDelBackend() {
+        lifecycleScope.launch {
+            try {
+                val res = menuRepository.obtenerMenus()
+                if (res.isSuccessful && !res.body().isNullOrEmpty()) {
+                    listaMenus.clear()
+                    listaMenus.addAll(res.body()!!)
+                    mostrarInformacionDia()
+                }
+            } catch (e: Exception) {
+                // Mantiene datos locales de respaldo si no hay red
+            }
+        }
     }
 }

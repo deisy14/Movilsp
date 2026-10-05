@@ -1,137 +1,228 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-
+    android:background="@drawable/bg_card"
     android:orientation="vertical"
+    android:padding="22dp">
 
-    android:padding="24dp"
-
-    android:background="@color/blanco">
-
-
-    <!-- ================================================= -->
-    <!-- TÍTULO                                            -->
-    <!-- ================================================= -->
-
+    <!-- TÍTULO -->
     <TextView
         android:id="@+id/txtTituloDialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
-        android:text="Registrar asistencia"
-        android:textColor="@color/negro_principal"
-        android:textSize="20sp"
+        android:text="Registrar Asistencia por Grado"
+        android:textColor="#1B3317"
+        android:textSize="18sp"
         android:textStyle="bold"/>
-
-
-    <!-- ================================================= -->
-    <!-- DESCRIPCIÓN                                       -->
-    <!-- ================================================= -->
 
     <TextView
         android:id="@+id/txtDescripcionDialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
-        android:layout_marginTop="8dp"
-
-        android:text="Ingresa la cantidad de niños que asistirán en esta jornada."
-        android:textColor="@color/gris_texto"
-        android:textSize="13sp"/>
-
-
-    <!-- ================================================= -->
-    <!-- JORNADA                                           -->
-    <!-- ================================================= -->
+        android:layout_marginTop="4dp"
+        android:text="Diferenciación de asistencia para cálculo de gramaje PAE (Primaria vs. Secundaria)."
+        android:textColor="#64748B"
+        android:textSize="12sp"/>
 
     <TextView
         android:id="@+id/txtJornadaDialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
-        android:layout_marginTop="20dp"
-
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_tag_plato"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="5dp"
         android:text="Jornada: Mañana"
-        android:textColor="@color/negro_principal"
-        android:textSize="14sp"
+        android:textColor="#1B3317"
+        android:textSize="12sp"
         android:textStyle="bold"/>
 
+    <!-- 1. PRIMARIA (1° A 5° GRADO) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:orientation="vertical">
 
-    <!-- ================================================= -->
-    <!-- CAMPO CANTIDAD                                    -->
-    <!-- ================================================= -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Estudiantes Primaria (1° - 5°)"
+                android:textColor="#1B3317"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_pill_yellow"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="3dp"
+                android:text="Gramaje Base: 250g"
+                android:textColor="#7A5500"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/edtCantidadPrimaria"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_edittext"
+            android:hint="Ejemplo: 85"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:maxLines="1"
+            android:paddingHorizontal="14dp"
+            android:textColor="#1B3317"
+            android:textColorHint="#94A3B8"
+            android:textSize="15sp" />
+
+    </LinearLayout>
+
+    <!-- 2. SECUNDARIA (6° A 11° GRADO) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Estudiantes Secundaria (6° - 11°)"
+                android:textColor="#1B3317"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_pill_green"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="3dp"
+                android:text="Gramaje Mayor: 380g"
+                android:textColor="#2A5226"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/edtCantidadSecundaria"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_edittext"
+            android:hint="Ejemplo: 65"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:maxLines="1"
+            android:paddingHorizontal="14dp"
+            android:textColor="#1B3317"
+            android:textColorHint="#94A3B8"
+            android:textSize="15sp" />
+
+    </LinearLayout>
+
+    <!-- CAMPO LEGACY PARA COMPATIBILIDAD -->
     <EditText
         android:id="@+id/edtCantidadAsistencia"
         android:layout_width="match_parent"
-        android:layout_height="55dp"
+        android:layout_height="0dp"
+        android:visibility="gone" />
 
-        android:layout_marginTop="12dp"
+    <!-- RESUMEN DE GRAMAJE CALCULADO EN TIEMPO REAL -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        app:cardBackgroundColor="#FAF9F4"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="0dp"
+        app:strokeColor="#EBE8D8"
+        app:strokeWidth="1dp">
 
-        android:background="@drawable/bg_edittext"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
 
-        android:hint="Ejemplo: 120"
-        android:inputType="number"
-        android:maxLines="1"
+            <TextView
+                android:id="@+id/txtTotalEstudiantesCalculado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total Estudiantes: 0"
+                android:textColor="#1B3317"
+                android:textSize="13sp"
+                android:textStyle="bold" />
 
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
+            <TextView
+                android:id="@+id/txtGramajeTotalEstimado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Gramaje total estimado: 0.0 kg a cocinar"
+                android:textColor="#7A5500"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
-        android:textColor="@color/negro_principal"
-        android:textColorHint="@color/gris_texto"
+        </LinearLayout>
 
-        android:textSize="18sp"/>
+    </com.google.android.material.card.MaterialCardView>
 
-
-    <!-- ================================================= -->
-    <!-- BOTONES                                           -->
-    <!-- ================================================= -->
-
+    <!-- BOTONES -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-
-        android:layout_marginTop="22dp"
-
+        android:layout_height="48dp"
+        android:layout_marginTop="18dp"
         android:orientation="horizontal">
 
-
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCancelarAsistencia"
+            style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-
+            android:layout_marginEnd="6dp"
             android:layout_weight="1"
-
             android:text="Cancelar"
-            android:textColor="@color/negro_principal"
+            android:textColor="#1B3317"
             android:textSize="13sp"
+            app:cornerRadius="12dp"
+            app:strokeColor="#C5DFC3" />
 
-            android:backgroundTint="@color/gris_claro"/>
-
-
-        <Space
-            android:layout_width="10dp"
-            android:layout_height="match_parent"/>
-
-
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnGuardarAsistencia"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-
+            android:layout_marginStart="6dp"
             android:layout_weight="1"
-
+            android:backgroundTint="#F4B41F"
             android:text="Guardar"
-            android:textColor="@color/blanco"
+            android:textColor="#1B3317"
             android:textSize="13sp"
             android:textStyle="bold"
-
-            android:backgroundTint="@color/amarillo_principal"/>
+            app:cornerRadius="12dp" />
 
     </LinearLayout>
 

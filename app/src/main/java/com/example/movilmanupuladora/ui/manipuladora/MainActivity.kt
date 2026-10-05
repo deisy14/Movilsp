@@ -1,9 +1,11 @@
 package com.example.movilmanupuladora.ui.manipuladora
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.movilmanupuladora.R
@@ -14,108 +16,71 @@ import com.example.movilmanupuladora.data.model.SeccionMenu
 import com.example.movilmanupuladora.data.repository.MenuRepository
 import com.example.movilmanupuladora.databinding.ActivityMainBinding
 import com.example.movilmanupuladora.databinding.DialogDetallePlatoBinding
+import com.example.movilmanupuladora.databinding.PopupNotificacionesBinding
+import com.example.movilmanupuladora.utils.NavigationHelper
 import com.example.movilmanupuladora.utils.SessionManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
-import kotlin.math.atan2
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private val menuRepository =
-        MenuRepository(RetrofitClient.apiService)
+    private val menuRepository = MenuRepository(RetrofitClient.apiService)
 
     // =========================================================
-    // DATOS DEL BACKEND
+    // DATOS DEL BACKEND / LOCAL
     // =========================================================
 
     private var listaPlatos: List<PlatoResponse> = emptyList()
-
     private var listaSecciones: List<SeccionMenu> = emptyList()
-
     private var listaDetalles: List<DetallePlato> = emptyList()
 
     // Plato actualmente seleccionado
     private var platoActualSeleccionado: PlatoResponse? = null
 
-    // =========================================================
-    // SECCIONES DE LA RULETA
-    // =========================================================
-
-    private val seccionesRuleta = listOf(
-        "Desayuno",
-        "Almuerzo",
-        "Merienda"
-    )
-
+    // 0 = Desayuno, 1 = Almuerzo, 2 = Merienda
+    private val seccionesNombres = listOf("Desayuno", "Almuerzo", "Merienda")
     private var seccionSeleccionada = 0
 
+    // Jornada activa en el Inicio: "MANANA" o "TARDE"
+    private var jornadaActualInicio = "MANANA"
+
+    // Ángulo de rotación de la rueda circular
+    private var anguloRotacionActual = 0f
+
     // =========================================================
-    // DATOS DE RESPALDO
+    // DATOS DE RESPALDO (MOCK)
     // =========================================================
 
     private val platosBaseRespaldo = listOf(
-
-        // ALMUERZO
-        PlatoResponse(
-            idPlato = 4,
-            idSeccion = 2,
-            nombrePlato = "Bandeja Paisa",
-            componente =
-                "carne molida, chicharron, aguacate, arroz, frijol"
-        ),
-
-        // MERIENDA
         PlatoResponse(
             idPlato = 1,
-            idSeccion = 3,
-            nombrePlato = "Arroz a la Valenciana",
-            componente = "proteina"
+            idSeccion = 1,
+            nombrePlato = "Café con Pan y Huevo",
+            componente = "Bebida caliente y proteína"
         ),
-
         PlatoResponse(
             idPlato = 2,
-            idSeccion = 3,
+            idSeccion = 2,
             nombrePlato = "Arroz con Pollo",
-            componente = "pollo"
+            componente = "Sopas, Sazón y Proteína"
         ),
-
         PlatoResponse(
             idPlato = 3,
             idSeccion = 3,
-            nombrePlato = "Arroz con Pollo Especial",
-            componente = "Principal"
-        ),
-
-        // DESAYUNO
-        PlatoResponse(
-            idPlato = 5,
-            idSeccion = 4,
-            nombrePlato = "Café con Pan",
-            componente = "no se"
+            nombrePlato = "Muffin y Leche",
+            componente = "Cereal y lácteo"
         )
     )
 
     private val seccionesRespaldo = listOf(
-
-        SeccionMenu(
-            idSeccion = 1,
-            idJornada = 1,
-            nombreSeccion = "Desayuno"
-        ),
-
-        SeccionMenu(
-            idSeccion = 2,
-            idJornada = 1,
-            nombreSeccion = "Almuerzo"
-        ),
-
-        SeccionMenu(
-            idSeccion = 3,
-            idJornada = 1,
-            nombreSeccion = "Merienda"
-        )
+        SeccionMenu(idSeccion = 1, idJornada = 1, nombreSeccion = "Desayuno"),
+        SeccionMenu(idSeccion = 2, idJornada = 1, nombreSeccion = "Almuerzo"),
+        SeccionMenu(idSeccion = 3, idJornada = 1, nombreSeccion = "Merienda")
     )
 
     // =========================================================
@@ -125,395 +90,353 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding =
-            ActivityMainBinding.inflate(layoutInflater)
-
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         // Token de sesión
         SessionManager.getToken(this)
 
-        // Configurar saludo y fecha dinámica
+        // Configurar usuario y fecha
         val sessionMgr = SessionManager(this)
-        val nombreUser = sessionMgr.getUserName() ?: "Manipuladora"
-        binding.tvSaludo.text = "¡BIENVENIDA, ${nombreUser.uppercase()}!"
+        val nombreUser = sessionMgr.getUserName() ?: "María López"
+        binding.tvSaludo.text = nombreUser
 
-        val fechaHoyFormatted = java.text.SimpleDateFormat(
+        val fechaFormatted = SimpleDateFormat(
             "EEEE / d / MMM / yyyy",
-            java.util.Locale("es", "CO")
-        ).format(java.util.Date()).uppercase()
-        binding.tvFecha.text = fechaHoyFormatted
+            Locale.forLanguageTag("es-CO")
+        ).format(Date()).uppercase()
+        binding.tvFecha.text = fechaFormatted
 
-        // -----------------------------------------------------
-        // DATOS INICIALES
-        // -----------------------------------------------------
-
+        // Inicializar con respaldo
         listaPlatos = platosBaseRespaldo
-
         listaSecciones = seccionesRespaldo
 
-        // Mostrar inicialmente DESAYUNO
-        seccionSeleccionada = 0
+        // Configurar botones de Jornada Mañana / Tarde
+        configurarBotonesJornadaInicio()
 
-        actualizarRuleta()
-
-        actualizarInformacionSeccion()
-
-        configurarMenusAnteriores()
-
-        // -----------------------------------------------------
-        // BACKEND
-        // -----------------------------------------------------
-
-        cargarDatosDesdeBackend()
-
-        // -----------------------------------------------------
-        // RULETA
-        // -----------------------------------------------------
-
+        // Configurar giro y deslizamiento en la rueda circular
         configurarGiroRuleta()
 
-        // -----------------------------------------------------
-        // TARJETA DEL PLATO
-        // -----------------------------------------------------
+        // Cargar datos reales de la API
+        cargarDatosDesdeBackend()
 
-        binding.cardPlatoSeleccionado.setOnClickListener {
+        // Botón Notificaciones -> Abre Pop-up emergente de Notificaciones
+        binding.btnNotificaciones.setOnClickListener {
+            mostrarPopupNotificaciones()
+        }
 
-            platoActualSeleccionado?.let {
+        // Botón "Ver preparación" -> Abre la receta y pasos de cocción
+        binding.btnVerPreparacion.setOnClickListener {
+            val intent = Intent(this, PreparacionActivity::class.java).apply {
+                platoActualSeleccionado?.let { plato ->
+                    putExtra("id_plato", plato.idPlato)
+                    putExtra("nombre_plato", plato.nombrePlato)
+                    putExtra("componente_seleccionado", plato.componente)
+                }
+            }
+            startActivity(intent)
+        }
 
-                mostrarDialogoPlato(it)
+        binding.cardPlatoMain.setOnClickListener {
+            platoActualSeleccionado?.let { plato ->
+                mostrarDialogoPlato(plato)
             }
         }
 
-        // =====================================================
-        // BARRA DE NAVEGACIÓN
-        // =====================================================
+        // Configurar tarjetas de menús anteriores
+        configurarMenusAnteriores()
 
-        com.example.movilmanupuladora.utils.NavigationHelper.setupBarraNavegacion(
+        // Configurar barra de navegación inferior
+        NavigationHelper.setupBarraNavegacion(
             this,
             binding.barraNavegacion,
-            com.example.movilmanupuladora.utils.NavigationHelper.Tab.INICIO
+            NavigationHelper.Tab.INICIO
         )
     }
 
     // =========================================================
-    // CONSUMO DEL BACKEND
+    // BOTONES DE JORNADA (MAÑANA Y TARDE)
     // =========================================================
 
-    private fun cargarDatosDesdeBackend() {
+    private fun configurarBotonesJornadaInicio() {
+        binding.btnJornadaManana.setOnClickListener {
+            jornadaActualInicio = "MANANA"
+            actualizarEstadoJornadaInicio()
+        }
 
-        lifecycleScope.launch {
+        binding.btnJornadaTarde.setOnClickListener {
+            jornadaActualInicio = "TARDE"
+            actualizarEstadoJornadaInicio()
+        }
 
-            try {
+        actualizarEstadoJornadaInicio()
+    }
 
-                // -------------------------------------------------
-                // A. PLATOS
-                // -------------------------------------------------
+    private fun actualizarEstadoJornadaInicio() {
+        if (jornadaActualInicio == "MANANA") {
+            // Estilos de botones de jornada
+            binding.btnJornadaManana.setBackgroundResource(R.drawable.bg_pill_yellow)
+            binding.btnJornadaManana.setTextColor(Color.parseColor("#7A5500"))
 
-                val resPlatos =
-                    menuRepository.obtenerPlatos()
+            binding.btnJornadaTarde.setBackgroundResource(R.drawable.bg_tag_plato)
+            binding.btnJornadaTarde.setTextColor(Color.parseColor("#64748B"))
 
-                if (
-                    resPlatos.isSuccessful &&
-                    !resPlatos.body().isNullOrEmpty()
-                ) {
+            // En Mañana: Solo DESAYUNO activo, Almuerzo y Merienda atenuados en gris
+            binding.btnSeccionDesayuno.alpha = 1.0f
+            binding.btnSeccionDesayuno.isEnabled = true
 
-                    listaPlatos =
-                        resPlatos.body()!!
+            binding.btnSeccionAlmuerzo.alpha = 0.35f
+            binding.btnSeccionAlmuerzo.isEnabled = false
 
-                    Log.d(
-                        "BACKEND_SIRAE",
-                        "Platos recibidos: ${listaPlatos.size}"
-                    )
-                }
+            binding.btnSeccionMerienda.alpha = 0.35f
+            binding.btnSeccionMerienda.isEnabled = false
 
-                // -------------------------------------------------
-                // B. SECCIONES
-                // -------------------------------------------------
+            seleccionarSeccion(0) // Selecciona Desayuno
+        } else {
+            // Estilos de botones de jornada
+            binding.btnJornadaTarde.setBackgroundResource(R.drawable.bg_pill_yellow)
+            binding.btnJornadaTarde.setTextColor(Color.parseColor("#7A5500"))
 
-                val resSecciones =
-                    menuRepository.obtenerSeccionesMenu()
+            binding.btnJornadaManana.setBackgroundResource(R.drawable.bg_tag_plato)
+            binding.btnJornadaManana.setTextColor(Color.parseColor("#64748B"))
 
-                if (
-                    resSecciones.isSuccessful &&
-                    !resSecciones.body().isNullOrEmpty()
-                ) {
+            // En Tarde: Desayuno atenuado en gris, Almuerzo y Merienda activos
+            binding.btnSeccionDesayuno.alpha = 0.35f
+            binding.btnSeccionDesayuno.isEnabled = false
 
-                    listaSecciones =
-                        resSecciones.body()!!
+            binding.btnSeccionAlmuerzo.alpha = 1.0f
+            binding.btnSeccionAlmuerzo.isEnabled = true
 
-                    Log.d(
-                        "BACKEND_SIRAE",
-                        "Secciones recibidas: ${listaSecciones.size}"
-                    )
-                }
+            binding.btnSeccionMerienda.alpha = 1.0f
+            binding.btnSeccionMerienda.isEnabled = true
 
-                // -------------------------------------------------
-                // C. DETALLES
-                // -------------------------------------------------
-
-                val resDetalles =
-                    menuRepository.obtenerDetallePlatos()
-
-                if (
-                    resDetalles.isSuccessful &&
-                    !resDetalles.body().isNullOrEmpty()
-                ) {
-
-                    listaDetalles =
-                        resDetalles.body()!!
-
-                    Log.d(
-                        "BACKEND_SIRAE",
-                        "Detalles recibidos: ${listaDetalles.size}"
-                    )
-                }
-
-                // -------------------------------------------------
-                // ACTUALIZAR INTERFAZ
-                // -------------------------------------------------
-
-                actualizarRuleta()
-
-                actualizarInformacionSeccion()
-
-                configurarMenusAnteriores()
-
-            } catch (e: Exception) {
-
-                Log.e(
-                    "BACKEND_SIRAE",
-                    "Error al conectar con Render: ${e.message}"
-                )
-            }
+            seleccionarSeccion(1) // Selecciona Almuerzo por defecto en la tarde
         }
     }
 
     // =========================================================
-    // RULETA
+    // MOSTRAR POPUP EMERGENTE DE NOTIFICACIONES
+    // =========================================================
+
+    private fun mostrarPopupNotificaciones() {
+        val popupBinding = PopupNotificacionesBinding.inflate(layoutInflater)
+        popupBinding.txtCantidadNotificaciones.text = "3"
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(popupBinding.root)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        popupBinding.notificacionPreparacion.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(this, PreparacionActivity::class.java).apply {
+                platoActualSeleccionado?.let { plato ->
+                    putExtra("id_plato", plato.idPlato)
+                    putExtra("nombre_plato", plato.nombrePlato)
+                }
+            }
+            startActivity(intent)
+        }
+
+        popupBinding.notificacionInventario.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(this, InventarioActivity::class.java)
+            startActivity(intent)
+        }
+
+        popupBinding.notificacionAsistencia.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(this, AsignadasActivity::class.java)
+            startActivity(intent)
+        }
+
+        popupBinding.btnVerTodasNotificaciones.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(this, AvisosActivity::class.java)
+            startActivity(intent)
+        }
+
+        dialog.show()
+    }
+
+    // =========================================================
+    // GIRO Y DESLIZAMIENTO DE LA RULETA CIRCULAR
     // =========================================================
 
     private fun configurarGiroRuleta() {
+        var startY = 0f
+        var isSwiping = false
 
-        var totalRotation = 0f
+        val touchListener = View.OnTouchListener { view, event ->
+            view.parent?.requestDisallowInterceptTouchEvent(true)
 
-        var lastAngle = 0f
-
-        binding.wheelContainer.setOnTouchListener { view, event ->
-
-            val centerX =
-                view.width / 2f
-
-            val centerY =
-                view.height / 2f
-
-            val x = event.x
-
-            val y = event.y
-
-            when (event.action) {
-
-                // -------------------------------------------------
-                // INICIO DEL GIRO
-                // -------------------------------------------------
-
+            when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
-
-                    lastAngle =
-                        Math.toDegrees(
-                            atan2(
-                                (y - centerY).toDouble(),
-                                (x - centerX).toDouble()
-                            )
-                        ).toFloat()
-
+                    startY = event.rawY
+                    isSwiping = false
                     true
                 }
-
-                // -------------------------------------------------
-                // MOVIMIENTO
-                // -------------------------------------------------
-
                 MotionEvent.ACTION_MOVE -> {
-
-                    val currentAngle =
-                        Math.toDegrees(
-                            atan2(
-                                (y - centerY).toDouble(),
-                                (x - centerX).toDouble()
-                            )
-                        ).toFloat()
-
-                    var deltaAngle =
-                        currentAngle - lastAngle
-
-                    if (deltaAngle > 180f) {
-
-                        deltaAngle -= 360f
+                    val deltaY = event.rawY - startY
+                    if (Math.abs(deltaY) > 15) {
+                        isSwiping = true
+                        val anguloTemp = anguloRotacionActual + (deltaY * 0.4f)
+                        binding.wheelContainer.rotation = anguloTemp
+                        contraRotarImagenes(-anguloTemp)
                     }
-
-                    if (deltaAngle < -180f) {
-
-                        deltaAngle += 360f
-                    }
-
-                    totalRotation += deltaAngle
-
-                    binding.wheelContainer.rotation =
-                        totalRotation
-
-                    lastAngle =
-                        currentAngle
-
                     true
                 }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    view.parent?.requestDisallowInterceptTouchEvent(false)
+                    val deltaY = event.rawY - startY
 
-                // -------------------------------------------------
-                // FINAL DEL GIRO
-                // -------------------------------------------------
-
-                MotionEvent.ACTION_UP,
-                MotionEvent.ACTION_CANCEL -> {
-
-                    seleccionarSeccionPorRotacion(
-                        totalRotation
-                    )
-
+                    if (isSwiping && Math.abs(deltaY) > 30) {
+                        if (jornadaActualInicio == "MANANA") {
+                            seleccionarSeccion(0)
+                        } else {
+                            if (seccionSeleccionada == 1) {
+                                seleccionarSeccion(2)
+                            } else {
+                                seleccionarSeccion(1)
+                            }
+                        }
+                    } else if (!isSwiping) { // Clic directo
+                        when (view.id) {
+                            R.id.btnSeccionDesayuno -> {
+                                if (jornadaActualInicio == "MANANA") seleccionarSeccion(0)
+                            }
+                            R.id.btnSeccionAlmuerzo -> {
+                                if (jornadaActualInicio == "TARDE") seleccionarSeccion(1)
+                            }
+                            R.id.btnSeccionMerienda -> {
+                                if (jornadaActualInicio == "TARDE") seleccionarSeccion(2)
+                            }
+                        }
+                    } else {
+                        seleccionarSeccion(seccionSeleccionada)
+                    }
+                    isSwiping = false
                     true
                 }
-
                 else -> false
             }
         }
+
+        binding.wheelAreaContainer.setOnTouchListener(touchListener)
+        binding.wheelContainer.setOnTouchListener(touchListener)
+        binding.btnSeccionDesayuno.setOnTouchListener(touchListener)
+        binding.btnSeccionAlmuerzo.setOnTouchListener(touchListener)
+        binding.btnSeccionMerienda.setOnTouchListener(touchListener)
     }
 
-    // =========================================================
-    // DETERMINAR SECCIÓN
-    // =========================================================
+    private fun seleccionarSeccion(index: Int) {
+        seccionSeleccionada = index
 
-    private fun seleccionarSeccionPorRotacion(
-        rotation: Float
-    ) {
+        val targetAngle = when (index) {
+            0 -> 120f  // Desayuno
+            1 -> 0f    // Almuerzo
+            2 -> -120f // Merienda
+            else -> 0f
+        }
 
-        val normalizedRotation =
-            (rotation % 360f + 360f) % 360f
+        anguloRotacionActual = targetAngle
 
-        /*
-         * Tenemos 3 secciones.
-         *
-         * 360 / 3 = 120 grados
-         */
+        binding.wheelContainer.animate()
+            .rotation(targetAngle)
+            .setDuration(220)
+            .start()
 
-        val sector =
-            ((normalizedRotation + 60f) / 120f)
-                .toInt() % 3
+        contraRotarImagenes(-targetAngle)
 
-        seccionSeleccionada =
-            sector
+        when (index) {
+            0 -> { // DESAYUNO
+                resaltarCard(binding.cardDesayuno, true)
+                resaltarCard(binding.cardAlmuerzo, false)
+                resaltarCard(binding.cardMerienda, false)
+            }
+            1 -> { // ALMUERZO
+                resaltarCard(binding.cardDesayuno, false)
+                resaltarCard(binding.cardAlmuerzo, true)
+                resaltarCard(binding.cardMerienda, false)
+            }
+            2 -> { // MERIENDA
+                resaltarCard(binding.cardDesayuno, false)
+                resaltarCard(binding.cardAlmuerzo, false)
+                resaltarCard(binding.cardMerienda, true)
+            }
+        }
 
         actualizarInformacionSeccion()
     }
 
-    // =========================================================
-    // ACTUALIZAR RULETA - SOLO IMÁGENES
-    // =========================================================
+    private fun contraRotarImagenes(anguloInverso: Float) {
+        binding.cardDesayuno.rotation = anguloInverso
+        binding.cardAlmuerzo.rotation = anguloInverso
+        binding.cardMerienda.rotation = anguloInverso
+    }
 
-    private fun actualizarRuleta() {
+    private fun resaltarCard(card: com.google.android.material.card.MaterialCardView, activa: Boolean) {
+        val params = card.layoutParams
+        if (activa) {
+            params.width = (66 * resources.displayMetrics.density).toInt()
+            params.height = (66 * resources.displayMetrics.density).toInt()
+            card.strokeWidth = (3.5 * resources.displayMetrics.density).toInt()
+            card.cardElevation = 6 * resources.displayMetrics.density
+        } else {
+            params.width = (54 * resources.displayMetrics.density).toInt()
+            params.height = (54 * resources.displayMetrics.density).toInt()
+            card.strokeWidth = (2 * resources.displayMetrics.density).toInt()
+            card.cardElevation = 2 * resources.displayMetrics.density
+        }
+        card.layoutParams = params
+    }
 
-        // -----------------------------------------------------
-        // DESAYUNO
-        // -----------------------------------------------------
+    private fun actualizarInformacionSeccion() {
+        val nombreSeccion = seccionesNombres[seccionSeleccionada]
+        binding.tvSeccionSeleccionada.text = nombreSeccion.uppercase()
 
-        val desayuno =
-            obtenerPlatoPorSeccion("Desayuno")
+        val plato = obtenerPlatoPorSeccion(nombreSeccion)
 
-        binding.imgRuletaDesayuno.setImageResource(
-            if (desayuno != null) {
-                obtenerImagenPlato(desayuno)
-            } else {
-                R.drawable.apanado
-            }
-        )
-
-        // -----------------------------------------------------
-        // ALMUERZO
-        // -----------------------------------------------------
-
-        val almuerzo =
-            obtenerPlatoPorSeccion("Almuerzo")
-
-        binding.imgRuletaAlmuerzo.setImageResource(
-            if (almuerzo != null) {
-                obtenerImagenPlato(almuerzo)
-            } else {
-                R.drawable.bandeja_paisa
-            }
-        )
-
-        // -----------------------------------------------------
-        // MERIENDA
-        // -----------------------------------------------------
-
-        val merienda =
-            obtenerPlatoPorSeccion("Merienda")
-
-        binding.imgRuletaMerienda.setImageResource(
-            if (merienda != null) {
-                obtenerImagenPlato(merienda)
-            } else {
-                R.drawable.arroz_de_leche
-            }
-        )
+        if (plato != null) {
+            platoActualSeleccionado = plato
+            binding.tvPlatoSeleccionado.text = formatearNombrePlato(plato.nombrePlato)
+            binding.imgPlatoMain.setImageResource(obtenerImagenPlato(plato))
+        } else {
+            platoActualSeleccionado = null
+            binding.tvPlatoSeleccionado.text = "Sin menú asignado"
+            binding.imgPlatoMain.setImageResource(R.drawable.arroz_pollo)
+        }
     }
 
     // =========================================================
-    // MOSTRAR INFORMACIÓN DE LA SECCIÓN
+    // CONSUMO DEL BACKEND (API SIRAE)
     // =========================================================
 
-    private fun actualizarInformacionSeccion() {
-
-        val nombreSeccion =
-            seccionesRuleta[seccionSeleccionada]
-
-        binding.tvSeccionSeleccionada.text =
-            nombreSeccion.uppercase()
-
-        val plato =
-            obtenerPlatoPorSeccion(
-                nombreSeccion
-            )
-
-        if (plato != null) {
-
-            platoActualSeleccionado =
-                plato
-
-            binding.tvPlatoSeleccionado.text =
-                formatearNombrePlato(
-                    plato.nombrePlato
-                )
-
-            binding.tvIngredientes.text =
-                if (
-                    !plato.componente.isNullOrEmpty()
-                ) {
-
-                    "• ${plato.componente} disponible"
-
-                } else {
-
-                    "• Toca para ver detalles"
+    private fun cargarDatosDesdeBackend() {
+        lifecycleScope.launch {
+            try {
+                val resPlatos = menuRepository.obtenerPlatos()
+                if (resPlatos.isSuccessful && !resPlatos.body().isNullOrEmpty()) {
+                    listaPlatos = resPlatos.body()!!
                 }
 
-        } else {
+                val resSecciones = menuRepository.obtenerSeccionesMenu()
+                if (resSecciones.isSuccessful && !resSecciones.body().isNullOrEmpty()) {
+                    listaSecciones = resSecciones.body()!!
+                }
 
-            platoActualSeleccionado = null
+                val resDetalles = menuRepository.obtenerDetallePlatos()
+                if (resDetalles.isSuccessful && !resDetalles.body().isNullOrEmpty()) {
+                    listaDetalles = resDetalles.body()!!
+                }
 
-            binding.tvPlatoSeleccionado.text =
-                "Sin menú asignado"
+                actualizarInformacionSeccion()
+                configurarMenusAnteriores()
 
-            binding.tvIngredientes.text =
-                "• No hay plato para esta sección"
+            } catch (e: Exception) {
+                Log.e("BACKEND_SIRAE", "Error al conectar con el servidor: ${e.message}")
+            }
         }
     }
 
@@ -521,106 +444,38 @@ class MainActivity : AppCompatActivity() {
     // BUSCAR PLATO POR SECCIÓN
     // =========================================================
 
-    private fun obtenerPlatoPorSeccion(
-        nombreSeccion: String
-    ): PlatoResponse? {
-
-        val seccion =
-            listaSecciones.firstOrNull {
-
-                it.nombreSeccion.equals(
-                    nombreSeccion,
-                    ignoreCase = true
-                )
-            }
-
-        // -----------------------------------------------------
-        // PRIMERO USAMOS EL ID REAL DE LA SECCIÓN
-        // -----------------------------------------------------
-
-        if (seccion != null) {
-
-            val platoPorId =
-                listaPlatos.firstOrNull {
-
-                    it.idSeccion ==
-                            seccion.idSeccion
-                }
-
-            if (platoPorId != null) {
-
-                return platoPorId
-            }
+    private fun obtenerPlatoPorSeccion(nombreSeccion: String): PlatoResponse? {
+        val seccion = listaSecciones.firstOrNull {
+            it.nombreSeccion.equals(nombreSeccion, ignoreCase = true)
         }
 
-        // -----------------------------------------------------
-        // RESPALDO POR NOMBRE
-        // -----------------------------------------------------
+        if (seccion != null) {
+            val platoPorId = listaPlatos.firstOrNull { it.idSeccion == seccion.idSeccion }
+            if (platoPorId != null) return platoPorId
+        }
 
         return when {
-
-            // -------------------------------------------------
-            // DESAYUNO
-            // -------------------------------------------------
-
-            nombreSeccion.equals(
-                "Desayuno",
-                ignoreCase = true
-            ) -> {
-
+            nombreSeccion.equals("Desayuno", ignoreCase = true) -> {
                 listaPlatos.firstOrNull {
-
-                    it.nombrePlato?.contains(
-                        "café",
-                        ignoreCase = true
-                    ) == true ||
-                            it.nombrePlato?.contains(
-                                "chocolate",
-                                ignoreCase = true
-                            ) == true
-                }
+                    it.nombrePlato?.contains("café", true) == true ||
+                            it.nombrePlato?.contains("huevo", true) == true ||
+                            it.idSeccion == 1
+                } ?: platosBaseRespaldo[0]
             }
-
-            // -------------------------------------------------
-            // ALMUERZO
-            // -------------------------------------------------
-
-            nombreSeccion.equals(
-                "Almuerzo",
-                ignoreCase = true
-            ) -> {
-
+            nombreSeccion.equals("Almuerzo", ignoreCase = true) -> {
                 listaPlatos.firstOrNull {
-
-                    it.nombrePlato?.contains(
-                        "bandeja",
-                        ignoreCase = true
-                    ) == true
-                }
+                    it.nombrePlato?.contains("pollo", true) == true ||
+                            it.nombrePlato?.contains("bandeja", true) == true ||
+                            it.idSeccion == 2
+                } ?: platosBaseRespaldo[1]
             }
-
-            // -------------------------------------------------
-            // MERIENDA
-            // -------------------------------------------------
-
-            nombreSeccion.equals(
-                "Merienda",
-                ignoreCase = true
-            ) -> {
-
+            nombreSeccion.equals("Merienda", ignoreCase = true) -> {
                 listaPlatos.firstOrNull {
-
-                    it.nombrePlato?.contains(
-                        "pollo",
-                        ignoreCase = true
-                    ) == true ||
-                            it.nombrePlato?.contains(
-                                "valenciana",
-                                ignoreCase = true
-                            ) == true
-                }
+                    it.nombrePlato?.contains("muffin", true) == true ||
+                            it.nombrePlato?.contains("leche", true) == true ||
+                            it.idSeccion == 3
+                } ?: platosBaseRespaldo[2]
             }
-
             else -> null
         }
     }
@@ -629,26 +484,19 @@ class MainActivity : AppCompatActivity() {
     // IMAGEN DEL PLATO
     // =========================================================
 
-    private fun obtenerImagenPlato(
-        plato: PlatoResponse
-    ): Int {
-
-        val nombre =
-            plato.nombrePlato
-                ?.lowercase()
-                ?: ""
+    private fun obtenerImagenPlato(plato: PlatoResponse): Int {
+        val nombre = plato.nombrePlato?.lowercase() ?: ""
 
         return when {
             nombre.contains("bandeja") -> R.drawable.bandeja_paisa
             nombre.contains("frijol") -> R.drawable.frijoles
             nombre.contains("chocolate") -> R.drawable.chocolate
-            nombre.contains("huevo") -> R.drawable.huevo_perico
+            nombre.contains("huevo") || nombre.contains("café") || nombre.contains("pan") -> R.drawable.comida_desayuno
             nombre.contains("pasta") || nombre.contains("carne") -> R.drawable.pasta_carne
             nombre.contains("lenteja") -> R.drawable.lentejas_arroz
-            nombre.contains("pollo") -> R.drawable.pollo_guisado
-            nombre.contains("arroz") -> R.drawable.arroz_de_leche
-            nombre.contains("café") || nombre.contains("cafe") || nombre.contains("pan") -> R.drawable.comida_desayuno
-            else -> R.drawable.comida_almuerzo
+            nombre.contains("pollo") -> R.drawable.arroz_pollo
+            nombre.contains("muffin") || nombre.contains("leche") -> R.drawable.comida_merienda
+            else -> R.drawable.arroz_pollo
         }
     }
 
@@ -658,243 +506,88 @@ class MainActivity : AppCompatActivity() {
 
     private fun configurarMenusAnteriores() {
 
-        if (listaPlatos.isEmpty()) return
+        val plato1 = listaPlatos.firstOrNull {
+            it.nombrePlato?.contains("pollo", true) == true
+        } ?: platosBaseRespaldo[1]
 
-        val plato1 =
-            listaPlatos.firstOrNull {
+        val plato2 = listaPlatos.firstOrNull {
+            it.nombrePlato?.contains("café", true) == true || it.nombrePlato?.contains("huevo", true) == true
+        } ?: platosBaseRespaldo[0]
 
-                it.nombrePlato?.contains(
-                    "pollo",
-                    ignoreCase = true
-                ) == true
+        val plato3 = listaPlatos.firstOrNull {
+            it.nombrePlato?.contains("muffin", true) == true || it.nombrePlato?.contains("leche", true) == true
+        } ?: platosBaseRespaldo[2]
 
-            } ?: listaPlatos.getOrNull(0)
+        binding.tvPlatoAnterior1.text = "Almuerzo"
+        binding.imgMenuAnterior1.setImageResource(obtenerImagenPlato(plato1))
+        binding.tvFechaAnterior1.text = "01 Oct"
+        binding.cardMenuAnterior1.setOnClickListener { mostrarDialogoPlato(plato1) }
 
-        val plato2 =
-            listaPlatos.firstOrNull {
+        binding.tvPlatoAnterior2.text = "Desayuno"
+        binding.imgMenuAnterior2.setImageResource(obtenerImagenPlato(plato2))
+        binding.tvFechaAnterior2.text = "30 Sep"
+        binding.cardMenuAnterior2.setOnClickListener { mostrarDialogoPlato(plato2) }
 
-                it.nombrePlato?.contains(
-                    "bandeja",
-                    ignoreCase = true
-                ) == true
-
-            } ?: listaPlatos.getOrNull(1)
-
-        val plato3 =
-            listaPlatos.firstOrNull {
-
-                it.nombrePlato?.contains(
-                    "valenciana",
-                    ignoreCase = true
-                ) == true ||
-
-                        it.nombrePlato?.contains(
-                            "lenteja",
-                            ignoreCase = true
-                        ) == true
-
-            } ?: listaPlatos.getOrNull(2)
-            ?: listaPlatos.lastOrNull()
-
-        // -----------------------------------------------------
-        // TARJETA 1
-        // -----------------------------------------------------
-
-        plato1?.let { p ->
-            binding.tvPlatoAnterior1.text = formatearNombrePlato(p.nombrePlato)
-            binding.imgMenuAnterior1.setImageResource(obtenerImagenPlato(p))
-            binding.cardMenuAnterior1.setOnClickListener { mostrarDialogoPlato(p) }
-        }
-
-        // -----------------------------------------------------
-        // TARJETA 2
-        // -----------------------------------------------------
-
-        plato2?.let { p ->
-            binding.tvPlatoAnterior2.text = formatearNombrePlato(p.nombrePlato)
-            binding.imgMenuAnterior2.setImageResource(obtenerImagenPlato(p))
-            binding.cardMenuAnterior2.setOnClickListener { mostrarDialogoPlato(p) }
-        }
-
-        // -----------------------------------------------------
-        // TARJETA 3
-        // -----------------------------------------------------
-
-        plato3?.let { p ->
-            binding.tvPlatoAnterior3.text = formatearNombrePlato(p.nombrePlato)
-            binding.imgMenuAnterior3.setImageResource(obtenerImagenPlato(p))
-            binding.cardMenuAnterior3.setOnClickListener { mostrarDialogoPlato(p) }
-        }
+        binding.tvPlatoAnterior3.text = "Merienda"
+        binding.imgMenuAnterior3.setImageResource(obtenerImagenPlato(plato3))
+        binding.tvFechaAnterior3.text = "29 Sep"
+        binding.cardMenuAnterior3.setOnClickListener { mostrarDialogoPlato(plato3) }
     }
 
     // =========================================================
     // FORMATEAR NOMBRE
     // =========================================================
 
-    private fun formatearNombrePlato(
-        nombre: String?
-    ): String {
-
+    private fun formatearNombrePlato(nombre: String?): String {
         return nombre
             ?.split(" ")
             ?.joinToString(" ") { palabra ->
-
                 palabra.replaceFirstChar {
-
-                    if (it.isLowerCase())
-                        it.titlecase()
-                    else
-                        it.toString()
+                    if (it.isLowerCase()) it.titlecase() else it.toString()
                 }
             }
-            ?: "Plato del día"
+            ?: "Arroz con pollo"
     }
 
     // =========================================================
-    // DIÁLOGO DEL PLATO
+    // DIÁLOGO DETALLE DEL PLATO
     // =========================================================
 
-    private fun mostrarDialogoPlato(
-        plato: PlatoResponse
-    ) {
-
-        platoActualSeleccionado =
-            plato
-
-        actualizarTarjetaPlato(
-            plato
-        )
-
-        // -----------------------------------------------------
-        // SECCIÓN
-        // -----------------------------------------------------
-
-        val seccion =
-            listaSecciones.firstOrNull {
-
-                it.idSeccion ==
-                        plato.idSeccion
-            }
-
-        val nombreSeccion =
-            seccion?.nombreSeccion
-                ?: when (plato.idSeccion) {
-
-                    1 -> "Desayuno"
-
-                    2 -> "Almuerzo"
-
-                    3 -> "Merienda"
-
-                    else -> "Almuerzo"
-                }
-
-        // -----------------------------------------------------
-        // DETALLE
-        // -----------------------------------------------------
-
-        val detalle =
-            listaDetalles.firstOrNull {
-
-                it.idPlato ==
-                        plato.idPlato
-            }
-
-        val porcion =
-            detalle?.porcionPorNino
-                ?: "100g aprox."
-
-        val totalPreparar =
-            detalle?.totalAPreparar
-                ?: "50"
-
-        val unidad =
-            detalle?.unidadTotal
-                ?: "porciones"
-
-        val estado =
-            detalle?.estadoPreparacion
-                ?: "Asignado"
-
-        val componenteTipo =
-            if (
-                !plato.componente.isNullOrEmpty()
-            ) {
-
-                plato.componente
-
-            } else {
-
-                "Principio y Proteína"
-            }
-
-        // -----------------------------------------------------
-        // VIEWBINDING MODAL
-        // -----------------------------------------------------
-
-        val dialogBinding =
-            DialogDetallePlatoBinding.inflate(
-                layoutInflater
-            )
-
-        val nombreFormateado =
-            formatearNombrePlato(
-                plato.nombrePlato
-            )
-
-        dialogBinding.tvTituloPlatoModal.text =
-            nombreFormateado
-
-        dialogBinding.tvSeccionModal.text =
-            nombreSeccion
-
-        dialogBinding.tvComponenteModal.text =
-            componenteTipo
-
-        dialogBinding.tvPorcionModal.text =
-            porcion
-
-        dialogBinding.tvTotalPrepararModal.text =
-            "$totalPreparar $unidad"
-
-        dialogBinding.tvBadgeEstadoModal.text =
-            estado
-
-        // -----------------------------------------------------
-        // IMAGEN
-        // -----------------------------------------------------
-
-        dialogBinding.imgPlatoModal.setImageResource(
-            obtenerImagenPlato(plato)
-        )
-
-        // -----------------------------------------------------
-        // DIALOG
-        // -----------------------------------------------------
-
-        val dialog =
-            MaterialAlertDialogBuilder(this)
-                .setView(
-                    dialogBinding.root
-                )
-                .create()
-
-        dialog.window?.setBackgroundDrawableResource(
-            android.R.color.transparent
-        )
-
-        // -----------------------------------------------------
-        // CERRAR
-        // -----------------------------------------------------
-
-        dialogBinding.btnCerrarModal.setOnClickListener {
-
-            dialog.dismiss()
+    private fun mostrarDialogoPlato(plato: PlatoResponse) {
+        val seccion = listaSecciones.firstOrNull { it.idSeccion == plato.idSeccion }
+        val nombreSeccion = seccion?.nombreSeccion ?: when (plato.idSeccion) {
+            1 -> "Desayuno"
+            2 -> "Almuerzo"
+            3 -> "Merienda"
+            else -> "Almuerzo"
         }
 
-        // -----------------------------------------------------
-        // COMPONENTES / INSUMOS
-        // -----------------------------------------------------
+        val detalle = listaDetalles.firstOrNull { it.idPlato == plato.idPlato }
+        val porcion = detalle?.porcionPorNino ?: "100g aprox."
+        val totalPreparar = detalle?.totalAPreparar ?: "50"
+        val unidad = detalle?.unidadTotal ?: "porciones"
+        val estado = detalle?.estadoPreparacion ?: "Asignado"
+        val componenteTipo = if (!plato.componente.isNullOrEmpty()) plato.componente else "Sopas, Sazón y Proteína"
+
+        val dialogBinding = DialogDetallePlatoBinding.inflate(layoutInflater)
+
+        dialogBinding.tvTituloPlatoModal.text = formatearNombrePlato(plato.nombrePlato)
+        dialogBinding.tvSeccionModal.text = nombreSeccion
+        dialogBinding.tvComponenteModal.text = "Componente: $componenteTipo"
+        dialogBinding.tvPorcionModal.text = porcion
+        dialogBinding.tvTotalPrepararModal.text = "$totalPreparar $unidad"
+        dialogBinding.tvBadgeEstadoModal.text = estado
+        dialogBinding.imgPlatoModal.setImageResource(obtenerImagenPlato(plato))
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(dialogBinding.root)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        dialogBinding.btnCerrarModal.setOnClickListener {
+            dialog.dismiss()
+        }
 
         dialogBinding.btnVerComponentesModal.setOnClickListener {
             dialog.dismiss()
@@ -902,49 +595,21 @@ class MainActivity : AppCompatActivity() {
                 putExtra("id_plato", plato.idPlato)
                 putExtra("id_seccion", plato.idSeccion ?: -1)
                 putExtra("nombre_plato", plato.nombrePlato)
-                putExtra("componente_seleccionado", plato.componente)
+                putExtra("componente_seleccionado", componenteTipo)
             }
             startActivity(intent)
         }
-
-        // -----------------------------------------------------
-        // PREPARACIÓN
-        // -----------------------------------------------------
 
         dialogBinding.btnOtroAleatorioModal.setOnClickListener {
             dialog.dismiss()
             val intent = Intent(this, PreparacionActivity::class.java).apply {
                 putExtra("id_plato", plato.idPlato)
                 putExtra("nombre_plato", plato.nombrePlato)
+                putExtra("componente_seleccionado", componenteTipo)
             }
             startActivity(intent)
         }
 
         dialog.show()
-    }
-
-    // =========================================================
-    // ACTUALIZAR TARJETA
-    // =========================================================
-
-    private fun actualizarTarjetaPlato(
-        plato: PlatoResponse
-    ) {
-
-        binding.tvPlatoSeleccionado.text =
-            plato.nombrePlato
-                ?: "Plato sin nombre"
-
-        binding.tvIngredientes.text =
-            if (
-                !plato.componente.isNullOrEmpty()
-            ) {
-
-                "• ${plato.componente} disponible"
-
-            } else {
-
-                "• Toca para ver detalles"
-            }
     }
 }

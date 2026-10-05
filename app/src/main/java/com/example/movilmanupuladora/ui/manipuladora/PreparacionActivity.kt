@@ -1,89 +1,102 @@
 package com.example.movilmanupuladora.ui.manipuladora
 
-import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.ImageView
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.model.pasos_preparacion
+import com.example.movilmanupuladora.databinding.ActivityPreparacionBinding
+import com.example.movilmanupuladora.utils.NavigationHelper
 import kotlinx.coroutines.launch
 
 class PreparacionActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityPreparacionBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_preparacion)
+
+        binding = ActivityPreparacionBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         // Botón volver
-        val btnVolver = findViewById<ImageView>(R.id.btnVolver)
-        btnVolver?.setOnClickListener { finish() }
+        binding.btnVolver.setOnClickListener { finish() }
 
         // Botón marcar como preparado
-        val btnMarcarPreparado = findViewById<Button>(R.id.btnMarcarPreparado)
         val preferencias = getSharedPreferences("SIRAE", MODE_PRIVATE)
         val preparado = preferencias.getBoolean("plato_preparado", false)
 
-        if (preparado && btnMarcarPreparado != null) {
-            btnMarcarPreparado.text = "✓   Preparado"
-            btnMarcarPreparado.isEnabled = false
-            btnMarcarPreparado.alpha = 0.6f
+        if (preparado) {
+            binding.btnMarcarPreparado.text = "✓   Preparado"
+            binding.btnMarcarPreparado.isEnabled = false
+            binding.btnMarcarPreparado.alpha = 0.6f
         }
 
-        btnMarcarPreparado?.setOnClickListener {
+        binding.btnMarcarPreparado.setOnClickListener {
             preferencias.edit().putBoolean("plato_preparado", true).apply()
-            btnMarcarPreparado.text = "✓   Preparado"
-            btnMarcarPreparado.isEnabled = false
-            btnMarcarPreparado.alpha = 0.6f
+            binding.btnMarcarPreparado.text = "✓   Preparado"
+            binding.btnMarcarPreparado.isEnabled = false
+            binding.btnMarcarPreparado.alpha = 0.6f
             Toast.makeText(this, "¡Plato marcado como preparado!", Toast.LENGTH_SHORT).show()
         }
 
         // Barra de navegación
-        val barraView = findViewById<android.view.View>(R.id.barraNavegacion)
-        if (barraView != null) {
-            val barraBinding = com.example.movilmanupuladora.databinding.ActivityBarraNavegacionBinding.bind(barraView)
-            com.example.movilmanupuladora.utils.NavigationHelper.setupBarraNavegacion(
-                this,
-                barraBinding,
-                com.example.movilmanupuladora.utils.NavigationHelper.Tab.ASIGNADAS
-            )
-        }
+        NavigationHelper.setupBarraNavegacion(
+            this,
+            binding.barraNavegacion,
+            NavigationHelper.Tab.ASIGNADAS
+        )
 
         // Mostrar nombre e imagen del plato si viene del intent
-        val nombrePlato = intent.getStringExtra("nombre_plato") ?: "Bandeja Paisa"
-        val tvNombre = findViewById<TextView>(R.id.tvNombrePlatoPreparacion)
+        val nombrePlato = intent.getStringExtra("nombre_plato") ?: "Arroz con Pollo"
+        val componente = intent.getStringExtra("componente_seleccionado")
+
         val nombreFormateado = nombrePlato.split(" ").joinToString(" ") { palabra ->
             palabra.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
         }
-        tvNombre?.text = nombreFormateado
+        binding.tvNombrePlatoPreparacion.text = nombreFormateado
 
-        val imgPlato = findViewById<ImageView>(R.id.imgPlatoPreparacion)
+        if (!componente.isNullOrBlank()) {
+            binding.tvComponenteSubtituloPreparacion.text = "Componente: $componente"
+            binding.tvComponenteSubtituloPreparacion.visibility = View.VISIBLE
+        } else {
+            binding.tvComponenteSubtituloPreparacion.visibility = View.GONE
+        }
+
         val imgRes = when {
             nombrePlato.contains("bandeja", ignoreCase = true) -> R.drawable.bandeja_paisa
             nombrePlato.contains("frijol", ignoreCase = true) -> R.drawable.frijoles
             nombrePlato.contains("chocolate", ignoreCase = true) -> R.drawable.chocolate
             nombrePlato.contains("huevo", ignoreCase = true) -> R.drawable.huevo_perico
-            nombrePlato.contains("pollo", ignoreCase = true) -> R.drawable.apanado
+            nombrePlato.contains("pollo", ignoreCase = true) -> R.drawable.arroz_pollo
             nombrePlato.contains("arroz", ignoreCase = true) -> R.drawable.arroz_de_leche
-            else -> R.drawable.frijoles
+            else -> R.drawable.comida_almuerzo
         }
-        imgPlato?.setImageResource(imgRes)
+        binding.imgPlatoPreparacion.setImageResource(imgRes)
 
-        // Cargar pasos desde el backend
+        // Cargar pasos de la receta
         cargarPasos()
     }
 
     private val pasosFallback = listOf(
-        pasos_preparacion(idPlato = 1, numeroPaso = "1", descripcionPaso = "Lavar y desinfectar los ingredientes, utensilios y mesas de trabajo siguiendo el protocolo de bioseguridad."),
+        pasos_preparacion(idPlato = 1, numeroPaso = "1", descripcionPaso = "Lavar y desinfectar los ingredientes, utensilios y mesas de trabajo siguiendo el protocolo de inocuidad PAE."),
         pasos_preparacion(idPlato = 1, numeroPaso = "2", descripcionPaso = "Cocinar y sellar la proteína y los principios a temperatura controlada (mínimo 75°C)."),
-        pasos_preparacion(idPlato = 1, numeroPaso = "3", descripcionPaso = "Verificar sazón, textura, cocción completa y temperatura antes del ensamble del plato."),
+        pasos_preparacion(idPlato = 1, numeroPaso = "3", descripcionPaso = "Verificar sazón, textura, cocción completa y temperatura antes del porcionado."),
         pasos_preparacion(idPlato = 1, numeroPaso = "4", descripcionPaso = "Porcionar y servir según las tablas de gramaje institucional del programa de alimentación escolar.")
     )
 
@@ -105,34 +118,32 @@ class PreparacionActivity : AppCompatActivity() {
     }
 
     private fun mostrarPasos(pasos: List<pasos_preparacion>) {
-        val contenedor = findViewById<LinearLayout>(R.id.contenedorPasos) ?: return
+        val contenedor = binding.contenedorPasos
         contenedor.removeAllViews()
 
         for (paso in pasos) {
-            // Fila horizontal: número + descripción
             val fila = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
-                setPadding(0, 36, 0, 0)
+                gravity = android.view.Gravity.CENTER_VERTICAL
+                setPadding(0, 16, 0, 16)
             }
 
-            // Círculo con el número del paso
             val tvNumero = TextView(this).apply {
                 text = paso.numeroPaso
-                setTextColor(0xFFFFFFFF.toInt())
-                textSize = 14f
+                setTextColor(0xFF7A5500.toInt())
+                textSize = 13f
                 gravity = android.view.Gravity.CENTER
-                setBackgroundResource(R.drawable.bg_numero_paso)
-                layoutParams = LinearLayout.LayoutParams(72, 72)
+                setBackgroundResource(R.drawable.bg_pill_yellow)
+                layoutParams = LinearLayout.LayoutParams(56, 56)
             }
 
-            // Descripción del paso
             val tvDescripcion = TextView(this).apply {
                 text = paso.descripcionPaso
-                setTextColor(0xFF34443A.toInt())
-                textSize = 14f
+                setTextColor(0xFF1B3317.toInt())
+                textSize = 13f
                 layoutParams = LinearLayout.LayoutParams(
                     0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
-                ).also { it.marginStart = 30 }
+                ).also { it.marginStart = 20 }
             }
 
             fila.addView(tvNumero)
