@@ -22,7 +22,7 @@ object NavigationHelper {
         PERFIL
     }
 
-    private const val COLOR_ACTIVO_HEX = "#D4A017"
+    private const val COLOR_ACTIVO_HEX = "#F4B41F"
     private const val COLOR_INACTIVO_HEX = "#667085"
 
     fun setupBarraNavegacion(

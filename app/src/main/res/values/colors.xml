@@ -13,14 +13,14 @@
     <!-- VERDE PRINCIPAL -->
     <color name="verde_principal">#5F7625</color>
 
-    <!-- AMARILLO PRINCIPAL -->
-    <color name="amarillo_sirae">#E0BA28</color>
+    <!-- AMARILLO PRINCIPAL Y MARCA PAE -->
+    <color name="amarillo_sirae">#F4B41F</color>
 
     <!-- AMARILLO DEL BORDE -->
-    <color name="amarillo_borde">#E8D16A</color>
+    <color name="amarillo_borde">#F4B41F</color>
 
     <!-- AMARILLO MÁS CLARO -->
-    <color name="amarillo_claro">#F7E7A1</color>
+    <color name="amarillo_claro">#FDF2CA</color>
 
     <!-- GRIS PARA TEXTOS SECUNDARIOS -->
     <color name="texto_gris">#888888</color>
@@ -43,19 +43,16 @@
     <!-- NEGRO -->
     <color name="negro">#000000</color>
 
-
     <!-- Colores definidos en el diseño -->
-    <color name="amarillo_principal">#D9A700</color>
+    <color name="amarillo_principal">#F4B41F</color>
     <color name="negro_principal">#111111</color>
     <color name="verde_claro">#E5FED0</color>
     <color name="verde_prinpipal">#3E6B21</color>
     <color name="rojo_principal">#E53935</color>
 
     <!-- Colores auxiliares -->
-
     <color name="gris_texto">#666666</color>
     <color name="gris_claro">#F5F5F5</color>
-    <color name="amarillo_dorado_suave">#D8B84C</color>
-
+    <color name="amarillo_dorado_suave">#F4B41F</color>
 
 </resources>
