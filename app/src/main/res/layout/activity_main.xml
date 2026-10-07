@@ -1,547 +1,874 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="#FAF9F5">
 
     <!-- ===================================================== -->
-    <!-- CABECERA                                               -->
+    <!-- CONTENIDO CON SCROLL PARA AJUSTE PERFECTO EN PANTALLA -->
     <!-- ===================================================== -->
 
-    <LinearLayout
-        android:id="@+id/layoutHeader"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="56dp"
-        android:orientation="vertical"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <TextView
-            android:id="@+id/tvSaludo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="BIENVENIDA"
-            android:textColor="#111111"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvFecha"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:text="LUNES / 7 / JUN / 2026"
-            android:textColor="#3F3F3F"
-            android:textSize="12sp" />
-
-    </LinearLayout>
-
-
-    <!-- ===================================================== -->
-    <!-- TITULO PRINCIPAL                                      -->
-    <!-- ===================================================== -->
-
-    <TextView
-        android:id="@+id/tvTituloMenu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
-        android:text="MENÚ DIARIO"
-        android:textColor="#111111"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:letterSpacing="0.05"
-        app:layout_constraintTop_toBottomOf="@id/layoutHeader"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-
-    <!-- ===================================================== -->
-    <!-- CONTENIDO PRINCIPAL                                   -->
-    <!-- ===================================================== -->
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollContainer"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="12dp"
-        android:background="@drawable/fondo_blanco_superior"
-        android:clipToPadding="false"
-        android:paddingTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/tvTituloMenu"
-        app:layout_constraintBottom_toTopOf="@id/barra_navegacion">
-
-        <!-- ================================================= -->
-        <!-- SUGERENCIAS                                        -->
-        <!-- ================================================= -->
-
-        <TextView
-            android:id="@+id/tvSugerencias"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:text="Sugerencias para hoy"
-            android:textColor="#111111"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-
-        <!-- ================================================= -->
-        <!-- ZONA DE RULETA + INFORMACIÓN DEL MENÚ             -->
-        <!-- ================================================= -->
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/barra_navegacion"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/wheelArea"
             android:layout_width="match_parent"
-            android:layout_height="220dp"
-            android:layout_marginTop="12dp"
-            app:layout_constraintTop_toBottomOf="@id/tvSugerencias"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
+            android:layout_height="wrap_content"
+            android:paddingBottom="20dp">
 
             <!-- ================================================= -->
-            <!-- RULETA                                             -->
+            <!-- FONDO AMARILLO DE LA CABECERA                     -->
+            <!-- ================================================= -->
+
+            <View
+                android:id="@+id/bgHeader"
+                android:layout_width="match_parent"
+                android:layout_height="175dp"
+                android:background="@drawable/bg_header_curved"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- ================================================= -->
+            <!-- LOGO PAE (IZQUIERDA ARRIBA)                       -->
             <!-- ================================================= -->
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/wheelContainer"
-                android:layout_width="210dp"
-                android:layout_height="210dp"
-                android:layout_marginStart="-80dp"
+                android:id="@+id/layoutLogoPae"
+                android:layout_width="120dp"
+                android:layout_height="72dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="28dp"
+                android:background="@drawable/bg_logo_pae"
+                android:padding="8dp"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent">
 
+                <ImageView
+                    android:id="@+id/imgLogoPae"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="PAE - Programa de Alimentación Escolar"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/logo_sirae" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- ================================================= -->
+            <!-- TEXTO DE BIENVENIDA Y NOMBRE                       -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:id="@+id/layoutUsuarioHeader"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="8dp"
+                android:orientation="vertical"
+                app:layout_constraintTop_toTopOf="@id/layoutLogoPae"
+                app:layout_constraintStart_toEndOf="@id/layoutLogoPae"
+                app:layout_constraintEnd_toStartOf="@id/btnNotificaciones">
+
+                <TextView
+                    android:id="@+id/tvBienvenidaLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.05"
+                    android:text="BIENVENIDA"
+                    android:textColor="#1B3317"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvSaludo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="María López"
+                    android:textColor="#1B3317"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvRol"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Manipuladora de Alimentos"
+                    android:textColor="#355230"
+                    android:textSize="11sp" />
+
+            </LinearLayout>
+
+            <!-- ================================================= -->
+            <!-- BOTÓN DE NOTIFICACIONES CON PUNTO ROJO           -->
+            <!-- ================================================= -->
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnNotificaciones"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginEnd="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="3dp"
+                app:strokeWidth="0dp"
+                app:layout_constraintTop_toTopOf="@id/layoutLogoPae"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/imgCampana"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:contentDescription="Notificaciones"
+                        android:src="@drawable/ic_notificaciones"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                    <!-- PUNTO ROJO DE BADGE -->
+                    <View
+                        android:id="@+id/viewRedDot"
+                        android:layout_width="9dp"
+                        android:layout_height="9dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/bg_icono_rojo"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ================================================= -->
+            <!-- CÁPSULA DE FECHA DEL DÍA                          -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:id="@+id/layoutFechaCapsula"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/bg_badge_fecha"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="6dp"
+                app:layout_constraintTop_toBottomOf="@id/layoutUsuarioHeader"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginEnd="6dp"
+                    android:contentDescription="Calendario"
+                    android:src="@drawable/ic_calendar"
+                    app:tint="#1B3317" />
+
+                <TextView
+                    android:id="@+id/tvFecha"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="LUNES / 7 / JUN / 2026"
+                    android:textColor="#1B3317"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- ================================================= -->
+            <!-- BOTONES DE JORNADA: MAÑANA Y TARDE                -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:id="@+id/layoutConmutadorJornada"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_tag_plato"
+                android:orientation="horizontal"
+                android:padding="3dp"
+                app:layout_constraintTop_toBottomOf="@id/bgHeader"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <TextView
+                    android:id="@+id/btnJornadaManana"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:background="@drawable/bg_pill_yellow"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:paddingHorizontal="16dp"
+                    android:text="☀️ Mañana"
+                    android:textColor="#7A5500"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnJornadaTarde"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:paddingHorizontal="16dp"
+                    android:text="🌤️ Tarde"
+                    android:textColor="#64748B"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+
+            <!-- ===================================================== -->
+            <!-- RULETA CIRCULAR INTERACTIVA AUMENTADA DE TAMAÑO       -->
+            <!-- ===================================================== -->
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/wheelAreaContainer"
+                android:layout_width="270dp"
+                android:layout_height="270dp"
+                android:layout_marginStart="-95dp"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@id/layoutConmutadorJornada"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <!-- FONDO CIRCULAR AMARILLO DE LA RULETA -->
                 <View
                     android:id="@+id/fondoRueda"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@drawable/circulo_amarillo" />
 
+                <!-- CONTENEDOR GIRATORIO DE LA RULETA -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/wheelContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-                <!-- ============================================= -->
-                <!-- DESAYUNO                                        -->
-                <!-- ============================================= -->
+                    <!-- 1. DESAYUNO (ARRIBA) -->
+                    <LinearLayout
+                        android:id="@+id/btnSeccionDesayuno"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent">
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cardDesayuno"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:layout_marginTop="8dp"
-                    app:cardBackgroundColor="#FFFFFF"
-                    app:cardCornerRadius="32dp"
-                    app:cardElevation="4dp"
-                    app:strokeColor="#E7B84A"
-                    app:strokeWidth="2dp"
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cardDesayuno"
+                            android:layout_width="58dp"
+                            android:layout_height="58dp"
+                            app:cardBackgroundColor="#FFFFFF"
+                            app:cardCornerRadius="29dp"
+                            app:cardElevation="4dp"
+                            app:strokeColor="#FFFFFF"
+                            app:strokeWidth="2dp">
+
+                            <ImageView
+                                android:id="@+id/imgRuletaDesayuno"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:contentDescription="Desayuno"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/comida_desayuno" />
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <TextView
+                            android:id="@+id/tvLabelDesayuno"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:text="DESAYUNO"
+                            android:textColor="#1B3317"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                    <!-- 2. ALMUERZO (CENTRO / DERECHA) -->
+                    <LinearLayout
+                        android:id="@+id/btnSeccionAlmuerzo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="14dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cardAlmuerzo"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
+                            app:cardBackgroundColor="#FFFFFF"
+                            app:cardCornerRadius="35dp"
+                            app:cardElevation="6dp"
+                            app:strokeColor="#FFFFFF"
+                            app:strokeWidth="3.5dp">
+
+                            <ImageView
+                                android:id="@+id/imgRuletaAlmuerzo"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:contentDescription="Almuerzo"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/arroz_pollo" />
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <TextView
+                            android:id="@+id/tvLabelAlmuerzo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:text="ALMUERZO"
+                            android:textColor="#1B3317"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                    <!-- 3. MERIENDA (ABAJO) -->
+                    <LinearLayout
+                        android:id="@+id/btnSeccionMerienda"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cardMerienda"
+                            android:layout_width="58dp"
+                            android:layout_height="58dp"
+                            app:cardBackgroundColor="#FFFFFF"
+                            app:cardCornerRadius="29dp"
+                            app:cardElevation="4dp"
+                            app:strokeColor="#FFFFFF"
+                            app:strokeWidth="2dp">
+
+                            <ImageView
+                                android:id="@+id/imgRuletaMerienda"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:contentDescription="Merienda"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/comida_merienda" />
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <TextView
+                            android:id="@+id/tvLabelMerienda"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:text="MERIENDA"
+                            android:textColor="#1B3317"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- ================================================= -->
+            <!-- ÁREA DERECHA: DETALLE DEL PLATO DE LA SECCIÓN      -->
+            <!-- ================================================= -->
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutDetalleSeccion"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintTop_toTopOf="@id/wheelAreaContainer"
+                app:layout_constraintBottom_toBottomOf="@id/wheelAreaContainer"
+                app:layout_constraintStart_toEndOf="@id/wheelAreaContainer"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <!-- ETIQUETA "SECCIÓN SELECCIONADA" -->
+                <TextView
+                    android:id="@+id/tvTagSeccionSeleccionada"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_pill_yellow"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="5dp"
+                    android:text="SECCIÓN SELECCIONADA"
+                    android:textColor="#7A5500"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
                     app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <!-- TÍTULO DE LA SECCIÓN ("ALMUERZO") -->
+                <TextView
+                    android:id="@+id/tvSeccionSeleccionada"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="ALMUERZO"
+                    android:textColor="#1B3317"
+                    android:textSize="26sp"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toBottomOf="@id/tvTagSeccionSeleccionada"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <!-- CAJA NOMBRE DEL PLATO ("Arroz con pollo") -->
+                <TextView
+                    android:id="@+id/tvPlatoSeleccionado"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_tag_plato"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="7dp"
+                    android:text="Arroz con pollo"
+                    android:textColor="#1B3317"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toBottomOf="@id/tvSeccionSeleccionada"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <!-- TARJETA CON LA IMAGEN GRANDE DEL PLATO -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardPlatoMain"
+                    android:layout_width="0dp"
+                    android:layout_height="130dp"
+                    android:layout_marginTop="10dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:strokeWidth="0dp"
+                    app:layout_constraintTop_toBottomOf="@id/tvPlatoSeleccionado"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
 
                     <ImageView
-                        android:id="@+id/imgRuletaDesayuno"
+                        android:id="@+id/imgPlatoMain"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:contentDescription="Desayuno"
+                        android:contentDescription="Plato principal del día"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/apanado" />
+                        android:src="@drawable/arroz_pollo" />
 
                 </com.google.android.material.card.MaterialCardView>
 
-
-                <!-- ============================================= -->
-                <!-- ALMUERZO                                        -->
-                <!-- ============================================= -->
-
+                <!-- BOTÓN "VER PREPARACIÓN" -->
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cardAlmuerzo"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:layout_marginStart="8dp"
-                    app:cardBackgroundColor="#FFFFFF"
-                    app:cardCornerRadius="32dp"
-                    app:cardElevation="4dp"
-                    app:strokeColor="#E7B84A"
-                    app:strokeWidth="2dp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent">
-
-                    <ImageView
-                        android:id="@+id/imgRuletaAlmuerzo"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:contentDescription="Almuerzo"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/huevo_perico" />
-
-                </com.google.android.material.card.MaterialCardView>
-
-
-                <!-- ============================================= -->
-                <!-- MERIENDA                                        -->
-                <!-- ============================================= -->
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cardMerienda"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:layout_marginEnd="8dp"
-                    app:cardBackgroundColor="#FFFFFF"
-                    app:cardCornerRadius="32dp"
-                    app:cardElevation="4dp"
-                    app:strokeColor="#E7B84A"
-                    app:strokeWidth="2dp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:id="@+id/btnVerPreparacion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardBackgroundColor="#E2EFE0"
+                    app:cardCornerRadius="18dp"
+                    app:cardElevation="1dp"
+                    app:strokeColor="#C5DFC3"
+                    app:strokeWidth="1dp"
+                    app:layout_constraintTop_toBottomOf="@id/cardPlatoMain"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
 
-                    <ImageView
-                        android:id="@+id/imgRuletaMerienda"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:contentDescription="Merienda"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/apanado" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="7dp">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_marginEnd="6dp"
+                            android:contentDescription="Gorro de Chef"
+                            android:src="@drawable/ic_chef_hat" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ver preparación"
+                            android:textColor="#1B3317"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-            <!-- ================================================= -->
-            <!-- INFORMACIÓN DE LA SECCIÓN SELECCIONADA           -->
-            <!-- ================================================= -->
+            <!-- ===================================================== -->
+            <!-- SECCIÓN: MENÚS ANTERIORES                            -->
+            <!-- ===================================================== -->
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardPlatoSeleccionado"
-                android:layout_width="150dp"
+            <LinearLayout
+                android:id="@+id/layoutHeaderMenusAnteriores"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="18dp"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="4dp"
-                app:strokeColor="#E7B84A"
-                app:strokeWidth="2dp"
-                app:layout_constraintStart_toEndOf="@id/wheelContainer"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/wheelContainer"
-                app:layout_constraintBottom_toBottomOf="@id/wheelContainer">
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="24dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@id/wheelAreaContainer"
+                app:layout_constraintStart_toStartOf="parent">
 
-                <LinearLayout
+                <!-- LÍNEA AMARILLA INDICADORA -->
+                <View
+                    android:layout_width="24dp"
+                    android:layout_height="4dp"
+                    android:background="#F4B41F" />
+
+                <TextView
+                    android:id="@+id/tvMenusAnterioresTitulo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:letterSpacing="0.03"
+                    android:text="MENÚS ANTERIORES"
+                    android:textColor="#1B3317"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+
+            <!-- LISTA VERTICAL DE MENÚS ANTERIORES -->
+            <LinearLayout
+                android:id="@+id/layoutListaMenusAnteriores"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical"
+                android:paddingHorizontal="20dp"
+                app:layout_constraintTop_toBottomOf="@id/layoutHeaderMenusAnteriores">
+
+                <!-- TARJETA 1 -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardMenuAnterior1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="12dp">
+                    android:layout_marginBottom="10dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardBackgroundColor="#FAF9F4"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="#EBE8D8"
+                    app:strokeWidth="1dp">
 
-                    <!-- SECCIÓN SELECCIONADA -->
-
-                    <TextView
-                        android:id="@+id/tvSeccionSeleccionada"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="DESAYUNO"
-                        android:textColor="#596B35"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-
-                    <!-- PLATO QUE CORRESPONDE A LA SECCIÓN -->
-
-                    <TextView
-                        android:id="@+id/tvPlatoSeleccionado"
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:gravity="center"
-                        android:ellipsize="end"
-                        android:maxLines="2"
-                        android:text="Sopa de Frijoles"
-                        android:textColor="#111111"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:padding="12dp">
 
-                    <!-- INFORMACIÓN -->
+                        <!-- IMAGEN CIRCULAR DEL PLATO -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/frameImgAnterior1"
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            app:cardCornerRadius="21dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent">
 
-                    <TextView
-                        android:id="@+id/tvIngredientes"
-                        android:layout_width="wrap_content"
+                            <ImageView
+                                android:id="@+id/imgMenuAnterior1"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:contentDescription="Almuerzo"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/arroz_pollo" />
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- TÍTULO DEL PLATO -->
+                        <TextView
+                            android:id="@+id/tvPlatoAnterior1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_marginEnd="8dp"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:text="Almuerzo"
+                            android:textColor="#1B3317"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/frameImgAnterior1"
+                            app:layout_constraintEnd_toStartOf="@id/tvFechaAnterior1" />
+
+                        <!-- BADGE FECHA -->
+                        <TextView
+                            android:id="@+id/tvFechaAnterior1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/bg_pill_yellow"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="5dp"
+                            android:text="01 Oct"
+                            android:textColor="#7A5500"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/icArrow1" />
+
+                        <!-- FLECHA FLECHA DERECHA -->
+                        <ImageView
+                            android:id="@+id/icArrow1"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:contentDescription="Ver detalle"
+                            android:src="@drawable/ic_arrow_forward"
+                            app:tint="#1B3317"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- TARJETA 2 -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardMenuAnterior2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardBackgroundColor="#FAF9F4"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="#EBE8D8"
+                    app:strokeWidth="1dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:text="Menú de hoy"
-                        android:textColor="#596B35"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
+                        android:padding="12dp">
 
-                </LinearLayout>
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/frameImgAnterior2"
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            app:cardCornerRadius="21dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent">
 
-            </com.google.android.material.card.MaterialCardView>
+                            <ImageView
+                                android:id="@+id/imgMenuAnterior2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:contentDescription="Desayuno"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/comida_desayuno" />
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <TextView
+                            android:id="@+id/tvPlatoAnterior2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_marginEnd="8dp"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:text="Desayuno"
+                            android:textColor="#1B3317"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/frameImgAnterior2"
+                            app:layout_constraintEnd_toStartOf="@id/tvFechaAnterior2" />
+
+                        <TextView
+                            android:id="@+id/tvFechaAnterior2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/bg_pill_green"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="5dp"
+                            android:text="30 Sep"
+                            android:textColor="#2A5226"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/icArrow2" />
+
+                        <ImageView
+                            android:id="@+id/icArrow2"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:contentDescription="Ver detalle"
+                            android:src="@drawable/ic_arrow_forward"
+                            app:tint="#1B3317"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- TARJETA 3 -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardMenuAnterior3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardBackgroundColor="#FAF9F4"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="#EBE8D8"
+                    app:strokeWidth="1dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="12dp">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/frameImgAnterior3"
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            app:cardCornerRadius="21dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent">
+
+                            <ImageView
+                                android:id="@+id/imgMenuAnterior3"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:contentDescription="Merienda"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/comida_merienda" />
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <TextView
+                            android:id="@+id/tvPlatoAnterior3"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_marginEnd="8dp"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:text="Merienda"
+                            android:textColor="#1B3317"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/frameImgAnterior3"
+                            app:layout_constraintEnd_toStartOf="@id/tvFechaAnterior3" />
+
+                        <TextView
+                            android:id="@+id/tvFechaAnterior3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/bg_pill_yellow"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="5dp"
+                            android:text="29 Sep"
+                            android:textColor="#7A5500"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/icArrow3" />
+
+                        <ImageView
+                            android:id="@+id/icArrow3"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:contentDescription="Ver detalle"
+                            android:src="@drawable/ic_arrow_forward"
+                            app:tint="#1B3317"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-        <!-- ================================================= -->
-        <!-- DIVISOR                                            -->
-        <!-- ================================================= -->
-
-        <View
-            android:id="@+id/dividerMenus"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="16dp"
-            android:background="#EAECF0"
-            app:layout_constraintTop_toBottomOf="@id/wheelArea" />
-
-
-        <!-- ================================================= -->
-        <!-- MENUS ANTERIORES                                   -->
-        <!-- ================================================= -->
-
-        <TextView
-            android:id="@+id/tvMenusAnteriores"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="12dp"
-            android:text="Menús anteriores"
-            android:textColor="#111111"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@id/dividerMenus"
-            app:layout_constraintStart_toStartOf="parent" />
-
-
-        <!-- ================================================= -->
-        <!-- TARJETAS ANTERIORES                                -->
-        <!-- ================================================= -->
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:paddingHorizontal="16dp"
-            app:layout_constraintTop_toBottomOf="@id/tvMenusAnteriores">
-
-            <!-- TARJETA 1 -->
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardMenuAnterior1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="4dp"
-                android:layout_weight="1"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#E7B84A"
-                app:strokeWidth="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="8dp">
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        app:cardBackgroundColor="#FFFFFF"
-                        app:cardCornerRadius="18dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="#E7B84A"
-                        app:strokeWidth="1.5dp">
-
-                        <ImageView
-                            android:id="@+id/imgMenuAnterior1"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:contentDescription="Arroz con pollo"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/frijoles" />
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <TextView
-                        android:id="@+id/tvFechaAnterior1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Lun 19"
-                        android:textColor="#667085"
-                        android:textSize="10sp" />
-
-                    <TextView
-                        android:id="@+id/tvPlatoAnterior1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:text="Arroz con pollo"
-                        android:textColor="#111111"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-
-            <!-- TARJETA 2 -->
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardMenuAnterior2"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="4dp"
-                android:layout_weight="1"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#E7B84A"
-                app:strokeWidth="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="8dp">
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        app:cardBackgroundColor="#FFFFFF"
-                        app:cardCornerRadius="18dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="#E7B84A"
-                        app:strokeWidth="1.5dp">
-
-                        <ImageView
-                            android:id="@+id/imgMenuAnterior2"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:contentDescription="Bandeja paisa"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/apanado" />
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <TextView
-                        android:id="@+id/tvFechaAnterior2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Mar 20"
-                        android:textColor="#667085"
-                        android:textSize="10sp" />
-
-                    <TextView
-                        android:id="@+id/tvPlatoAnterior2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:text="Bandeja paisa"
-                        android:textColor="#111111"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-
-            <!-- TARJETA 3 -->
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardMenuAnterior3"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="4dp"
-                android:layout_weight="1"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#E7B84A"
-                app:strokeWidth="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="8dp">
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        app:cardBackgroundColor="#FFFFFF"
-                        app:cardCornerRadius="18dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="#E7B84A"
-                        app:strokeWidth="1.5dp">
-
-                        <ImageView
-                            android:id="@+id/imgMenuAnterior3"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:contentDescription="Lentejas"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/frijoles" />
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <TextView
-                        android:id="@+id/tvFechaAnterior3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Mié 21"
-                        android:textColor="#667085"
-                        android:textSize="10sp" />
-
-                    <TextView
-                        android:id="@+id/tvPlatoAnterior3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:text="Lentejas"
-                        android:textColor="#111111"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-        </LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+    </androidx.core.widget.NestedScrollView>
 
     <!-- ===================================================== -->
-    <!-- BARRA INFERIOR                                        -->
+    <!-- BARRA DE NAVEGACIÓN INFERIOR                          -->
     <!-- ===================================================== -->
 
     <include
@@ -549,8 +876,8 @@
         layout="@layout/activity_barra_navegacion"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

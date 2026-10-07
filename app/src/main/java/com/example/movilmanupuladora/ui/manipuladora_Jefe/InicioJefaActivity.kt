@@ -3,10 +3,24 @@ package com.example.movilmanupuladora.ui.manipuladora_Jefe
 import com.example.movilmanupuladora.R
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.CompositePageTransformer
+import androidx.viewpager2.widget.MarginPageTransformer
+import androidx.viewpager2.widget.ViewPager2
+import com.example.movilmanupuladora.R
+import com.example.movilmanupuladora.data.api.RetrofitClient
+import com.example.movilmanupuladora.data.repository.MenuRepository
+import com.example.movilmanupuladora.databinding.ActivityInicioJefaBinding
+import com.example.movilmanupuladora.utils.NavigationHelper
+import com.example.movilmanupuladora.utils.SessionManager
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.repository.MenuRepository
 import com.example.movilmanupuladora.databinding.ActivityInicioJefaBinding
@@ -25,10 +39,6 @@ class InicioJefaActivity : AppCompatActivity() {
 
     private var jornadaSeleccionada = Jornada.MANANA
 
-    // =========================================================
-    // PLATOS
-    // =========================================================
-
     data class Plato(
         val id: Int? = null,
         val nombre: String,
@@ -37,6 +47,16 @@ class InicioJefaActivity : AppCompatActivity() {
     )
 
     private val platosManana = mutableListOf(
+        Plato(id = 5, nombre = "Pollo Guisado Criollo", componente = "Pollo y Guiso", imagen = R.drawable.pollo_guisado),
+        Plato(id = 6, nombre = "Café con Pan y Huevo", componente = "Desayuno", imagen = R.drawable.comida_desayuno),
+        Plato(id = 7, nombre = "Bandeja Paisa Tradicional", componente = "Frijoles y carne", imagen = R.drawable.bandeja_paisa),
+        Plato(id = 10, nombre = "Pasta con Carne Molida", componente = "Proteína", imagen = R.drawable.pasta_carne)
+    )
+
+    private val platosTarde = mutableListOf(
+        Plato(id = 4, nombre = "Arroz a la Valenciana", componente = "Arroz y verduras", imagen = R.drawable.arroz_de_leche),
+        Plato(id = 2, nombre = "Arroz con Pollo Especial", componente = "Pollo especial", imagen = R.drawable.arroz_pollo),
+        Plato(id = 7, nombre = "Lentejas con Arroz", componente = "Leguminosa", imagen = R.drawable.lentejas_arroz)
         Plato(id = 5, nombre = "Arroz con pollo", componente = "Pollo"),
         Plato(id = 6, nombre = "Café con pan", componente = "Desayuno"),
         Plato(id = 7, nombre = "Bandeja paisa", componente = "Frijoles y carne"),
@@ -52,28 +72,10 @@ class InicioJefaActivity : AppCompatActivity() {
 
     private var posicionPlato = 0
 
-    // =========================================================
-    // ESTADOS
-    // =========================================================
-
-    private var platoSeleccionado = false
-
-    private var preparacionesTotales = 4
-    private var preparacionesCompletadas = 1
-    private var preparacionesEnCurso = 1
-
-    // =========================================================
-    // ENUM JORNADA
-    // =========================================================
-
     enum class Jornada {
         MANANA,
         TARDE
     }
-
-    // =========================================================
-    // ON CREATE
-    // =========================================================
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,9 +84,12 @@ class InicioJefaActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         sessionManager = SessionManager(this)
+
         configurarPantalla()
         configurarEventos()
+        configurarViewPagerCarousel()
         configurarNavegacionInferior()
+
         actualizarPantalla()
         cargarPlatosYMenusDelBackend()
     }
@@ -99,360 +104,124 @@ class InicioJefaActivity : AppCompatActivity() {
     // =========================================================
 
     private fun configurarPantalla() {
+        val nombre = sessionManager.getUserName() ?: "Jefa de Cocina"
+        binding.txtSaludo.text = "Hola, $nombre"
 
+        val fecha = SimpleDateFormat("EEEE, d 'de' MMMM", Locale.forLanguageTag("es-CO")).format(Date())
+        binding.txtFecha.text = "Hoy es $fecha"
         val nombre = com.example.movilmanupuladora.utils.SessionManager(this).getUserName() ?: "Jefa"
         binding.txtSaludo.text = "Hola, $nombre"
 
         actualizarFecha()
 
         seleccionarJornada(Jornada.MANANA)
-
-        actualizarPlato()
-
         actualizarResumen()
-
-        actualizarEvolucion()
-
-        actualizarMisPreparaciones()
     }
 
     // =========================================================
-    // EVENTOS
+    // CAROUSEL CON VISTA PREVIA (IZQUIERDA, CENTRO, DERECHA)
     // =========================================================
 
-    private fun configurarEventos() {
-
-        // -----------------------------------------------------
-        // NOTIFICACIONES
-        // -----------------------------------------------------
-
-        binding.btnNotificaciones.setOnClickListener {
-            startActivity(Intent(this, PopupNotificacionesActivity::class.java))
-        }
-
-        // -----------------------------------------------------
-        // RESUMEN / ASISTENCIA
-        // -----------------------------------------------------
-
-        binding.cardResumen.setOnClickListener {
-            startActivity(Intent(this, AsistenciaJefaActivity::class.java))
-        }
-
-
-        // -----------------------------------------------------
-        // INFORMACIÓN IA
-        // -----------------------------------------------------
-
-        binding.btnInfoIA.setOnClickListener {
-
-            Toast.makeText(
-                this,
-                "La IA recomienda platos teniendo en cuenta la asistencia y los alimentos disponibles.",
-                Toast.LENGTH_LONG
-            ).show()
-        }
-
-
-        // -----------------------------------------------------
-        // JORNADA MAÑANA
-        // -----------------------------------------------------
-
-        binding.btnManana.setOnClickListener {
-
-            seleccionarJornada(Jornada.MANANA)
-
-        }
-
-
-        // -----------------------------------------------------
-        // JORNADA TARDE
-        // -----------------------------------------------------
-
-        binding.btnTarde.setOnClickListener {
-
-            seleccionarJornada(Jornada.TARDE)
-
-        }
-
-
-        // -----------------------------------------------------
-        // PLATO ANTERIOR
-        // -----------------------------------------------------
-
-        binding.btnPlatoAnterior.setOnClickListener {
-
-            cambiarPlato(-1)
-
-        }
-
-
-        // -----------------------------------------------------
-        // PLATO SIGUIENTE
-        // -----------------------------------------------------
-
-        binding.btnPlatoSiguiente.setOnClickListener {
-
-            cambiarPlato(1)
-
-        }
-
-
-        // -----------------------------------------------------
-        // SELECCIONAR PLATO
-        // -----------------------------------------------------
-
-        binding.btnSeleccionarPlato.setOnClickListener {
-
-            seleccionarPlato()
-
-        }
-
-
-        // -----------------------------------------------------
-        // MIS PREPARACIONES
-        // -----------------------------------------------------
-
-        binding.cardMisPreparaciones.setOnClickListener {
-
-            abrirMisPreparaciones()
-
-        }
-
-
-        // -----------------------------------------------------
-        // CALENDARIO
-        // -----------------------------------------------------
-
-        binding.cardCalendario.setOnClickListener {
-
-            abrirCalendario()
-
-        }
-
-
-        // -----------------------------------------------------
-        // EVOLUCIÓN
-        // -----------------------------------------------------
-
-        binding.btnVerEvolucion.setOnClickListener {
-
-            abrirEvolucion()
-
-        }
-    }
-
-    // =========================================================
-    // JORNADA
-    // =========================================================
-
-    private fun seleccionarJornada(jornada: Jornada) {
-
-        jornadaSeleccionada = jornada
-
-        posicionPlato = 0
-        platoSeleccionado = false
-
-        when (jornada) {
-
-            Jornada.MANANA -> {
-
-                binding.btnManana.setBackgroundResource(
-                    R.drawable.bg_jornada_seleccionada
-                )
-
-                binding.btnManana.setTextColor(
-                    getColor(R.color.blanco)
-                )
-
-                binding.btnTarde.setBackgroundResource(
-                    R.drawable.bg_jornada_no_seleccionada
-                )
-
-                binding.btnTarde.setTextColor(
-                    getColor(R.color.negro_principal)
-                )
-
-                binding.txtSubtituloIA.text =
-                    "Plato recomendado para la mañana"
-
-                txtJornadaMenu()
-
-                actualizarPlato()
+    private fun configurarViewPagerCarousel() {
+        val platosActuales = obtenerPlatos()
+        val adapter = SugerenciaIaAdapter(platosActuales) { plato ->
+            val intent = Intent(this, IniciarPreparacionActivity::class.java).apply {
+                putExtra("nombre_menu", plato.nombre)
+                putExtra("id_plato", plato.id ?: -1)
+                putExtra("jornada", if (jornadaSeleccionada == Jornada.MANANA) "Mañana" else "Tarde")
             }
+            startActivity(intent)
+        }
 
-            Jornada.TARDE -> {
+        binding.viewPagerSugerenciasIA.adapter = adapter
+        binding.viewPagerSugerenciasIA.offscreenPageLimit = 3
 
-                binding.btnTarde.setBackgroundResource(
-                    R.drawable.bg_jornada_seleccionada
-                )
-
-                binding.btnTarde.setTextColor(
-                    getColor(R.color.blanco)
-                )
-
-                binding.btnManana.setBackgroundResource(
-                    R.drawable.bg_jornada_no_seleccionada
-                )
-
-                binding.btnManana.setTextColor(
-                    getColor(R.color.negro_principal)
-                )
-
-                binding.txtSubtituloIA.text =
-                    "Plato recomendado para la tarde"
-
-                txtJornadaMenu()
-
-                actualizarPlato()
+        val pageTransformer = CompositePageTransformer().apply {
+            addTransformer(MarginPageTransformer((12 * resources.displayMetrics.density).toInt()))
+            addTransformer { page, position ->
+                val r = 1 - Math.abs(position)
+                page.scaleY = 0.85f + r * 0.15f
+                page.scaleX = 0.85f + r * 0.15f
+                page.alpha = 0.6f + r * 0.4f
             }
         }
 
-        actualizarEstado()
-    }
+        binding.viewPagerSugerenciasIA.setPageTransformer(pageTransformer)
 
-    // =========================================================
-    // ACTUALIZAR TEXTO DE JORNADA
-    // =========================================================
-
-    private fun txtJornadaMenu() {
-
-        when (jornadaSeleccionada) {
-
-            Jornada.MANANA -> {
-
-                binding.txtTituloJornada.text =
-                    "Jornada de la mañana"
-
+        binding.viewPagerSugerenciasIA.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                posicionPlato = position
+                actualizarIndicadorPuntos(position, platosActuales.size)
             }
-
-            Jornada.TARDE -> {
-
-                binding.txtTituloJornada.text =
-                    "Jornada de la tarde"
-            }
-        }
+        })
     }
 
-    // =========================================================
-    // OBTENER PLATOS
-    // =========================================================
-
-    private fun obtenerPlatos(): List<Plato> {
-
-        return when (jornadaSeleccionada) {
-
-            Jornada.MANANA -> platosManana
-
-            Jornada.TARDE -> platosTarde
-        }
-    }
-
-    // =========================================================
-    // ACTUALIZAR PLATO
-    // =========================================================
-
-    private fun actualizarPlato() {
-
-        val platos = obtenerPlatos()
-
-        if (platos.isEmpty()) {
-            return
-        }
-
-        if (posicionPlato >= platos.size) {
-            posicionPlato = 0
-        }
-
-        if (posicionPlato < 0) {
-            posicionPlato = platos.lastIndex
-        }
-
-        val plato = platos[posicionPlato]
-
-        binding.imgPlatoSugerido.setImageResource(
-            plato.imagen
-        )
-
-        binding.txtNombrePlato.text =
-            plato.nombre
-
-        actualizarIndicador()
-
-        actualizarEstado()
-    }
-
-    // =========================================================
-    // CAMBIAR PLATO
-    // =========================================================
-
-    private fun cambiarPlato(direccion: Int) {
-
-        val platos = obtenerPlatos()
-
-        if (platos.isEmpty()) {
-            return
-        }
-
-        posicionPlato += direccion
-
-        if (posicionPlato > platos.lastIndex) {
-            posicionPlato = 0
-        }
-
-        if (posicionPlato < 0) {
-            posicionPlato = platos.lastIndex
-        }
-
-        platoSeleccionado = false
-
-        actualizarPlato()
-    }
-
-    // =========================================================
-    // INDICADOR
-    // =========================================================
-
-    private fun actualizarIndicador() {
-
-        val platos = obtenerPlatos()
-
-        if (platos.isEmpty()) {
+    private fun actualizarIndicadorPuntos(position: Int, total: Int) {
+        if (total <= 0) {
             binding.txtIndicadorPlatos.text = ""
             return
         }
 
-        val indicador = StringBuilder()
-
-        platos.forEachIndexed { index, _ ->
-
-            if (index == posicionPlato) {
-                indicador.append("●")
+        val sb = StringBuilder()
+        for (i in 0 until total) {
+            if (i == position) {
+                sb.append("●")
             } else {
-                indicador.append("○")
+                sb.append("○")
             }
-
-            if (index != platos.lastIndex) {
-                indicador.append(" ")
-            }
+            if (i < total - 1) sb.append("  ")
         }
-
-        binding.txtIndicadorPlatos.text =
-            indicador.toString()
+        binding.txtIndicadorPlatos.text = sb.toString()
     }
 
     // =========================================================
-    // SELECCIONAR PLATO
+    // EVENTOS Y CONEXIONES DE PANTALLAS
     // =========================================================
 
-    private fun seleccionarPlato() {
-
-        val platos = obtenerPlatos()
-
-        if (platos.isEmpty()) {
-            mostrarMensaje("No hay platos disponibles")
-            return
+    private fun configurarEventos() {
+        // Avatar Header -> Perfil Jefa
+        binding.btnPerfilHeader.setOnClickListener {
+            startActivity(Intent(this, PerfilJefaActivity::class.java))
         }
 
+        // Campana Notificaciones -> Popup Notificaciones
+        binding.btnNotificaciones.setOnClickListener {
+            startActivity(Intent(this, PopupNotificacionesActivity::class.java))
+        }
+
+        // Asistencia y Niños -> AsistenciaJefaActivity
+        binding.cardResumen.setOnClickListener {
+            startActivity(Intent(this, AsistenciaJefaActivity::class.java))
+        }
+
+        // Mis Preparaciones -> Historial/Preparaciones Jefa
+        binding.cardMisPreparaciones.setOnClickListener {
+            startActivity(Intent(this, HistorialPreparacionesActivity::class.java))
+        }
+
+        // Calendario y Programación -> CalendarioMenuActivity
+        binding.cardCalendario.setOnClickListener {
+            startActivity(Intent(this, CalendarioMenuActivity::class.java))
+        }
+
+        // Evolución / Resumen -> ResumenDiaActivity
+        binding.cardEvolucionAlmuerzo.setOnClickListener {
+            startActivity(Intent(this, ResumenDiaActivity::class.java))
+        }
+
+        // Información IA
+        binding.btnInfoIA.setOnClickListener {
+            Toast.makeText(
+                this,
+                "La IA recomienda platos teniendo en cuenta la asistencia y los alimentos disponibles en cocina.",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+
+        // Jornada Mañana / Tarde
+        binding.btnManana.setOnClickListener { seleccionarJornada(Jornada.MANANA) }
+        binding.btnTarde.setOnClickListener { seleccionarJornada(Jornada.TARDE) }
         val plato = platos[posicionPlato]
 
         platoSeleccionado = true
@@ -615,229 +384,106 @@ class InicioJefaActivity : AppCompatActivity() {
 
                 width = 0
 
-            }
+        // Botón "Seleccionar este plato"
+        binding.btnSeleccionarPlato.setOnClickListener {
+            val platos = obtenerPlatos()
+            if (platos.isNotEmpty() && posicionPlato in platos.indices) {
+                val plato = platos[posicionPlato]
+                sessionManager.savePlatoSeleccionado(plato.nombre, plato.id)
 
-        binding.progresoEvolucion.layoutParams =
-            binding.progresoEvolucion.layoutParams
-
-        val parent =
-            binding.progresoEvolucion.parent
-
-        if (parent is android.widget.LinearLayout) {
-
-            val progresoView =
-                binding.progresoEvolucion
-
-            val restanteView =
-                parent.getChildAt(1)
-
-            val paramsProgreso =
-                progresoView.layoutParams as android.widget.LinearLayout.LayoutParams
-
-            val paramsRestante =
-                restanteView.layoutParams as android.widget.LinearLayout.LayoutParams
-
-            paramsProgreso.weight = porcentaje
-            paramsRestante.weight = restante
-
-            progresoView.layoutParams =
-                paramsProgreso
-
-            restanteView.layoutParams =
-                paramsRestante
-        }
-    }
-
-    // =========================================================
-    // MIS PREPARACIONES
-    // =========================================================
-
-    private fun actualizarMisPreparaciones() {
-
-        val pendientes =
-            preparacionesTotales -
-                    preparacionesCompletadas
-
-        if (pendientes <= 0) {
-
-            binding.txtMisPreparaciones.text =
-                "Preparaciones completadas"
-
-            binding.txtEstadoMisPreparaciones.text =
-                "No hay preparaciones pendientes"
-
-        } else {
-
-            val platoActual =
-                obtenerPlatos()[posicionPlato]
-
-            binding.txtMisPreparaciones.text =
-                platoActual.nombre
-
-            binding.txtEstadoMisPreparaciones.text =
-                if (preparacionesEnCurso > 0) {
-                    "Preparación en curso"
-                } else {
-                    "Pendiente de preparar"
+                val intent = Intent(this, IniciarPreparacionActivity::class.java).apply {
+                    putExtra("nombre_menu", plato.nombre)
+                    putExtra("id_plato", plato.id ?: -1)
+                    putExtra("jornada", if (jornadaSeleccionada == Jornada.MANANA) "Mañana" else "Tarde")
                 }
-        }
-
-        val progreso =
-            preparacionesCompletadas.toFloat() /
-                    preparacionesTotales.toFloat()
-
-        actualizarBarraMisPreparaciones(progreso)
-    }
-
-    // =========================================================
-    // BARRA MIS PREPARACIONES
-    // =========================================================
-
-    private fun actualizarBarraMisPreparaciones(
-        progreso: Float
-    ) {
-
-        val porcentaje =
-            progreso.coerceIn(0f, 1f)
-
-        val restante =
-            1f - porcentaje
-
-        val parent =
-            binding.progresoMisPreparaciones.parent
-
-        if (parent is android.widget.LinearLayout) {
-
-            val progresoView =
-                binding.progresoMisPreparaciones
-
-            val restanteView =
-                parent.getChildAt(1)
-
-            val paramsProgreso =
-                progresoView.layoutParams as android.widget.LinearLayout.LayoutParams
-
-            val paramsRestante =
-                restanteView.layoutParams as android.widget.LinearLayout.LayoutParams
-
-            paramsProgreso.weight =
-                if (porcentaje == 0f) 0.01f else porcentaje
-
-            paramsRestante.weight =
-                if (restante == 0f) 0.01f else restante
-
-            progresoView.layoutParams =
-                paramsProgreso
-
-            restanteView.layoutParams =
-                paramsRestante
+                startActivity(intent)
+            }
         }
     }
 
-    // =========================================================
-    // FECHA
-    // =========================================================
+    private fun seleccionarJornada(jornada: Jornada) {
+        jornadaSeleccionada = jornada
+        posicionPlato = 0
 
-    private fun actualizarFecha() {
+        if (jornada == Jornada.MANANA) {
+            binding.btnManana.setBackgroundResource(R.drawable.bg_pill_yellow)
+            binding.btnManana.setTextColor(Color.parseColor("#7A5500"))
 
-        val fecha =
-            java.text.SimpleDateFormat(
-                "EEEE, d 'de' MMMM",
-                java.util.Locale("es", "CO")
-            ).format(
-                java.util.Date()
-            )
+            binding.btnTarde.setBackgroundResource(R.drawable.bg_tag_plato)
+            binding.btnTarde.setTextColor(Color.parseColor("#64748B"))
 
-        binding.txtFecha.text =
-            "Hoy es $fecha"
+            binding.txtSubtituloIA.text = "Platos recomendados para la jornada de la mañana"
+        } else {
+            binding.btnTarde.setBackgroundResource(R.drawable.bg_pill_yellow)
+            binding.btnTarde.setTextColor(Color.parseColor("#7A5500"))
+
+            binding.btnManana.setBackgroundResource(R.drawable.bg_tag_plato)
+            binding.btnManana.setTextColor(Color.parseColor("#64748B"))
+
+            binding.txtSubtituloIA.text = "Platos recomendados para la jornada de la tarde"
+        }
+
+        configurarViewPagerCarousel()
     }
 
-    // =========================================================
-    // ACTUALIZAR TODA LA PANTALLA
-    // =========================================================
+    private fun obtenerPlatos(): List<Plato> {
+        return if (jornadaSeleccionada == Jornada.MANANA) platosManana else platosTarde
+    }
+
+    private fun actualizarResumen() {
+        val guardados = if (jornadaSeleccionada == Jornada.MANANA) {
+            AsistenciaManager.obtenerManana(this)
+        } else {
+            AsistenciaManager.obtenerTarde(this)
+        }
+        val cantidadNinos = if (guardados > 0) guardados else 120
+        binding.txtNinos.text = "$cantidadNinos niños asistirán hoy"
+    }
 
     private fun actualizarPantalla() {
-
-        actualizarPlato()
-
         actualizarResumen()
-
-        actualizarEvolucion()
-
-        actualizarMisPreparaciones()
     }
 
-    // =========================================================
-    // NAVEGACIÓN - MIS PREPARACIONES
-    // =========================================================
+    private fun configurarNavegacionInferior() {
+        NavigationHelper.setupBarraNavegacion(
+            this,
+            binding.barraNavegacion,
+            NavigationHelper.Tab.INICIO
+        )
+    }
 
-    private fun abrirMisPreparaciones() {
+    private fun cargarPlatosYMenusDelBackend() {
+        lifecycleScope.launch {
+            try {
+                val platosRes = menuRepository.obtenerPlatos()
+                if (platosRes.isSuccessful && !platosRes.body().isNullOrEmpty()) {
+                    val lista = platosRes.body()!!
+                    val tempManana = mutableListOf<Plato>()
+                    val tempTarde = mutableListOf<Plato>()
 
-        try {
+                    for (p in lista) {
+                        val nombre = p.nombrePlato ?: "Plato del día"
+                        val plato = Plato(id = p.idPlato, nombre = nombre, componente = p.componente)
+                        if (p.idSeccion == 1) tempManana.add(plato) else tempTarde.add(plato)
+                    }
 
-            val intent =
-                Intent(
-                    this,
-                    PreparacionEnCursoActivity::class.java
-                )
+                    if (tempManana.isNotEmpty()) {
+                        platosManana.clear()
+                        platosManana.addAll(tempManana)
+                    }
+                    if (tempTarde.isNotEmpty()) {
+                        platosTarde.clear()
+                        platosTarde.addAll(tempTarde)
+                    }
 
-            startActivity(intent)
-
-        } catch (e: Exception) {
-
-            mostrarMensaje(
-                "Pantalla de preparaciones no disponible"
-            )
+                    configurarViewPagerCarousel()
+                }
+            } catch (e: Exception) {
+                // Conserva platos locales de respaldo
+            }
         }
     }
-
-    // =========================================================
-    // NAVEGACIÓN - CALENDARIO
-    // =========================================================
-
-    private fun abrirCalendario() {
-
-        try {
-
-            val intent =
-                Intent(
-                    this,
-                    CalendarioMenuActivity::class.java
-                )
-
-            startActivity(intent)
-
-        } catch (e: Exception) {
-
-            mostrarMensaje(
-                "Pantalla de calendario no disponible"
-            )
-        }
-    }
-
-    // =========================================================
-    // NAVEGACIÓN - EVOLUCIÓN
-    // =========================================================
-
-    private fun abrirEvolucion() {
-
-        try {
-
-            val intent =
-                Intent(
-                    this,
-                    ResumenDiaActivity::class.java
-                )
-
-            startActivity(intent)
-
-        } catch (e: Exception) {
-
-            mostrarMensaje(
-                "Detalle de evolución no disponible"
-            )
-        }
-    }
+}
 
     // =========================================================
     // MENSAJE

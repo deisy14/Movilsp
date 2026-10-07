@@ -1,369 +1,361 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
-
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FAFAF7">
-
+    android:background="#FAF9F5"
+    tools:context=".ui.manipuladora.PerfilActivity">
 
     <!-- ========================================= -->
-    <!-- CONTENIDO DESPLAZABLE -->
+    <!-- CONTENIDO DESPLAZABLE                     -->
     <!-- ========================================= -->
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollPerfil"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
-
-        app:layout_constraintTop_toTopOf="parent"
+        android:overScrollMode="never"
         app:layout_constraintBottom_toTopOf="@id/barraNavegacion"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:id="@+id/contenedorPerfil"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:paddingHorizontal="20dp"
+            android:paddingTop="28dp"
+            android:paddingBottom="20dp">
 
-
-            <!-- ================================= -->
-            <!-- ENCABEZADO -->
-            <!-- ================================= -->
-
-            <LinearLayout
-                android:id="@+id/headerPerfil"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/txtSirae"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="SIRAE"
-                    android:textColor="#477A26"
-                    android:textSize="21sp"
-                    android:textStyle="bold"/>
-
-            </LinearLayout>
-
-
-            <!-- ================================= -->
-            <!-- TÍTULO -->
-            <!-- ================================= -->
-
+            <!-- ENCABEZADO Y TÍTULO -->
             <TextView
                 android:id="@+id/txtTituloPerfil"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
-                android:text="Perfil"
-                android:textColor="#3F3F3A"
-                android:textSize="28sp"
-                android:textStyle="bold"
-                />
+                android:text="MI PERFIL"
+                android:textColor="#1B3317"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Información personal y ajustes de la cuenta"
+                android:textColor="#3D5C37"
+                android:textSize="12sp" />
 
-            <!-- ================================= -->
-            <!-- AVATAR -->
-            <!-- ================================= -->
-
-            <LinearLayout
-                android:id="@+id/contenedorAvatar"
+            <!-- TARJETA CABECERA DE USUARIO / AVATAR -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardInfoUsuario"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"
-                android:gravity="center"
-                android:orientation="vertical">
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="3dp"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
 
-                <TextView
-                    android:id="@+id/txtAvatar"
-                    android:layout_width="82dp"
-                    android:layout_height="82dp"
-                    android:background="@drawable/bg_avatar"
+                <LinearLayout
+                    android:id="@+id/contenedorAvatar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="MJ"
-                    android:textColor="#3F3F3A"
-                    android:textSize="25sp"
-                    android:textStyle="bold"/>
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
-                <TextView
-                    android:id="@+id/txtNombreUsuario"
-                    android:layout_width="wrap_content"
+                    <TextView
+                        android:id="@+id/txtAvatar"
+                        android:layout_width="76dp"
+                        android:layout_height="76dp"
+                        android:background="@drawable/bg_pill_yellow"
+                        android:gravity="center"
+                        android:text="MJ"
+                        android:textColor="#7A5500"
+                        android:textSize="26sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtNombreUsuario"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="María José Rojas"
+                        android:textColor="#1B3317"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtCargoUsuario"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Manipuladora de Alimentos · Sede Institucional"
+                        android:textColor="#64748B"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/txtEstadoUsuario"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/bg_pill_green"
+                        android:paddingHorizontal="14dp"
+                        android:paddingVertical="5dp"
+                        android:text="● Activo en Turno"
+                        android:textColor="#2A5226"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- CARD TURNO ACTUAL -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardTurnoActual"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                app:cardBackgroundColor="#FAF9F4"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeColor="#EBE8D8"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="María José Rojas"
-                    android:textColor="#3F3F3A"
-                    android:textSize="19sp"
-                    android:textStyle="bold"/>
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-                <TextView
-                    android:id="@+id/txtCargoUsuario"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Auxiliar de cocina · Turno mañana"
-                    android:textColor="#555550"
-                    android:textSize="14sp"/>
+                    <TextView
+                        android:id="@+id/txtEtiquetaTurno"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TURNO ASIGNADO HOY"
+                        android:textColor="#7A5500"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
 
+                    <TextView
+                        android:id="@+id/txtHorarioTurno"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Turno Mañana · 6:00 a. m. - 2:00 p. m."
+                        android:textColor="#1B3317"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
-                <!-- ESTADO -->
+                </LinearLayout>
 
-                <TextView
-                    android:id="@+id/txtEstadoUsuario"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/bg_estado"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="6dp"
-                    android:text="● Activo"
-                    android:textColor="#477A26"
-                    android:textSize="13sp"
-                    android:textStyle="bold"/>
+            </com.google.android.material.card.MaterialCardView>
 
-            </LinearLayout>
-
-
-            <!-- ================================= -->
-            <!-- INFORMACIÓN DEL TURNO -->
-            <!-- ================================= -->
-
-
-            <!-- ================================= -->
-            <!-- OPCIONES -->
-            <!-- ================================= -->
-
+            <!-- OPCIONES DE CUENTA -->
             <TextView
                 android:id="@+id/txtTituloCuenta"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:text="Cuenta"
-                android:textColor="#3F3F3A"
-                android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:layout_marginTop="20dp"
+                android:text="Opciones de la Cuenta"
+                android:textColor="#1B3317"
+                android:textSize="15sp"
+                android:textStyle="bold" />
 
-
-            <!-- ================================= -->
             <!-- EDITAR PERFIL -->
-            <!-- ================================= -->
-
-            <LinearLayout
-                android:id="@+id/btnEditarPerfil"
-                android:layout_width="match_parent"
-                android:layout_height="58dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_option"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingEnd="14dp"
-                android:clickable="true"
-                android:focusable="true">
-
-                <ImageView
-                    android:id="@+id/icEditarPerfil"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_person_edit"
-                    android:tint="#9A6300"
-                    android:contentDescription="Editar perfil"/>
-
-                <TextView
-                    android:id="@+id/txtEditarPerfil"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="14dp"
-                    android:text="Editar perfil"
-                    android:textColor="#3F3F3A"
-                    android:textSize="15sp"/>
-
-                <TextView
-                    android:id="@+id/flechaEditarPerfil"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="›"
-                    android:textColor="#477A26"
-                    android:textSize="28sp"/>
-
-            </LinearLayout>
-
-
-            <!-- ================================= -->
-            <!-- NOTIFICACIONES -->
-            <!-- ================================= -->
-
-            <LinearLayout
-                android:id="@+id/btnNotificaciones"
-                android:layout_width="match_parent"
-                android:layout_height="58dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_option"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingEnd="14dp"
-                android:clickable="true"
-                android:focusable="true">
-
-                <ImageView
-                    android:id="@+id/icNotificaciones"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_notifications"
-                    android:tint="#9A6300"
-                    android:contentDescription="Notificaciones"/>
-
-                <TextView
-                    android:id="@+id/txtNotificaciones"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="14dp"
-                    android:text="Notificaciones"
-                    android:textColor="#3F3F3A"
-                    android:textSize="15sp"/>
-
-                <TextView
-                    android:id="@+id/flechaNotificaciones"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="›"
-                    android:textColor="#477A26"
-                    android:textSize="28sp"/>
-
-            </LinearLayout>
-
-
-            <!-- ================================= -->
-            <!-- AYUDA -->
-            <!-- ================================= -->
-
-            <LinearLayout
-                android:id="@+id/cardTurnoActual"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnEditarPerfilCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"
-                android:background="@drawable/bg_card"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:id="@+id/txtEtiquetaTurno"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Turno actual"
-                    android:textColor="#96968F"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:id="@+id/txtHorarioTurno"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:text="Mañana · 6:00 a. m. - 2:00 p. m."
-                    android:textColor="#3F3F3A"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/btnAyuda"
-                android:layout_width="match_parent"
-                android:layout_height="58dp"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/bg_option"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingEnd="14dp"
                 android:clickable="true"
-                android:focusable="true">
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="2dp"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
 
-                <ImageView
-                    android:id="@+id/icAyuda"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_help"
-                    android:tint="#9A6300"
-                    android:contentDescription="Ayuda"/>
+                <LinearLayout
+                    android:id="@+id/btnEditarPerfil"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp">
 
-                <TextView
-                    android:id="@+id/txtAyuda"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="14dp"
-                    android:text="Ayuda y soporte"
-                    android:textColor="#3F3F3A"
-                    android:textSize="15sp"/>
+                    <ImageView
+                        android:id="@+id/icEditarPerfil"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:contentDescription="Editar perfil"
+                        android:src="@drawable/ic_person_edit"
+                        app:tint="#1B3317" />
 
-                <TextView
-                    android:id="@+id/flechaAyuda"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="›"
-                    android:textColor="#477A26"
-                    android:textSize="28sp"/>
+                    <TextView
+                        android:id="@+id/txtEditarPerfil"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:text="Editar perfil"
+                        android:textColor="#1B3317"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
-            </LinearLayout>
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:contentDescription="Ir"
+                        android:src="@drawable/ic_arrow_forward"
+                        app:tint="#1B3317" />
 
+                </LinearLayout>
 
-            <!-- ================================= -->
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- NOTIFICACIONES -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnNotificacionesCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="2dp"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:id="@+id/btnNotificaciones"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp">
+
+                    <ImageView
+                        android:id="@+id/icNotificaciones"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:contentDescription="Notificaciones"
+                        android:src="@drawable/ic_notificaciones"
+                        app:tint="#1B3317" />
+
+                    <TextView
+                        android:id="@+id/txtNotificaciones"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:text="Avisos y Notificaciones"
+                        android:textColor="#1B3317"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:contentDescription="Ir"
+                        android:src="@drawable/ic_arrow_forward"
+                        app:tint="#1B3317" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- AYUDA -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnAyudaCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="2dp"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:id="@+id/btnAyuda"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp">
+
+                    <ImageView
+                        android:id="@+id/icAyuda"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:contentDescription="Ayuda"
+                        android:src="@drawable/ic_help"
+                        app:tint="#1B3317" />
+
+                    <TextView
+                        android:id="@+id/txtAyuda"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:text="Ayuda y soporte institucional"
+                        android:textColor="#1B3317"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:contentDescription="Ir"
+                        android:src="@drawable/ic_arrow_forward"
+                        app:tint="#1B3317" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- CERRAR SESIÓN -->
-            <!-- ================================= -->
-
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCerrarSesion"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:layout_marginTop="28dp"
-                android:layout_marginBottom="20dp"
-                android:background="@drawable/bg_login_card"
-                android:backgroundTint="@null"
-                android:colorAccent="#477A26"
-                android:minHeight="0dp"
-                android:minWidth="0dp"
-                android:padding="0dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="16dp"
+                android:backgroundTint="#F2BF15"
                 android:text="Cerrar sesión"
                 android:textAllCaps="false"
-                android:textColor="#3F3F3A"
-                android:textSize="16sp"
+                android:textColor="#1B3317"
+                android:textSize="15sp"
                 android:textStyle="bold"
-                android:stateListAnimator="@null"/>
+                app:cornerRadius="14dp" />
 
         </LinearLayout>
 
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
-
-    <!-- ========================================= -->
     <!-- BARRA DE NAVEGACIÓN -->
-    <!-- ========================================= -->
-
     <include
         android:id="@+id/barraNavegacion"
         layout="@layout/activity_barra_navegacion"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
