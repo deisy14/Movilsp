@@ -43,6 +43,25 @@ class LoginActivity : AppCompatActivity() {
         }
 
         // =====================================================
+        // VISIBILIDAD DE CONTRASEÑA
+        // =====================================================
+
+        var passwordVisible = false
+        binding.btnTogglePassword.setOnClickListener {
+            passwordVisible = !passwordVisible
+            if (passwordVisible) {
+                binding.txtPassword.transformationMethod =
+                    android.text.method.HideReturnsTransformationMethod.getInstance()
+                binding.btnTogglePassword.setImageResource(com.example.movilmanupuladora.R.drawable.ic_visibility)
+            } else {
+                binding.txtPassword.transformationMethod =
+                    android.text.method.PasswordTransformationMethod.getInstance()
+                binding.btnTogglePassword.setImageResource(com.example.movilmanupuladora.R.drawable.ic_visibility_off)
+            }
+            binding.txtPassword.setSelection(binding.txtPassword.text.length)
+        }
+
+        // =====================================================
         // BOTÓN INGRESAR
         // =====================================================
 
@@ -71,6 +90,26 @@ class LoginActivity : AppCompatActivity() {
             ocultarTeclado()
 
             iniciarSesion(correo, password)
+        }
+
+        // =====================================================
+        // OLVIDÉ CONTRASEÑA Y CONTACTAR ADMIN
+        // =====================================================
+
+        binding.txtOlvide.setOnClickListener {
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Recuperar contraseña")
+                .setMessage("Para restablecer tu contraseña, por favor solicita la actualización a tu Administrador o comunícate con la coordinación del PAE.")
+                .setPositiveButton("Aceptar", null)
+                .show()
+        }
+
+        binding.txtAdministrador.setOnClickListener {
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Contactar Administrador")
+                .setMessage("Si tienes inconvenientes para ingresar a la aplicación móvil, comunícate con el Administrador institucional del sistema SIRAE.")
+                .setPositiveButton("Aceptar", null)
+                .show()
         }
     }
 
@@ -137,12 +176,28 @@ class LoginActivity : AppCompatActivity() {
 
                         val rol = (loginRes.usuario?.rol ?: "").lowercase()
                         val email = (loginRes.usuario?.correo ?: correo).lowercase()
-                        val esJefa = rol.contains("jefa") || rol.contains("jefe") || email.contains("jefe") || email.contains("jefa")
 
-                        val destino = if (esJefa) {
-                            InicioJefaActivity::class.java
-                        } else {
-                            TurnoActivity::class.java
+                        // 1. Si es Administrador, bloquear porque ese rol es exclusivo de la Web
+                        if (rol.contains("admin")) {
+                            mostrarCargando(false)
+                            Toast.makeText(
+                                this@LoginActivity,
+                                "Correo no encontrado",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            return@launch
+                        }
+
+                        // 2. Si es Jefa de Manipuladoras, redirigir a InicioJefaActivity
+                        val esJefa = rol.contains("jefa") || rol.contains("jefe") ||
+                                email.contains("jefe") || email.contains("jefa") ||
+                                email.contains("isaperez") || email.contains("carlos")
+
+                        // 3. Determinar destino según el rol
+                        val destino = when {
+                            esJefa -> InicioJefaActivity::class.java
+                            rol.contains("manipuladora") -> TurnoActivity::class.java
+                            else -> TurnoActivity::class.java
                         }
 
                         startActivity(
@@ -175,11 +230,15 @@ class LoginActivity : AppCompatActivity() {
 
                     val errorBody = response.errorBody()?.string()
 
-                    val msg = try {
-                        val json = JSONObject(errorBody ?: "")
-                        json.optString("detail", json.optString("error", "Credenciales incorrectas"))
-                    } catch (e: Exception) {
-                        "Error ${response.code()}: No se pudo iniciar sesión"
+                    val msg = if (response.code() == 401) {
+                        "Correo o contraseña incorrectos"
+                    } else {
+                        try {
+                            val json = JSONObject(errorBody ?: "")
+                            json.optString("detail", json.optString("error", "Error al iniciar sesión"))
+                        } catch (e: Exception) {
+                            "Error ${response.code()}: No se pudo iniciar sesión"
+                        }
                     }
 
                     Toast.makeText(
