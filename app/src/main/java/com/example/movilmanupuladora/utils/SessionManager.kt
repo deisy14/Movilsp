@@ -15,6 +15,7 @@ class SessionManager(context: Context) {
 
         private const val KEY_USER_EMAIL = "user_email"
         private const val KEY_USER_PHONE = "user_phone"
+        private const val KEY_USER_ID = "user_id"
 
         var currentToken: String?
             get() = RetrofitClient.authToken
@@ -56,15 +57,20 @@ class SessionManager(context: Context) {
     /**
      * Guarda el nombre, correo y rol del usuario autenticado
      */
-    fun saveUserData(name: String, role: String?, email: String? = null) {
+    fun saveUserData(name: String, role: String?, email: String? = null, idUsuario: Int? = null) {
         val editor = prefs.edit()
         editor.putString(KEY_USER_NAME, name)
         editor.putString(KEY_USER_ROLE, role ?: "Manipuladora PAE")
         if (!email.isNullOrEmpty()) {
             editor.putString(KEY_USER_EMAIL, email)
         }
+        if (idUsuario != null && idUsuario > 0) {
+            editor.putInt(KEY_USER_ID, idUsuario)
+        }
         editor.apply()
     }
+
+    fun getUserId(): Int = prefs.getInt(KEY_USER_ID, -1)
 
     fun saveUserPhone(phone: String) {
         prefs.edit().putString(KEY_USER_PHONE, phone).apply()
@@ -89,4 +95,15 @@ class SessionManager(context: Context) {
     fun getUserRole(): String? = prefs.getString(KEY_USER_ROLE, null)
     fun getUserEmail(): String? = prefs.getString(KEY_USER_EMAIL, null)
     fun getUserPhone(): String? = prefs.getString(KEY_USER_PHONE, null)
+
+    fun savePlatoSeleccionado(nombre: String, id: Int? = null) {
+        val editor = prefs.edit().putString("plato_seleccionado_nombre", nombre)
+        if (id != null) {
+            editor.putInt("plato_seleccionado_id", id)
+        }
+        editor.apply()
+    }
+
+    fun getPlatoSeleccionadoNombre(): String = prefs.getString("plato_seleccionado_nombre", "Arroz con pollo") ?: "Arroz con pollo"
+    fun getPlatoSeleccionadoId(): Int = prefs.getInt("plato_seleccionado_id", -1)
 }

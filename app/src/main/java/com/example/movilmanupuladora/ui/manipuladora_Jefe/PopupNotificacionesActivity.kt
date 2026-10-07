@@ -8,7 +8,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.movilmanupuladora.databinding.PopupNotificacionesBinding
 
-
 class PopupNotificacionesActivity : AppCompatActivity() {
 
     private lateinit var binding: PopupNotificacionesBinding

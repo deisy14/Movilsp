@@ -1,15 +1,14 @@
 package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
+import com.example.movilmanupuladora.R
+
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-
-import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.databinding.ActivityMisPreparacionesManipuladoraBinding
-
 
 class MisPreparacionesManipuladoraActivity : AppCompatActivity() {
 

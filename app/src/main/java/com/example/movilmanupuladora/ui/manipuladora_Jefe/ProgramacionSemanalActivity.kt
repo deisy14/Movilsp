@@ -10,7 +10,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.movilmanupuladora.databinding.ActivityProgramacionSemanalBinding
 
-
 class ProgramacionSemanalActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityProgramacionSemanalBinding

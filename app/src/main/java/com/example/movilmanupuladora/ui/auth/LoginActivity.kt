@@ -12,6 +12,7 @@ import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.repository.UsuarioRepository
 import com.example.movilmanupuladora.databinding.ActivityLoginBinding
 import com.example.movilmanupuladora.ui.manipuladora.TurnoActivity
+import com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity
 import com.example.movilmanupuladora.utils.SessionManager
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -113,8 +114,10 @@ class LoginActivity : AppCompatActivity() {
                         loginRes.usuario?.let { usuario ->
 
                             sessionManager.saveUserData(
-                                usuario.nombre,
-                                usuario.rol
+                                name = usuario.nombre,
+                                role = usuario.rol,
+                                email = usuario.correo,
+                                idUsuario = usuario.idUsuario
                             )
                         }
 
@@ -129,13 +132,23 @@ class LoginActivity : AppCompatActivity() {
                         ).show()
 
                         // =====================================
-                        // IR AL MAIN
+                        // DETERMINAR ROL Y REDIRIGIR
                         // =====================================
+
+                        val rol = (loginRes.usuario?.rol ?: "").lowercase()
+                        val email = (loginRes.usuario?.correo ?: correo).lowercase()
+                        val esJefa = rol.contains("jefa") || rol.contains("jefe") || email.contains("jefe") || email.contains("jefa")
+
+                        val destino = if (esJefa) {
+                            InicioJefaActivity::class.java
+                        } else {
+                            TurnoActivity::class.java
+                        }
 
                         startActivity(
                             Intent(
                                 this@LoginActivity,
-                                TurnoActivity::class.java
+                                destino
                             )
                         )
 
@@ -155,53 +168,18 @@ class LoginActivity : AppCompatActivity() {
                 } else {
 
                     // =========================================
-                    // MODO DE PRUEBA LOCAL
-                    // =========================================
-
-                    if (
-                        correo == "manipuladora@gmail.com" &&
-                        pass == "123456789"
-                    ) {
-
-                        Toast.makeText(
-                            this@LoginActivity,
-                            "Inicio de sesión (Modo prueba)",
-                            Toast.LENGTH_SHORT
-                        ).show()
-
-                        startActivity(
-                            Intent(
-                                this@LoginActivity,
-                                TurnoActivity::class.java
-                            )
-                        )
-
-                        finish()
-
-                        return@launch
-                    }
-
-                    // =========================================
                     // ERROR DEL BACKEND
                     // =========================================
 
                     mostrarCargando(false)
 
-                    val errorBody =
-                        response.errorBody()?.string()
+                    val errorBody = response.errorBody()?.string()
 
                     val msg = try {
-
-                        JSONObject(
-                            errorBody ?: ""
-                        ).optString(
-                            "detail",
-                            "Error de credenciales"
-                        )
-
+                        val json = JSONObject(errorBody ?: "")
+                        json.optString("detail", json.optString("error", "Credenciales incorrectas"))
                     } catch (e: Exception) {
-
-                        "Error ${response.code()}"
+                        "Error ${response.code()}: No se pudo iniciar sesión"
                     }
 
                     Toast.makeText(
@@ -212,43 +190,11 @@ class LoginActivity : AppCompatActivity() {
                 }
 
             } catch (e: Exception) {
-
-                // =============================================
-                // MODO OFFLINE DE PRUEBA
-                // =============================================
-
-                if (
-                    correo == "manipuladora@gmail.com" &&
-                    pass == "123456789"
-                ) {
-
-                    Toast.makeText(
-                        this@LoginActivity,
-                        "Inicio de sesión (Modo offline)",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
-                    startActivity(
-                        Intent(
-                            this@LoginActivity,
-                            TurnoActivity::class.java
-                        )
-                    )
-
-                    finish()
-
-                    return@launch
-                }
-
-                // =============================================
-                // ERROR DE RED
-                // =============================================
-
                 mostrarCargando(false)
 
                 Toast.makeText(
                     this@LoginActivity,
-                    "Error de red: ${e.localizedMessage}",
+                    "Error de red: ${e.localizedMessage ?: "No se pudo conectar al servidor"}",
                     Toast.LENGTH_LONG
                 ).show()
             }

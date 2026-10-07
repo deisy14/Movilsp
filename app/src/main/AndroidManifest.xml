@@ -90,6 +90,85 @@
             android:name=".ui.manipuladora.AyudaActivity"
             android:exported="false" />
 
+        <!-- ===================================== -->
+        <!-- MÓDULO JEFA DE MANIPULADORAS          -->
+        <!-- ===================================== -->
+        <activity
+            android:name=".ui.manipuladora_Jefe.InicioJefaActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora_Jefe.AlimentosDisponiblesActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora_Jefe.AsistenciaJefaActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora_Jefe.CalendarioMenuActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora_Jefe.DetallePreparacionActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora_Jefe.HistorialPreparacionesActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora_Jefe.IniciarPreparacionActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora_Jefe.InventarioJefaActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora_Jefe.ManipuladorasAsignadasActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora_Jefe.ManipuladorasJefaActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora_Jefe.MisPreparacionesManipuladoraActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora_Jefe.PerfilJefaActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora_Jefe.PopupNotificacionesActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora_Jefe.PreparacionCompletadaActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora_Jefe.PreparacionEnCursoActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora_Jefe.PreparacionesJefaActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora_Jefe.ProgramacionSemanalActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora_Jefe.RegistrarEntregaActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora_Jefe.ResumenDiaActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

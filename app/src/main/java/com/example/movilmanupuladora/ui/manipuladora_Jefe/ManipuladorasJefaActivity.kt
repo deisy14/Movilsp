@@ -1,18 +1,14 @@
 package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
+import com.example.movilmanupuladora.R
+
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-
-import com.example.manipuladorajefe.ManipuladorasManager
-
-
-import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.databinding.ActivityManipuladorasJefaBinding
-
 
 class ManipuladorasJefaActivity : AppCompatActivity() {
 
