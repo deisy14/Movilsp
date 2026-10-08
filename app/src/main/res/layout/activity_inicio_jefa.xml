@@ -532,10 +532,10 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <!-- BARRA DE NAVEGACIÓN INFERIOR PARA JEFA DE MANIPULADORAS -->
+    <!-- BARRA DE NAVEGACIÓN INFERIOR EXCLUSIVA DE JEFA -->
     <include
-        android:id="@+id/barra_navegacion"
-        layout="@layout/activity_barra_navegacion"
+        android:id="@+id/barra_navegacion_jefa"
+        layout="@layout/barra_navegacion_jefa"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

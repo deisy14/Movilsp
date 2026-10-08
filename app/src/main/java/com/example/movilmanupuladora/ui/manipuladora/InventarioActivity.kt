@@ -372,7 +372,7 @@ class InventarioActivity : AppCompatActivity() {
         com.example.movilmanupuladora.utils.NavigationHelper.setupBarraNavegacion(
             this,
             binding.barraNavegacion,
-            com.example.movilmanupuladora.utils.NavigationHelper.Tab.INVENTARIO
+            com.example.movilmanupuladora.utils.NavigationHelper.Tab.INVENTARIO,
         )
     }
 }

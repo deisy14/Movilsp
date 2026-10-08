@@ -1,6 +1,5 @@
 package com.example.movilmanupuladora.ui.manipuladora
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -161,7 +160,7 @@ class AvisosActivity : AppCompatActivity() {
         com.example.movilmanupuladora.utils.NavigationHelper.setupBarraNavegacion(
             this,
             binding.barraNavegacion,
-            com.example.movilmanupuladora.utils.NavigationHelper.Tab.AVISOS
+            com.example.movilmanupuladora.utils.NavigationHelper.Tab.AVISOS,
         )
     }
 }

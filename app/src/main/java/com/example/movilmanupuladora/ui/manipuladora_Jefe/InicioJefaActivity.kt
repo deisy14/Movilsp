@@ -14,6 +14,7 @@ import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.repository.MenuRepository
 import com.example.movilmanupuladora.databinding.ActivityInicioJefaBinding
 import com.example.movilmanupuladora.utils.NavigationHelper
+import com.example.movilmanupuladora.utils.NavigationHelperJefa
 import com.example.movilmanupuladora.utils.SessionManager
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -41,17 +42,57 @@ class InicioJefaActivity : AppCompatActivity() {
     )
 
     private val platosManana = mutableListOf(
-        Plato(id = 5, nombre = "Pollo Guisado Criollo", componente = "Pollo y Guiso", imagen = R.drawable.pollo_guisado),
-        Plato(id = 6, nombre = "Café con Pan y Huevo", componente = "Desayuno", imagen = R.drawable.comida_desayuno),
-        Plato(id = 7, nombre = "Bandeja Paisa Tradicional", componente = "Frijoles y carne", imagen = R.drawable.bandeja_paisa),
-        Plato(id = 10, nombre = "Pasta con Carne Molida", componente = "Proteína", imagen = R.drawable.pasta_carne)
+        Plato(
+            id = 5,
+            nombre = "Pollo Guisado Criollo",
+            componente = "Pollo y Guiso",
+            imagen = R.drawable.pollo_guisado
+        ),
+        Plato(
+            id = 6,
+            nombre = "Café con Pan y Huevo",
+            componente = "Desayuno",
+            imagen = R.drawable.comida_desayuno
+        ),
+        Plato(
+            id = 7,
+            nombre = "Bandeja Paisa Tradicional",
+            componente = "Frijoles y carne",
+            imagen = R.drawable.bandeja_paisa
+        ),
+        Plato(
+            id = 10,
+            nombre = "Pasta con Carne Molida",
+            componente = "Proteína",
+            imagen = R.drawable.pasta_carne
+        )
     )
 
     private val platosTarde = mutableListOf(
-        Plato(id = 4, nombre = "Arroz a la Valenciana", componente = "Arroz y verduras", imagen = R.drawable.arroz_de_leche),
-        Plato(id = 2, nombre = "Arroz con Pollo Especial", componente = "Pollo especial", imagen = R.drawable.arroz_pollo),
-        Plato(id = 7, nombre = "Lentejas con Arroz", componente = "Leguminosa", imagen = R.drawable.lentejas_arroz),
-        Plato(id = 10, nombre = "Carne Asada con Arepa", componente = "Proteína", imagen = R.drawable.pasta_carne)
+        Plato(
+            id = 4,
+            nombre = "Arroz a la Valenciana",
+            componente = "Arroz y verduras",
+            imagen = R.drawable.arroz_de_leche
+        ),
+        Plato(
+            id = 2,
+            nombre = "Arroz con Pollo Especial",
+            componente = "Pollo especial",
+            imagen = R.drawable.arroz_pollo
+        ),
+        Plato(
+            id = 7,
+            nombre = "Lentejas con Arroz",
+            componente = "Leguminosa",
+            imagen = R.drawable.lentejas_arroz
+        ),
+        Plato(
+            id = 10,
+            nombre = "Carne Asada con Arepa",
+            componente = "Proteína",
+            imagen = R.drawable.pasta_carne
+        )
     )
 
     enum class Jornada {
@@ -89,8 +130,10 @@ class InicioJefaActivity : AppCompatActivity() {
         val nombre = sessionManager.getUserName() ?: "Jefa de Cocina"
         binding.txtSaludo.text = "Hola, $nombre"
 
-        val fecha = SimpleDateFormat("EEEE, d 'de' MMMM", Locale.forLanguageTag("es-CO")).format(Date())
-        binding.txtFecha.text = "Hoy es ${fecha.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }}"
+        val fecha =
+            SimpleDateFormat("EEEE, d 'de' MMMM", Locale.forLanguageTag("es-CO")).format(Date())
+        binding.txtFecha.text =
+            "Hoy es ${fecha.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }}"
 
         seleccionarJornada(Jornada.MANANA)
     }
@@ -105,7 +148,10 @@ class InicioJefaActivity : AppCompatActivity() {
             val intent = Intent(this, IniciarPreparacionActivity::class.java).apply {
                 putExtra("nombre_menu", plato.nombre)
                 putExtra("id_plato", plato.id ?: -1)
-                putExtra("jornada", if (jornadaSeleccionada == Jornada.MANANA) "Mañana" else "Tarde")
+                putExtra(
+                    "jornada",
+                    if (jornadaSeleccionada == Jornada.MANANA) "Mañana" else "Tarde"
+                )
             }
             startActivity(intent)
         }
@@ -125,7 +171,8 @@ class InicioJefaActivity : AppCompatActivity() {
 
         binding.viewPagerSugerenciasIA.setPageTransformer(pageTransformer)
 
-        binding.viewPagerSugerenciasIA.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+        binding.viewPagerSugerenciasIA.registerOnPageChangeCallback(object :
+            ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 posicionPlato = position
@@ -212,7 +259,10 @@ class InicioJefaActivity : AppCompatActivity() {
                 val intent = Intent(this, IniciarPreparacionActivity::class.java).apply {
                     putExtra("nombre_menu", plato.nombre)
                     putExtra("id_plato", plato.id ?: -1)
-                    putExtra("jornada", if (jornadaSeleccionada == Jornada.MANANA) "Mañana" else "Tarde")
+                    putExtra(
+                        "jornada",
+                        if (jornadaSeleccionada == Jornada.MANANA) "Mañana" else "Tarde"
+                    )
                 }
                 startActivity(intent)
             }
@@ -259,14 +309,6 @@ class InicioJefaActivity : AppCompatActivity() {
         binding.txtNinos.text = "$cantidadNinos niños asistirán hoy"
     }
 
-    private fun configurarNavegacionInferior() {
-        NavigationHelper.setupBarraNavegacion(
-            this,
-            binding.barraNavegacion,
-            NavigationHelper.Tab.INICIO
-        )
-    }
-
     private fun cargarPlatosYMenusDelBackend() {
         lifecycleScope.launch {
             try {
@@ -280,9 +322,13 @@ class InicioJefaActivity : AppCompatActivity() {
                         val nombre = p.nombrePlato ?: "Plato del día"
                         val imagenRes = when {
                             nombre.lowercase().contains("arroz") -> R.drawable.arroz_pollo
-                            nombre.lowercase().contains("pan") || nombre.lowercase().contains("desayuno") -> R.drawable.comida_desayuno
+                            nombre.lowercase().contains("pan") || nombre.lowercase()
+                                .contains("desayuno") -> R.drawable.comida_desayuno
+
                             nombre.lowercase().contains("paisa") -> R.drawable.bandeja_paisa
-                            nombre.lowercase().contains("pasta") || nombre.lowercase().contains("carne") -> R.drawable.pasta_carne
+                            nombre.lowercase().contains("pasta") || nombre.lowercase()
+                                .contains("carne") -> R.drawable.pasta_carne
+
                             nombre.lowercase().contains("lenteja") -> R.drawable.lentejas_arroz
                             else -> R.drawable.pollo_guisado
                         }
@@ -316,8 +362,10 @@ class InicioJefaActivity : AppCompatActivity() {
 
                 val menuRes = menuRepository.obtenerMenus()
                 if (menuRes.isSuccessful && !menuRes.body().isNullOrEmpty()) {
-                    val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-                    val menuHoy = menuRes.body()!!.find { it.fecha == fechaHoy } ?: menuRes.body()!!.last()
+                    val fechaHoy =
+                        SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                    val menuHoy =
+                        menuRes.body()!!.find { it.fecha == fechaHoy } ?: menuRes.body()!!.last()
                     menuHoy.informacion_nutricional?.let { info ->
                         if (info.isNotBlank()) {
                             binding.txtSubtituloIA.text = "Sugerencia IA: $info"
@@ -329,4 +377,14 @@ class InicioJefaActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun configurarNavegacionInferior() {
+        NavigationHelperJefa.setupBarraNavegacionJefa(
+            activity = this,
+            binding = binding.barraNavegacionJefa,
+            tabActual = NavigationHelperJefa.TabJefa.INICIO
+        )
+    }
 }
+
+

@@ -1,7 +1,5 @@
 package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
-import com.example.movilmanupuladora.R
-
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -13,9 +11,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import androidx.lifecycle.lifecycleScope
+import com.example.movilmanupuladora.R
+import com.example.movilmanupuladora.data.api.RetrofitClient
+import com.example.movilmanupuladora.data.repository.MenuRepository
+import com.example.movilmanupuladora.ui.manipuladora.MainActivity
+import kotlinx.coroutines.launch
 
 class IniciarPreparacionActivity : AppCompatActivity() {
 
@@ -26,7 +27,8 @@ class IniciarPreparacionActivity : AppCompatActivity() {
     private lateinit var btnIniciarPreparacion: Button
     private lateinit var btnCancelar: Button
     private lateinit var btnCerrar: ImageButton
-    private lateinit var btnVerManipuladoras: ImageButton
+
+    private val menuRepository = MenuRepository(RetrofitClient.apiService)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,17 +36,9 @@ class IniciarPreparacionActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_iniciar_preparacion)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.cardEstadoPreparacion)) { v, insets ->
-            val systemBars =
-                insets.getInsets(WindowInsetsCompat.Type.systemBars())
-
-            v.setPadding(
-                v.paddingLeft,
-                systemBars.top,
-                v.paddingRight,
-                v.paddingBottom
-            )
-
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.cardMenuDia)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(v.paddingLeft, systemBars.top, v.paddingRight, v.paddingBottom)
             insets
         }
 
@@ -54,229 +48,49 @@ class IniciarPreparacionActivity : AppCompatActivity() {
     }
 
     private fun inicializarVistas() {
-
-        txtEstadoPreparacion =
-            findViewById(R.id.txtEstadoPreparacion)
-
-        txtCantidadNinos =
-            findViewById(R.id.txtCantidadNinos)
-
-        txtCantidadManipuladoras =
-            findViewById(R.id.txtCantidadManipuladoras)
-
-        edtObservaciones =
-            findViewById(R.id.edtObservaciones)
-
-        btnIniciarPreparacion =
-            findViewById(R.id.btnIniciarPreparacion)
-
-        btnCancelar =
-            findViewById(R.id.btnCancelar)
-
-        btnCerrar =
-            findViewById(R.id.btnCerrar)
-
-        btnVerManipuladoras =
-            findViewById(R.id.btnVerManipuladoras)
+        txtEstadoPreparacion = findViewById(R.id.txtEstadoPreparacion)
+        txtCantidadNinos = findViewById(R.id.txtCantidadNinos)
+        txtCantidadManipuladoras = findViewById(R.id.txtCantidadManipuladoras)
+        edtObservaciones = findViewById(R.id.edtObservaciones)
+        btnIniciarPreparacion = findViewById(R.id.btnIniciarPreparacion)
+        btnCancelar = findViewById(R.id.btnCancelar)
+        btnCerrar = findViewById(R.id.btnCerrar)
     }
 
     private fun cargarDatos() {
+        val nombreMenuIntent = intent.getStringExtra("nombre_menu") ?: "Arroz con Pollo Criollo"
+        findViewById<TextView>(R.id.txtNombreMenu)?.text = nombreMenuIntent
 
-        /*
-         * Datos iniciales.
-         *
-         * Posteriormente estos datos pueden venir
-         * de una base de datos.
-         */
+        val jornadaIntent = intent.getStringExtra("jornada") ?: "Mañana"
+        findViewById<TextView>(R.id.txtJornada)?.text = "Jornada: $jornadaIntent"
 
-        val cantidadNinos =
-            intent.getIntExtra("cantidad_ninos", 35)
+        val guardados = if (jornadaIntent.contains("Mañana", ignoreCase = true)) {
+            AsistenciaManager.obtenerManana(this)
+        } else {
+            AsistenciaManager.obtenerTarde(this)
+        }
 
-        val cantidadManipuladoras =
-            intent.getIntExtra("cantidad_manipuladoras", 2)
-
-        val nombreMenu =
-            intent.getStringExtra("nombre_menu")
-                ?: "Arroz con pollo"
-
-        val descripcionMenu =
-            intent.getStringExtra("descripcion_menu")
-                ?: "Preparación principal de la jornada"
-
-        val jornada =
-            intent.getStringExtra("jornada")
-                ?: "Mañana"
-
-        findViewById<TextView>(R.id.txtJornada).text =
-            "Jornada: $jornada"
-
-        findViewById<TextView>(R.id.txtNombreMenu).text =
-            nombreMenu
-
-        findViewById<TextView>(R.id.txtDescripcionMenu).text =
-            descripcionMenu
-
-        txtCantidadNinos.text =
-            "$cantidadNinos niños"
-
-        txtCantidadManipuladoras.text =
-            "$cantidadManipuladoras manipuladoras"
-
-        txtEstadoPreparacion.text =
-            "Pendiente"
+        val ninos = if (guardados > 0) guardados else 120
+        txtCantidadNinos.text = "$ninos niños"
+        txtCantidadManipuladoras.text = "2 operarias"
     }
 
     private fun configurarBotones() {
+        btnCerrar.setOnClickListener { finish() }
+        btnCancelar.setOnClickListener { finish() }
 
-        // BOTÓN VOLVER
-        btnCerrar.setOnClickListener {
-            finish()
-        }
-
-        // CANCELAR
-        btnCancelar.setOnClickListener {
-            finish()
-        }
-
-        // VER MANIPULADORAS
-        btnVerManipuladoras.setOnClickListener {
-
-            try {
-
-                val intent = Intent(
-                    this,
-                    ManipuladorasAsignadasActivity::class.java
-                )
-
-                startActivity(intent)
-
-            } catch (e: Exception) {
-
-                Toast.makeText(
-                    this,
-                    "No se pudo abrir la lista de manipuladoras",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-
-        // INICIAR PREPARACIÓN
         btnIniciarPreparacion.setOnClickListener {
-            iniciarPreparacion()
+            val obs = edtObservaciones.text.toString().trim()
+            val preferencias = getSharedPreferences("SIRAE", MODE_PRIVATE)
+            preferencias.edit().putString("observaciones_preparacion", obs).apply()
+            preferencias.edit().putString("estado_plato", "EN_PREPARACION").apply()
+
+            Toast.makeText(this, "¡Preparación del menú iniciada exitosamente!", Toast.LENGTH_SHORT).show()
+
+            val intentMain = Intent(this, MainActivity::class.java)
+            intentMain.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intentMain)
+            finish()
         }
-    }
-
-    private fun iniciarPreparacion() {
-
-        // Evitamos iniciar dos veces
-        if (txtEstadoPreparacion.text.toString() == "En preparación") {
-
-            Toast.makeText(
-                this,
-                "La preparación ya está en curso",
-                Toast.LENGTH_SHORT
-            ).show()
-
-            return
-        }
-
-        /*
-         * Guardamos la hora en la que comenzó
-         * la preparación.
-         */
-
-        val horaInicio = obtenerHoraActual()
-
-        /*
-         * Guardamos las observaciones escritas
-         * por la manipuladora.
-         */
-
-        val observaciones =
-            edtObservaciones.text.toString().trim()
-
-        /*
-         * Cambiamos el estado visual.
-         */
-
-        txtEstadoPreparacion.text =
-            "En preparación"
-
-        /*
-         * Deshabilitamos el botón para evitar
-         * iniciar varias veces la misma preparación.
-         */
-
-        btnIniciarPreparacion.isEnabled = false
-
-        btnIniciarPreparacion.text =
-            "Preparación iniciada"
-
-        Toast.makeText(
-            this,
-            "Preparación iniciada a las $horaInicio",
-            Toast.LENGTH_SHORT
-        ).show()
-
-        /*
-         * Aquí dejamos preparados los datos
-         * para enviarlos posteriormente a la base
-         * de datos.
-         */
-
-        guardarPreparacion(
-            horaInicio,
-            observaciones
-        )
-    }
-
-    private fun guardarPreparacion(
-        horaInicio: String,
-        observaciones: String
-    ) {
-
-        /*
-         * Por ahora guardamos los datos localmente
-         * utilizando SharedPreferences.
-         *
-         * Después podemos reemplazar esto por
-         * SQLite, Room o Firebase.
-         */
-
-        val preferencias =
-            getSharedPreferences(
-                "preparaciones",
-                MODE_PRIVATE
-            )
-
-        preferencias.edit()
-            .putString(
-                "estado_actual",
-                "En preparación"
-            )
-            .putString(
-                "hora_inicio",
-                horaInicio
-            )
-            .putString(
-                "observaciones",
-                observaciones
-            )
-            .apply()
-    }
-
-    private fun obtenerHoraActual(): String {
-
-        val formato =
-            SimpleDateFormat(
-                "hh:mm a",
-                Locale("es", "CO")
-            )
-
-        return formato.format(Date())
-    }
-
-    override fun onBackPressed() {
-        finish()
     }
 }

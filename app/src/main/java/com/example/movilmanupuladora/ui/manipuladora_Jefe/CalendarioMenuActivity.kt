@@ -16,6 +16,7 @@ import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.model.menus
 import com.example.movilmanupuladora.data.repository.MenuRepository
 import com.example.movilmanupuladora.databinding.ActivityCalendarioMenuBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -61,23 +62,27 @@ class CalendarioMenuActivity : AppCompatActivity() {
         }
 
         binding.btnVerDetalleDia.setOnClickListener {
-            mostrarDetalleDia()
+            mostrarPantallaFlotanteHistorial()
         }
     }
 
     // =========================================================
-    // GENERAR Y MOSTRAR TIRA HORIZONTAL DE DÍAS (DAY STRIP)
+    // GENERAR TIRA HORIZONTAL DE TODOS LOS DÍAS DEL MES
     // =========================================================
 
     private fun generarTiraDiasSemana() {
         listaDiasSemana.clear()
         binding.contenedorDiasStrip.removeAllViews()
 
-        val calBase = Calendar.getInstance()
-        calBase.firstDayOfWeek = Calendar.MONDAY
-        calBase.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        val calBase = diaSeleccionado.clone() as Calendar
+        calBase.set(Calendar.DAY_OF_MONTH, 1)
 
-        for (i in 0 until 7) {
+        val totalDiasMes = calBase.getActualMaximum(Calendar.DAY_OF_MONTH)
+        val formatoNombreMes = SimpleDateFormat("MMMM yyyy", Locale.forLanguageTag("es-CO"))
+        val nombreMesAnio = formatoNombreMes.format(calBase.time).uppercase()
+        binding.txtSubtitulo.text = "Mes: $nombreMesAnio · Desliza para consultar días"
+
+        for (i in 1..totalDiasMes) {
             val fechaDia = calBase.clone() as Calendar
             listaDiasSemana.add(fechaDia)
 
@@ -127,6 +132,7 @@ class CalendarioMenuActivity : AppCompatActivity() {
                 diaSeleccionado = fechaDia
                 generarTiraDiasSemana()
                 mostrarInformacionDia()
+                mostrarPantallaFlotanteHistorial()
             }
 
             binding.contenedorDiasStrip.addView(cardDia)
@@ -140,7 +146,7 @@ class CalendarioMenuActivity : AppCompatActivity() {
     }
 
     // =========================================================
-    // INFORMACIÓN Y DETALLE DEL DÍA SELECCIONADO
+    // INFORMACIÓN Y PANTALLA FLOTANTE DEL DÍA Y OPERARIAS
     // =========================================================
 
     private fun mostrarInformacionDia() {
@@ -157,7 +163,7 @@ class CalendarioMenuActivity : AppCompatActivity() {
 
         val menuDia = listaMenus.find { it.fecha == fechaIso }
         if (menuDia != null) {
-            val infoNutricional = menuDia.informacion_nutricional ?: "Estándar Nutricional PAE"
+            val infoNutricional = menuDia.informacion_nutricional ?: "Estándar PAE"
             val ninos = menuDia.ninos_presentes ?: 120
             val estado = menuDia.estado ?: "Planificado"
 
@@ -168,7 +174,7 @@ class CalendarioMenuActivity : AppCompatActivity() {
             binding.badgeEstadoTarde.text = "Confirmado"
 
             binding.txtHistorialTitulo.text = "$ninos raciones asignadas ($infoNutricional)"
-            binding.txtHistorialSubtitulo.text = "Ingredientes e insumos verificados en inventario"
+            binding.txtHistorialSubtitulo.text = "Operarias a cargo: Ana López & María Rodríguez"
         } else {
             binding.txtPlatoManana.text = "Sopa de Frijoles y Proteína"
             binding.badgeEstadoManana.text = "Programado"
@@ -176,27 +182,43 @@ class CalendarioMenuActivity : AppCompatActivity() {
             binding.txtPlatoTarde.text = "Arroz con Pollo Especial"
             binding.badgeEstadoTarde.text = "Confirmado"
 
-            binding.txtHistorialTitulo.text = "Menú del día disponible en servidor"
-            binding.txtHistorialSubtitulo.text = "Control de gramaje e inocuidad certificado PAE"
+            binding.txtHistorialTitulo.text = "Menú del día registrado en servidor"
+            binding.txtHistorialSubtitulo.text = "Operarias a cargo: Ana López & María Rodríguez"
         }
     }
 
-    private fun mostrarDetalleDia() {
+    private fun mostrarPantallaFlotanteHistorial() {
         val formatoLargo = SimpleDateFormat("EEEE, d 'de' MMMM", Locale.forLanguageTag("es-CO"))
         val textoFecha = formatoLargo.format(diaSeleccionado.time).replaceFirstChar { it.uppercase() }
 
-        val intent = Intent(this, DetallePreparacionActivity::class.java).apply {
-            putExtra("fecha", textoFecha)
-            putExtra("plato", binding.txtPlatoManana.text.toString())
-            putExtra("jornada", "Mañana y Tarde")
-            putExtra("ninos", "120 niños")
-        }
-        startActivity(intent)
-    }
+        val mensajeHistorial = """
+            📅 Fecha: $textoFecha
+            🍲 Plato Mañana: ${binding.txtPlatoManana.text}
+            🍛 Plato Tarde: ${binding.txtPlatoTarde.text}
+            
+            👩‍🍳 Manipuladoras a cargo del plato:
+            • Ana López (Encargada de cocción)
+            • María Rodríguez (Porcionado e inocuidad)
+            
+            📊 Estado del turno: Registrado e insumos al día.
+        """.trimIndent()
 
-    // =========================================================
-    // CONSUMO DEL BACKEND (API SIRAE)
-    // =========================================================
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Historial y Responsables del Día")
+            .setMessage(mensajeHistorial)
+            .setPositiveButton("Ver Receta Completa") { dialog, _ ->
+                dialog.dismiss()
+                val intent = Intent(this, DetallePreparacionActivity::class.java).apply {
+                    putExtra("fecha", textoFecha)
+                    putExtra("plato", binding.txtPlatoManana.text.toString())
+                    putExtra("jornada", "Mañana y Tarde")
+                    putExtra("ninos", "120 niños")
+                }
+                startActivity(intent)
+            }
+            .setNegativeButton("Cerrar") { dialog, _ -> dialog.dismiss() }
+            .show()
+    }
 
     private fun cargarMenusDelBackend() {
         lifecycleScope.launch {
@@ -208,7 +230,7 @@ class CalendarioMenuActivity : AppCompatActivity() {
                     mostrarInformacionDia()
                 }
             } catch (e: Exception) {
-                // Mantiene datos locales de respaldo si no hay red
+                // Conserva datos locales si no hay red
             }
         }
     }

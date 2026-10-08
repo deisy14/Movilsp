@@ -150,7 +150,7 @@ class MainActivity : AppCompatActivity() {
         NavigationHelper.setupBarraNavegacion(
             this,
             binding.barraNavegacion,
-            NavigationHelper.Tab.INICIO
+            NavigationHelper.Tab.INICIO,
         )
     }
 

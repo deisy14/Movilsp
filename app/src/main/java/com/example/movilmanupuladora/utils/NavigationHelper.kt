@@ -22,8 +22,8 @@ object NavigationHelper {
         PERFIL
     }
 
-    private const val COLOR_ACTIVO_HEX = "#F4B41F"
-    private const val COLOR_INACTIVO_HEX = "#667085"
+    private const val COLOR_ACTIVO_HEX = "#1B3317"
+    private const val COLOR_INACTIVO_HEX = "#94A3B8"
 
     fun setupBarraNavegacion(
         activity: Activity,
@@ -33,7 +33,6 @@ object NavigationHelper {
         val colorActivo = Color.parseColor(COLOR_ACTIVO_HEX)
         val colorInactivo = Color.parseColor(COLOR_INACTIVO_HEX)
 
-        // 1. Resetear todos los tabs a inactivo
         binding.tvNavInicio.setTextColor(colorInactivo)
         binding.tvNavInicio.typeface = Typeface.DEFAULT
         binding.icNavInicio.imageTintList = ColorStateList.valueOf(colorInactivo)
@@ -54,7 +53,6 @@ object NavigationHelper {
         binding.tvNavPerfil.typeface = Typeface.DEFAULT
         binding.icNavPerfil.imageTintList = ColorStateList.valueOf(colorInactivo)
 
-        // 2. Resaltar tab activo con su color y negrita
         when (tabActual) {
             Tab.INICIO -> {
                 binding.tvNavInicio.setTextColor(colorActivo)
@@ -83,7 +81,6 @@ object NavigationHelper {
             }
         }
 
-        // 3. Configurar clics
         binding.navInicio.setOnClickListener {
             if (tabActual != Tab.INICIO) {
                 val intent = Intent(activity, MainActivity::class.java)
