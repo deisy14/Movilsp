@@ -141,7 +141,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="76dp"
                         android:layout_marginTop="20dp"
-                        app:cardBackgroundColor="#FFF4C7"
+                        app:cardBackgroundColor="#F4B41F"
                         app:cardCornerRadius="18dp"
                         app:cardElevation="0dp">
 

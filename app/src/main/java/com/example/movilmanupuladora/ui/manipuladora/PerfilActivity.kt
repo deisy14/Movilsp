@@ -139,7 +139,7 @@ class PerfilActivity : AppCompatActivity() {
             com.example.movilmanupuladora.utils.NavigationHelper.setupBarraNavegacion(
                 this,
                 barraBinding,
-                com.example.movilmanupuladora.utils.NavigationHelper.Tab.PERFIL
+                com.example.movilmanupuladora.utils.NavigationHelper.Tab.PERFIL,
             )
         }
     }

@@ -399,8 +399,9 @@
     <!-- ===================================================== -->
 
     <include
+        android:id="@+id/barra_navegacion_jefa"
         layout="@layout/barra_navegacion_jefa"
         android:layout_width="match_parent"
-        android:layout_height="88dp"/>
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

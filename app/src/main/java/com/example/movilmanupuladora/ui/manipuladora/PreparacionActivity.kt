@@ -1,25 +1,25 @@
 package com.example.movilmanupuladora.ui.manipuladora
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.model.pasos_preparacion
 import com.example.movilmanupuladora.databinding.ActivityPreparacionBinding
 import com.example.movilmanupuladora.utils.NavigationHelper
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 
 class PreparacionActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPreparacionBinding
+    private var nombrePlatoActual: String = "Pollo Guisado Criollo"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,75 +28,100 @@ class PreparacionActivity : AppCompatActivity() {
         binding = ActivityPreparacionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-
-        // Botón volver
         binding.btnVolver.setOnClickListener { finish() }
 
-        // Botón marcar como preparado
         val preferencias = getSharedPreferences("SIRAE", MODE_PRIVATE)
-        val preparado = preferencias.getBoolean("plato_preparado", false)
+        val estadoActual = preferencias.getString("estado_plato", "PENDIENTE")
 
-        if (preparado) {
-            binding.btnMarcarPreparado.text = "✓   Preparado"
+        if (estadoActual == "FINALIZADO") {
+            binding.btnMarcarPreparado.text = "✅   Finalizado"
             binding.btnMarcarPreparado.isEnabled = false
-            binding.btnMarcarPreparado.alpha = 0.6f
+            binding.btnMarcarPreparado.alpha = 0.7f
+            binding.badgeTurnoPreparacion.text = "Estado: ✅ Finalizado"
+            binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_pill_green)
+        } else if (estadoActual == "EN_PREPARACION") {
+            binding.btnMarcarPreparado.text = "🍳 En preparación"
+            binding.badgeTurnoPreparacion.text = "Estado: 🍳 En preparación"
+            binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_pill_yellow)
         }
 
         binding.btnMarcarPreparado.setOnClickListener {
-            preferencias.edit().putBoolean("plato_preparado", true).apply()
-            binding.btnMarcarPreparado.text = "✓   Preparado"
-            binding.btnMarcarPreparado.isEnabled = false
-            binding.btnMarcarPreparado.alpha = 0.6f
-            Toast.makeText(this, "¡Plato marcado como preparado!", Toast.LENGTH_SHORT).show()
+            mostrarDialogoEstadoPreparacion()
         }
 
-        // Barra de navegación
         NavigationHelper.setupBarraNavegacion(
             this,
             binding.barraNavegacion,
-            NavigationHelper.Tab.ASIGNADAS
+            NavigationHelper.Tab.ASIGNADAS,
         )
 
-        // Mostrar nombre e imagen del plato si viene del intent
-        val nombrePlato = intent.getStringExtra("nombre_plato") ?: "Arroz con Pollo"
-        val componente = intent.getStringExtra("componente_seleccionado")
-
-        val nombreFormateado = nombrePlato.split(" ").joinToString(" ") { palabra ->
+        nombrePlatoActual = intent.getStringExtra("nombre_plato") ?: "Pollo Guisado Criollo"
+        val nombreFormateado = nombrePlatoActual.split(" ").joinToString(" ") { palabra ->
             palabra.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
         }
         binding.tvNombrePlatoPreparacion.text = nombreFormateado
 
-        if (!componente.isNullOrBlank()) {
-            binding.tvComponenteSubtituloPreparacion.text = "Componente: $componente"
-            binding.tvComponenteSubtituloPreparacion.visibility = View.VISIBLE
-        } else {
-            binding.tvComponenteSubtituloPreparacion.visibility = View.GONE
-        }
-
         val imgRes = when {
-            nombrePlato.contains("bandeja", ignoreCase = true) -> R.drawable.bandeja_paisa
-            nombrePlato.contains("frijol", ignoreCase = true) -> R.drawable.frijoles
-            nombrePlato.contains("chocolate", ignoreCase = true) -> R.drawable.chocolate
-            nombrePlato.contains("huevo", ignoreCase = true) -> R.drawable.huevo_perico
-            nombrePlato.contains("pollo", ignoreCase = true) -> R.drawable.arroz_pollo
-            nombrePlato.contains("arroz", ignoreCase = true) -> R.drawable.arroz_de_leche
-            else -> R.drawable.comida_almuerzo
+            nombrePlatoActual.contains("bandeja", ignoreCase = true) -> R.drawable.bandeja_paisa
+            nombrePlatoActual.contains("frijol", ignoreCase = true) -> R.drawable.frijoles
+            nombrePlatoActual.contains("chocolate", ignoreCase = true) -> R.drawable.chocolate
+            nombrePlatoActual.contains("huevo", ignoreCase = true) -> R.drawable.huevo_perico
+            nombrePlatoActual.contains("pollo", ignoreCase = true) -> R.drawable.pollo_guisado
+            nombrePlatoActual.contains("arroz", ignoreCase = true) -> R.drawable.arroz_de_leche
+            else -> R.drawable.pollo_guisado
         }
         binding.imgPlatoPreparacion.setImageResource(imgRes)
 
-        // Cargar pasos de la receta
         cargarPasos()
     }
 
+    private fun mostrarDialogoEstadoPreparacion() {
+        val opciones = arrayOf("📋 Por hacer / Pendiente", "🍳 En proceso / En preparación", "✅ Completado / Finalizado")
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Actualizar Estado de Preparación")
+            .setItems(opciones) { dialog, which ->
+                val preferencias = getSharedPreferences("SIRAE", MODE_PRIVATE)
+                when (which) {
+                    0 -> { // Por hacer
+                        preferencias.edit().putString("estado_plato", "PENDIENTE").apply()
+                        binding.badgeTurnoPreparacion.text = "Estado: 📋 Por hacer"
+                        binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_tag_plato)
+                        binding.btnMarcarPreparado.text = "Marcar Estado"
+                        Toast.makeText(this, "Estado cambiado a: Por hacer", Toast.LENGTH_SHORT).show()
+                    }
+                    1 -> { // En proceso
+                        preferencias.edit().putString("estado_plato", "EN_PREPARACION").apply()
+                        binding.badgeTurnoPreparacion.text = "Estado: 🍳 En proceso"
+                        binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_pill_yellow)
+                        binding.btnMarcarPreparado.text = "🍳 En proceso"
+                        Toast.makeText(this, "Estado cambiado a: En proceso", Toast.LENGTH_SHORT).show()
+                    }
+                    2 -> { // Completado -> Abre ConfirmacionActivity
+                        preferencias.edit().putBoolean("plato_preparado", true).apply()
+                        preferencias.edit().putString("estado_plato", "FINALIZADO").apply()
+                        binding.badgeTurnoPreparacion.text = "Estado: ✅ Completado"
+                        binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_pill_green)
+                        binding.btnMarcarPreparado.text = "✅   Completado"
+                        binding.btnMarcarPreparado.isEnabled = false
+                        binding.btnMarcarPreparado.alpha = 0.7f
+
+                        val intentConf = Intent(this, ConfirmacionActivity::class.java).apply {
+                            putExtra("nombre_plato", nombrePlatoActual)
+                        }
+                        startActivity(intentConf)
+                        finish()
+                    }
+                }
+            }
+            .setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
+            .show()
+    }
+
     private val pasosFallback = listOf(
-        pasos_preparacion(idPlato = 1, numeroPaso = "1", descripcionPaso = "Lavar y desinfectar los ingredientes, utensilios y mesas de trabajo siguiendo el protocolo de inocuidad PAE."),
+        pasos_preparacion(idPlato = 1, numeroPaso = "1", descripcionPaso = "Lavar y desinfectar los ingredientes, utensilios y mesas de trabajo siguiendo el protocolo de bioseguridad."),
         pasos_preparacion(idPlato = 1, numeroPaso = "2", descripcionPaso = "Cocinar y sellar la proteína y los principios a temperatura controlada (mínimo 75°C)."),
-        pasos_preparacion(idPlato = 1, numeroPaso = "3", descripcionPaso = "Verificar sazón, textura, cocción completa y temperatura antes del porcionado."),
+        pasos_preparacion(idPlato = 1, numeroPaso = "3", descripcionPaso = "Verificar sazón, textura, cocción completa y temperatura antes del ensamble del plato."),
         pasos_preparacion(idPlato = 1, numeroPaso = "4", descripcionPaso = "Porcionar y servir según las tablas de gramaje institucional del programa de alimentación escolar.")
     )
 
@@ -118,23 +143,23 @@ class PreparacionActivity : AppCompatActivity() {
     }
 
     private fun mostrarPasos(pasos: List<pasos_preparacion>) {
-        val contenedor = binding.contenedorPasos
-        contenedor.removeAllViews()
+        binding.contenedorPasos.removeAllViews()
 
         for (paso in pasos) {
             val fila = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
+                setPadding(0, 24, 0, 0)
                 gravity = android.view.Gravity.CENTER_VERTICAL
-                setPadding(0, 16, 0, 16)
             }
 
             val tvNumero = TextView(this).apply {
                 text = paso.numeroPaso
-                setTextColor(0xFF7A5500.toInt())
+                setTextColor(0xFF1B3317.toInt())
                 textSize = 13f
                 gravity = android.view.Gravity.CENTER
                 setBackgroundResource(R.drawable.bg_pill_yellow)
-                layoutParams = LinearLayout.LayoutParams(56, 56)
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
+                layoutParams = LinearLayout.LayoutParams(54, 54)
             }
 
             val tvDescripcion = TextView(this).apply {
@@ -148,7 +173,7 @@ class PreparacionActivity : AppCompatActivity() {
 
             fila.addView(tvNumero)
             fila.addView(tvDescripcion)
-            contenedor.addView(fila)
+            binding.contenedorPasos.addView(fila)
         }
     }
 }

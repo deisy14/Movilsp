@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/blanco"
     android:fillViewport="true"
-    tools:context=".ManipuladorasAsignadasActivity">
+    tools:context=".ui.manipuladora_Jefe.ManipuladorasAsignadasActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,10 +15,7 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <!-- ================================================= -->
-        <!-- ENCABEZADO                                       -->
-        <!-- ================================================= -->
-
+        <!-- ENCABEZADO -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -45,7 +42,7 @@
                     android:id="@+id/txtTitulo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Manipuladoras asignadas"
+                    android:text="Manipuladoras Asignadas PAE"
                     android:textColor="@color/negro_principal"
                     android:textSize="22sp"
                     android:textStyle="bold" />
@@ -63,16 +60,12 @@
 
         </LinearLayout>
 
-
-        <!-- ================================================= -->
-        <!-- INFORMACIÓN                                      -->
-        <!-- ================================================= -->
-
+        <!-- INFORMACIÓN -->
         <LinearLayout
             android:id="@+id/cardInformacion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="20dp"
             android:background="@drawable/bg_card_resumen"
             android:orientation="vertical"
             android:padding="16dp">
@@ -80,7 +73,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Responsables de la preparación"
+                android:text="Equipo a Cargo de la Preparación"
                 android:textColor="@color/negro_principal"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -89,18 +82,14 @@
                 android:id="@+id/txtDescripcion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="Revisa las manipuladoras asignadas para esta preparación."
+                android:layout_marginTop="4dp"
+                android:text="Consulta y gestiona las manipuladoras oficiales asignadas a este turno."
                 android:textColor="@color/gris_texto"
                 android:textSize="13sp" />
 
         </LinearLayout>
 
-
-        <!-- ================================================= -->
-        <!-- RESUMEN                                           -->
-        <!-- ================================================= -->
-
+        <!-- RESUMEN -->
         <LinearLayout
             android:id="@+id/cardResumen"
             android:layout_width="match_parent"
@@ -138,7 +127,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
-                    android:text="0 manipuladoras"
+                    android:text="3 manipuladoras"
                     android:textColor="@color/negro_principal"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -147,25 +136,17 @@
 
         </LinearLayout>
 
-
-        <!-- ================================================= -->
-        <!-- TÍTULO LISTA                                     -->
-        <!-- ================================================= -->
-
+        <!-- TÍTULO LISTA -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="26dp"
-            android:text="Personal asignado"
+            android:layout_marginTop="22dp"
+            android:text="Personal Asignado al Turno"
             android:textColor="@color/negro_principal"
             android:textSize="18sp"
             android:textStyle="bold" />
 
-
-        <!-- ================================================= -->
-        <!-- MANIPULADORA 1                                   -->
-        <!-- ================================================= -->
-
+        <!-- MANIPULADORA 1 -->
         <LinearLayout
             android:id="@+id/cardManipuladora1"
             android:layout_width="match_parent"
@@ -177,8 +158,8 @@
 
             <ImageView
                 android:id="@+id/imgManipuladora1"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
                 android:background="@drawable/bg_icono_verde"
                 android:contentDescription="Manipuladora"
                 android:padding="10dp"
@@ -217,10 +198,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_estado_disponible"
-                android:paddingStart="10dp"
-                android:paddingTop="5dp"
-                android:paddingEnd="10dp"
-                android:paddingBottom="5dp"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="5dp"
                 android:text="Asignada"
                 android:textColor="@color/negro_principal"
                 android:textSize="11sp"
@@ -228,11 +207,7 @@
 
         </LinearLayout>
 
-
-        <!-- ================================================= -->
-        <!-- MANIPULADORA 2                                   -->
-        <!-- ================================================= -->
-
+        <!-- MANIPULADORA 2 -->
         <LinearLayout
             android:id="@+id/cardManipuladora2"
             android:layout_width="match_parent"
@@ -244,8 +219,8 @@
 
             <ImageView
                 android:id="@+id/imgManipuladora2"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
                 android:background="@drawable/bg_icono_amarillo"
                 android:contentDescription="Manipuladora"
                 android:padding="10dp"
@@ -284,10 +259,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_estado_disponible"
-                android:paddingStart="10dp"
-                android:paddingTop="5dp"
-                android:paddingEnd="10dp"
-                android:paddingBottom="5dp"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="5dp"
                 android:text="Asignada"
                 android:textColor="@color/negro_principal"
                 android:textSize="11sp"
@@ -295,11 +268,7 @@
 
         </LinearLayout>
 
-
-        <!-- ================================================= -->
-        <!-- MANIPULADORA 3                                   -->
-        <!-- ================================================= -->
-
+        <!-- MANIPULADORA 3 -->
         <LinearLayout
             android:id="@+id/cardManipuladora3"
             android:layout_width="match_parent"
@@ -311,8 +280,8 @@
 
             <ImageView
                 android:id="@+id/imgManipuladora3"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
                 android:background="@drawable/bg_icono_verde"
                 android:contentDescription="Manipuladora"
                 android:padding="10dp"
@@ -351,10 +320,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_estado_disponible"
-                android:paddingStart="10dp"
-                android:paddingTop="5dp"
-                android:paddingEnd="10dp"
-                android:paddingBottom="5dp"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="5dp"
                 android:text="Asignada"
                 android:textColor="@color/negro_principal"
                 android:textSize="11sp"
@@ -362,52 +329,38 @@
 
         </LinearLayout>
 
-
-        <!-- ================================================= -->
-        <!-- BOTÓN AGREGAR                                    -->
-        <!-- ================================================= -->
-
+        <!-- OCULTO: OPCIÓN DE AGREGAR ELIMINADA -->
         <Button
             android:id="@+id/btnAgregarManipuladora"
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_marginTop="20dp"
-            android:backgroundTint="@color/amarillo_principal"
-            android:text="Agregar manipuladora"
-            android:textColor="@color/blanco"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
-
-        <!-- ================================================= -->
-        <!-- CONFIRMAR                                        -->
-        <!-- ================================================= -->
-
-        <Button
+        <!-- CONFIRMAR -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnConfirmarAsignacion"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_marginTop="10dp"
-            android:backgroundTint="@color/negro_principal"
-            android:text="Confirmar asignación"
-            android:textColor="@color/blanco"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:layout_height="48dp"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="#F4B41F"
+            android:text="Confirmar Asignación de Turno"
+            android:textColor="#1B3317"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp" />
 
-
-        <!-- ================================================= -->
-        <!-- CANCELAR                                         -->
-        <!-- ================================================= -->
-
-        <Button
+        <!-- CANCELAR -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCancelar"
+            style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginTop="8dp"
-            android:backgroundTint="@color/gris_claro"
-            android:text="Cancelar"
-            android:textColor="@color/negro_principal"
-            android:textSize="14sp" />
+            android:text="Volver"
+            android:textColor="#1B3317"
+            android:textSize="13sp"
+            app:cornerRadius="12dp"
+            app:strokeColor="#C5DFC3" />
 
     </LinearLayout>
 

@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.model.Ingrediente
 import com.example.movilmanupuladora.data.model.inventario
@@ -230,7 +229,7 @@ class RegistrarEntradaActivity : AppCompatActivity() {
         com.example.movilmanupuladora.utils.NavigationHelper.setupBarraNavegacion(
             this,
             binding.barraNavegacion,
-            com.example.movilmanupuladora.utils.NavigationHelper.Tab.INVENTARIO
+            com.example.movilmanupuladora.utils.NavigationHelper.Tab.INVENTARIO,
         )
     }
 }

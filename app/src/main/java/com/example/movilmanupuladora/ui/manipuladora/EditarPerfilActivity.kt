@@ -1,6 +1,5 @@
 package com.example.movilmanupuladora.ui.manipuladora
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -106,7 +105,7 @@ class EditarPerfilActivity : AppCompatActivity() {
         com.example.movilmanupuladora.utils.NavigationHelper.setupBarraNavegacion(
             this,
             binding.barraNavegacion,
-            com.example.movilmanupuladora.utils.NavigationHelper.Tab.PERFIL
+            com.example.movilmanupuladora.utils.NavigationHelper.Tab.PERFIL,
         )
     }
 }

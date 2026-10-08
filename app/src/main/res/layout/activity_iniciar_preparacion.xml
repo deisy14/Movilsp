@@ -1,367 +1,355 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/blanco"
+    android:background="#FAF9F5"
     android:fillViewport="true"
-    tools:context=".IniciarPreparacionActivity">
+    android:overScrollMode="never"
+    android:scrollbars="none"
+    tools:context=".ui.manipuladora_Jefe.IniciarPreparacionActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:paddingHorizontal="20dp"
+        android:paddingTop="28dp"
+        android:paddingBottom="30dp">
 
-        <!-- ================================================= -->
-        <!-- ENCABEZADO                                       -->
-        <!-- ================================================= -->
-
+        <!-- ENCABEZADO -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <ImageButton
                 android:id="@+id/btnCerrar"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:background="@drawable/bg_icono_circular"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@android:color/transparent"
                 android:contentDescription="Volver"
-                android:padding="10dp"
+                android:padding="8dp"
                 android:src="@drawable/ic_arrow_back"
-                android:tint="@color/negro_principal" />
+                app:tint="#1B3317" />
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_marginStart="12dp"
+                android:layout_weight="1"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/txtTitulo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Iniciar preparación"
-                    android:textColor="@color/negro_principal"
-                    android:textSize="22sp"
+                    android:text="Iniciar Preparación de Menú"
+                    android:textColor="#1B3317"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/txtJornada"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
+                    android:layout_marginTop="2dp"
                     android:text="Jornada: Mañana"
-                    android:textColor="@color/gris_texto"
-                    android:textSize="13sp" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-
-        <!-- ================================================= -->
-        <!-- ESTADO                                            -->
-        <!-- ================================================= -->
-
-        <LinearLayout
-            android:id="@+id/cardEstadoPreparacion"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:background="@drawable/bg_card_resumen"
-            android:gravity="center_vertical"
-            android:padding="16dp">
-
-            <ImageView
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:background="@drawable/bg_icono_amarillo"
-                android:contentDescription="Estado"
-                android:padding="9dp"
-                android:src="@drawable/ic_food"
-                android:tint="@color/negro_principal" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Estado de preparación"
-                    android:textColor="@color/gris_texto"
+                    android:textColor="#3D5C37"
                     android:textSize="12sp" />
 
-                <TextView
-                    android:id="@+id/txtEstadoPreparacion"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:text="Pendiente"
-                    android:textColor="@color/negro_principal"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
             </LinearLayout>
 
         </LinearLayout>
 
-
-        <!-- ================================================= -->
-        <!-- MENÚ DEL DÍA                                      -->
-        <!-- ================================================= -->
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="26dp"
-            android:text="Menú del día"
-            android:textColor="@color/negro_principal"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-
-        <LinearLayout
+        <!-- TARJETA MENÚ Y ESTADO -->
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardMenuDia"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_card_resumen"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:id="@+id/txtNombreMenu"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Arroz con pollo"
-                android:textColor="@color/negro_principal"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/txtDescripcionMenu"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="Preparación principal de la jornada"
-                android:textColor="@color/gris_texto"
-                android:textSize="13sp" />
-
-        </LinearLayout>
-
-
-        <!-- ================================================= -->
-        <!-- CANTIDAD DE NIÑOS                                -->
-        <!-- ================================================= -->
-
-        <LinearLayout
-            android:id="@+id/cardCantidadNinos"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_card_resumen"
-            android:gravity="center_vertical"
-            android:padding="16dp">
-
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="@drawable/bg_icono_verde"
-                android:contentDescription="Niños"
-                android:padding="9dp"
-                android:src="@drawable/ic_nav_manipuladoras"
-                android:tint="@color/negro_principal" />
+            android:layout_marginTop="20dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="3dp"
+            app:strokeColor="#F4B41F"
+            app:strokeWidth="2dp">
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="MENÚ SELECCIONADO PAE"
+                        android:textColor="#7A5500"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtEstadoPreparacion"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_pill_yellow"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="4dp"
+                        android:text="Pendiente por Iniciar"
+                        android:textColor="#7A5500"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/txtNombreMenu"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Niños registrados"
-                    android:textColor="@color/gris_texto"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/txtCantidadNinos"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:text="0 niños"
-                    android:textColor="@color/negro_principal"
-                    android:textSize="16sp"
+                    android:layout_marginTop="8dp"
+                    android:text="Arroz con Pollo Criollo"
+                    android:textColor="#1B3317"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/txtDescripcionMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Preparación principal programada con insumos validados en cocina"
+                    android:textColor="#64748B"
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- CANTIDAD DE ESTUDIANTES Y MANIPULADORAS -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+
+            <!-- CANTIDAD DE ESTUDIANTES -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="14dp">
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_pill_yellow"
+                        android:contentDescription="Estudiantes"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_people"
+                        app:tint="#1B3317" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="RACIONES"
+                            android:textColor="#64748B"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/txtCantidadNinos"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="120 niños"
+                            android:textColor="#1B3317"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- MANIPULADORAS -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="14dp">
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_pill_green"
+                        android:contentDescription="Equipo"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_nav_manipuladoras"
+                        app:tint="#2A5226" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="EQUIPO"
+                            android:textColor="#64748B"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/txtCantidadManipuladoras"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="2 operarias"
+                            android:textColor="#1B3317"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
         </LinearLayout>
 
-
-        <!-- ================================================= -->
-        <!-- ALIMENTOS NECESARIOS                              -->
-        <!-- ================================================= -->
-
+        <!-- INSUMOS NECESARIOS -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="26dp"
-            android:text="Alimentos necesarios"
-            android:textColor="@color/negro_principal"
-            android:textSize="18sp"
+            android:layout_marginTop="22dp"
+            android:text="Insumos e Ingredientes Requeridos"
+            android:textColor="#1B3317"
+            android:textSize="15sp"
             android:textStyle="bold" />
 
-
-        <LinearLayout
-            android:id="@+id/cardAlimentosNecesarios"
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_card_resumen"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:id="@+id/txtAlimentosNecesarios"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Arroz  •  12 kg&#10;Pollo  •  18 kg&#10;Verduras  •  8 kg"
-                android:textColor="@color/negro_principal"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-
-
-        <!-- ================================================= -->
-        <!-- MANIPULADORAS ASIGNADAS                          -->
-        <!-- ================================================= -->
-
-        <LinearLayout
-            android:id="@+id/cardManipuladoras"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_card_resumen"
-            android:gravity="center_vertical"
-            android:padding="16dp">
-
-            <ImageView
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:background="@drawable/bg_icono_amarillo"
-                android:contentDescription="Manipuladoras"
-                android:padding="9dp"
-                android:src="@drawable/ic_nav_manipuladoras"
-                android:tint="@color/negro_principal" />
+            android:layout_marginTop="10dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeColor="#E2E8F0"
+            app:strokeWidth="1dp">
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:padding="16dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/txtAlimentosNecesarios"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Manipuladoras asignadas"
-                    android:textColor="@color/gris_texto"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/txtCantidadManipuladoras"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:text="0 manipuladoras"
-                    android:textColor="@color/negro_principal"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:text="• Arroz  •  12 kg\n• Pollo  •  18 kg\n• Verduras  •  8 kg"
+                    android:textColor="#1B3317"
+                    android:textSize="14sp" />
 
             </LinearLayout>
 
-            <ImageButton
-                android:id="@+id/btnVerManipuladoras"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:background="@drawable/bg_icono_circular"
-                android:contentDescription="Ver manipuladoras asignadas"
-                android:padding="9dp"
-                android:src="@drawable/ic_arrow_forward"
-                android:tint="@color/negro_principal" />
+        </com.google.android.material.card.MaterialCardView>
 
-        </LinearLayout>
-
-
-        <!-- ================================================= -->
-        <!-- OBSERVACIONES                                    -->
-        <!-- ================================================= -->
-
+        <!-- OBSERVACIONES -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="26dp"
-            android:text="Observaciones"
-            android:textColor="@color/negro_principal"
-            android:textSize="18sp"
+            android:layout_marginTop="22dp"
+            android:text="Observaciones e Instrucciones Iniciales"
+            android:textColor="#1B3317"
+            android:textSize="15sp"
             android:textStyle="bold" />
 
         <EditText
             android:id="@+id/edtObservaciones"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_campo"
+            android:layout_height="90dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_edittext"
             android:gravity="top|start"
-            android:hint="Escribe una observación si es necesario..."
+            android:hint="Escribe observaciones iniciales sobre el turno o ingredientes..."
+            android:importantForAutofill="no"
             android:inputType="textCapSentences|textMultiLine"
             android:padding="14dp"
-            android:textColor="@color/negro_principal"
-            android:textColorHint="@color/gris_texto"
-            android:textSize="14sp" />
+            android:textColor="#1B3317"
+            android:textColorHint="#94A3B8"
+            android:textSize="13sp" />
 
-
-        <!-- ================================================= -->
-        <!-- BOTÓN INICIAR                                    -->
-        <!-- ================================================= -->
-
-        <Button
+        <!-- BOTÓN INICIAR PREPARACIÓN -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnIniciarPreparacion"
             android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:layout_marginTop="24dp"
-            android:backgroundTint="@color/amarillo_principal"
-            android:text="Iniciar preparación"
-            android:textColor="@color/blanco"
-            android:textSize="15sp"
-            android:textStyle="bold" />
+            android:layout_height="48dp"
+            android:layout_marginTop="22dp"
+            android:backgroundTint="#F4B41F"
+            android:text="Iniciar Preparación del Menú"
+            android:textColor="#1B3317"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp" />
 
-
-        <!-- ================================================= -->
-        <!-- CANCELAR                                         -->
-        <!-- ================================================= -->
-
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCancelar"
+            style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginTop="8dp"
-            android:backgroundTint="@color/gris_claro"
             android:text="Cancelar"
-            android:textColor="@color/negro_principal"
-            android:textSize="14sp" />
+            android:textColor="#1B3317"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            app:strokeColor="#C5DFC3" />
 
     </LinearLayout>
 
