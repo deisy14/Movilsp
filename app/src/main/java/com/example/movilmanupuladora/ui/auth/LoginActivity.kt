@@ -230,13 +230,24 @@ class LoginActivity : AppCompatActivity() {
 
                     val errorBody = response.errorBody()?.string()
 
-                    val msg = if (response.code() == 401) {
-                        "Correo o contraseña incorrectos"
-                    } else {
-                        try {
-                            val json = JSONObject(errorBody ?: "")
-                            json.optString("detail", json.optString("error", "Error al iniciar sesión"))
-                        } catch (e: Exception) {
+                    val msg = try {
+                        val json = JSONObject(errorBody ?: "")
+                        val detail = json.optString("detail", json.optString("error", ""))
+                        when {
+                            detail.contains("No existe ninguna cuenta", ignoreCase = true) ||
+                            detail.contains("correo", ignoreCase = true) ->
+                                "Correo no registrado o no encontrado"
+                            detail.contains("contraseña", ignoreCase = true) ||
+                            detail.contains("password", ignoreCase = true) ->
+                                "Contraseña incorrecta"
+                            detail.isNotEmpty() -> detail
+                            response.code() == 401 -> "Correo o contraseña incorrectos"
+                            else -> "Error ${response.code()}: No se pudo iniciar sesión"
+                        }
+                    } catch (e: Exception) {
+                        if (response.code() == 401) {
+                            "Correo o contraseña incorrectos"
+                        } else {
                             "Error ${response.code()}: No se pudo iniciar sesión"
                         }
                     }

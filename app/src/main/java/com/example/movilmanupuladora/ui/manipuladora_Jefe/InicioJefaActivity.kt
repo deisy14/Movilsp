@@ -1,7 +1,5 @@
 package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
-import com.example.movilmanupuladora.R
-
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -21,11 +19,6 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import com.example.movilmanupuladora.data.api.RetrofitClient
-import com.example.movilmanupuladora.data.repository.MenuRepository
-import com.example.movilmanupuladora.databinding.ActivityInicioJefaBinding
-import com.example.movilmanupuladora.utils.SessionManager
-import kotlinx.coroutines.launch
 
 class InicioJefaActivity : AppCompatActivity() {
 
@@ -34,10 +27,11 @@ class InicioJefaActivity : AppCompatActivity() {
     private val menuRepository = MenuRepository(RetrofitClient.apiService)
 
     // =========================================================
-    // JORNADA
+    // JORNADA Y ESTADO
     // =========================================================
 
     private var jornadaSeleccionada = Jornada.MANANA
+    private var posicionPlato = 0
 
     data class Plato(
         val id: Int? = null,
@@ -56,21 +50,9 @@ class InicioJefaActivity : AppCompatActivity() {
     private val platosTarde = mutableListOf(
         Plato(id = 4, nombre = "Arroz a la Valenciana", componente = "Arroz y verduras", imagen = R.drawable.arroz_de_leche),
         Plato(id = 2, nombre = "Arroz con Pollo Especial", componente = "Pollo especial", imagen = R.drawable.arroz_pollo),
-        Plato(id = 7, nombre = "Lentejas con Arroz", componente = "Leguminosa", imagen = R.drawable.lentejas_arroz)
-        Plato(id = 5, nombre = "Arroz con pollo", componente = "Pollo"),
-        Plato(id = 6, nombre = "Café con pan", componente = "Desayuno"),
-        Plato(id = 7, nombre = "Bandeja paisa", componente = "Frijoles y carne"),
-        Plato(id = 10, nombre = "Carne asada", componente = "Proteína")
+        Plato(id = 7, nombre = "Lentejas con Arroz", componente = "Leguminosa", imagen = R.drawable.lentejas_arroz),
+        Plato(id = 10, nombre = "Carne Asada con Arepa", componente = "Proteína", imagen = R.drawable.pasta_carne)
     )
-
-    private val platosTarde = mutableListOf(
-        Plato(id = 4, nombre = "Arroz a la valenciana", componente = "Arroz y verduras"),
-        Plato(id = 2, nombre = "Arroz con Pollo Especial", componente = "Pollo especial"),
-        Plato(id = 7, nombre = "Bandeja paisa", componente = "Carne y arroz"),
-        Plato(id = 10, nombre = "Carne asada", componente = "Proteína")
-    )
-
-    private var posicionPlato = 0
 
     enum class Jornada {
         MANANA,
@@ -90,7 +72,7 @@ class InicioJefaActivity : AppCompatActivity() {
         configurarViewPagerCarousel()
         configurarNavegacionInferior()
 
-        actualizarPantalla()
+        actualizarResumen()
         cargarPlatosYMenusDelBackend()
     }
 
@@ -108,14 +90,9 @@ class InicioJefaActivity : AppCompatActivity() {
         binding.txtSaludo.text = "Hola, $nombre"
 
         val fecha = SimpleDateFormat("EEEE, d 'de' MMMM", Locale.forLanguageTag("es-CO")).format(Date())
-        binding.txtFecha.text = "Hoy es $fecha"
-        val nombre = com.example.movilmanupuladora.utils.SessionManager(this).getUserName() ?: "Jefa"
-        binding.txtSaludo.text = "Hola, $nombre"
-
-        actualizarFecha()
+        binding.txtFecha.text = "Hoy es ${fecha.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }}"
 
         seleccionarJornada(Jornada.MANANA)
-        actualizarResumen()
     }
 
     // =========================================================
@@ -155,6 +132,8 @@ class InicioJefaActivity : AppCompatActivity() {
                 actualizarIndicadorPuntos(position, platosActuales.size)
             }
         })
+
+        actualizarIndicadorPuntos(0, platosActuales.size)
     }
 
     private fun actualizarIndicadorPuntos(position: Int, total: Int) {
@@ -195,7 +174,7 @@ class InicioJefaActivity : AppCompatActivity() {
             startActivity(Intent(this, AsistenciaJefaActivity::class.java))
         }
 
-        // Mis Preparaciones -> Historial/Preparaciones Jefa
+        // Mis Preparaciones -> Historial Preparaciones Jefa
         binding.cardMisPreparaciones.setOnClickListener {
             startActivity(Intent(this, HistorialPreparacionesActivity::class.java))
         }
@@ -222,167 +201,6 @@ class InicioJefaActivity : AppCompatActivity() {
         // Jornada Mañana / Tarde
         binding.btnManana.setOnClickListener { seleccionarJornada(Jornada.MANANA) }
         binding.btnTarde.setOnClickListener { seleccionarJornada(Jornada.TARDE) }
-        val plato = platos[posicionPlato]
-
-        platoSeleccionado = true
-        sessionManager.savePlatoSeleccionado(plato.nombre, plato.id)
-
-        binding.txtNombrePlato.text =
-            plato.nombre
-
-        binding.txtEstado.text =
-            "Seleccionado"
-
-        binding.txtEstado.setBackgroundResource(
-            R.drawable.bg_icono_verde
-        )
-
-        binding.txtEstado.setTextColor(
-            getColor(R.color.negro_principal)
-        )
-
-        binding.txtEstadoResumen.text =
-            "Listo para preparar"
-
-        binding.txtEstadoResumen.setTextColor(
-            getColor(R.color.verde_prinpipal)
-        )
-
-        binding.btnSeleccionarPlato.text =
-            "Plato seleccionado"
-
-        mostrarMensaje(
-            "${plato.nombre} seleccionado"
-        )
-    }
-
-    // =========================================================
-    // ESTADO
-    // =========================================================
-
-    private fun actualizarEstado() {
-
-        if (platoSeleccionado) {
-
-            binding.txtEstado.text =
-                "Seleccionado"
-
-            binding.txtEstadoResumen.text =
-                "Listo para preparar"
-
-            return
-        }
-
-        binding.txtEstado.text =
-            "Pendiente"
-
-        binding.txtEstado.setBackgroundResource(
-            R.drawable.bg_estado
-        )
-
-        binding.txtEstadoResumen.text =
-            "Pendiente"
-
-        binding.txtEstadoResumen.setTextColor(
-            getColor(R.color.rojo_principal)
-        )
-
-        binding.btnSeleccionarPlato.text =
-            "Seleccionar plato"
-    }
-
-    // =========================================================
-    // RESUMEN
-    // =========================================================
-
-    private fun actualizarResumen() {
-
-        // Estos valores posteriormente pueden venir
-        // de Firebase.
-
-        val guardados = if (jornadaSeleccionada == Jornada.MANANA) {
-            AsistenciaManager.obtenerManana(this)
-        } else {
-            AsistenciaManager.obtenerTarde(this)
-        }
-        val cantidadNinos = if (guardados > 0) guardados else 120
-
-        binding.txtNinos.text =
-            "$cantidadNinos niños"
-
-        binding.txtPreparaciones.text =
-            "$preparacionesTotales platos"
-
-        binding.txtEstadoResumen.text =
-            if (platoSeleccionado) {
-                "Listo para preparar"
-            } else {
-                "Pendiente"
-            }
-    }
-
-    // =========================================================
-    // EVOLUCIÓN DEL ALMUERZO
-    // =========================================================
-
-    private fun actualizarEvolucion() {
-
-        val pendientes =
-            preparacionesTotales -
-                    preparacionesCompletadas -
-                    preparacionesEnCurso
-
-        binding.txtPendientesEvolucion.text =
-            pendientes.coerceAtLeast(0).toString()
-
-        binding.txtEnPreparacionEvolucion.text =
-            preparacionesEnCurso.toString()
-
-        binding.txtCompletadasEvolucion.text =
-            preparacionesCompletadas.toString()
-
-        binding.txtDetalleEvolucion.text =
-            "$preparacionesCompletadas de " +
-                    "$preparacionesTotales preparaciones completadas"
-
-        val progreso =
-            preparacionesCompletadas.toFloat() /
-                    preparacionesTotales.toFloat()
-
-        actualizarBarraProgreso(progreso)
-
-        binding.txtEstadoEvolucion.text =
-            when {
-
-                preparacionesCompletadas >= preparacionesTotales ->
-                    "Preparación completada"
-
-                preparacionesEnCurso > 0 ->
-                    "Preparación en curso"
-
-                else ->
-                    "Preparación pendiente"
-            }
-    }
-
-    // =========================================================
-    // BARRA EVOLUCIÓN
-    // =========================================================
-
-    private fun actualizarBarraProgreso(
-        progreso: Float
-    ) {
-
-        val porcentaje =
-            progreso.coerceIn(0f, 1f)
-
-        val restante =
-            1f - porcentaje
-
-        binding.progresoEvolucion.layoutParams =
-            binding.progresoEvolucion.layoutParams.apply {
-
-                width = 0
 
         // Botón "Seleccionar este plato"
         binding.btnSeleccionarPlato.setOnClickListener {
@@ -424,6 +242,7 @@ class InicioJefaActivity : AppCompatActivity() {
         }
 
         configurarViewPagerCarousel()
+        actualizarResumen()
     }
 
     private fun obtenerPlatos(): List<Plato> {
@@ -438,10 +257,6 @@ class InicioJefaActivity : AppCompatActivity() {
         }
         val cantidadNinos = if (guardados > 0) guardados else 120
         binding.txtNinos.text = "$cantidadNinos niños asistirán hoy"
-    }
-
-    private fun actualizarPantalla() {
-        actualizarResumen()
     }
 
     private fun configurarNavegacionInferior() {
@@ -463,62 +278,19 @@ class InicioJefaActivity : AppCompatActivity() {
 
                     for (p in lista) {
                         val nombre = p.nombrePlato ?: "Plato del día"
-                        val plato = Plato(id = p.idPlato, nombre = nombre, componente = p.componente)
-                        if (p.idSeccion == 1) tempManana.add(plato) else tempTarde.add(plato)
-                    }
-
-                    if (tempManana.isNotEmpty()) {
-                        platosManana.clear()
-                        platosManana.addAll(tempManana)
-                    }
-                    if (tempTarde.isNotEmpty()) {
-                        platosTarde.clear()
-                        platosTarde.addAll(tempTarde)
-                    }
-
-                    configurarViewPagerCarousel()
-                }
-            } catch (e: Exception) {
-                // Conserva platos locales de respaldo
-            }
-        }
-    }
-}
-
-    // =========================================================
-    // MENSAJE
-    // =========================================================
-
-    private fun mostrarMensaje(
-        mensaje: String
-    ) {
-
-        Toast.makeText(
-            this,
-            mensaje,
-            Toast.LENGTH_SHORT
-        ).show()
-    }
-
-    // =========================================================
-    // CARGAR PLATOS Y MENÚS DEL BACKEND
-    // =========================================================
-
-    private fun cargarPlatosYMenusDelBackend() {
-        lifecycleScope.launch {
-            try {
-                val platosRes = menuRepository.obtenerPlatos()
-                if (platosRes.isSuccessful && !platosRes.body().isNullOrEmpty()) {
-                    val lista = platosRes.body()!!
-                    val tempManana = mutableListOf<Plato>()
-                    val tempTarde = mutableListOf<Plato>()
-
-                    for (p in lista) {
-                        val nombre = p.nombrePlato ?: "Plato del día"
+                        val imagenRes = when {
+                            nombre.lowercase().contains("arroz") -> R.drawable.arroz_pollo
+                            nombre.lowercase().contains("pan") || nombre.lowercase().contains("desayuno") -> R.drawable.comida_desayuno
+                            nombre.lowercase().contains("paisa") -> R.drawable.bandeja_paisa
+                            nombre.lowercase().contains("pasta") || nombre.lowercase().contains("carne") -> R.drawable.pasta_carne
+                            nombre.lowercase().contains("lenteja") -> R.drawable.lentejas_arroz
+                            else -> R.drawable.pollo_guisado
+                        }
                         val plato = Plato(
                             id = p.idPlato,
                             nombre = nombre,
-                            componente = p.componente
+                            componente = p.componente,
+                            imagen = imagenRes
                         )
                         when (p.idSeccion) {
                             1 -> tempManana.add(plato)
@@ -539,12 +311,12 @@ class InicioJefaActivity : AppCompatActivity() {
                         platosTarde.addAll(tempTarde)
                     }
 
-                    actualizarPlato()
+                    configurarViewPagerCarousel()
                 }
 
                 val menuRes = menuRepository.obtenerMenus()
                 if (menuRes.isSuccessful && !menuRes.body().isNullOrEmpty()) {
-                    val fechaHoy = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+                    val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
                     val menuHoy = menuRes.body()!!.find { it.fecha == fechaHoy } ?: menuRes.body()!!.last()
                     menuHoy.informacion_nutricional?.let { info ->
                         if (info.isNotBlank()) {

@@ -1,7 +1,5 @@
 package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
-import com.example.movilmanupuladora.R
-
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -19,38 +17,18 @@ import com.example.movilmanupuladora.data.model.menus
 import com.example.movilmanupuladora.data.repository.MenuRepository
 import com.example.movilmanupuladora.databinding.ActivityCalendarioMenuBinding
 import kotlinx.coroutines.launch
-import androidx.lifecycle.lifecycleScope
-import com.example.movilmanupuladora.data.api.RetrofitClient
-import com.example.movilmanupuladora.data.repository.MenuRepository
-import kotlinx.coroutines.launch
-import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.example.movilmanupuladora.databinding.ActivityCalendarioMenuBinding
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
 import java.util.Locale
 
 class CalendarioMenuActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCalendarioMenuBinding
 
-    private val calendario = Calendar.getInstance()
     private var diaSeleccionado: Calendar = Calendar.getInstance()
-
     private val menuRepository = MenuRepository(RetrofitClient.apiService)
     private val listaMenus = mutableListOf<menus>()
-
-    // Días de la tira horizontal (7 días de la semana actual)
     private val listaDiasSemana = mutableListOf<Calendar>()
-    private val menuRepository = MenuRepository(RetrofitClient.apiService)
-    private val listaMenus = mutableListOf<com.example.movilmanupuladora.data.model.menus>()
-
-
-    // =========================================================
-    // ON CREATE
-    // =========================================================
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,12 +47,6 @@ class CalendarioMenuActivity : AppCompatActivity() {
         configurarBotones()
         generarTiraDiasSemana()
         mostrarInformacionDia()
-
-        configurarCalendario()
-
-        configurarNavegacionInferior()
-
-        mostrarMesActual()
         cargarMenusDelBackend()
     }
 
@@ -109,7 +81,7 @@ class CalendarioMenuActivity : AppCompatActivity() {
             val fechaDia = calBase.clone() as Calendar
             listaDiasSemana.add(fechaDia)
 
-            val isSelected = esMismodia(fechaDia, diaSeleccionado)
+            val isSelected = esMismoDia(fechaDia, diaSeleccionado)
 
             val cardDia = com.google.android.material.card.MaterialCardView(this).apply {
                 radius = (14 * resources.displayMetrics.density)
@@ -142,7 +114,7 @@ class CalendarioMenuActivity : AppCompatActivity() {
 
             val tvNumDia = TextView(this).apply {
                 text = SimpleDateFormat("dd", Locale.getDefault()).format(fechaDia.time)
-                setTextColor(if (isSelected) Color.parseColor("#1B3317") else Color.parseColor("#1B3317"))
+                setTextColor(Color.parseColor("#1B3317"))
                 textSize = 16f
                 setTypeface(typeface, android.graphics.Typeface.BOLD)
             }
@@ -162,7 +134,7 @@ class CalendarioMenuActivity : AppCompatActivity() {
         }
     }
 
-    private fun esMismodia(cal1: Calendar, cal2: Calendar): Boolean {
+    private fun esMismoDia(cal1: Calendar, cal2: Calendar): Boolean {
         return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
                 cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
     }
@@ -179,73 +151,6 @@ class CalendarioMenuActivity : AppCompatActivity() {
         val textoLargo = formatoLargo.format(diaSeleccionado.time).replaceFirstChar { it.uppercase() }
         val textoPill = formatoPill.format(diaSeleccionado.time)
         val fechaIso = formatoIso.format(diaSeleccionado.time)
-        val fecha = diaSeleccionado ?: return
-
-        val formato = SimpleDateFormat(
-            "EEEE, dd 'de' MMMM 'de' yyyy",
-            Locale("es", "ES")
-        )
-        val formatoIso = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val fechaIso = formatoIso.format(fecha.time)
-
-        val textoFecha = formato.format(fecha.time).replaceFirstChar { it.uppercase() }
-
-        binding.txtTituloDia.text = textoFecha
-        binding.txtFechaSeleccionada.text = textoFecha
-
-        val menuDia = listaMenus.find { it.fecha == fechaIso }
-        if (menuDia != null) {
-            val infoNutricional = menuDia.informacion_nutricional ?: "Estándar PAE"
-            val ninos = menuDia.ninos_presentes ?: 0
-            val estado = menuDia.estado ?: "Planificado"
-
-            binding.txtPlatoManana.text = "Mañana: Menú #${menuDia.id_menu} ($estado)"
-            binding.txtPlatoTarde.text = "Información: $infoNutricional ($ninos niños)"
-        } else {
-            binding.txtPlatoManana.text = "Mañana: Sin menú programado en el servidor"
-            binding.txtPlatoTarde.text = "Tarde: Sin menú programado en el servidor"
-        }
-    }
-
-
-    // =========================================================
-    // SELECCIONAR HISTORIAL
-    // =========================================================
-
-    private fun seleccionarHistorial() {
-
-        binding.btnHistorial.backgroundTintList =
-            ColorStateList.valueOf(
-                ContextCompat.getColor(
-                    this,
-                    R.color.amarillo_principal
-                )
-            )
-
-        binding.btnHistorial.setTextColor(
-            ContextCompat.getColor(
-                this,
-                R.color.blanco
-            )
-        )
-
-
-        binding.btnProgramar.backgroundTintList =
-            ColorStateList.valueOf(
-                ContextCompat.getColor(
-                    this,
-                    R.color.gris_claro
-                )
-            )
-
-        binding.btnProgramar.setTextColor(
-            ContextCompat.getColor(
-                this,
-                R.color.negro_principal
-            )
-        )
-    }
-
 
         binding.txtTituloDia.text = textoLargo
         binding.txtFechaSeleccionada.text = textoPill
@@ -304,26 +209,6 @@ class CalendarioMenuActivity : AppCompatActivity() {
                 }
             } catch (e: Exception) {
                 // Mantiene datos locales de respaldo si no hay red
-            }
-        }
-    }
-
-    // =========================================================
-    // CARGAR MENÚS DEL BACKEND
-    // =========================================================
-
-    private fun cargarMenusDelBackend() {
-        lifecycleScope.launch {
-            try {
-                val res = menuRepository.obtenerMenus()
-                if (res.isSuccessful && !res.body().isNullOrEmpty()) {
-                    listaMenus.clear()
-                    listaMenus.addAll(res.body()!!)
-                    actualizarSeleccionVisual()
-                    mostrarInformacionDia()
-                }
-            } catch (e: Exception) {
-                // Modo offline si falla la conexión
             }
         }
     }
