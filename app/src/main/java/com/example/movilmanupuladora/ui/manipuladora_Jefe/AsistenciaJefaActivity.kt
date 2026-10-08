@@ -1,8 +1,7 @@
 package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
-import com.example.movilmanupuladora.R
-
 import android.app.AlertDialog
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -43,18 +42,11 @@ class AsistenciaJefaActivity : AppCompatActivity() {
 
     private var idAsistenciaManana: Int? = null
     private var idAsistenciaTarde: Int? = null
-    private var gradoId: Int = 9
+    private var gradoId: Int = 9 // Default a grado existente
 
     // Constantes de gramaje PAE (en kilogramos por estudiante)
     private val GRAMAJE_KG_PRIMARIA = 0.25 // 250g
     private val GRAMAJE_KG_SECUNDARIA = 0.38 // 380g
-
-    private val fechaHoy: String
-        get() = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-
-    private var idAsistenciaManana: Int? = null
-    private var idAsistenciaTarde: Int? = null
-    private var gradoId: Int = 9 // Default a grado existente
 
     private val fechaHoy: String
         get() = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
@@ -98,7 +90,6 @@ class AsistenciaJefaActivity : AppCompatActivity() {
         val totalManana = AsistenciaManager.obtenerManana(this)
         val totalTarde = AsistenciaManager.obtenerTarde(this)
 
-        // Asignación estimada si viene de guardado simple previa
         if (totalManana > 0) {
             primariaManana = (totalManana * 0.6).toInt()
             secundariaManana = totalManana - primariaManana
@@ -107,8 +98,6 @@ class AsistenciaJefaActivity : AppCompatActivity() {
             primariaTarde = (totalTarde * 0.6).toInt()
             secundariaTarde = totalTarde - primariaTarde
         }
-        asistenciaManana = AsistenciaManager.obtenerManana(this)
-        asistenciaTarde = AsistenciaManager.obtenerTarde(this)
     }
 
     // =========================================================
@@ -141,17 +130,12 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                             val total = registro.ninosPresentes
                             primariaTarde = (total * 0.6).toInt()
                             secundariaTarde = total - primariaTarde
-                            asistenciaManana = registro.ninosPresentes
-                            idAsistenciaManana = registro.idAsistencia
-                        } else {
-                            asistenciaTarde = registro.ninosPresentes
                             idAsistenciaTarde = registro.idAsistencia
                         }
                         actualizarInterfaz()
                     }
                 }
             } catch (e: Exception) {
-                // Silencioso en error de red
                 // Si falla la red, conserva los datos locales cargados
             }
         }
@@ -199,28 +183,17 @@ class AsistenciaJefaActivity : AppCompatActivity() {
     private fun actualizarBotonesJornada() {
         val amarillo = ContextCompat.getColor(this, R.color.amarillo_principal)
         val gris = ContextCompat.getColor(this, R.color.gris_claro)
-        val blanco = ContextCompat.getColor(this, R.color.blanco)
         val negro = ContextCompat.getColor(this, R.color.negro_principal)
 
         if (jornadaActual == "MANANA") {
-            binding.btnManana.backgroundTintList = android.content.res.ColorStateList.valueOf(amarillo)
-            binding.btnManana.setTextColor(negro)
-
-            binding.btnTarde.backgroundTintList = android.content.res.ColorStateList.valueOf(ContextCompat.getColor(this, R.color.gris_claro))
-            binding.btnTarde.setTextColor(negro)
-        } else {
-            binding.btnTarde.backgroundTintList = android.content.res.ColorStateList.valueOf(amarillo)
-            binding.btnTarde.setTextColor(negro)
-
-            binding.btnManana.backgroundTintList = android.content.res.ColorStateList.valueOf(ContextCompat.getColor(this, R.color.gris_claro))
             binding.btnManana.backgroundTintList = ColorStateList.valueOf(amarillo)
-            binding.btnManana.setTextColor(blanco)
+            binding.btnManana.setTextColor(negro)
 
             binding.btnTarde.backgroundTintList = ColorStateList.valueOf(gris)
             binding.btnTarde.setTextColor(negro)
         } else {
             binding.btnTarde.backgroundTintList = ColorStateList.valueOf(amarillo)
-            binding.btnTarde.setTextColor(blanco)
+            binding.btnTarde.setTextColor(negro)
 
             binding.btnManana.backgroundTintList = ColorStateList.valueOf(gris)
             binding.btnManana.setTextColor(negro)
@@ -250,31 +223,6 @@ class AsistenciaJefaActivity : AppCompatActivity() {
     }
 
     private fun obtenerAsistenciaActualPorGrado(): Pair<Int, Int> {
-        val cantidad = obtenerCantidadActual()
-        binding.txtJornadaActual.text = "Jornada: ${obtenerNombreJornada()}"
-
-        if (cantidad > 0) {
-            binding.txtCantidadAsistencia.text = "$cantidad niños"
-            binding.txtEstadoAsistencia.text = "Registrada en el servidor"
-            binding.txtEstadoAsistencia.setTextColor(
-                ContextCompat.getColor(this, R.color.negro_principal)
-            )
-            binding.btnRegistrarAsistencia.text = "Actualizar asistencia"
-        } else {
-            binding.txtCantidadAsistencia.text = "Sin registrar"
-            binding.txtEstadoAsistencia.text = "Pendiente"
-            binding.txtEstadoAsistencia.setTextColor(
-                ContextCompat.getColor(this, R.color.rojo_principal)
-            )
-            binding.btnRegistrarAsistencia.text = "Registrar asistencia"
-        }
-    }
-
-    // =========================================================
-    // OBTENER CANTIDAD ACTUAL
-    // =========================================================
-
-    private fun obtenerCantidadActual(): Int {
         return if (jornadaActual == "MANANA") {
             Pair(primariaManana, secundariaManana)
         } else {
@@ -298,7 +246,6 @@ class AsistenciaJefaActivity : AppCompatActivity() {
         val txtTotalCalc = vistaDialogo.findViewById<TextView>(R.id.txtTotalEstudiantesCalculado)
         val txtGramajeCalc = vistaDialogo.findViewById<TextView>(R.id.txtGramajeTotalEstimado)
 
-        val edtCantidad = vistaDialogo.findViewById<EditText>(R.id.edtCantidadAsistencia)
         val btnCancelar = vistaDialogo.findViewById<Button>(R.id.btnCancelarAsistencia)
         val btnGuardar = vistaDialogo.findViewById<Button>(R.id.btnGuardarAsistencia)
 
@@ -324,13 +271,6 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                 recalcularCalculosModal()
             }
             override fun afterTextChanged(s: Editable?) {}
-        edtCantidad.inputType = InputType.TYPE_CLASS_NUMBER
-        edtCantidad.filters = arrayOf(InputFilter.LengthFilter(3))
-
-        val cantidadActual = obtenerCantidadActual()
-        if (cantidadActual > 0) {
-            edtCantidad.setText(cantidadActual.toString())
-            edtCantidad.setSelection(edtCantidad.text.length)
         }
 
         edtPrimaria.addTextChangedListener(watcher)
@@ -351,13 +291,11 @@ class AsistenciaJefaActivity : AppCompatActivity() {
             val total = p + s
 
             if (total <= 0) {
-                Toast.makeText(this, "Ingresa al menos un estudiante en Primaria o Secundaria", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@AsistenciaJefaActivity, "Ingresa al menos un estudiante en Primaria o Secundaria", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             guardarAsistenciaEnBackend(p, s, total, dialog, btnGuardar)
-            val texto = edtCantidad.text.toString().trim()
-            guardarAsistenciaEnBackend(texto, dialog, btnGuardar)
         }
 
         dialog.show()
@@ -379,21 +317,6 @@ class AsistenciaJefaActivity : AppCompatActivity() {
         dialog: AlertDialog,
         btnGuardar: Button
     ) {
-        texto: String,
-        dialog: AlertDialog,
-        btnGuardar: Button
-    ) {
-        if (texto.isEmpty()) {
-            Toast.makeText(this, "Ingresa la cantidad de niños", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val cantidad = texto.toIntOrNull()
-        if (cantidad == null || cantidad <= 0) {
-            Toast.makeText(this, "La cantidad debe ser mayor que cero", Toast.LENGTH_SHORT).show()
-            return
-        }
-
         btnGuardar.isEnabled = false
         btnGuardar.text = "Guardando..."
 
@@ -407,7 +330,6 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                     idGrado = gradoId,
                     fecha = fechaHoy,
                     ninosPresentes = total,
-                    ninosPresentes = cantidad,
                     idUsuarioManipuladora = userId
                 )
 
@@ -430,13 +352,6 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                         secundariaTarde = secundaria
                         idAsistenciaTarde = nueva.idAsistencia
                         AsistenciaManager.guardarTarde(this@AsistenciaJefaActivity, total)
-                        asistenciaManana = nueva.ninosPresentes
-                        idAsistenciaManana = nueva.idAsistencia
-                        AsistenciaManager.guardarManana(this@AsistenciaJefaActivity, cantidad)
-                    } else {
-                        asistenciaTarde = nueva.ninosPresentes
-                        idAsistenciaTarde = nueva.idAsistencia
-                        AsistenciaManager.guardarTarde(this@AsistenciaJefaActivity, cantidad)
                     }
 
                     actualizarDatosAsistencia()
@@ -447,25 +362,15 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                         this@AsistenciaJefaActivity,
                         "¡Asistencia de $total estudiantes registrada! Gramaje PAE: ${String.format(Locale.US, "%.1f", gramajeTotal)} kg",
                         Toast.LENGTH_LONG
-                    Toast.makeText(
-                        this@AsistenciaJefaActivity,
-                        "¡Asistencia de $cantidad niños guardada en el backend!",
-                        Toast.LENGTH_SHORT
                     ).show()
                 } else {
                     btnGuardar.isEnabled = true
                     btnGuardar.text = "Guardar"
-                    Toast.makeText(this@AsistenciaJefaActivity, "Error al guardar en el servidor", Toast.LENGTH_SHORT).show()
-                    Toast.makeText(
-                        this@AsistenciaJefaActivity,
-                        "Error al guardar (${response.code()}): Verifique su conexión",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Toast.makeText(this@AsistenciaJefaActivity, "Error al guardar en el servidor (${response.code()})", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 btnGuardar.isEnabled = true
                 btnGuardar.text = "Guardar"
-                Toast.makeText(this@AsistenciaJefaActivity, "Error de red al guardar", Toast.LENGTH_SHORT).show()
                 Toast.makeText(
                     this@AsistenciaJefaActivity,
                     "Error de red: ${e.localizedMessage ?: "No se pudo conectar"}",
@@ -477,10 +382,5 @@ class AsistenciaJefaActivity : AppCompatActivity() {
 
     private fun obtenerNombreJornada(): String {
         return if (jornadaActual == "MANANA") "Mañana" else "Tarde"
-        return if (jornadaActual == "MANANA") {
-            "Mañana"
-        } else {
-            "Tarde"
-        }
     }
 }
