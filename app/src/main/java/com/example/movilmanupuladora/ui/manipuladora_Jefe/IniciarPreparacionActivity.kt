@@ -64,13 +64,18 @@ class IniciarPreparacionActivity : AppCompatActivity() {
         val jornadaIntent = intent.getStringExtra("jornada") ?: "Mañana"
         findViewById<TextView>(R.id.txtJornada)?.text = "Jornada: $jornadaIntent"
 
-        val guardados = if (jornadaIntent.contains("Mañana", ignoreCase = true)) {
+        val p = AsistenciaManager.obtenerPrimaria(this)
+        val s = AsistenciaManager.obtenerSecundaria(this)
+        val suma = p + s
+        val guardados = if (suma > 0) {
+            suma
+        } else if (jornadaIntent.contains("Mañana", ignoreCase = true)) {
             AsistenciaManager.obtenerManana(this)
         } else {
             AsistenciaManager.obtenerTarde(this)
         }
 
-        val ninos = if (guardados > 0) guardados else 120
+        val ninos = if (guardados > 0) guardados else 0
         txtCantidadNinos.text = "$ninos niños"
         txtCantidadManipuladoras.text = "2 operarias"
     }
