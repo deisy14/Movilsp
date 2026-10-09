@@ -300,13 +300,22 @@ class InicioJefaActivity : AppCompatActivity() {
     }
 
     private fun actualizarResumen() {
-        val guardados = if (jornadaSeleccionada == Jornada.MANANA) {
+        val p = AsistenciaManager.obtenerPrimaria(this)
+        val s = AsistenciaManager.obtenerSecundaria(this)
+        val suma = p + s
+        val guardados = if (suma > 0) {
+            suma
+        } else if (jornadaSeleccionada == Jornada.MANANA) {
             AsistenciaManager.obtenerManana(this)
         } else {
             AsistenciaManager.obtenerTarde(this)
         }
-        val cantidadNinos = if (guardados > 0) guardados else 120
-        binding.txtNinos.text = "$cantidadNinos niños asistirán hoy"
+
+        binding.txtNinos.text = if (guardados > 0) {
+            "$guardados niños asistirán hoy (P: $p | S: $s)"
+        } else {
+            "Asistencia de hoy pendiente de registro"
+        }
     }
 
     private fun cargarPlatosYMenusDelBackend() {
