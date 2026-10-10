@@ -48,7 +48,7 @@ class AsistenciaJefaActivity : AppCompatActivity() {
 
     // IDs de grado en el backend
     private var idGradoPrimaria: Int = 16
-    private var idGradoSecundaria: Int = 17
+    private var idGradoSecundaria: Int = 19
 
     // Gramajes PAE oficiales (kg por ración)
     private val GRAMAJE_KG_JARDIN = 0.15
@@ -66,6 +66,7 @@ class AsistenciaJefaActivity : AppCompatActivity() {
 
         asistenciaRepository = AsistenciaRepository(RetrofitClient.apiService)
         sessionManager = SessionManager(this)
+        sessionManager.fetchAuthToken()
 
         configurarFecha()
         cargarAsistenciaGuardada()
@@ -100,12 +101,14 @@ class AsistenciaJefaActivity : AppCompatActivity() {
     private fun cargarAsistenciaDelBackend() {
         lifecycleScope.launch {
             try {
+                sessionManager.fetchAuthToken()
+
                 // 1. Identificar IDs de grados para Primaria y Secundaria
                 val gradosRes = asistenciaRepository.obtenerGrados()
                 if (gradosRes.isSuccessful && !gradosRes.body().isNullOrEmpty()) {
                     val grados = gradosRes.body()!!
                     idGradoPrimaria = grados.find { it.nombreGrado.contains("primaria", ignoreCase = true) }?.idGrado ?: 16
-                    idGradoSecundaria = grados.find { it.nombreGrado.contains("secundaria", ignoreCase = true) }?.idGrado ?: 17
+                    idGradoSecundaria = grados.find { it.nombreGrado.contains("secundaria", ignoreCase = true) }?.idGrado ?: 19
                 }
 
                 // 2. Obtener asistencias de hoy del servidor
@@ -114,8 +117,9 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                     val lista = res.body()!!
                     val registrosHoy = lista.filter { it.fecha == fechaHoy }
 
-                    val regPrimaria = registrosHoy.find { it.idGrado == idGradoPrimaria }
-                    val regSecundaria = registrosHoy.find { it.idGrado == idGradoSecundaria }
+                    // Obtener siempre el registro MÁS RECIENTE para evitar discrepancias
+                    val regPrimaria = registrosHoy.filter { it.idGrado == idGradoPrimaria }.maxByOrNull { it.idAsistencia ?: 0 }
+                    val regSecundaria = registrosHoy.filter { it.idGrado == idGradoSecundaria }.maxByOrNull { it.idAsistencia ?: 0 }
 
                     if (regPrimaria != null) {
                         primariaManana = regPrimaria.ninosPresentes
@@ -128,7 +132,7 @@ class AsistenciaJefaActivity : AppCompatActivity() {
 
                     // Respaldo de registro legacy (por si existía un único registro sin grado asignado)
                     if (regPrimaria == null && regSecundaria == null && registrosHoy.isNotEmpty()) {
-                        val regLegacy = registrosHoy.first()
+                        val regLegacy = registrosHoy.maxByOrNull { it.idAsistencia ?: 0 }!!
                         val total = regLegacy.ninosPresentes
                         primariaManana = (total * 0.6).toInt()
                         secundariaManana = total - primariaManana
@@ -253,40 +257,37 @@ class AsistenciaJefaActivity : AppCompatActivity() {
 
         txtJornada.text = "Jornada: ${obtenerNombreJornada()}"
 
-        val (primActual, secActual) = obtenerAsistenciaActualPorGrado()
-        if (primActual > 0) {
-            val base = primActual / 6
-            edtJardin.setText(base.toString())
-            edtP1.setText(base.toString())
-            edtP2.setText(base.toString())
-            edtP3.setText(base.toString())
-            edtP4.setText(base.toString())
-            edtP5.setText((primActual - (base * 5)).toString())
-        }
-        if (secActual > 0) {
-            val baseS = secActual / 6
-            edtS6.setText(baseS.toString())
-            edtS7.setText(baseS.toString())
-            edtS8.setText(baseS.toString())
-            edtS9.setText(baseS.toString())
-            edtS10.setText(baseS.toString())
-            edtS11.setText((secActual - (baseS * 5)).toString())
-        }
+        // Cargar los valores guardados exactamente como los ingresó la jefa.
+        // Si un grado no tiene clase, ese campo permanecerá vacío ("")
+        val detalle = AsistenciaManager.obtenerDetalleGradosHoy(this)
+        edtJardin.setText(detalle["jar"].orEmpty())
+        edtP1.setText(detalle["p1"].orEmpty())
+        edtP2.setText(detalle["p2"].orEmpty())
+        edtP3.setText(detalle["p3"].orEmpty())
+        edtP4.setText(detalle["p4"].orEmpty())
+        edtP5.setText(detalle["p5"].orEmpty())
+
+        edtS6.setText(detalle["s6"].orEmpty())
+        edtS7.setText(detalle["s7"].orEmpty())
+        edtS8.setText(detalle["s8"].orEmpty())
+        edtS9.setText(detalle["s9"].orEmpty())
+        edtS10.setText(detalle["s10"].orEmpty())
+        edtS11.setText(detalle["s11"].orEmpty())
 
         fun recalcularCalculosModal() {
-            val jar = edtJardin.text.toString().toIntOrNull() ?: 0
-            val p1 = edtP1.text.toString().toIntOrNull() ?: 0
-            val p2 = edtP2.text.toString().toIntOrNull() ?: 0
-            val p3 = edtP3.text.toString().toIntOrNull() ?: 0
-            val p4 = edtP4.text.toString().toIntOrNull() ?: 0
-            val p5 = edtP5.text.toString().toIntOrNull() ?: 0
+            val jar = edtJardin.text.toString().trim().toIntOrNull() ?: 0
+            val p1 = edtP1.text.toString().trim().toIntOrNull() ?: 0
+            val p2 = edtP2.text.toString().trim().toIntOrNull() ?: 0
+            val p3 = edtP3.text.toString().trim().toIntOrNull() ?: 0
+            val p4 = edtP4.text.toString().trim().toIntOrNull() ?: 0
+            val p5 = edtP5.text.toString().trim().toIntOrNull() ?: 0
 
-            val s6 = edtS6.text.toString().toIntOrNull() ?: 0
-            val s7 = edtS7.text.toString().toIntOrNull() ?: 0
-            val s8 = edtS8.text.toString().toIntOrNull() ?: 0
-            val s9 = edtS9.text.toString().toIntOrNull() ?: 0
-            val s10 = edtS10.text.toString().toIntOrNull() ?: 0
-            val s11 = edtS11.text.toString().toIntOrNull() ?: 0
+            val s6 = edtS6.text.toString().trim().toIntOrNull() ?: 0
+            val s7 = edtS7.text.toString().trim().toIntOrNull() ?: 0
+            val s8 = edtS8.text.toString().trim().toIntOrNull() ?: 0
+            val s9 = edtS9.text.toString().trim().toIntOrNull() ?: 0
+            val s10 = edtS10.text.toString().trim().toIntOrNull() ?: 0
+            val s11 = edtS11.text.toString().trim().toIntOrNull() ?: 0
 
             val totalPrimaria = jar + p1 + p2 + p3 + p4 + p5
             val totalSecundaria = s6 + s7 + s8 + s9 + s10 + s11
@@ -329,26 +330,54 @@ class AsistenciaJefaActivity : AppCompatActivity() {
         btnCancelar.setOnClickListener { dialog.dismiss() }
 
         btnGuardar.setOnClickListener {
-            val jar = edtJardin.text.toString().trim().toIntOrNull() ?: 0
-            val p1 = edtP1.text.toString().trim().toIntOrNull() ?: 0
-            val p2 = edtP2.text.toString().trim().toIntOrNull() ?: 0
-            val p3 = edtP3.text.toString().trim().toIntOrNull() ?: 0
-            val p4 = edtP4.text.toString().trim().toIntOrNull() ?: 0
-            val p5 = edtP5.text.toString().trim().toIntOrNull() ?: 0
+            val strJar = edtJardin.text.toString().trim()
+            val strP1 = edtP1.text.toString().trim()
+            val strP2 = edtP2.text.toString().trim()
+            val strP3 = edtP3.text.toString().trim()
+            val strP4 = edtP4.text.toString().trim()
+            val strP5 = edtP5.text.toString().trim()
 
-            val s6 = edtS6.text.toString().trim().toIntOrNull() ?: 0
-            val s7 = edtS7.text.toString().trim().toIntOrNull() ?: 0
-            val s8 = edtS8.text.toString().trim().toIntOrNull() ?: 0
-            val s9 = edtS9.text.toString().trim().toIntOrNull() ?: 0
-            val s10 = edtS10.text.toString().trim().toIntOrNull() ?: 0
-            val s11 = edtS11.text.toString().trim().toIntOrNull() ?: 0
+            val strS6 = edtS6.text.toString().trim()
+            val strS7 = edtS7.text.toString().trim()
+            val strS8 = edtS8.text.toString().trim()
+            val strS9 = edtS9.text.toString().trim()
+            val strS10 = edtS10.text.toString().trim()
+            val strS11 = edtS11.text.toString().trim()
+
+            val jar = strJar.toIntOrNull() ?: 0
+            val p1 = strP1.toIntOrNull() ?: 0
+            val p2 = strP2.toIntOrNull() ?: 0
+            val p3 = strP3.toIntOrNull() ?: 0
+            val p4 = strP4.toIntOrNull() ?: 0
+            val p5 = strP5.toIntOrNull() ?: 0
+
+            val s6 = strS6.toIntOrNull() ?: 0
+            val s7 = strS7.toIntOrNull() ?: 0
+            val s8 = strS8.toIntOrNull() ?: 0
+            val s9 = strS9.toIntOrNull() ?: 0
+            val s10 = strS10.toIntOrNull() ?: 0
+            val s11 = strS11.toIntOrNull() ?: 0
 
             val totalPrimaria = jar + p1 + p2 + p3 + p4 + p5
             val totalSecundaria = s6 + s7 + s8 + s9 + s10 + s11
             val total = totalPrimaria + totalSecundaria
 
-            if (total <= 0) {
-                Toast.makeText(this, "Ingresa al menos un estudiante en algún grado", Toast.LENGTH_SHORT).show()
+            // Persistir los campos vacíos o con números en el gestor local
+            val mapaDetalle = mapOf(
+                "jar" to strJar, "p1" to strP1, "p2" to strP2, "p3" to strP3, "p4" to strP4, "p5" to strP5,
+                "s6" to strS6, "s7" to strS7, "s8" to strS8, "s9" to strS9, "s10" to strS10, "s11" to strS11
+            )
+            AsistenciaManager.guardarDetalleGradosHoy(this@AsistenciaJefaActivity, mapaDetalle)
+
+            if (total == 0) {
+                AlertDialog.Builder(this)
+                    .setTitle("Sin asistencia registrada")
+                    .setMessage("Todos los campos están vacíos (0 estudiantes). ¿Deseas registrar este día como sin asistencia?")
+                    .setPositiveButton("Sí, guardar 0") { _, _ ->
+                        guardarAsistenciaEnBackend(0, 0, 0, dialog, btnGuardar)
+                    }
+                    .setNegativeButton("Cancelar", null)
+                    .show()
                 return@setOnClickListener
             }
 
@@ -375,6 +404,7 @@ class AsistenciaJefaActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
+                sessionManager.fetchAuthToken()
                 val userId = sessionManager.getUserId().takeIf { it > 0 }
                 val idP = if (jornadaActual == "MANANA") idAsistenciaPrimariaManana else idAsistenciaPrimariaTarde
                 val idS = if (jornadaActual == "MANANA") idAsistenciaSecundariaManana else idAsistenciaSecundariaTarde
@@ -434,10 +464,9 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                     actualizarDatosAsistencia()
                     dialog.dismiss()
 
-                    val gramajeTotal = (totalPrimaria * GRAMAJE_KG_PRIMARIA) + (totalSecundaria * GRAMAJE_KG_SECUNDARIA)
                     Toast.makeText(
                         this@AsistenciaJefaActivity,
-                        "¡Asistencia registrada! Primaria: $totalPrimaria | Secundaria: $totalSecundaria (Total: $total)",
+                        "¡Asistencia sincronizada! Primaria: $totalPrimaria | Secundaria: $totalSecundaria (Total: $total)",
                         Toast.LENGTH_LONG
                     ).show()
                 } else {
