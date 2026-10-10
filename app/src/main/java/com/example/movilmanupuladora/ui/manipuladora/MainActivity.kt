@@ -491,11 +491,11 @@ class MainActivity : AppCompatActivity() {
             val asistenciasRes = asistenciaRepository.obtenerAsistencias()
             if (asistenciasRes.isSuccessful && !asistenciasRes.body().isNullOrEmpty()) {
                 val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-                val asistenciasHoy = asistenciasRes.body()!!.filter { it.fecha == fechaHoy }
+                val asistenciasHoy = asistenciasRes.body()!!.filter { it.fecha.trim().startsWith(fechaHoy) }
 
-                // Obtener el registro MÁS RECIENTE de hoy para cada nivel
-                val regPrimaria = asistenciasHoy.filter { it.idGrado == idPrimaria }.maxByOrNull { it.idAsistencia ?: 0 }
-                val regSecundaria = asistenciasHoy.filter { it.idGrado == idSecundaria }.maxByOrNull { it.idAsistencia ?: 0 }
+                // Obtener el registro MÁS RECIENTE de hoy para cada nivel (Primaria: 16, Secundaria: 19)
+                val regPrimaria = asistenciasHoy.filter { it.idGrado == idPrimaria || it.idGrado == 16 }.maxByOrNull { it.idAsistencia ?: 0 }
+                val regSecundaria = asistenciasHoy.filter { it.idGrado == idSecundaria || it.idGrado == 19 }.maxByOrNull { it.idAsistencia ?: 0 }
 
                 var totalPrimaria = regPrimaria?.ninosPresentes ?: 0
                 var totalSecundaria = regSecundaria?.ninosPresentes ?: 0

@@ -115,11 +115,11 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                 val res = asistenciaRepository.obtenerAsistencias()
                 if (res.isSuccessful && res.body() != null) {
                     val lista = res.body()!!
-                    val registrosHoy = lista.filter { it.fecha == fechaHoy }
+                    val registrosHoy = lista.filter { it.fecha.trim().startsWith(fechaHoy) }
 
-                    // Obtener siempre el registro MÁS RECIENTE para evitar discrepancias
-                    val regPrimaria = registrosHoy.filter { it.idGrado == idGradoPrimaria }.maxByOrNull { it.idAsistencia ?: 0 }
-                    val regSecundaria = registrosHoy.filter { it.idGrado == idGradoSecundaria }.maxByOrNull { it.idAsistencia ?: 0 }
+                    // Obtener siempre el registro MÁS RECIENTE para Primaria y Secundaria
+                    val regPrimaria = registrosHoy.filter { it.idGrado == idGradoPrimaria || it.idGrado == 16 }.maxByOrNull { it.idAsistencia ?: 0 }
+                    val regSecundaria = registrosHoy.filter { it.idGrado == idGradoSecundaria || it.idGrado == 19 }.maxByOrNull { it.idAsistencia ?: 0 }
 
                     if (regPrimaria != null) {
                         primariaManana = regPrimaria.ninosPresentes
@@ -417,10 +417,11 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                     ninosPresentes = totalPrimaria,
                     idUsuarioManipuladora = userId
                 )
-                val resP = if (idP != null) {
+                var resP = if (idP != null) {
                     asistenciaRepository.actualizarAsistencia(idP, payloadPrimaria)
-                } else {
-                    asistenciaRepository.registrarAsistencia(payloadPrimaria)
+                } else null
+                if (resP == null || !resP.isSuccessful) {
+                    resP = asistenciaRepository.registrarAsistencia(payloadPrimaria)
                 }
 
                 // 2. Guardar/Actualizar Secundaria
@@ -431,18 +432,19 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                     ninosPresentes = totalSecundaria,
                     idUsuarioManipuladora = userId
                 )
-                val resS = if (idS != null) {
+                var resS = if (idS != null) {
                     asistenciaRepository.actualizarAsistencia(idS, payloadSecundaria)
-                } else {
-                    asistenciaRepository.registrarAsistencia(payloadSecundaria)
+                } else null
+                if (resS == null || !resS.isSuccessful) {
+                    resS = asistenciaRepository.registrarAsistencia(payloadSecundaria)
                 }
 
-                if (resP.isSuccessful || resS.isSuccessful) {
-                    if (resP.isSuccessful && resP.body() != null) {
+                if (resP.isSuccessful && resS.isSuccessful) {
+                    if (resP.body() != null) {
                         if (jornadaActual == "MANANA") idAsistenciaPrimariaManana = resP.body()!!.idAsistencia
                         else idAsistenciaPrimariaTarde = resP.body()!!.idAsistencia
                     }
-                    if (resS.isSuccessful && resS.body() != null) {
+                    if (resS.body() != null) {
                         if (jornadaActual == "MANANA") idAsistenciaSecundariaManana = resS.body()!!.idAsistencia
                         else idAsistenciaSecundariaTarde = resS.body()!!.idAsistencia
                     }
@@ -466,13 +468,15 @@ class AsistenciaJefaActivity : AppCompatActivity() {
 
                     Toast.makeText(
                         this@AsistenciaJefaActivity,
-                        "¡Asistencia sincronizada! Primaria: $totalPrimaria | Secundaria: $totalSecundaria (Total: $total)",
+                        "¡Asistencia sincronizada! Total: $total (Primaria: $totalPrimaria | Secundaria: $totalSecundaria)",
                         Toast.LENGTH_LONG
                     ).show()
                 } else {
                     btnGuardar.isEnabled = true
                     btnGuardar.text = "Guardar"
-                    Toast.makeText(this@AsistenciaJefaActivity, "Error al guardar en el servidor", Toast.LENGTH_SHORT).show()
+                    val errP = if (!resP.isSuccessful) "Primaria: ${resP.code()} " else ""
+                    val errS = if (!resS.isSuccessful) "Secundaria: ${resS.code()}" else ""
+                    Toast.makeText(this@AsistenciaJefaActivity, "Error al guardar en el servidor ($errP$errS)", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 btnGuardar.isEnabled = true
