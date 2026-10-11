@@ -75,11 +75,13 @@ class InicioJefaActivity : AppCompatActivity() {
 
         actualizarPantalla()
         cargarPlatosYMenusDelBackend()
+        cargarAsistenciaDelBackend()
     }
 
     override fun onResume() {
         super.onResume()
         actualizarResumen()
+        cargarAsistenciaDelBackend()
     }
 
     private fun configurarPantalla() {
@@ -302,13 +304,63 @@ class InicioJefaActivity : AppCompatActivity() {
     }
 
     private fun actualizarResumen() {
-        val guardados = if (jornadaSeleccionada == Jornada.MANANA) {
+        val p = AsistenciaManager.obtenerPrimaria(this)
+        val s = AsistenciaManager.obtenerSecundaria(this)
+        val suma = p + s
+        val guardados = if (suma > 0) {
+            suma
+        } else if (jornadaSeleccionada == Jornada.MANANA) {
             AsistenciaManager.obtenerManana(this)
         } else {
             AsistenciaManager.obtenerTarde(this)
         }
-        val cantidadNinos = if (guardados > 0) guardados else 120
-        binding.txtNinos.text = "$cantidadNinos niños asistirán hoy"
+
+        binding.txtNinos.text = if (guardados > 0) {
+            "$guardados niños asistirán hoy (Primaria: $p | Secundaria: $s)"
+        } else {
+            "Asistencia de hoy pendiente de registro"
+        }
+    }
+
+    private fun cargarAsistenciaDelBackend() {
+        lifecycleScope.launch {
+            try {
+                sessionManager.fetchAuthToken()
+                val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+
+                val gradosRes = RetrofitClient.apiService.obtenerGrados()
+                val listaGrados = gradosRes.body().orEmpty()
+                val idPrimaria = listaGrados.find { it.nombreGrado.contains("primaria", ignoreCase = true) }?.idGrado ?: 16
+                val idSecundaria = listaGrados.find { it.nombreGrado.contains("secundaria", ignoreCase = true) }?.idGrado ?: 19
+
+                val asistenciasRes = RetrofitClient.apiService.obtenerAsistenciaDiaria()
+                if (asistenciasRes.isSuccessful && !asistenciasRes.body().isNullOrEmpty()) {
+                    val asistenciasHoy = asistenciasRes.body()!!.filter { it.fecha.trim().startsWith(fechaHoy) }
+
+                    val regPrimaria = asistenciasHoy.filter { it.idGrado == idPrimaria || it.idGrado == 16 }.maxByOrNull { it.idAsistencia ?: 0 }
+                    val regSecundaria = asistenciasHoy.filter { it.idGrado == idSecundaria || it.idGrado == 19 }.maxByOrNull { it.idAsistencia ?: 0 }
+
+                    var p = regPrimaria?.ninosPresentes ?: AsistenciaManager.obtenerPrimaria(this@InicioJefaActivity)
+                    var s = regSecundaria?.ninosPresentes ?: AsistenciaManager.obtenerSecundaria(this@InicioJefaActivity)
+
+                    if (regPrimaria == null && regSecundaria == null && asistenciasHoy.isNotEmpty()) {
+                        val regLegacy = asistenciasHoy.maxByOrNull { it.idAsistencia ?: 0 }!!
+                        val tot = regLegacy.ninosPresentes
+                        p = (tot * 0.6).toInt()
+                        s = tot - p
+                    }
+
+                    val total = p + s
+                    AsistenciaManager.guardarPrimaria(this@InicioJefaActivity, p)
+                    AsistenciaManager.guardarSecundaria(this@InicioJefaActivity, s)
+                    AsistenciaManager.guardarManana(this@InicioJefaActivity, total)
+
+                    actualizarResumen()
+                }
+            } catch (e: Exception) {
+                // Si no hay conexión, se mantiene el resumen local
+            }
+        }
     }
 
     private fun actualizarPantalla() {

@@ -13,6 +13,7 @@ import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.model.DetallePlato
 import com.example.movilmanupuladora.data.model.PlatoResponse
 import com.example.movilmanupuladora.data.model.SeccionMenu
+import com.example.movilmanupuladora.data.repository.AsistenciaRepository
 import com.example.movilmanupuladora.data.repository.MenuRepository
 import com.example.movilmanupuladora.databinding.ActivityMainBinding
 import com.example.movilmanupuladora.databinding.DialogDetallePlatoBinding
@@ -21,6 +22,9 @@ import com.example.movilmanupuladora.ui.manipuladora_Jefe.AsistenciaManager
 import com.example.movilmanupuladora.utils.NavigationHelper
 import com.example.movilmanupuladora.utils.SessionManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -31,6 +35,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private val menuRepository = MenuRepository(RetrofitClient.apiService)
+    private val asistenciaRepository = AsistenciaRepository(RetrofitClient.apiService)
+    private var jobPollingAsistencia: Job? = null
 
     private var listaPlatos: List<PlatoResponse> = emptyList()
     private var listaSecciones: List<SeccionMenu> = emptyList()
@@ -120,6 +126,11 @@ class MainActivity : AppCompatActivity() {
 
         configurarMenusAnteriores()
 
+        // Configurar tarjeta de asistencia de estudiantes
+        cargarAsistenciaLocal()
+        configurarCardAsistencia()
+
+        // Configurar barra de navegación inferior
         NavigationHelper.setupBarraNavegacion(
             this,
             binding.barraNavegacion,
@@ -167,6 +178,28 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+        iniciarPollingAsistenciaEnVivo()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        jobPollingAsistencia?.cancel()
+    }
+
+    private fun iniciarPollingAsistenciaEnVivo() {
+        jobPollingAsistencia?.cancel()
+        jobPollingAsistencia = lifecycleScope.launch {
+            while (isActive) {
+                cargarAsistenciaBackend()
+                // Polling cada 4 segundos para reflejar la asistencia de la jefa en tiempo real
+                delay(4000)
+            }
+        }
+    }
+
+    // =========================================================
+    // BOTONES DE JORNADA (MAÑANA Y TARDE)
+    // =========================================================
 
     private fun configurarBotonesJornadaInicio() {
         binding.btnJornadaManana.setOnClickListener {
@@ -429,12 +462,124 @@ class MainActivity : AppCompatActivity() {
 
                 actualizarInformacionSeccion()
                 configurarMenusAnteriores()
+                cargarAsistenciaBackend()
 
             } catch (e: Exception) {
                 Log.e("BACKEND_SIRAE", "Error al conectar con el servidor: ${e.message}")
             }
         }
     }
+
+    // =========================================================
+    // CONSUMO DE ASISTENCIA DIARIA (GET API SIRAE EN TIEMPO REAL)
+    // =========================================================
+
+    private suspend fun cargarAsistenciaBackend() {
+        try {
+            SessionManager.getToken(this@MainActivity)
+
+            // 1. Obtener lista de grados del backend
+            val gradosRes = asistenciaRepository.obtenerGrados()
+            val listaGrados = gradosRes.body().orEmpty()
+            val idPrimaria = listaGrados.find { it.nombreGrado.contains("primaria", ignoreCase = true) }?.idGrado ?: 16
+            val idSecundaria = listaGrados.find { it.nombreGrado.contains("secundaria", ignoreCase = true) }?.idGrado ?: 19
+
+            // 2. Obtener asistencias del servidor
+            val asistenciasRes = asistenciaRepository.obtenerAsistencias()
+            if (asistenciasRes.isSuccessful && !asistenciasRes.body().isNullOrEmpty()) {
+                val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                val asistenciasHoy = asistenciasRes.body()!!.filter { it.fecha.trim().startsWith(fechaHoy) }
+
+                // Obtener el registro MÁS RECIENTE de hoy para cada nivel (Primaria: 16, Secundaria: 19)
+                val regPrimaria = asistenciasHoy.filter { it.idGrado == idPrimaria || it.idGrado == 16 }.maxByOrNull { it.idAsistencia ?: 0 }
+                val regSecundaria = asistenciasHoy.filter { it.idGrado == idSecundaria || it.idGrado == 19 }.maxByOrNull { it.idAsistencia ?: 0 }
+
+                var totalPrimaria = regPrimaria?.ninosPresentes ?: 0
+                var totalSecundaria = regSecundaria?.ninosPresentes ?: 0
+
+                // Soporte para registro general legacy si no venía discriminado por grado
+                if (regPrimaria == null && regSecundaria == null && asistenciasHoy.isNotEmpty()) {
+                    val regLegacy = asistenciasHoy.maxByOrNull { it.idAsistencia ?: 0 }!!
+                    val tot = regLegacy.ninosPresentes
+                    totalPrimaria = (tot * 0.6).toInt()
+                    totalSecundaria = tot - totalPrimaria
+                }
+
+                val totalEstudiantes = totalPrimaria + totalSecundaria
+
+                // Persistir en cache local para acceso offline
+                AsistenciaManager.guardarPrimaria(this@MainActivity, totalPrimaria)
+                AsistenciaManager.guardarSecundaria(this@MainActivity, totalSecundaria)
+                AsistenciaManager.guardarManana(this@MainActivity, totalEstudiantes)
+
+                actualizarVistaAsistencia(
+                    primaria = totalPrimaria,
+                    secundaria = totalSecundaria,
+                    total = totalEstudiantes,
+                    hayRegistro = (regPrimaria != null || regSecundaria != null || asistenciasHoy.isNotEmpty())
+                )
+            } else {
+                cargarAsistenciaLocal()
+            }
+        } catch (e: Exception) {
+            cargarAsistenciaLocal()
+        }
+    }
+
+    private fun cargarAsistenciaLocal() {
+        val p = AsistenciaManager.obtenerPrimaria(this)
+        val s = AsistenciaManager.obtenerSecundaria(this)
+        val total = p + s
+        actualizarVistaAsistencia(p, s, total, hayRegistro = (total > 0))
+    }
+
+    private fun actualizarVistaAsistencia(primaria: Int, secundaria: Int, total: Int, hayRegistro: Boolean = true) {
+        if (hayRegistro) {
+            if (total > 0) {
+                binding.tvTotalAsistenciaSumatoria.text = "$total Estudiantes"
+                binding.tvDesgloseAsistencia.text = "Primaria: $primaria  |  Secundaria: $secundaria"
+            } else {
+                binding.tvTotalAsistenciaSumatoria.text = "0 Estudiantes (Sin clases hoy)"
+                binding.tvDesgloseAsistencia.text = "Primaria: 0  |  Secundaria: 0"
+            }
+        } else {
+            binding.tvTotalAsistenciaSumatoria.text = "Sin registro para hoy"
+            binding.tvDesgloseAsistencia.text = "La jefa aún no ha registrado la asistencia"
+        }
+    }
+
+    private fun configurarCardAsistencia() {
+        binding.cardAsistenciaSumatoria.setOnClickListener {
+            // Refrescar inmediatamente al tocar la tarjeta
+            lifecycleScope.launch {
+                cargarAsistenciaBackend()
+            }
+
+            val p = AsistenciaManager.obtenerPrimaria(this)
+            val s = AsistenciaManager.obtenerSecundaria(this)
+            val total = p + s
+            val kgPrimaria = p * 0.25
+            val kgSecundaria = s * 0.38
+            val kgTotal = kgPrimaria + kgSecundaria
+
+            MaterialAlertDialogBuilder(this)
+                .setTitle("Sumatoria Asistencia PAE")
+                .setMessage(
+                    "📊 Asistencia de estudiantes registrada para hoy:\n\n" +
+                    "• Primaria (Transición a 5°): $p niños (~${String.format(Locale.US, "%.1f", kgPrimaria)} kg)\n" +
+                    "• Secundaria (6° a 11°): $s estudiantes (~${String.format(Locale.US, "%.1f", kgSecundaria)} kg)\n" +
+                    "───────────────────────\n" +
+                    "• Total raciones a servir: $total raciones\n" +
+                    "• Gramaje total PAE: ${String.format(Locale.US, "%.1f", kgTotal)} kg"
+                )
+                .setPositiveButton("Entendido", null)
+                .show()
+        }
+    }
+
+    // =========================================================
+    // BUSCAR PLATO POR SECCIÓN
+    // =========================================================
 
     private fun obtenerPlatoPorSeccion(nombreSeccion: String): PlatoResponse? {
         val seccion = listaSecciones.firstOrNull {
