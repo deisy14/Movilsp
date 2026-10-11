@@ -190,7 +190,7 @@
 
     </HorizontalScrollView>
 
-    <!-- LISTA DE INSUMOS DE INVENTARIO -->
+    <!-- LISTA DE INSUMOS DE INVENTARIO (OCUPA TODAS LAS EXISTENCIAS HASTA LA BARRA) -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollInventario"
         android:layout_width="0dp"
@@ -199,7 +199,7 @@
         android:fillViewport="true"
         android:overScrollMode="never"
         android:scrollbars="none"
-        app:layout_constraintBottom_toTopOf="@+id/btnRegistrarEntrada"
+        app:layout_constraintBottom_toTopOf="@+id/barra_navegacion"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/scrollCategorias">
@@ -210,27 +210,9 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingHorizontal="20dp"
-            android:paddingBottom="16dp" />
+            android:paddingBottom="24dp" />
 
     </androidx.core.widget.NestedScrollView>
-
-    <!-- BOTÓN REGISTRAR ENTRADA -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnRegistrarEntrada"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="12dp"
-        android:backgroundTint="#F2BF15"
-        android:text="+ Registrar Entrada de Insumos"
-        android:textColor="#1B3317"
-        android:textSize="13sp"
-        android:textStyle="bold"
-        app:cornerRadius="12dp"
-        app:layout_constraintBottom_toTopOf="@id/barra_navegacion"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <!-- BARRA DE NAVEGACIÓN -->
     <include

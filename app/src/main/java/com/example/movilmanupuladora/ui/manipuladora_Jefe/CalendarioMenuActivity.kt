@@ -80,20 +80,23 @@ class CalendarioMenuActivity : AppCompatActivity() {
         val totalDiasMes = calBase.getActualMaximum(Calendar.DAY_OF_MONTH)
         val formatoNombreMes = SimpleDateFormat("MMMM yyyy", Locale.forLanguageTag("es-CO"))
         val nombreMesAnio = formatoNombreMes.format(calBase.time).uppercase()
-        binding.txtSubtitulo.text = "Mes: $nombreMesAnio · Desliza para consultar días"
+        binding.txtSubtitulo.text = "Mes: $nombreMesAnio · Hoy está marcado · Toca cualquier día"
+
+        val hoy = Calendar.getInstance()
 
         for (i in 1..totalDiasMes) {
             val fechaDia = calBase.clone() as Calendar
             listaDiasSemana.add(fechaDia)
 
             val isSelected = esMismoDia(fechaDia, diaSeleccionado)
+            val isToday = esMismoDia(fechaDia, hoy)
 
             val cardDia = com.google.android.material.card.MaterialCardView(this).apply {
                 radius = (14 * resources.displayMetrics.density)
                 elevation = if (isSelected) (4 * resources.displayMetrics.density) else (1 * resources.displayMetrics.density)
-                strokeWidth = if (isSelected) (2 * resources.displayMetrics.density).toInt() else (1 * resources.displayMetrics.density).toInt()
-                setStrokeColor(if (isSelected) Color.parseColor("#F4B41F") else Color.parseColor("#E2E8F0"))
-                setCardBackgroundColor(if (isSelected) Color.parseColor("#FDF2CA") else Color.parseColor("#FFFFFF"))
+                strokeWidth = if (isSelected) (2.5 * resources.displayMetrics.density).toInt() else if (isToday) (1.5 * resources.displayMetrics.density).toInt() else (1 * resources.displayMetrics.density).toInt()
+                setStrokeColor(if (isSelected) Color.parseColor("#F4B41F") else if (isToday) Color.parseColor("#1B3317") else Color.parseColor("#E2E8F0"))
+                setCardBackgroundColor(if (isSelected) Color.parseColor("#FDF2CA") else if (isToday) Color.parseColor("#EEF4DF") else Color.parseColor("#FFFFFF"))
 
                 val params = LinearLayout.LayoutParams(
                     (62 * resources.displayMetrics.density).toInt(),
@@ -112,7 +115,7 @@ class CalendarioMenuActivity : AppCompatActivity() {
             val formatoNombreDia = SimpleDateFormat("EEE", Locale.forLanguageTag("es-CO"))
             val tvNombreDia = TextView(this).apply {
                 text = formatoNombreDia.format(fechaDia.time).uppercase()
-                setTextColor(if (isSelected) Color.parseColor("#7A5500") else Color.parseColor("#64748B"))
+                setTextColor(if (isSelected) Color.parseColor("#7A5500") else if (isToday) Color.parseColor("#2A5226") else Color.parseColor("#64748B"))
                 textSize = 11f
                 setTypeface(typeface, android.graphics.Typeface.BOLD)
             }
@@ -137,6 +140,13 @@ class CalendarioMenuActivity : AppCompatActivity() {
 
             binding.contenedorDiasStrip.addView(cardDia)
             calBase.add(Calendar.DAY_OF_MONTH, 1)
+        }
+
+        // Auto-scroll to today's date card on open
+        binding.scrollDiasSemana.post {
+            val todayDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH) - 1
+            val cardWidth = (70 * resources.displayMetrics.density).toInt()
+            binding.scrollDiasSemana.smoothScrollTo(todayDay * cardWidth, 0)
         }
     }
 

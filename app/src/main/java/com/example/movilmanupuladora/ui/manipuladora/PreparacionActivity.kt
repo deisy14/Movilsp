@@ -34,14 +34,14 @@ class PreparacionActivity : AppCompatActivity() {
         val estadoActual = preferencias.getString("estado_plato", "PENDIENTE")
 
         if (estadoActual == "FINALIZADO") {
-            binding.btnMarcarPreparado.text = "✅   Finalizado"
+            binding.btnMarcarPreparado.text = "  Finalizado"
             binding.btnMarcarPreparado.isEnabled = false
             binding.btnMarcarPreparado.alpha = 0.7f
-            binding.badgeTurnoPreparacion.text = "Estado: ✅ Finalizado"
+            binding.badgeTurnoPreparacion.text = "Estado: Finalizado"
             binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_pill_green)
         } else if (estadoActual == "EN_PREPARACION") {
-            binding.btnMarcarPreparado.text = "🍳 En preparación"
-            binding.badgeTurnoPreparacion.text = "Estado: 🍳 En preparación"
+            binding.btnMarcarPreparado.text = " En preparación"
+            binding.badgeTurnoPreparacion.text = "Estado:  En preparación"
             binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_pill_yellow)
         }
 
@@ -76,7 +76,7 @@ class PreparacionActivity : AppCompatActivity() {
     }
 
     private fun mostrarDialogoEstadoPreparacion() {
-        val opciones = arrayOf("📋 Por hacer / Pendiente", "🍳 En proceso / En preparación", "✅ Completado / Finalizado")
+        val opciones = arrayOf(" Por hacer / Pendiente", " En proceso / En preparación", " Completado / Finalizado")
 
         MaterialAlertDialogBuilder(this)
             .setTitle("Actualizar Estado de Preparación")
@@ -85,24 +85,24 @@ class PreparacionActivity : AppCompatActivity() {
                 when (which) {
                     0 -> { // Por hacer
                         preferencias.edit().putString("estado_plato", "PENDIENTE").apply()
-                        binding.badgeTurnoPreparacion.text = "Estado: 📋 Por hacer"
+                        binding.badgeTurnoPreparacion.text = "Estado: Por hacer"
                         binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_tag_plato)
                         binding.btnMarcarPreparado.text = "Marcar Estado"
                         Toast.makeText(this, "Estado cambiado a: Por hacer", Toast.LENGTH_SHORT).show()
                     }
                     1 -> { // En proceso
                         preferencias.edit().putString("estado_plato", "EN_PREPARACION").apply()
-                        binding.badgeTurnoPreparacion.text = "Estado: 🍳 En proceso"
+                        binding.badgeTurnoPreparacion.text = "Estado: En proceso"
                         binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_pill_yellow)
-                        binding.btnMarcarPreparado.text = "🍳 En proceso"
+                        binding.btnMarcarPreparado.text = " En proceso"
                         Toast.makeText(this, "Estado cambiado a: En proceso", Toast.LENGTH_SHORT).show()
                     }
                     2 -> { // Completado -> Abre ConfirmacionActivity
                         preferencias.edit().putBoolean("plato_preparado", true).apply()
                         preferencias.edit().putString("estado_plato", "FINALIZADO").apply()
-                        binding.badgeTurnoPreparacion.text = "Estado: ✅ Completado"
+                        binding.badgeTurnoPreparacion.text = "Estado:  Completado"
                         binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_pill_green)
-                        binding.btnMarcarPreparado.text = "✅   Completado"
+                        binding.btnMarcarPreparado.text = "  Completado"
                         binding.btnMarcarPreparado.isEnabled = false
                         binding.btnMarcarPreparado.alpha = 0.7f
 

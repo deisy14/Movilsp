@@ -66,14 +66,6 @@ class ProgramacionSemanalActivity : AppCompatActivity() {
         // Viernes
         binding.btnEditarViernesManana.setOnClickListener { mostrarSelectorPlato(binding.txtPlatoViernesManana) }
         binding.btnEditarViernesTarde.setOnClickListener { mostrarSelectorPlato(binding.txtPlatoViernesTarde) }
-
-        // Sábado
-        binding.btnEditarSabadoManana.setOnClickListener { mostrarSelectorPlato(binding.txtPlatoSabadoManana) }
-        binding.btnEditarSabadoTarde.setOnClickListener { mostrarSelectorPlato(binding.txtPlatoSabadoTarde) }
-
-        // Domingo
-        binding.btnEditarDomingoManana.setOnClickListener { mostrarSelectorPlato(binding.txtPlatoDomingoManana) }
-        binding.btnEditarDomingoTarde.setOnClickListener { mostrarSelectorPlato(binding.txtPlatoDomingoTarde) }
     }
 
     private fun mostrarSelectorPlato(textView: TextView) {

@@ -1,18 +1,28 @@
 package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
-import com.example.movilmanupuladora.R
-
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.databinding.ActivityPreparacionesJefaBinding
+import com.example.movilmanupuladora.utils.SessionManager
 
 class PreparacionesJefaActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPreparacionesJefaBinding
+    private lateinit var sessionManager: SessionManager
+
+    private var jornadaActual = Jornada.MANANA
+
+    enum class Jornada {
+        MANANA,
+        TARDE
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,6 +30,8 @@ class PreparacionesJefaActivity : AppCompatActivity() {
 
         binding = ActivityPreparacionesJefaBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        sessionManager = SessionManager(this)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -29,16 +41,111 @@ class PreparacionesJefaActivity : AppCompatActivity() {
 
         configurarNavegacionInferior()
         configurarEventos()
+        actualizarDatosJornada()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        actualizarDatosJornada()
     }
 
     private fun configurarEventos() {
-        // Example: card click to open detail or start preparation
-        try {
-            binding.root.findViewById<android.view.View>(R.id.btnVer1)?.setOnClickListener {
-                startActivity(Intent(this, DetallePreparacionActivity::class.java))
+        binding.btnManana.setOnClickListener {
+            jornadaActual = Jornada.MANANA
+            actualizarBotonesJornada()
+            actualizarDatosJornada()
+        }
+
+        binding.btnTarde.setOnClickListener {
+            jornadaActual = Jornada.TARDE
+            actualizarBotonesJornada()
+            actualizarDatosJornada()
+        }
+
+        binding.btnIniciarPreparacion.setOnClickListener {
+            val plato = binding.txtPlatoPreparacion.text.toString()
+            val jornadaNombre = if (jornadaActual == Jornada.MANANA) "Mañana" else "Tarde"
+
+            val intent = Intent(this, IniciarPreparacionActivity::class.java).apply {
+                putExtra("nombre_menu", plato)
+                putExtra("jornada", jornadaNombre)
             }
-        } catch (e: Exception) {
-            // fallback
+            startActivity(intent)
+        }
+
+        binding.btnVerManipuladoras.setOnClickListener {
+            val jornadaNombre = if (jornadaActual == Jornada.MANANA) "Mañana" else "Tarde"
+            val intent = Intent(this, ManipuladorasAsignadasActivity::class.java).apply {
+                putExtra("jornada", jornadaNombre)
+            }
+            startActivity(intent)
+        }
+    }
+
+    private fun actualizarBotonesJornada() {
+        val amarillo = ContextCompat.getColor(this, R.color.amarillo_principal)
+        val gris = ContextCompat.getColor(this, R.color.gris_claro)
+        val blanco = ContextCompat.getColor(this, R.color.blanco)
+        val negro = ContextCompat.getColor(this, R.color.negro_principal)
+
+        if (jornadaActual == Jornada.MANANA) {
+            binding.btnManana.backgroundTintList = android.content.res.ColorStateList.valueOf(amarillo)
+            binding.btnManana.setTextColor(blanco)
+            binding.btnTarde.backgroundTintList = android.content.res.ColorStateList.valueOf(gris)
+            binding.btnTarde.setTextColor(negro)
+        } else {
+            binding.btnTarde.backgroundTintList = android.content.res.ColorStateList.valueOf(amarillo)
+            binding.btnTarde.setTextColor(blanco)
+            binding.btnManana.backgroundTintList = android.content.res.ColorStateList.valueOf(gris)
+            binding.btnManana.setTextColor(negro)
+        }
+    }
+
+    private fun actualizarDatosJornada() {
+        actualizarBotonesJornada()
+
+        val guardados = if (jornadaActual == Jornada.MANANA) {
+            AsistenciaManager.obtenerManana(this)
+        } else {
+            AsistenciaManager.obtenerTarde(this)
+        }
+        val ninos = if (guardados > 0) guardados else if (jornadaActual == Jornada.MANANA) 120 else 110
+
+        if (jornadaActual == Jornada.MANANA) {
+            binding.txtTituloJornada.text = "Preparación de la mañana"
+            binding.txtNinosPreparacion.text = "$ninos niños"
+        } else {
+            binding.txtTituloJornada.text = "Preparación de la tarde"
+            binding.txtNinosPreparacion.text = "$ninos niños"
+        }
+
+        val platoSeleccionado = getSharedPreferences("SIRAE", MODE_PRIVATE).getString("plato_seleccionado", "Pollo Guisado Criollo") ?: "Pollo Guisado Criollo"
+        binding.txtPlatoPreparacion.text = platoSeleccionado
+        binding.txtDescripcionPlato.text = "Plato programado para la jornada de ${if (jornadaActual == Jornada.MANANA) "la mañana" else "la tarde"}."
+
+        val arrozKg = (ninos * 0.1).toInt().coerceAtLeast(10)
+        val polloKg = (ninos * 0.15).toInt().coerceAtLeast(15)
+        val lentejasKg = (ninos * 0.08).toInt().coerceAtLeast(8)
+        val pastaKg = (ninos * 0.08).toInt().coerceAtLeast(8)
+
+        binding.txtCantidadArroz.text = "$arrozKg kg"
+        binding.txtCantidadPollo.text = "$polloKg kg"
+        binding.txtCantidadLentejas.text = "$lentejasKg kg"
+        binding.txtCantidadPasta.text = "$pastaKg kg"
+
+        val estado = getSharedPreferences("SIRAE_JEFA", MODE_PRIVATE).getString("estado_plato", "PENDIENTE")
+        if (estado == "EN_PREPARACION") {
+            binding.txtEstadoPreparacion.text = "En proceso"
+            binding.txtEstadoPreparacion.setTextColor(Color.parseColor("#7A5500"))
+            binding.btnIniciarPreparacion.text = "Continuar preparación"
+        } else if (estado == "FINALIZADO") {
+            binding.txtEstadoPreparacion.text = "Completado"
+            binding.txtEstadoPreparacion.setTextColor(Color.parseColor("#2A5226"))
+            binding.btnIniciarPreparacion.text = "Preparación completada"
+        } else {
+            binding.txtEstadoPreparacion.text = "Pendiente"
+            binding.txtEstadoPreparacion.setTextColor(Color.parseColor("#D92D20"))
+            binding.btnIniciarPreparacion.text = "Iniciar preparación"
         }
     }
 }

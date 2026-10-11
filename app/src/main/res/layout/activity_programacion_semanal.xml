@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/blanco"
-    android:fillViewport="true">
+    android:background="#FAF9F5"
+    android:fillViewport="true"
+    android:overScrollMode="never"
+    android:scrollbars="none">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,10 +15,7 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <!-- ================================================= -->
-        <!-- ENCABEZADO                                        -->
-        <!-- ================================================= -->
-
+        <!-- ENCABEZADO -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -24,13 +23,13 @@
 
             <ImageButton
                 android:id="@+id/btnVolver"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:background="@drawable/bg_icono_circular"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@android:color/transparent"
                 android:contentDescription="Volver"
-                android:padding="10dp"
+                android:padding="8dp"
                 android:src="@drawable/ic_arrow_back"
-                android:tint="@color/negro_principal" />
+                app:tint="#1B3317" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -43,44 +42,42 @@
                     android:id="@+id/txtTituloProgramacion"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Programación semanal"
-                    android:textColor="@color/negro_principal"
-                    android:textSize="22sp"
+                    android:text="Programación Semanal PAE"
+                    android:textColor="#1B3317"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/txtSubtituloProgramacion"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:text="Organiza los platos de toda la semana"
-                    android:textColor="@color/gris_texto"
-                    android:textSize="13sp" />
+                    android:layout_marginTop="2dp"
+                    android:text="Organiza los platos de lunes a viernes"
+                    android:textColor="#3D5C37"
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
         </LinearLayout>
 
-
-        <!-- ================================================= -->
-        <!-- SEMANA                                             -->
-        <!-- ================================================= -->
-
+        <!-- SELECTOR DE SEMANA ACTUAL -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:layout_marginTop="22dp"
-            android:gravity="center_vertical">
+            android:layout_height="52dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical"
+            android:background="@drawable/bg_tag_plato"
+            android:paddingHorizontal="8dp">
 
             <ImageButton
                 android:id="@+id/btnSemanaAnterior"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:background="@drawable/bg_icono_circular"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@android:color/transparent"
                 android:contentDescription="Semana anterior"
-                android:padding="9dp"
+                android:padding="8dp"
                 android:src="@drawable/ic_arrow_back"
-                android:tint="@color/negro_principal" />
+                app:tint="#1B3317" />
 
             <TextView
                 android:id="@+id/txtSemanaActual"
@@ -88,806 +85,633 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="Semana del 28 de septiembre"
-                android:textColor="@color/negro_principal"
-                android:textSize="16sp"
+                android:text="Semana del 5 al 9 de Octubre"
+                android:textColor="#1B3317"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <ImageButton
                 android:id="@+id/btnSemanaSiguiente"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:background="@drawable/bg_icono_circular"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@android:color/transparent"
                 android:contentDescription="Semana siguiente"
-                android:padding="9dp"
+                android:padding="8dp"
                 android:rotation="180"
                 android:src="@drawable/ic_arrow_back"
-                android:tint="@color/negro_principal" />
+                app:tint="#1B3317" />
 
         </LinearLayout>
 
-
-        <!-- ================================================= -->
-        <!-- INFORMACIÓN                                        -->
-        <!-- ================================================= -->
-
-        <LinearLayout
+        <!-- INFO -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:background="@drawable/bg_card_resumen"
-            android:orientation="vertical"
-            android:padding="16dp">
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeColor="#E2E8F0"
+            app:strokeWidth="1dp">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Programa con anticipación"
-                android:textColor="@color/negro_principal"
-                android:textSize="15sp"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:padding="16dp">
 
-            <TextView
-                android:id="@+id/txtInfoProgramacion"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="Puedes definir el plato de cada jornada para evitar tener que programarlo diariamente."
-                android:textColor="@color/gris_texto"
-                android:textSize="12sp" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Programa con Anticipación"
+                    android:textColor="#1B3317"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/txtInfoProgramacion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Define el plato de cada jornada escolar de lunes a viernes."
+                    android:textColor="#64748B"
+                    android:textSize="12sp" />
 
+            </LinearLayout>
 
-        <!-- ================================================= -->
-        <!-- LUNES                                              -->
-        <!-- ================================================= -->
+        </com.google.android.material.card.MaterialCardView>
 
-        <LinearLayout
+        <!-- LUNES -->
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardLunes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/bg_card_resumen"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:id="@+id/txtLunes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Lunes"
-                android:textColor="@color/negro_principal"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/txtFechaLunes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="28 de septiembre"
-                android:textColor="@color/gris_texto"
-                android:textSize="12sp" />
-
-            <!-- MAÑANA -->
+            android:layout_marginTop="12dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeColor="#E2E8F0"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="12dp"
-                android:gravity="center_vertical">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
 
                 <TextView
-                    android:layout_width="70dp"
+                    android:id="@+id/txtLunes"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Mañana"
-                    android:textColor="@color/gris_texto"
-                    android:textSize="12sp"
+                    android:text="Lunes"
+                    android:textColor="#1B3317"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/txtPlatoLunesManana"
-                    android:layout_width="0dp"
+                    android:id="@+id/txtFechaLunes"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Sin plato programado"
-                    android:textColor="@color/negro_principal"
-                    android:textSize="14sp" />
+                    android:layout_marginTop="2dp"
+                    android:text="5 de Octubre"
+                    android:textColor="#64748B"
+                    android:textSize="12sp" />
 
-                <ImageButton
-                    android:id="@+id/btnEditarLunesManana"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:background="@drawable/bg_icono_circular"
-                    android:contentDescription="Editar plato del lunes en la mañana"
-                    android:padding="9dp"
-                    android:src="@drawable/ic_editar"
-                    android:tint="@color/negro_principal" />
+                <!-- MAÑANA -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:text="Mañana"
+                        android:textColor="#7A5500"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtPlatoLunesManana"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Sin plato programado"
+                        android:textColor="#1B3317"
+                        android:textSize="13sp" />
+
+                    <ImageButton
+                        android:id="@+id/btnEditarLunesManana"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/bg_pill_yellow"
+                        android:contentDescription="Editar"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_editar"
+                        app:tint="#1B3317" />
+
+                </LinearLayout>
+
+                <!-- TARDE -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:text="Tarde"
+                        android:textColor="#7A5500"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtPlatoLunesTarde"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Sin plato programado"
+                        android:textColor="#1B3317"
+                        android:textSize="13sp" />
+
+                    <ImageButton
+                        android:id="@+id/btnEditarLunesTarde"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/bg_pill_yellow"
+                        android:contentDescription="Editar"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_editar"
+                        app:tint="#1B3317" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
-            <!-- TARDE -->
+        </com.google.android.material.card.MaterialCardView>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="70dp"
-                    android:layout_height="wrap_content"
-                    android:text="Tarde"
-                    android:textColor="@color/gris_texto"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/txtPlatoLunesTarde"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Sin plato programado"
-                    android:textColor="@color/negro_principal"
-                    android:textSize="14sp" />
-
-                <ImageButton
-                    android:id="@+id/btnEditarLunesTarde"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:background="@drawable/bg_icono_circular"
-                    android:contentDescription="Editar plato del lunes en la tarde"
-                    android:padding="9dp"
-                    android:src="@drawable/ic_editar"
-                    android:tint="@color/negro_principal" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-
-        <!-- ================================================= -->
-        <!-- MARTES                                             -->
-        <!-- ================================================= -->
-
-        <LinearLayout
+        <!-- MARTES -->
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardMartes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:background="@drawable/bg_card_resumen"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:id="@+id/txtMartes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Martes"
-                android:textColor="@color/negro_principal"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/txtFechaMartes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="29 de septiembre"
-                android:textColor="@color/gris_texto"
-                android:textSize="12sp" />
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeColor="#E2E8F0"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="12dp"
-                android:gravity="center_vertical">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
 
                 <TextView
-                    android:layout_width="70dp"
+                    android:id="@+id/txtMartes"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Mañana"
-                    android:textColor="@color/gris_texto"
-                    android:textSize="12sp"
+                    android:text="Martes"
+                    android:textColor="#1B3317"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/txtPlatoMartesManana"
-                    android:layout_width="0dp"
+                    android:id="@+id/txtFechaMartes"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Sin plato programado"
-                    android:textColor="@color/negro_principal"
-                    android:textSize="14sp" />
+                    android:layout_marginTop="2dp"
+                    android:text="6 de Octubre"
+                    android:textColor="#64748B"
+                    android:textSize="12sp" />
 
-                <ImageButton
-                    android:id="@+id/btnEditarMartesManana"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:background="@drawable/bg_icono_circular"
-                    android:contentDescription="Editar plato del martes en la mañana"
-                    android:padding="9dp"
-                    android:src="@drawable/ic_editar"
-                    android:tint="@color/negro_principal" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:text="Mañana"
+                        android:textColor="#7A5500"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtPlatoMartesManana"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Sin plato programado"
+                        android:textColor="#1B3317"
+                        android:textSize="13sp" />
+
+                    <ImageButton
+                        android:id="@+id/btnEditarMartesManana"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/bg_pill_yellow"
+                        android:contentDescription="Editar"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_editar"
+                        app:tint="#1B3317" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:text="Tarde"
+                        android:textColor="#7A5500"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtPlatoMartesTarde"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Sin plato programado"
+                        android:textColor="#1B3317"
+                        android:textSize="13sp" />
+
+                    <ImageButton
+                        android:id="@+id/btnEditarMartesTarde"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/bg_pill_yellow"
+                        android:contentDescription="Editar"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_editar"
+                        app:tint="#1B3317" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:gravity="center_vertical">
+        </com.google.android.material.card.MaterialCardView>
 
-                <TextView
-                    android:layout_width="70dp"
-                    android:layout_height="wrap_content"
-                    android:text="Tarde"
-                    android:textColor="@color/gris_texto"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/txtPlatoMartesTarde"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Sin plato programado"
-                    android:textColor="@color/negro_principal"
-                    android:textSize="14sp" />
-
-                <ImageButton
-                    android:id="@+id/btnEditarMartesTarde"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:background="@drawable/bg_icono_circular"
-                    android:contentDescription="Editar plato del martes en la tarde"
-                    android:padding="9dp"
-                    android:src="@drawable/ic_editar"
-                    android:tint="@color/negro_principal" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-
-        <!-- ================================================= -->
-        <!-- MIÉRCOLES                                         -->
-        <!-- ================================================= -->
-
-        <LinearLayout
+        <!-- MIÉRCOLES -->
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardMiercoles"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:background="@drawable/bg_card_resumen"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:id="@+id/txtMiercoles"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Miércoles"
-                android:textColor="@color/negro_principal"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/txtFechaMiercoles"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="30 de septiembre"
-                android:textColor="@color/gris_texto"
-                android:textSize="12sp" />
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeColor="#E2E8F0"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="12dp"
-                android:gravity="center_vertical">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
 
                 <TextView
-                    android:layout_width="70dp"
+                    android:id="@+id/txtMiercoles"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Mañana"
-                    android:textColor="@color/gris_texto"
-                    android:textSize="12sp"
+                    android:text="Miércoles"
+                    android:textColor="#1B3317"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/txtPlatoMiercolesManana"
-                    android:layout_width="0dp"
+                    android:id="@+id/txtFechaMiercoles"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Sin plato programado"
-                    android:textColor="@color/negro_principal"
-                    android:textSize="14sp" />
+                    android:layout_marginTop="2dp"
+                    android:text="7 de Octubre"
+                    android:textColor="#64748B"
+                    android:textSize="12sp" />
 
-                <ImageButton
-                    android:id="@+id/btnEditarMiercolesManana"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:background="@drawable/bg_icono_circular"
-                    android:contentDescription="Editar plato del miércoles en la mañana"
-                    android:padding="9dp"
-                    android:src="@drawable/ic_editar"
-                    android:tint="@color/negro_principal" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:text="Mañana"
+                        android:textColor="#7A5500"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtPlatoMiercolesManana"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Sin plato programado"
+                        android:textColor="#1B3317"
+                        android:textSize="13sp" />
+
+                    <ImageButton
+                        android:id="@+id/btnEditarMiercolesManana"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/bg_pill_yellow"
+                        android:contentDescription="Editar"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_editar"
+                        app:tint="#1B3317" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:text="Tarde"
+                        android:textColor="#7A5500"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtPlatoMiercolesTarde"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Sin plato programado"
+                        android:textColor="#1B3317"
+                        android:textSize="13sp" />
+
+                    <ImageButton
+                        android:id="@+id/btnEditarMiercolesTarde"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/bg_pill_yellow"
+                        android:contentDescription="Editar"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_editar"
+                        app:tint="#1B3317" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:gravity="center_vertical">
+        </com.google.android.material.card.MaterialCardView>
 
-                <TextView
-                    android:layout_width="70dp"
-                    android:layout_height="wrap_content"
-                    android:text="Tarde"
-                    android:textColor="@color/gris_texto"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/txtPlatoMiercolesTarde"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Sin plato programado"
-                    android:textColor="@color/negro_principal"
-                    android:textSize="14sp" />
-
-                <ImageButton
-                    android:id="@+id/btnEditarMiercolesTarde"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:background="@drawable/bg_icono_circular"
-                    android:contentDescription="Editar plato del miércoles en la tarde"
-                    android:padding="9dp"
-                    android:src="@drawable/ic_editar"
-                    android:tint="@color/negro_principal" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-
-        <!-- ================================================= -->
-        <!-- JUEVES                                             -->
-        <!-- ================================================= -->
-
-        <LinearLayout
+        <!-- JUEVES -->
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardJueves"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:background="@drawable/bg_card_resumen"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:id="@+id/txtJueves"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Jueves"
-                android:textColor="@color/negro_principal"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/txtFechaJueves"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="1 de octubre"
-                android:textColor="@color/gris_texto"
-                android:textSize="12sp" />
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeColor="#E2E8F0"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="12dp"
-                android:gravity="center_vertical">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
 
                 <TextView
-                    android:layout_width="70dp"
+                    android:id="@+id/txtJueves"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Mañana"
-                    android:textColor="@color/gris_texto"
-                    android:textSize="12sp"
+                    android:text="Jueves"
+                    android:textColor="#1B3317"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/txtPlatoJuevesManana"
-                    android:layout_width="0dp"
+                    android:id="@+id/txtFechaJueves"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Sin plato programado"
-                    android:textColor="@color/negro_principal"
-                    android:textSize="14sp" />
+                    android:layout_marginTop="2dp"
+                    android:text="8 de Octubre"
+                    android:textColor="#64748B"
+                    android:textSize="12sp" />
 
-                <ImageButton
-                    android:id="@+id/btnEditarJuevesManana"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:background="@drawable/bg_icono_circular"
-                    android:contentDescription="Editar plato del jueves en la mañana"
-                    android:padding="9dp"
-                    android:src="@drawable/ic_editar"
-                    android:tint="@color/negro_principal" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:text="Mañana"
+                        android:textColor="#7A5500"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtPlatoJuevesManana"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Sin plato programado"
+                        android:textColor="#1B3317"
+                        android:textSize="13sp" />
+
+                    <ImageButton
+                        android:id="@+id/btnEditarJuevesManana"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/bg_pill_yellow"
+                        android:contentDescription="Editar"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_editar"
+                        app:tint="#1B3317" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:text="Tarde"
+                        android:textColor="#7A5500"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtPlatoJuevesTarde"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Sin plato programado"
+                        android:textColor="#1B3317"
+                        android:textSize="13sp" />
+
+                    <ImageButton
+                        android:id="@+id/btnEditarJuevesTarde"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/bg_pill_yellow"
+                        android:contentDescription="Editar"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_editar"
+                        app:tint="#1B3317" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:gravity="center_vertical">
+        </com.google.android.material.card.MaterialCardView>
 
-                <TextView
-                    android:layout_width="70dp"
-                    android:layout_height="wrap_content"
-                    android:text="Tarde"
-                    android:textColor="@color/gris_texto"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/txtPlatoJuevesTarde"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Sin plato programado"
-                    android:textColor="@color/negro_principal"
-                    android:textSize="14sp" />
-
-                <ImageButton
-                    android:id="@+id/btnEditarJuevesTarde"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:background="@drawable/bg_icono_circular"
-                    android:contentDescription="Editar plato del jueves en la tarde"
-                    android:padding="9dp"
-                    android:src="@drawable/ic_editar"
-                    android:tint="@color/negro_principal" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-
-        <!-- ================================================= -->
-        <!-- VIERNES                                            -->
-        <!-- ================================================= -->
-
-        <LinearLayout
+        <!-- VIERNES -->
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardViernes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:background="@drawable/bg_card_resumen"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:id="@+id/txtViernes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Viernes"
-                android:textColor="@color/negro_principal"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/txtFechaViernes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="2 de octubre"
-                android:textColor="@color/gris_texto"
-                android:textSize="12sp" />
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeColor="#E2E8F0"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="12dp"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="70dp"
-                    android:layout_height="wrap_content"
-                    android:text="Mañana"
-                    android:textColor="@color/gris_texto"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/txtPlatoViernesManana"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Sin plato programado"
-                    android:textColor="@color/negro_principal"
-                    android:textSize="14sp" />
-
-                <ImageButton
-                    android:id="@+id/btnEditarViernesManana"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:background="@drawable/bg_icono_circular"
-                    android:contentDescription="Editar plato del viernes en la mañana"
-                    android:padding="9dp"
-                    android:src="@drawable/ic_editar"
-                    android:tint="@color/negro_principal" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="70dp"
-                    android:layout_height="wrap_content"
-                    android:text="Tarde"
-                    android:textColor="@color/gris_texto"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/txtPlatoViernesTarde"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Sin plato programado"
-                    android:textColor="@color/negro_principal"
-                    android:textSize="14sp" />
-
-                <ImageButton
-                    android:id="@+id/btnEditarViernesTarde"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:background="@drawable/bg_icono_circular"
-                    android:contentDescription="Editar plato del viernes en la tarde"
-                    android:padding="9dp"
-                    android:src="@drawable/ic_editar"
-                    android:tint="@color/negro_principal" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-
-        <!-- ================================================= -->
-        <!-- SÁBADO                                             -->
-        <!-- ================================================= -->
-
-        <LinearLayout
-            android:id="@+id/cardSabado"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/bg_card_resumen"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:id="@+id/txtSabado"
-                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Sábado"
-                android:textColor="@color/negro_principal"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/txtFechaSabado"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="3 de octubre"
-                android:textColor="@color/gris_texto"
-                android:textSize="12sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="12dp"
-                android:gravity="center_vertical">
+                android:orientation="vertical"
+                android:padding="16dp">
 
                 <TextView
-                    android:layout_width="70dp"
+                    android:id="@+id/txtViernes"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Mañana"
-                    android:textColor="@color/gris_texto"
-                    android:textSize="12sp"
+                    android:text="Viernes"
+                    android:textColor="#1B3317"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/txtPlatoSabadoManana"
-                    android:layout_width="0dp"
+                    android:id="@+id/txtFechaViernes"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Sin plato programado"
-                    android:textColor="@color/negro_principal"
-                    android:textSize="14sp" />
+                    android:layout_marginTop="2dp"
+                    android:text="9 de Octubre"
+                    android:textColor="#64748B"
+                    android:textSize="12sp" />
 
-                <ImageButton
-                    android:id="@+id/btnEditarSabadoManana"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:background="@drawable/bg_icono_circular"
-                    android:contentDescription="Editar plato del sábado en la mañana"
-                    android:padding="9dp"
-                    android:src="@drawable/ic_editar"
-                    android:tint="@color/negro_principal" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:text="Mañana"
+                        android:textColor="#7A5500"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtPlatoViernesManana"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Sin plato programado"
+                        android:textColor="#1B3317"
+                        android:textSize="13sp" />
+
+                    <ImageButton
+                        android:id="@+id/btnEditarViernesManana"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/bg_pill_yellow"
+                        android:contentDescription="Editar"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_editar"
+                        app:tint="#1B3317" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:text="Tarde"
+                        android:textColor="#7A5500"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtPlatoViernesTarde"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Sin plato programado"
+                        android:textColor="#1B3317"
+                        android:textSize="13sp" />
+
+                    <ImageButton
+                        android:id="@+id/btnEditarViernesTarde"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/bg_pill_yellow"
+                        android:contentDescription="Editar"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_editar"
+                        app:tint="#1B3317" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:gravity="center_vertical">
+        </com.google.android.material.card.MaterialCardView>
 
-                <TextView
-                    android:layout_width="70dp"
-                    android:layout_height="wrap_content"
-                    android:text="Tarde"
-                    android:textColor="@color/gris_texto"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/txtPlatoSabadoTarde"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Sin plato programado"
-                    android:textColor="@color/negro_principal"
-                    android:textSize="14sp" />
-
-                <ImageButton
-                    android:id="@+id/btnEditarSabadoTarde"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:background="@drawable/bg_icono_circular"
-                    android:contentDescription="Editar plato del sábado en la tarde"
-                    android:padding="9dp"
-                    android:src="@drawable/ic_editar"
-                    android:tint="@color/negro_principal" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-
-        <!-- ================================================= -->
-        <!-- DOMINGO                                            -->
-        <!-- ================================================= -->
-
-        <LinearLayout
-            android:id="@+id/cardDomingo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/bg_card_resumen"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:id="@+id/txtDomingo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Domingo"
-                android:textColor="@color/negro_principal"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/txtFechaDomingo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="4 de octubre"
-                android:textColor="@color/gris_texto"
-                android:textSize="12sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="12dp"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="70dp"
-                    android:layout_height="wrap_content"
-                    android:text="Mañana"
-                    android:textColor="@color/gris_texto"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/txtPlatoDomingoManana"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Sin plato programado"
-                    android:textColor="@color/negro_principal"
-                    android:textSize="14sp" />
-
-                <ImageButton
-                    android:id="@+id/btnEditarDomingoManana"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:background="@drawable/bg_icono_circular"
-                    android:contentDescription="Editar plato del domingo en la mañana"
-                    android:padding="9dp"
-                    android:src="@drawable/ic_editar"
-                    android:tint="@color/negro_principal" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="70dp"
-                    android:layout_height="wrap_content"
-                    android:text="Tarde"
-                    android:textColor="@color/gris_texto"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/txtPlatoDomingoTarde"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Sin plato programado"
-                    android:textColor="@color/negro_principal"
-                    android:textSize="14sp" />
-
-                <ImageButton
-                    android:id="@+id/btnEditarDomingoTarde"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:background="@drawable/bg_icono_circular"
-                    android:contentDescription="Editar plato del domingo en la tarde"
-                    android:padding="9dp"
-                    android:src="@drawable/ic_editar"
-                    android:tint="@color/negro_principal" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-
-        <!-- ================================================= -->
-        <!-- GUARDAR                                            -->
-        <!-- ================================================= -->
-
-        <Button
+        <!-- BOTONES FINALES -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnGuardarProgramacion"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_marginTop="24dp"
-            android:backgroundTint="@color/amarillo_principal"
-            android:text="Guardar programación"
-            android:textColor="@color/blanco"
+            android:layout_height="48dp"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="#F4B41F"
+            android:text="Guardar Programación"
+            android:textColor="#1B3317"
             android:textSize="14sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            app:cornerRadius="12dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCancelar"
+            style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginTop="8dp"
-            android:backgroundTint="@color/gris_claro"
             android:text="Cancelar"
-            android:textColor="@color/negro_principal"
-            android:textSize="13sp" />
+            android:textColor="#1B3317"
+            android:textSize="13sp"
+            app:cornerRadius="12dp"
+            app:strokeColor="#C5DFC3" />
 
     </LinearLayout>
 

@@ -17,6 +17,7 @@ import com.example.movilmanupuladora.data.repository.MenuRepository
 import com.example.movilmanupuladora.databinding.ActivityMainBinding
 import com.example.movilmanupuladora.databinding.DialogDetallePlatoBinding
 import com.example.movilmanupuladora.databinding.PopupNotificacionesBinding
+import com.example.movilmanupuladora.ui.manipuladora_Jefe.AsistenciaManager
 import com.example.movilmanupuladora.utils.NavigationHelper
 import com.example.movilmanupuladora.utils.SessionManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -31,30 +32,17 @@ class MainActivity : AppCompatActivity() {
 
     private val menuRepository = MenuRepository(RetrofitClient.apiService)
 
-    // =========================================================
-    // DATOS DEL BACKEND / LOCAL
-    // =========================================================
-
     private var listaPlatos: List<PlatoResponse> = emptyList()
     private var listaSecciones: List<SeccionMenu> = emptyList()
     private var listaDetalles: List<DetallePlato> = emptyList()
 
-    // Plato actualmente seleccionado
     private var platoActualSeleccionado: PlatoResponse? = null
 
-    // 0 = Desayuno, 1 = Almuerzo, 2 = Merienda
     private val seccionesNombres = listOf("Desayuno", "Almuerzo", "Merienda")
     private var seccionSeleccionada = 0
 
-    // Jornada activa en el Inicio: "MANANA" o "TARDE"
     private var jornadaActualInicio = "MANANA"
-
-    // Ángulo de rotación de la rueda circular
     private var anguloRotacionActual = 0f
-
-    // =========================================================
-    // DATOS DE RESPALDO (MOCK)
-    // =========================================================
 
     private val platosBaseRespaldo = listOf(
         PlatoResponse(
@@ -83,23 +71,17 @@ class MainActivity : AppCompatActivity() {
         SeccionMenu(idSeccion = 3, idJornada = 1, nombreSeccion = "Merienda")
     )
 
-    // =========================================================
-    // ON CREATE
-    // =========================================================
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Token de sesión
         SessionManager.getToken(this)
 
-        // Configurar usuario y fecha
         val sessionMgr = SessionManager(this)
         val nombreUser = sessionMgr.getUserName() ?: "María López"
-        binding.tvSaludo.text = nombreUser
+        binding.tvSaludo.text = "BIENVENIDA, ${nombreUser.uppercase()}"
 
         val fechaFormatted = SimpleDateFormat(
             "EEEE / d / MMM / yyyy",
@@ -107,25 +89,18 @@ class MainActivity : AppCompatActivity() {
         ).format(Date()).uppercase()
         binding.tvFecha.text = fechaFormatted
 
-        // Inicializar con respaldo
         listaPlatos = platosBaseRespaldo
         listaSecciones = seccionesRespaldo
 
-        // Configurar botones de Jornada Mañana / Tarde
         configurarBotonesJornadaInicio()
-
-        // Configurar giro y deslizamiento en la rueda circular
         configurarGiroRuleta()
-
-        // Cargar datos reales de la API
         cargarDatosDesdeBackend()
+        actualizarSumatoriaAsistencia()
 
-        // Botón Notificaciones -> Abre Pop-up emergente de Notificaciones
         binding.btnNotificaciones.setOnClickListener {
             mostrarPopupNotificaciones()
         }
 
-        // Botón "Ver preparación" -> Abre la receta y pasos de cocción
         binding.btnVerPreparacion.setOnClickListener {
             val intent = Intent(this, PreparacionActivity::class.java).apply {
                 platoActualSeleccionado?.let { plato ->
@@ -143,30 +118,67 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Configurar tarjetas de menús anteriores
         configurarMenusAnteriores()
 
-        // Configurar barra de navegación inferior
         NavigationHelper.setupBarraNavegacion(
             this,
             binding.barraNavegacion,
-            NavigationHelper.Tab.INICIO,
+            NavigationHelper.Tab.INICIO
         )
     }
 
-    // =========================================================
-    // BOTONES DE JORNADA (MAÑANA Y TARDE)
-    // =========================================================
+    override fun onResume() {
+        super.onResume()
+        actualizarSumatoriaAsistencia()
+        cargarAsistenciaDelBackendParaManipuladora()
+    }
+
+    private fun actualizarSumatoriaAsistencia() {
+        val totalManana = AsistenciaManager.obtenerManana(this)
+        val totalTarde = AsistenciaManager.obtenerTarde(this)
+        val totalAsistencia = if (jornadaActualInicio == "MANANA") {
+            if (totalManana > 0) totalManana else 120
+        } else {
+            if (totalTarde > 0) totalTarde else 110
+        }
+
+        val primaria = (totalAsistencia * 0.6).toInt()
+        val bachillerato = totalAsistencia - primaria
+
+        binding.tvTotalAsistenciaSumatoria.text = "$totalAsistencia Estudiantes"
+        binding.tvDesgloseAsistencia.text = "Primaria: $primaria  |  Bachillerato: $bachillerato"
+    }
+
+    private fun cargarAsistenciaDelBackendParaManipuladora() {
+        lifecycleScope.launch {
+            try {
+                val res = RetrofitClient.apiService.obtenerAsistenciaDiaria()
+                if (res.isSuccessful && !res.body().isNullOrEmpty()) {
+                    val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                    val registroHoy = res.body()!!.find { it.fecha == fechaHoy }
+                    if (registroHoy != null) {
+                        val total = registroHoy.ninosPresentes
+                        AsistenciaManager.guardarManana(this@MainActivity, total)
+                        actualizarSumatoriaAsistencia()
+                    }
+                }
+            } catch (e: Exception) {
+                // Silencioso en modo offline
+            }
+        }
+    }
 
     private fun configurarBotonesJornadaInicio() {
         binding.btnJornadaManana.setOnClickListener {
             jornadaActualInicio = "MANANA"
             actualizarEstadoJornadaInicio()
+            actualizarSumatoriaAsistencia()
         }
 
         binding.btnJornadaTarde.setOnClickListener {
             jornadaActualInicio = "TARDE"
             actualizarEstadoJornadaInicio()
+            actualizarSumatoriaAsistencia()
         }
 
         actualizarEstadoJornadaInicio()
@@ -174,14 +186,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun actualizarEstadoJornadaInicio() {
         if (jornadaActualInicio == "MANANA") {
-            // Estilos de botones de jornada
             binding.btnJornadaManana.setBackgroundResource(R.drawable.bg_pill_yellow)
             binding.btnJornadaManana.setTextColor(Color.parseColor("#7A5500"))
 
             binding.btnJornadaTarde.setBackgroundResource(R.drawable.bg_tag_plato)
             binding.btnJornadaTarde.setTextColor(Color.parseColor("#64748B"))
 
-            // En Mañana: Solo DESAYUNO activo, Almuerzo y Merienda atenuados en gris
             binding.btnSeccionDesayuno.alpha = 1.0f
             binding.btnSeccionDesayuno.isEnabled = true
 
@@ -191,16 +201,14 @@ class MainActivity : AppCompatActivity() {
             binding.btnSeccionMerienda.alpha = 0.35f
             binding.btnSeccionMerienda.isEnabled = false
 
-            seleccionarSeccion(0) // Selecciona Desayuno
+            seleccionarSeccion(0)
         } else {
-            // Estilos de botones de jornada
             binding.btnJornadaTarde.setBackgroundResource(R.drawable.bg_pill_yellow)
             binding.btnJornadaTarde.setTextColor(Color.parseColor("#7A5500"))
 
             binding.btnJornadaManana.setBackgroundResource(R.drawable.bg_tag_plato)
             binding.btnJornadaManana.setTextColor(Color.parseColor("#64748B"))
 
-            // En Tarde: Desayuno atenuado en gris, Almuerzo y Merienda activos
             binding.btnSeccionDesayuno.alpha = 0.35f
             binding.btnSeccionDesayuno.isEnabled = false
 
@@ -210,13 +218,9 @@ class MainActivity : AppCompatActivity() {
             binding.btnSeccionMerienda.alpha = 1.0f
             binding.btnSeccionMerienda.isEnabled = true
 
-            seleccionarSeccion(1) // Selecciona Almuerzo por defecto en la tarde
+            seleccionarSeccion(1)
         }
     }
-
-    // =========================================================
-    // MOSTRAR POPUP EMERGENTE DE NOTIFICACIONES
-    // =========================================================
 
     private fun mostrarPopupNotificaciones() {
         val popupBinding = PopupNotificacionesBinding.inflate(layoutInflater)
@@ -260,10 +264,6 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    // =========================================================
-    // GIRO Y DESLIZAMIENTO DE LA RULETA CIRCULAR
-    // =========================================================
-
     private fun configurarGiroRuleta() {
         var startY = 0f
         var isSwiping = false
@@ -301,7 +301,7 @@ class MainActivity : AppCompatActivity() {
                                 seleccionarSeccion(1)
                             }
                         }
-                    } else if (!isSwiping) { // Clic directo
+                    } else if (!isSwiping) {
                         when (view.id) {
                             R.id.btnSeccionDesayuno -> {
                                 if (jornadaActualInicio == "MANANA") seleccionarSeccion(0)
@@ -334,9 +334,9 @@ class MainActivity : AppCompatActivity() {
         seccionSeleccionada = index
 
         val targetAngle = when (index) {
-            0 -> 120f  // Desayuno
-            1 -> 0f    // Almuerzo
-            2 -> -120f // Merienda
+            0 -> 120f
+            1 -> 0f
+            2 -> -120f
             else -> 0f
         }
 
@@ -350,17 +350,17 @@ class MainActivity : AppCompatActivity() {
         contraRotarImagenes(-targetAngle)
 
         when (index) {
-            0 -> { // DESAYUNO
+            0 -> {
                 resaltarCard(binding.cardDesayuno, true)
                 resaltarCard(binding.cardAlmuerzo, false)
                 resaltarCard(binding.cardMerienda, false)
             }
-            1 -> { // ALMUERZO
+            1 -> {
                 resaltarCard(binding.cardDesayuno, false)
                 resaltarCard(binding.cardAlmuerzo, true)
                 resaltarCard(binding.cardMerienda, false)
             }
-            2 -> { // MERIENDA
+            2 -> {
                 resaltarCard(binding.cardDesayuno, false)
                 resaltarCard(binding.cardAlmuerzo, false)
                 resaltarCard(binding.cardMerienda, true)
@@ -379,15 +379,15 @@ class MainActivity : AppCompatActivity() {
     private fun resaltarCard(card: com.google.android.material.card.MaterialCardView, activa: Boolean) {
         val params = card.layoutParams
         if (activa) {
-            params.width = (66 * resources.displayMetrics.density).toInt()
-            params.height = (66 * resources.displayMetrics.density).toInt()
+            params.width = (76 * resources.displayMetrics.density).toInt()
+            params.height = (76 * resources.displayMetrics.density).toInt()
             card.strokeWidth = (3.5 * resources.displayMetrics.density).toInt()
             card.cardElevation = 6 * resources.displayMetrics.density
         } else {
-            params.width = (54 * resources.displayMetrics.density).toInt()
-            params.height = (54 * resources.displayMetrics.density).toInt()
-            card.strokeWidth = (2 * resources.displayMetrics.density).toInt()
-            card.cardElevation = 2 * resources.displayMetrics.density
+            params.width = (64 * resources.displayMetrics.density).toInt()
+            params.height = (64 * resources.displayMetrics.density).toInt()
+            card.strokeWidth = (2.5 * resources.displayMetrics.density).toInt()
+            card.cardElevation = 3 * resources.displayMetrics.density
         }
         card.layoutParams = params
     }
@@ -408,10 +408,6 @@ class MainActivity : AppCompatActivity() {
             binding.imgPlatoMain.setImageResource(R.drawable.arroz_pollo)
         }
     }
-
-    // =========================================================
-    // CONSUMO DEL BACKEND (API SIRAE)
-    // =========================================================
 
     private fun cargarDatosDesdeBackend() {
         lifecycleScope.launch {
@@ -439,10 +435,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-    // =========================================================
-    // BUSCAR PLATO POR SECCIÓN
-    // =========================================================
 
     private fun obtenerPlatoPorSeccion(nombreSeccion: String): PlatoResponse? {
         val seccion = listaSecciones.firstOrNull {
@@ -480,10 +472,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // =========================================================
-    // IMAGEN DEL PLATO
-    // =========================================================
-
     private fun obtenerImagenPlato(plato: PlatoResponse): Int {
         val nombre = plato.nombrePlato?.lowercase() ?: ""
 
@@ -500,12 +488,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // =========================================================
-    // MENÚS ANTERIORES
-    // =========================================================
-
     private fun configurarMenusAnteriores() {
-
         val plato1 = listaPlatos.firstOrNull {
             it.nombrePlato?.contains("pollo", true) == true
         } ?: platosBaseRespaldo[1]
@@ -534,10 +517,6 @@ class MainActivity : AppCompatActivity() {
         binding.cardMenuAnterior3.setOnClickListener { mostrarDialogoPlato(plato3) }
     }
 
-    // =========================================================
-    // FORMATEAR NOMBRE
-    // =========================================================
-
     private fun formatearNombrePlato(nombre: String?): String {
         return nombre
             ?.split(" ")
@@ -548,10 +527,6 @@ class MainActivity : AppCompatActivity() {
             }
             ?: "Arroz con pollo"
     }
-
-    // =========================================================
-    // DIÁLOGO DETALLE DEL PLATO
-    // =========================================================
 
     private fun mostrarDialogoPlato(plato: PlatoResponse) {
         val seccion = listaSecciones.firstOrNull { it.idSeccion == plato.idSeccion }
