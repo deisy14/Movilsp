@@ -144,6 +144,7 @@
         <activity
             android:name=".ui.manipuladora_Jefe.PopupNotificacionesActivity"
             android:exported="false"
+            android:theme="@style/Theme.AppCompat.Dialog"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.manipuladora_Jefe.PreparacionCompletadaActivity"

@@ -15,7 +15,6 @@ import androidx.lifecycle.lifecycleScope
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.repository.MenuRepository
-import com.example.movilmanupuladora.ui.manipuladora.MainActivity
 import kotlinx.coroutines.launch
 
 class IniciarPreparacionActivity : AppCompatActivity() {
@@ -38,7 +37,7 @@ class IniciarPreparacionActivity : AppCompatActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.cardMenuDia)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(v.paddingLeft, systemBars.top, v.paddingRight, v.paddingBottom)
+            v.setPadding(v.paddingLeft, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
@@ -86,15 +85,15 @@ class IniciarPreparacionActivity : AppCompatActivity() {
 
         btnIniciarPreparacion.setOnClickListener {
             val obs = edtObservaciones.text.toString().trim()
-            val preferencias = getSharedPreferences("SIRAE", MODE_PRIVATE)
+            val preferencias = getSharedPreferences("SIRAE_JEFA", MODE_PRIVATE)
             preferencias.edit().putString("observaciones_preparacion", obs).apply()
             preferencias.edit().putString("estado_plato", "EN_PREPARACION").apply()
 
             Toast.makeText(this, "¡Preparación del menú iniciada exitosamente!", Toast.LENGTH_SHORT).show()
 
-            val intentMain = Intent(this, MainActivity::class.java)
-            intentMain.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(intentMain)
+            val intentJefa = Intent(this, InicioJefaActivity::class.java)
+            intentJefa.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intentJefa)
             finish()
         }
     }

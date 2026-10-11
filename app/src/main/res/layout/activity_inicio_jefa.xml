@@ -188,7 +188,7 @@
                         android:contentDescription="Información de IA"
                         android:padding="6dp"
                         android:src="@drawable/ic_info"
-                        app:tint="#64748B" />
+                        app:tint="#000000" />
 
                 </LinearLayout>
 
@@ -201,17 +201,55 @@
                     android:textColor="#64748B"
                     android:textSize="12sp" />
 
-                <!-- VIEWPAGER2 CON PEEK DE TARJETAS (ANTERIOR, CENTRO Y SIGUIENTE) -->
-                <androidx.viewpager2.widget.ViewPager2
-                    android:id="@+id/viewPagerSugerenciasIA"
+                <!-- CONTENEDOR DE CAROUSEL CON FLECHAS LATERALES NEGRAS (< y >) -->
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="225dp"
-                    android:layout_marginTop="14dp"
-                    android:clipChildren="false"
-                    android:clipToPadding="false"
-                    android:overScrollMode="never"
-                    android:paddingStart="42dp"
-                    android:paddingEnd="42dp" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                    <androidx.viewpager2.widget.ViewPager2
+                        android:id="@+id/viewPagerSugerenciasIA"
+                        android:layout_width="0dp"
+                        android:layout_height="225dp"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:overScrollMode="never"
+                        android:paddingStart="42dp"
+                        android:paddingEnd="42dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageButton
+                        android:id="@+id/btnPlatoAnterior"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="4dp"
+                        android:background="@drawable/bg_flecha"
+                        android:contentDescription="Plato anterior"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_arrow"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="#000000" />
+
+                    <ImageButton
+                        android:id="@+id/btnPlatoSiguiente"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/bg_flecha"
+                        android:contentDescription="Plato siguiente"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_arrow_forward"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="#000000" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <!-- INDICADOR DE PUNTOS DE NAVEGACIÓN -->
                 <TextView
@@ -237,6 +275,58 @@
                     android:textSize="13sp"
                     android:textStyle="bold"
                     app:cornerRadius="12dp" />
+
+            </LinearLayout>
+
+            <!-- ================================================= -->
+            <!-- SECCIÓN: MENÚ DISPONIBLE DEL PAE                  -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:id="@+id/seccionMenuDisponiblePAE"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Menú disponible del PAE"
+                        android:textColor="#1B3317"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/btnVerTodosPlatos"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:text="Ver todos los platos"
+                        android:textColor="#2E7D32"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerMenuDisponiblePAE"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal"
+                    android:overScrollMode="never"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/item_menu_disponible_pae" />
 
             </LinearLayout>
 

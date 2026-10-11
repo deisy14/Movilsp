@@ -8,6 +8,7 @@ import android.content.Context
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.repository.UsuarioRepository
 import com.example.movilmanupuladora.databinding.ActivityLoginBinding
@@ -52,11 +53,11 @@ class LoginActivity : AppCompatActivity() {
             if (passwordVisible) {
                 binding.txtPassword.transformationMethod =
                     android.text.method.HideReturnsTransformationMethod.getInstance()
-                binding.btnTogglePassword.setImageResource(com.example.movilmanupuladora.R.drawable.ic_visibility)
+                binding.btnTogglePassword.setImageResource(R.drawable.ic_visibility)
             } else {
                 binding.txtPassword.transformationMethod =
                     android.text.method.PasswordTransformationMethod.getInstance()
-                binding.btnTogglePassword.setImageResource(com.example.movilmanupuladora.R.drawable.ic_visibility_off)
+                binding.btnTogglePassword.setImageResource(R.drawable.ic_visibility_off)
             }
             binding.txtPassword.setSelection(binding.txtPassword.text.length)
         }

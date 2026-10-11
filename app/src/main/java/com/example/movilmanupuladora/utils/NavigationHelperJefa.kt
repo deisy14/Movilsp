@@ -6,11 +6,11 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
 import com.example.movilmanupuladora.databinding.BarraNavegacionJefaBinding
-import com.example.movilmanupuladora.ui.manipuladora_Jefe.HistorialPreparacionesActivity
 import com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity
 import com.example.movilmanupuladora.ui.manipuladora_Jefe.InventarioJefaActivity
 import com.example.movilmanupuladora.ui.manipuladora_Jefe.ManipuladorasJefaActivity
 import com.example.movilmanupuladora.ui.manipuladora_Jefe.PerfilJefaActivity
+import com.example.movilmanupuladora.ui.manipuladora_Jefe.PreparacionesJefaActivity
 
 object NavigationHelperJefa {
 
@@ -96,7 +96,7 @@ object NavigationHelperJefa {
 
         binding.navPreparaciones.setOnClickListener {
             if (tabActual != TabJefa.PREPARACIONES) {
-                val intent = Intent(activity, HistorialPreparacionesActivity::class.java)
+                val intent = Intent(activity, PreparacionesJefaActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
                 activity.finish()

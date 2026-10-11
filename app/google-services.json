@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1048071275722",
+    "project_id": "sirae-68f99",
+    "storage_bucket": "sirae-68f99.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1048071275722:android:be6a346368e07465172033",
+        "android_client_info": {
+          "package_name": "com.example.movilmanupuladora"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAAYW6JLZ92XnAuae-gTiv6nWEvRmiPNZo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
