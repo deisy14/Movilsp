@@ -151,8 +151,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        actualizarSumatoriaAsistencia()
-        cargarAsistenciaDelBackendParaManipuladora()
+        cargarAsistenciaLocal()
         iniciarPollingAsistenciaEnVivo()
     }
 
@@ -172,42 +171,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun actualizarSumatoriaAsistencia() {
-        val totalManana = AsistenciaManager.obtenerManana(this)
-        val totalTarde = AsistenciaManager.obtenerTarde(this)
-        val totalAsistencia = if (jornadaActualInicio == "MANANA") totalManana else totalTarde
-
-        if (totalAsistencia > 0) {
-            val primaria = (totalAsistencia * 0.6).toInt()
-            val bachillerato = totalAsistencia - primaria
-            binding.tvTotalAsistenciaSumatoria.text = "$totalAsistencia Estudiantes registrados"
-            binding.tvDesgloseAsistencia.text = "Primaria: $primaria  |  Bachillerato: $bachillerato"
-        } else {
-            binding.tvTotalAsistenciaSumatoria.text = "Sin datos de asistencia"
-            binding.tvDesgloseAsistencia.text = "Dato suministrado por la jefa"
-        }
-    }
-
-    private fun cargarAsistenciaDelBackendParaManipuladora() {
-        lifecycleScope.launch {
-            try {
-                val res = RetrofitClient.apiService.obtenerAsistenciaDiaria()
-                if (res.isSuccessful && !res.body().isNullOrEmpty()) {
-                    val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-                    val registroHoy = res.body()!!.find { it.fecha == fechaHoy }
-                    if (registroHoy != null) {
-                        val total = registroHoy.ninosPresentes
-                        if (jornadaActualInicio == "MANANA") {
-                            AsistenciaManager.guardarManana(this@MainActivity, total)
-                        } else {
-                            AsistenciaManager.guardarTarde(this@MainActivity, total)
-                        }
-                        actualizarSumatoriaAsistencia()
-                    }
-                }
-            } catch (e: Exception) {
-                // Silencioso en modo offline
-            }
-        }
+        cargarAsistenciaLocal()
     }
 
     // =========================================================

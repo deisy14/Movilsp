@@ -474,9 +474,9 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                 } else {
                     btnGuardar.isEnabled = true
                     btnGuardar.text = "Guardar"
-                    val errP = if (!resP.isSuccessful) "Primaria: ${resP.code()} " else ""
-                    val errS = if (!resS.isSuccessful) "Secundaria: ${resS.code()}" else ""
-                    Toast.makeText(this@AsistenciaJefaActivity, "Error al guardar en el servidor ($errP$errS)", Toast.LENGTH_SHORT).show()
+                    val errP = if (!resP.isSuccessful) resP.errorBody()?.string()?.take(80) ?: "Primaria error ${resP.code()}" else ""
+                    val errS = if (!resS.isSuccessful) resS.errorBody()?.string()?.take(80) ?: "Secundaria error ${resS.code()}" else ""
+                    Toast.makeText(this@AsistenciaJefaActivity, "Error del servidor: $errP $errS", Toast.LENGTH_LONG).show()
                 }
             } catch (e: Exception) {
                 btnGuardar.isEnabled = true
