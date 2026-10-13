@@ -142,6 +142,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         actualizarSumatoriaAsistencia()
         cargarAsistenciaDelBackendParaManipuladora()
+        iniciarPollingAsistenciaEnVivo()
     }
 
     private fun actualizarSumatoriaAsistencia() {
@@ -177,8 +178,6 @@ class MainActivity : AppCompatActivity() {
                 // Silencioso en modo offline
             }
         }
-    }
-        iniciarPollingAsistenciaEnVivo()
     }
 
     override fun onPause() {
