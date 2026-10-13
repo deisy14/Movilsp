@@ -150,7 +150,7 @@ class InicioJefaActivity : AppCompatActivity() {
         binding.recyclerMenuDisponiblePAE.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
 
         binding.btnVerTodosPlatos.setOnClickListener {
-            Toast.makeText(this, "Mostrando todos los platos disponibles del PAE", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, TodosLosPlatosActivity::class.java))
         }
     }
 
