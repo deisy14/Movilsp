@@ -159,6 +159,10 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name=".ui.manipuladora_Jefe.TodosLosPlatosActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".ui.manipuladora_Jefe.ProgramacionSemanalActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
