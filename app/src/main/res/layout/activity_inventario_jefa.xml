@@ -182,20 +182,72 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- RESUMEN INVENTARIO ACTUAL -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"
-                android:text="Resumen del Inventario Actual"
-                android:textColor="#1B3317"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
+            <!-- SECCIÓN INVENTARIO EN VIVO DEL ADMINISTRADOR -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="22dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="INVENTARIO DEL ADMINISTRADOR"
+                        android:textColor="#1B3317"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtEstadoSyncAdmin"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Sincronizado en tiempo real con SIRAE Admin"
+                        android:textColor="#3D5C37"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <!-- BOTÓN RECARGAR -->
+                <ImageButton
+                    android:id="@+id/btnRecargarInventario"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:background="@drawable/bg_pill_yellow"
+                    android:contentDescription="Recargar inventario"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_status"
+                    app:tint="#1B3317" />
+
+            </LinearLayout>
+
+            <!-- BUSCADOR DE INGREDIENTES -->
+            <EditText
+                android:id="@+id/edtBuscarInsumo"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_pill_white"
+                android:drawableStart="@drawable/ic_search"
+                android:drawablePadding="10dp"
+                android:hint="Buscar insumo por nombre o categoría..."
+                android:paddingHorizontal="14dp"
+                android:textColor="#1B3317"
+                android:textColorHint="#94A3B8"
+                android:textSize="13sp" />
+
+            <!-- RESUMEN EN VIVO DE MÉTRICAS -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
                 android:orientation="horizontal">
 
                 <com.google.android.material.card.MaterialCardView
@@ -214,13 +266,13 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:padding="14dp">
+                        android:padding="12dp">
 
                         <TextView
-                            android:id="@+id/txtCantidadAlimentos"
+                            android:id="@+id/txtTotalInsumosAdmin"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="14 Insumos"
+                            android:text="-- Insumos"
                             android:textColor="#1B3317"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -229,7 +281,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Registrados"
+                            android:text="En Sistema Admin"
                             android:textColor="#64748B"
                             android:textSize="11sp" />
 
@@ -253,13 +305,13 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:padding="14dp">
+                        android:padding="12dp">
 
                         <TextView
-                            android:id="@+id/txtTotalInventario"
+                            android:id="@+id/txtTotalKilosAdmin"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="185.0 kg"
+                            android:text="-- kg"
                             android:textColor="#7A5500"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -278,78 +330,133 @@
 
             </LinearLayout>
 
-            <!-- ESTADO GENERAL DEL STOCK -->
-            <com.google.android.material.card.MaterialCardView
+            <!-- FILTRO DE CATEGORÍAS (SCROLL HORIZONTAL) -->
+            <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                app:cardBackgroundColor="#EEF4DF"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="1dp"
-                app:strokeColor="#C5DFC3"
-                app:strokeWidth="1dp">
+                android:overScrollMode="never"
+                android:scrollbars="none">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="14dp">
+                    android:orientation="horizontal">
 
-                    <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@drawable/bg_pill_green"
-                        android:contentDescription="Estado"
-                        android:padding="7dp"
-                        android:src="@drawable/ic_check"
-                        app:tint="#2A5226" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFiltroTodos"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_marginEnd="6dp"
+                        android:backgroundTint="#F4B41F"
+                        android:paddingHorizontal="14dp"
+                        android:text="Todos"
+                        android:textColor="#1B3317"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:cornerRadius="18dp" />
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFiltroGranos"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_marginEnd="6dp"
+                        android:paddingHorizontal="14dp"
+                        android:text="Granos"
+                        android:textColor="#1B3317"
+                        android:textSize="12sp"
+                        app:cornerRadius="18dp"
+                        app:strokeColor="#C5DFC3" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="ESTADO DEL INVENTARIO"
-                            android:textColor="#2A5226"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFiltroProteinas"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_marginEnd="6dp"
+                        android:paddingHorizontal="14dp"
+                        android:text="Proteínas"
+                        android:textColor="#1B3317"
+                        android:textSize="12sp"
+                        app:cornerRadius="18dp"
+                        app:strokeColor="#C5DFC3" />
 
-                        <TextView
-                            android:id="@+id/txtEstadoInventario"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Stock Óptimo para Cocción PAE"
-                            android:textColor="#1B3317"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFiltroLacteos"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_marginEnd="6dp"
+                        android:paddingHorizontal="14dp"
+                        android:text="Lácteos"
+                        android:textColor="#1B3317"
+                        android:textSize="12sp"
+                        app:cornerRadius="18dp"
+                        app:strokeColor="#C5DFC3" />
 
-                    </LinearLayout>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFiltroVerduras"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:paddingHorizontal="14dp"
+                        android:text="Verduras y Frutas"
+                        android:textColor="#1B3317"
+                        android:textSize="12sp"
+                        app:cornerRadius="18dp"
+                        app:strokeColor="#C5DFC3" />
 
                 </LinearLayout>
 
-            </com.google.android.material.card.MaterialCardView>
+            </HorizontalScrollView>
 
-            <!-- BOTÓN REGISTRAR ENTREGA DEL SUPERVISOR -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnRegistrarEntrega"
+            <!-- BARRA DE CARGA -->
+            <ProgressBar
+                android:id="@+id/progressBarInventario"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginVertical="24dp"
+                android:indeterminateTint="#F4B41F"
+                android:visibility="gone" />
+
+            <!-- CONTENEDOR DINÁMICO DE ITEMS DEL INVENTARIO -->
+            <LinearLayout
+                android:id="@+id/contenedorItemsInventario"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="18dp"
-                android:backgroundTint="#F4B41F"
-                android:text="Registrar Entrega de Alimentos del Supervisor"
-                android:textColor="#1B3317"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                app:cornerRadius="12dp" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="vertical" />
 
-            <!-- MOVIMIENTOS ALIMENTARIOS CARD -->
+            <!-- EMPTY STATE -->
+            <LinearLayout
+                android:id="@+id/layoutSinDatosInventario"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingVertical="30dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:contentDescription="Sin insumos"
+                    android:src="@drawable/ic_food"
+                    app:tint="#94A3B8" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="No se encontraron ingredientes en el inventario"
+                    android:textColor="#64748B"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+            <!-- MOVIMIENTOS E HISTORIAL DE REPORTES CARD -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnMovimientos"
                 android:layout_width="match_parent"
@@ -380,15 +487,30 @@
                         android:src="@drawable/ic_status"
                         app:tint="#1B3317" />
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_weight="1"
-                        android:text="Movimientos e Historial de Insumos"
-                        android:textColor="#1B3317"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Movimientos e Historial de Insumos"
+                            android:textColor="#1B3317"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Revisa reportes enviados y ajustes realizados"
+                            android:textColor="#64748B"
+                            android:textSize="11sp" />
+
+                    </LinearLayout>
 
                     <ImageView
                         android:layout_width="20dp"

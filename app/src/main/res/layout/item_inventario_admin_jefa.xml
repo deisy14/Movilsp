@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="2dp"
+    app:strokeColor="#E5E7EB"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="14dp">
+
+        <!-- CABECERA: ÍCONO, NOMBRE, CATEGORÍA Y ESTADO -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                app:cardBackgroundColor="#F1F5E9"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <ImageView
+                    android:id="@+id/imgItemInsumo"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="Insumo"
+                    android:src="@drawable/ic_food"
+                    app:tint="#1B3317" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtItemNombre"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#1B3317"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    tools:text="Arroz Blanco Diana" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <!-- CHIP CATEGORÍA -->
+                    <TextView
+                        android:id="@+id/txtItemCategoria"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_pill_yellow"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="2dp"
+                        android:textColor="#7A5500"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        tools:text="Granos" />
+
+                    <TextView
+                        android:id="@+id/txtItemUnidad"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:textColor="#64748B"
+                        android:textSize="11sp"
+                        tools:text="Kilogramos (kg)" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- BADGE ESTADO -->
+            <TextView
+                android:id="@+id/txtItemBadgeEstado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_pill_green"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                android:textColor="#2A5226"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                tools:text="Stock Óptimo" />
+
+        </LinearLayout>
+
+        <!-- SEPARADOR SUTIL -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="12dp"
+            android:background="#F1F5F9" />
+
+        <!-- CUERPO: CANTIDAD DISPONIBLE Y BOTÓN MODIFICAR -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Stock Disponible Admin"
+                    android:textColor="#64748B"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/txtItemCantidad"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="#1B3317"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    tools:text="35.5 kg" />
+
+                <TextView
+                    android:id="@+id/txtItemStockMinimo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#94A3B8"
+                    android:textSize="10sp"
+                    tools:text="Mínimo sugerido: 5.0 kg" />
+
+            </LinearLayout>
+
+            <!-- BOTÓN MODIFICAR STOCK CON REPORTE -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnModificarStock"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:backgroundTint="#F4B41F"
+                android:paddingHorizontal="14dp"
+                android:text="Ajustar Stock"
+                android:textColor="#1B3317"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:cornerRadius="10dp"
+                app:icon="@drawable/ic_editar"
+                app:iconGravity="textStart"
+                app:iconPadding="6dp"
+                app:iconSize="14dp"
+                app:iconTint="#1B3317" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
