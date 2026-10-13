@@ -263,9 +263,15 @@ class LoginActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 mostrarCargando(false)
 
+                val errorMsg = if (e is java.net.SocketTimeoutException || e.message?.contains("timeout", ignoreCase = true) == true) {
+                    "El servidor en la nube estaba suspendido y está despertando. Por favor presiona Ingresar nuevamente."
+                } else {
+                    "Error de red: ${e.localizedMessage ?: "No se pudo conectar al servidor"}"
+                }
+
                 Toast.makeText(
                     this@LoginActivity,
-                    "Error de red: ${e.localizedMessage ?: "No se pudo conectar al servidor"}",
+                    errorMsg,
                     Toast.LENGTH_LONG
                 ).show()
             }
