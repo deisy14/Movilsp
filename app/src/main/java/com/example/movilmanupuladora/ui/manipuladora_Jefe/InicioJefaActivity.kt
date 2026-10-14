@@ -335,7 +335,14 @@ class InicioJefaActivity : AppCompatActivity() {
 
                 val asistenciasRes = RetrofitClient.apiService.obtenerAsistenciaDiaria()
                 if (asistenciasRes.isSuccessful && !asistenciasRes.body().isNullOrEmpty()) {
-                    val asistenciasHoy = asistenciasRes.body()!!.filter { it.fecha.trim().startsWith(fechaHoy) }
+                    val lista = asistenciasRes.body()!!
+                    var asistenciasHoy = lista.filter { it.fecha.trim().startsWith(fechaHoy) }
+                    if (asistenciasHoy.isEmpty()) {
+                        val fechaMasReciente = lista.maxByOrNull { it.idAsistencia ?: 0 }?.fecha?.trim()?.take(10)
+                        if (!fechaMasReciente.isNullOrEmpty()) {
+                            asistenciasHoy = lista.filter { it.fecha.trim().startsWith(fechaMasReciente) }
+                        }
+                    }
 
                     val regPrimaria = asistenciasHoy.filter { it.idGrado == idPrimaria || it.idGrado == 16 }.maxByOrNull { it.idAsistencia ?: 0 }
                     val regSecundaria = asistenciasHoy.filter { it.idGrado == idSecundaria || it.idGrado == 19 }.maxByOrNull { it.idAsistencia ?: 0 }

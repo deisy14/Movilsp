@@ -115,7 +115,13 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                 val res = asistenciaRepository.obtenerAsistencias()
                 if (res.isSuccessful && res.body() != null) {
                     val lista = res.body()!!
-                    val registrosHoy = lista.filter { it.fecha.trim().startsWith(fechaHoy) }
+                    var registrosHoy = lista.filter { it.fecha.trim().startsWith(fechaHoy) }
+                    if (registrosHoy.isEmpty() && lista.isNotEmpty()) {
+                        val fechaMasReciente = lista.maxByOrNull { it.idAsistencia ?: 0 }?.fecha?.trim()?.take(10)
+                        if (!fechaMasReciente.isNullOrEmpty()) {
+                            registrosHoy = lista.filter { it.fecha.trim().startsWith(fechaMasReciente) }
+                        }
+                    }
 
                     // Obtener siempre el registro MÁS RECIENTE para Primaria y Secundaria
                     val regPrimaria = registrosHoy.filter { it.idGrado == idGradoPrimaria || it.idGrado == 16 }.maxByOrNull { it.idAsistencia ?: 0 }
