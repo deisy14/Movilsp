@@ -199,285 +199,275 @@
 
             </LinearLayout>
 
-            <!-- RULETA FIJA Y DETALLE DEL PLATO -->
+            <!-- RULETA SEMICIRCULAR HORIZONTAL -->
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/wheelAndDetailContainer"
-                android:layout_width="0dp"
-                android:layout_height="350dp"
-                android:layout_marginTop="14dp"
+                android:id="@+id/wheelAreaContainer"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="16dp"
                 android:clipChildren="false"
                 android:clipToPadding="false"
                 app:layout_constraintTop_toBottomOf="@id/contenedorJornadasInicio"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
-                <!-- FONDO SEMICIRCULAR -->
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/wheelAreaContainer"
-                    android:layout_width="160dp"
-                    android:layout_height="350dp"
-                    android:clipChildren="false"
-                    android:clipToPadding="false"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent">
+                    android:id="@+id/wheelContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/wheelContainer"
-                        android:layout_width="330dp"
-                        android:layout_height="330dp"
-                        android:layout_marginStart="-165dp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent">
+                    <com.example.movilmanupuladora.ui.manipuladora.CircularWheelView
+                        android:id="@+id/circularWheelView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        tools:layout_editor_absoluteX="0dp"
+                        tools:layout_editor_absoluteY="16dp" />
 
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/circulo_amarillo" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <!-- DESAYUNO -->
                     <LinearLayout
                         android:id="@+id/btnSeccionDesayuno"
-                        android:layout_width="78dp"
+                        android:layout_width="85dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="38dp"
-                        android:layout_marginTop="14dp"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
                         android:orientation="vertical"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/cardDesayuno"
-                            android:layout_width="64dp"
-                            android:layout_height="64dp"
-                            app:cardBackgroundColor="#FFFFFF"
-                            app:cardCornerRadius="32dp"
-                            app:cardElevation="5dp"
-                            app:strokeColor="#FFFFFF"
-                            app:strokeWidth="2dp">
-
-                            <ImageView
-                                android:id="@+id/imgRuletaDesayuno"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:contentDescription="Desayuno"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/comida_desayuno" />
-
-                        </com.google.android.material.card.MaterialCardView>
+                        tools:layout_editor_absoluteX="47dp"
+                        tools:layout_editor_absoluteY="117dp">
 
                         <TextView
                             android:id="@+id/tvLabelDesayuno"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="3dp"
-                            android:text="DESAYUNO"
-                            android:textColor="#1B3317"
-                            android:textSize="9sp"
+                            android:layout_marginBottom="4dp"
+                            android:text="Desayuno"
+                            android:textColor="#FFFFFF"
+                            android:textSize="11sp"
                             android:textStyle="bold" />
 
-                    </LinearLayout>
-
-                    <!-- ALMUERZO -->
-                    <LinearLayout
-                        android:id="@+id/btnSeccionAlmuerzo"
-                        android:layout_width="108dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="68dp"
-                        android:layout_marginTop="112dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
                         <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/cardAlmuerzo"
-                            android:layout_width="92dp"
-                            android:layout_height="92dp"
+                            android:id="@+id/cardDesayuno"
+                            android:layout_width="58dp"
+                            android:layout_height="58dp"
                             app:cardBackgroundColor="#FFFFFF"
-                            app:cardCornerRadius="46dp"
-                            app:cardElevation="7dp"
+                            app:cardCornerRadius="29dp"
+                            app:cardElevation="5dp"
+                            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
                             app:strokeColor="#FFFFFF"
-                            app:strokeWidth="3dp">
+                            app:strokeWidth="2.5dp">
 
-                            <ImageView
-                                android:id="@+id/imgRuletaAlmuerzo"
+                            <com.google.android.material.imageview.ShapeableImageView
+                                android:id="@+id/imgRuletaDesayuno"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:contentDescription="Almuerzo"
+                                android:contentDescription="Desayuno"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/arroz_pollo" />
+                                android:src="@drawable/comida_desayuno"
+                                app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full" />
 
                         </com.google.android.material.card.MaterialCardView>
 
-                        <TextView
-                            android:id="@+id/tvLabelAlmuerzo"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="3dp"
-                            android:text="ALMUERZO"
-                            android:textColor="#1B3317"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
-
                     </LinearLayout>
 
-                    <!-- MERIENDA -->
                     <LinearLayout
                         android:id="@+id/btnSeccionMerienda"
-                        android:layout_width="78dp"
+                        android:layout_width="85dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="38dp"
-                        android:layout_marginTop="250dp"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
                         android:orientation="vertical"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/cardMerienda"
-                            android:layout_width="64dp"
-                            android:layout_height="64dp"
-                            app:cardBackgroundColor="#FFFFFF"
-                            app:cardCornerRadius="32dp"
-                            app:cardElevation="5dp"
-                            app:strokeColor="#FFFFFF"
-                            app:strokeWidth="2dp">
-
-                            <ImageView
-                                android:id="@+id/imgRuletaMerienda"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:contentDescription="Merienda"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/comida_merienda" />
-
-                        </com.google.android.material.card.MaterialCardView>
+                        tools:layout_editor_absoluteX="253dp"
+                        tools:layout_editor_absoluteY="117dp">
 
                         <TextView
                             android:id="@+id/tvLabelMerienda"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="3dp"
-                            android:text="MERIENDA"
-                            android:textColor="#1B3317"
-                            android:textSize="9sp"
+                            android:layout_marginBottom="4dp"
+                            android:text="Merienda"
+                            android:textColor="#FFFFFF"
+                            android:textSize="11sp"
                             android:textStyle="bold" />
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cardMerienda"
+                            android:layout_width="58dp"
+                            android:layout_height="58dp"
+                            app:cardBackgroundColor="#FFFFFF"
+                            app:cardCornerRadius="29dp"
+                            app:cardElevation="5dp"
+                            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+                            app:strokeColor="#FFFFFF"
+                            app:strokeWidth="2.5dp">
+
+                            <com.google.android.material.imageview.ShapeableImageView
+                                android:id="@+id/imgRuletaMerienda"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:contentDescription="Merienda"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/comida_merienda"
+                                app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full" />
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/btnSeccionAlmuerzo"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        tools:layout_editor_absoluteX="140dp"
+                        tools:layout_editor_absoluteY="58dp">
+
+                        <TextView
+                            android:id="@+id/tvLabelAlmuerzo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="4dp"
+                            android:text="Almuerzo"
+                            android:textColor="#FFFFFF"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cardAlmuerzo"
+                            android:layout_width="58dp"
+                            android:layout_height="58dp"
+                            app:cardBackgroundColor="#FFFFFF"
+                            app:cardCornerRadius="29dp"
+                            app:cardElevation="5dp"
+                            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+                            app:strokeColor="#FFFFFF"
+                            app:strokeWidth="2.5dp">
+
+                            <com.google.android.material.imageview.ShapeableImageView
+                                android:id="@+id/imgRuletaAlmuerzo"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:contentDescription="Almuerzo"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/arroz_pollo"
+                                app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full" />
+
+                        </com.google.android.material.card.MaterialCardView>
 
                     </LinearLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <!-- DETALLE DE LA SECCIÓN -->
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layoutDetalleSeccion"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="16dp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/wheelAreaContainer"
-                    app:layout_constraintEnd_toEndOf="parent">
+                <!-- ALMUERZO (CENTRO / SUPERIOR) -->
 
-                    <TextView
-                        android:id="@+id/tvTagSeccionSeleccionada"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_pill_yellow"
-                        android:paddingHorizontal="9dp"
-                        android:paddingVertical="5dp"
-                        android:text="SECCIÓN SELECCIONADA"
-                        android:textColor="#7A5500"
-                        android:textSize="9sp"
-                        android:textStyle="bold"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
+                <!-- DESAYUNO (IZQUIERDA) -->
 
-                    <TextView
-                        android:id="@+id/tvSeccionSeleccionada"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:text="DESAYUNO"
-                        android:textColor="#1B3317"
-                        android:textSize="21sp"
-                        android:textStyle="bold"
-                        app:layout_constraintTop_toBottomOf="@id/tvTagSeccionSeleccionada"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent" />
-
-                    <TextView
-                        android:id="@+id/tvPlatoSeleccionado"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="7dp"
-                        android:background="@drawable/bg_tag_plato"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:paddingHorizontal="10dp"
-                        android:paddingVertical="8dp"
-                        android:text="Plato asignado"
-                        android:textColor="#1B3317"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        app:layout_constraintTop_toBottomOf="@id/tvSeccionSeleccionada"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent" />
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardPlatoMain"
-                        android:layout_width="0dp"
-                        android:layout_height="140dp"
-                        android:layout_marginTop="10dp"
-                        app:cardBackgroundColor="#FFFFFF"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="4dp"
-                        app:strokeWidth="0dp"
-                        app:layout_constraintTop_toBottomOf="@id/tvPlatoSeleccionado"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent">
-
-                        <ImageView
-                            android:id="@+id/imgPlatoMain"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:contentDescription="Plato principal"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/arroz_pollo" />
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnVerPreparacion"
-                        android:layout_width="0dp"
-                        android:layout_height="44dp"
-                        android:layout_marginTop="8dp"
-                        android:backgroundTint="#F4B41F"
-                        android:text="Ver preparación"
-                        android:textColor="#1B3317"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        app:cornerRadius="12dp"
-                        app:layout_constraintTop_toBottomOf="@id/cardPlatoMain"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                <!-- MERIENDA (DERECHA) -->
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <!-- DETALLE DE LA SECCIÓN SELECCIONADA -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutDetalleSeccion"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintTop_toBottomOf="@id/wheelAreaContainer"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:id="@+id/tvTagSeccionSeleccionada"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_pill_yellow"
+                    android:paddingHorizontal="9dp"
+                    android:paddingVertical="5dp"
+                    android:text="SECCIÓN SELECCIONADA"
+                    android:textColor="#7A5500"
+                    android:textSize="9sp"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvSeccionSeleccionada"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="DESAYUNO"
+                    android:textColor="#1B3317"
+                    android:textSize="21sp"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toBottomOf="@id/tvTagSeccionSeleccionada"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvPlatoSeleccionado"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:background="@drawable/bg_tag_plato"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="8dp"
+                    android:text="Plato asignado"
+                    android:textColor="#1B3317"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toBottomOf="@id/tvSeccionSeleccionada"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardPlatoMain"
+                    android:layout_width="0dp"
+                    android:layout_height="140dp"
+                    android:layout_marginTop="10dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:strokeWidth="0dp"
+                    app:layout_constraintTop_toBottomOf="@id/tvPlatoSeleccionado"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <ImageView
+                        android:id="@+id/imgPlatoMain"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="Plato principal"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/arroz_pollo" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnVerPreparacion"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="8dp"
+                    android:backgroundTint="#F4B41F"
+                    android:text="Ver preparación"
+                    android:textColor="#1B3317"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="12dp"
+                    app:layout_constraintTop_toBottomOf="@id/cardPlatoMain"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <!-- CARD 1: SUMATORIA DE ASISTENCIA PAE -->
             <com.google.android.material.card.MaterialCardView
@@ -492,7 +482,7 @@
                 app:cardElevation="2dp"
                 app:strokeColor="#E2E8F0"
                 app:strokeWidth="1dp"
-                app:layout_constraintTop_toBottomOf="@id/wheelAndDetailContainer"
+                app:layout_constraintTop_toBottomOf="@id/layoutDetalleSeccion"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
