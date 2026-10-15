@@ -70,336 +70,115 @@
 
             </LinearLayout>
 
-            <!-- SELECCIÓN DE JORNADA -->
-            <TextView
-                android:layout_width="wrap_content"
+            <!-- 3 BOTONES DE CATEGORÍAS HORIZONTALMENTE (GRANOS, LÁCTEOS, VERDURAS) -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="Selecciona la Jornada"
-                android:textColor="#1B3317"
-                android:textSize="15sp"
-                android:textStyle="bold" />
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:weightSum="3">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:layout_marginTop="8dp"
-                android:orientation="horizontal">
-
+                <!-- BOTÓN 1: GRANOS -->
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnManana"
+                    android:id="@+id/btnCategoriaGranos"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="48dp"
                     android:layout_marginEnd="6dp"
                     android:layout_weight="1"
-                    android:backgroundTint="#F4B41F"
-                    android:text="Mañana"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:text="Granos"
+                    android:textAllCaps="false"
                     android:textColor="#1B3317"
                     android:textSize="13sp"
                     android:textStyle="bold"
-                    app:cornerRadius="12dp" />
+                    app:backgroundTint="#FFFFFF"
+                    app:cornerRadius="12dp"
+                    app:strokeColor="#CBD5E1"
+                    app:strokeWidth="1.5dp" />
 
+                <!-- BOTÓN 2: LÁCTEOS -->
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnTarde"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:id="@+id/btnCategoriaLacteos"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginHorizontal="3dp"
+                    android:layout_weight="1"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:text="Lácteos"
+                    android:textAllCaps="false"
+                    android:textColor="#1B3317"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="#FFFFFF"
+                    app:cornerRadius="12dp"
+                    app:strokeColor="#CBD5E1"
+                    app:strokeWidth="1.5dp" />
+
+                <!-- BOTÓN 3: VERDURAS -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCategoriaVerduras"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    android:text="Tarde"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:text="Verduras"
+                    android:textAllCaps="false"
                     android:textColor="#1B3317"
                     android:textSize="13sp"
                     android:textStyle="bold"
+                    app:backgroundTint="#FFFFFF"
                     app:cornerRadius="12dp"
-                    app:strokeColor="#C5DFC3" />
+                    app:strokeColor="#CBD5E1"
+                    app:strokeWidth="1.5dp" />
 
             </LinearLayout>
 
-            <!-- SUGERENCIAS IA CARD -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/btnGenerarIA"
+            <!-- ENCABEZADO DE PRODUCTOS DEL ADMIN -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="3dp"
-                app:strokeColor="#F4B41F"
-                app:strokeWidth="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_pill_yellow"
-                        android:contentDescription="IA"
-                        android:padding="9dp"
-                        android:src="@drawable/ic_food"
-                        app:tint="#1B3317" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="14dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Recomendación Inteligente IA"
-                            android:textColor="#1B3317"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Sugerencias de platos basadas en inventario y asistencia"
-                            android:textColor="#64748B"
-                            android:textSize="12sp" />
-
-                    </LinearLayout>
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:contentDescription="Ir"
-                        android:src="@drawable/ic_arrow_forward"
-                        app:tint="#1B3317" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- RESUMEN INVENTARIO ACTUAL -->
-            <TextView
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="22dp"
-                android:text="Resumen del Inventario Actual"
-                android:textColor="#1B3317"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginBottom="12dp"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <com.google.android.material.card.MaterialCardView
+                <TextView
+                    android:id="@+id/txtTituloSeccionProductos"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="6dp"
                     android:layout_weight="1"
-                    app:cardBackgroundColor="#FFFFFF"
-                    app:cardCornerRadius="14dp"
-                    app:cardElevation="2dp"
-                    app:strokeColor="#E2E8F0"
-                    app:strokeWidth="1dp">
+                    android:text="Inventario del Administrador"
+                    android:textColor="#1B3317"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="14dp">
-
-                        <TextView
-                            android:id="@+id/txtCantidadAlimentos"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="14 Insumos"
-                            android:textColor="#1B3317"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Registrados"
-                            android:textColor="#64748B"
-                            android:textSize="11sp" />
-
-                    </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
+                <TextView
+                    android:id="@+id/txtConteoProductos"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:layout_weight="1"
-                    app:cardBackgroundColor="#FFFFFF"
-                    app:cardCornerRadius="14dp"
-                    app:cardElevation="2dp"
-                    app:strokeColor="#E2E8F0"
-                    app:strokeWidth="1dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="14dp">
-
-                        <TextView
-                            android:id="@+id/txtTotalInventario"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="185.0 kg"
-                            android:textColor="#7A5500"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Stock Disponible"
-                            android:textColor="#64748B"
-                            android:textSize="11sp" />
-
-                    </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
+                    android:text="Todos los insumos"
+                    android:textColor="#64748B"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
 
             </LinearLayout>
 
-            <!-- ESTADO GENERAL DEL STOCK -->
-            <com.google.android.material.card.MaterialCardView
+            <!-- LISTA DE PRODUCTOS DEL ADMIN -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvProductosAdmin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                app:cardBackgroundColor="#EEF4DF"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="1dp"
-                app:strokeColor="#C5DFC3"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="14dp">
-
-                    <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@drawable/bg_pill_green"
-                        android:contentDescription="Estado"
-                        android:padding="7dp"
-                        android:src="@drawable/ic_check"
-                        app:tint="#2A5226" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="ESTADO DEL INVENTARIO"
-                            android:textColor="#2A5226"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/txtEstadoInventario"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Stock Óptimo para Cocción PAE"
-                            android:textColor="#1B3317"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- BOTÓN REGISTRAR ENTREGA DEL SUPERVISOR -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnRegistrarEntrega"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="18dp"
-                android:backgroundTint="#F4B41F"
-                android:text="Registrar Entrega de Alimentos del Supervisor"
-                android:textColor="#1B3317"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                app:cornerRadius="12dp" />
-
-            <!-- MOVIMIENTOS ALIMENTARIOS CARD -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/btnMovimientos"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#E2E8F0"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="14dp">
-
-                    <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:background="@drawable/bg_pill_yellow"
-                        android:contentDescription="Movimientos"
-                        android:padding="8dp"
-                        android:src="@drawable/ic_status"
-                        app:tint="#1B3317" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:layout_weight="1"
-                        android:text="Movimientos e Historial de Insumos"
-                        android:textColor="#1B3317"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:contentDescription="Ir"
-                        android:src="@drawable/ic_arrow_forward"
-                        app:tint="#1B3317" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
+                android:nestedScrollingEnabled="false"
+                tools:itemCount="5"
+                tools:listitem="@layout/item_producto_admin" />
 
         </LinearLayout>
 

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="2dp"
+    app:strokeColor="#E2E8F0"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <!-- ESPACIO PARA LA IMAGEN DEL PRODUCTO / INGREDIENTE -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="54dp"
+            android:layout_height="54dp"
+            app:cardBackgroundColor="#F8FAFC"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#E2E8F0"
+            app:strokeWidth="1dp">
+
+            <ImageView
+                android:id="@+id/imgProductoAdmin"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="Imagen del producto"
+                android:padding="6dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_food" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- NOMBRE DEL PRODUCTO Y CATEGORÍA -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtNombreProductoAdmin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Nombre del Producto"
+                android:textColor="#1B3317"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtCategoriaProductoAdmin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Granos • Inventario Admin"
+                android:textColor="#64748B"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <!-- CANTIDAD Y UNIDAD DE MEDIDA JUNTOS (EJ: 26K, 7L) -->
+        <TextView
+            android:id="@+id/txtCantidadUnidadAdmin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/bg_pill_green"
+            android:gravity="center"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="6dp"
+            android:text="26K"
+            android:textColor="#1B3317"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <!-- ACCIONES: LÁPIZ PARA EDITAR -->
+        <ImageButton
+            android:id="@+id/btnEditarProductoAdmin"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/bg_icono_circular"
+            android:backgroundTint="#F0FDF4"
+            android:contentDescription="Editar producto"
+            android:padding="9dp"
+            android:src="@drawable/ic_editar"
+            app:tint="#1B3317" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
