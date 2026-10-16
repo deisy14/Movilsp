@@ -49,6 +49,12 @@ class InventarioJefaActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Cada vez que la jefa abre o regresa a la pantalla, se consulta el stock actualizado del Admin
+        cargarDatosDesdeServidor()
+    }
+
     /**
      * Carga inicial con los productos reales del admin registrados en la base de datos
      */
@@ -59,50 +65,60 @@ class InventarioJefaActivity : AppCompatActivity() {
         listaProductosAdmin.add(
             ProductoAdmin(
                 id = 1,
+                idInventario = 23,
+                idIngrediente = 3,
                 nombre = "Arroz blanco",
                 cantidad = 24.0,
                 unidadMedida = "kg",
                 categoria = "Granos",
                 descripcion = "Arroz blanco seleccionado",
-                imagenRes = R.drawable.arroz_pollo
+                imagenRes = R.drawable.ic_food
             )
         )
         listaProductosAdmin.add(
             ProductoAdmin(
                 id = 2,
+                idInventario = 25,
+                idIngrediente = 12,
                 nombre = "Frijoles",
-                cantidad = 55.0,
+                cantidad = 50.0,
                 unidadMedida = "kg",
                 categoria = "Granos",
                 descripcion = "Frijol bolón",
-                imagenRes = R.drawable.frijoles
+                imagenRes = R.drawable.ic_food
             )
         )
         listaProductosAdmin.add(
             ProductoAdmin(
                 id = 3,
-                nombre = "Lentejas",
-                cantidad = 18.0,
+                idInventario = 27,
+                idIngrediente = 2,
+                nombre = "Carne de res",
+                cantidad = 0.02,
                 unidadMedida = "kg",
                 categoria = "Granos",
-                descripcion = "Lenteja limpia",
-                imagenRes = R.drawable.lentejas_arroz
+                descripcion = "Carne de res magra",
+                imagenRes = R.drawable.ic_food
             )
         )
         listaProductosAdmin.add(
             ProductoAdmin(
                 id = 4,
+                idInventario = 28,
+                idIngrediente = 4,
                 nombre = "Pasta",
                 cantidad = 12.0,
                 unidadMedida = "kg",
                 categoria = "Granos",
                 descripcion = "Fideos y pasta corta",
-                imagenRes = R.drawable.pasta_carne
+                imagenRes = R.drawable.ic_food
             )
         )
         listaProductosAdmin.add(
             ProductoAdmin(
                 id = 5,
+                idInventario = 24,
+                idIngrediente = 7,
                 nombre = "Aceite vegetal",
                 cantidad = 15.0,
                 unidadMedida = "L",
@@ -116,34 +132,40 @@ class InventarioJefaActivity : AppCompatActivity() {
         listaProductosAdmin.add(
             ProductoAdmin(
                 id = 6,
+                idInventario = 22,
+                idIngrediente = 1,
                 nombre = "Leche entera",
                 cantidad = 20.0,
                 unidadMedida = "L",
                 categoria = "Lácteos",
                 descripcion = "Leche pasteurizada",
-                imagenRes = R.drawable.ic_leche
+                imagenRes = R.drawable.ic_food
             )
         )
         listaProductosAdmin.add(
             ProductoAdmin(
                 id = 7,
+                idInventario = 29,
+                idIngrediente = 6,
                 nombre = "Queso campesino",
                 cantidad = 10.0,
                 unidadMedida = "kg",
                 categoria = "Lácteos",
                 descripcion = "Queso fresco",
-                imagenRes = R.drawable.huevo_perico
+                imagenRes = R.drawable.ic_food
             )
         )
         listaProductosAdmin.add(
             ProductoAdmin(
                 id = 8,
+                idInventario = 21,
+                idIngrediente = 8,
                 nombre = "Huevos",
-                cantidad = 500.0,
+                cantidad = 50.0,
                 unidadMedida = "u",
                 categoria = "Lácteos",
                 descripcion = "Huevos frescos tipo A",
-                imagenRes = R.drawable.huevo_perico
+                imagenRes = R.drawable.ic_food
             )
         )
 
@@ -151,6 +173,8 @@ class InventarioJefaActivity : AppCompatActivity() {
         listaProductosAdmin.add(
             ProductoAdmin(
                 id = 9,
+                idInventario = 26,
+                idIngrediente = 4,
                 nombre = "Tomate",
                 cantidad = 11.2,
                 unidadMedida = "kg",
@@ -162,6 +186,8 @@ class InventarioJefaActivity : AppCompatActivity() {
         listaProductosAdmin.add(
             ProductoAdmin(
                 id = 10,
+                idInventario = 30,
+                idIngrediente = 5,
                 nombre = "Papa criolla",
                 cantidad = 30.0,
                 unidadMedida = "kg",
@@ -173,6 +199,8 @@ class InventarioJefaActivity : AppCompatActivity() {
         listaProductosAdmin.add(
             ProductoAdmin(
                 id = 11,
+                idInventario = 31,
+                idIngrediente = 11,
                 nombre = "Zanahoria",
                 cantidad = 8.5,
                 unidadMedida = "kg",
@@ -184,6 +212,8 @@ class InventarioJefaActivity : AppCompatActivity() {
         listaProductosAdmin.add(
             ProductoAdmin(
                 id = 12,
+                idInventario = 32,
+                idIngrediente = 13,
                 nombre = "Cebolla de rama",
                 cantidad = 6.0,
                 unidadMedida = "kg",
@@ -311,8 +341,50 @@ class InventarioJefaActivity : AppCompatActivity() {
                     Toast.makeText(
                         this,
                         "¡Stock de ${producto.nombre} actualizado a ${producto.cantidadConUnidad}!",
-                        Toast.LENGTH_LONG
+                        Toast.LENGTH_SHORT
                     ).show()
+
+                    // Sincronizar con la API del backend para reflejarlo al Administrador
+                    val idInv = producto.idInventario
+                    if (idInv != null && idInv > 0) {
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            try {
+                                SessionManager.getToken(this@InventarioJefaActivity)
+                                val payload = com.example.movilmanupuladora.data.model.inventario(
+                                    idInventario = idInv,
+                                    idIngrediente = producto.idIngrediente,
+                                    cantidadActual = String.format(java.util.Locale.US, "%.2f", nuevoValor),
+                                    stockMinimo = "4.00",
+                                    idUnidadMedida = when (producto.unidadMedida.lowercase().trim()) {
+                                        "l", "litro", "litros" -> 2
+                                        "u", "unidad", "unidades" -> 3
+                                        else -> 1
+                                    }
+                                )
+                                val res = RetrofitClient.apiService.actualizarInventario(idInv, payload)
+                                withContext(Dispatchers.Main) {
+                                    if (res.isSuccessful) {
+                                        Toast.makeText(
+                                            this@InventarioJefaActivity,
+                                            "✅ Sincronizado con el panel del Administrador",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        android.util.Log.e("INVENTARIO_SYNC", "Error ${res.code()}: ${res.errorBody()?.string()}")
+                                        if (res.code() == 403) {
+                                            Toast.makeText(
+                                                this@InventarioJefaActivity,
+                                                "⚠️ Guardado en la app. El servidor requiere permiso de Supervisor/Admin para reflejarlo en la web.",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                android.util.Log.e("INVENTARIO_SYNC", "Error al conectar con servidor: ${e.message}")
+                            }
+                        }
+                    }
                 } else {
                     Toast.makeText(this, "Por favor ingresa una cantidad numérica válida", Toast.LENGTH_SHORT).show()
                 }
@@ -325,53 +397,83 @@ class InventarioJefaActivity : AppCompatActivity() {
     }
 
     /**
-     * Intenta sincronizar datos frescos del backend en segundo plano
+     * Sincroniza en tiempo real los datos frescos del inventario del Admin desde el backend
      */
     private fun cargarDatosDesdeServidor() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 SessionManager.getToken(this@InventarioJefaActivity)
-                val res = RetrofitClient.apiService.obtenerIngredientes()
-                if (res.isSuccessful && !res.body().isNullOrEmpty()) {
-                    val ingredientesBackend = res.body()!!
-                    withContext(Dispatchers.Main) {
-                        for (ing in ingredientesBackend) {
-                            val nombreIng = ing.nombreIngrediente ?: continue
-                            val existente = listaProductosAdmin.find {
-                                it.nombre.contains(nombreIng, ignoreCase = true) ||
-                                nombreIng.contains(it.nombre, ignoreCase = true)
-                            }
-                            if (existente == null) {
-                                val catNombre = when (ing.idCategoriaInventario) {
-                                    2, 7 -> "Lácteos"
-                                    4 -> "Granos"
-                                    5 -> "Verduras"
-                                    else -> "Granos"
-                                }
-                                val unidadStr = when (ing.idUnidadMedida) {
-                                    1 -> "kg"
-                                    2, 8 -> "L"
-                                    else -> "u"
-                                }
-                                listaProductosAdmin.add(
-                                    ProductoAdmin(
-                                        id = ing.idIngrediente ?: 0,
-                                        nombre = nombreIng,
-                                        cantidad = 10.0,
-                                        unidadMedida = unidadStr,
-                                        categoria = catNombre,
-                                        descripcion = ing.descripcion ?: "",
-                                        imagenRes = R.drawable.ic_food
-                                    )
-                                )
-                            }
+
+                // 1. Consultar el stock real del inventario del Administrador
+                val invRes = RetrofitClient.apiService.obtenerInventario()
+                if (invRes.isSuccessful && !invRes.body().isNullOrEmpty()) {
+                    val itemsInventario = invRes.body()!!
+                    for (inv in itemsInventario) {
+                        val stockServidor = inv.cantidadActual?.toDoubleOrNull()
+                            ?: inv.cantidad
+                            ?: continue
+
+                        // Buscar el producto en la lista local por idInventario o idIngrediente
+                        val producto = listaProductosAdmin.find {
+                            (inv.idInventario > 0 && it.idInventario == inv.idInventario) ||
+                            (inv.idIngrediente != null && it.idIngrediente == inv.idIngrediente)
                         }
-                        adapter.actualizarLista(listaProductosAdmin)
-                        actualizarTextoConteo()
+
+                        if (producto != null) {
+                            producto.cantidad = stockServidor
+                        }
                     }
                 }
+
+                // 2. Consultar el catálogo de ingredientes para incorporar cualquier insumo nuevo
+                val ingRes = RetrofitClient.apiService.obtenerIngredientes()
+                if (ingRes.isSuccessful && !ingRes.body().isNullOrEmpty()) {
+                    val ingredientesBackend = ingRes.body()!!
+                    for (ing in ingredientesBackend) {
+                        val nombreIng = ing.nombreIngrediente ?: continue
+                        val existente = listaProductosAdmin.find {
+                            it.nombre.contains(nombreIng, ignoreCase = true) ||
+                            nombreIng.contains(it.nombre, ignoreCase = true)
+                        }
+                        if (existente == null) {
+                            val catNombre = when (ing.idCategoriaInventario) {
+                                2, 7 -> "Lácteos"
+                                4 -> "Granos"
+                                5 -> "Verduras"
+                                else -> "Granos"
+                            }
+                            val unidadStr = when (ing.idUnidadMedida) {
+                                1 -> "kg"
+                                2, 8 -> "L"
+                                else -> "u"
+                            }
+                            listaProductosAdmin.add(
+                                ProductoAdmin(
+                                    id = ing.idIngrediente ?: 0,
+                                    idIngrediente = ing.idIngrediente,
+                                    nombre = nombreIng,
+                                    cantidad = 0.0,
+                                    unidadMedida = unidadStr,
+                                    categoria = catNombre,
+                                    descripcion = ing.descripcion ?: "",
+                                    imagenRes = R.drawable.ic_food
+                                )
+                            )
+                        }
+                    }
+                }
+
+                // 3. Refrescar la interfaz en el hilo principal
+                withContext(Dispatchers.Main) {
+                    adapter.actualizarLista(listaProductosAdmin)
+                    if (categoriaFiltroActiva != null) {
+                        adapter.filtrarPorCategoria(categoriaFiltroActiva)
+                    }
+                    actualizarTextoConteo()
+                }
+
             } catch (e: Exception) {
-                // Conserva los datos iniciales reales sin interrumpir la experiencia
+                android.util.Log.e("INVENTARIO_SYNC", "Error al sincronizar inventario del servidor: ${e.message}")
             }
         }
     }

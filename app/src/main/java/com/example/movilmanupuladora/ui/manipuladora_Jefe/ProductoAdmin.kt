@@ -11,7 +11,9 @@ data class ProductoAdmin(
     val categoria: String, // "Granos", "Lácteos", "Verduras", etc.
     val descripcion: String = "",
     val imagenRes: Int = R.drawable.ic_food,
-    val imagenUrl: String? = null
+    val imagenUrl: String? = null,
+    val idInventario: Int? = null,
+    val idIngrediente: Int? = null
 ) {
     /**
      * Muestra la cantidad y la unidad de medida JUNTOS (ejemplo: 26K, 7L, 55K, 500u)
