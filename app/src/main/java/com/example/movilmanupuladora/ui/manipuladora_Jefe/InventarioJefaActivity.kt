@@ -67,8 +67,8 @@ class InventarioJefaActivity : AppCompatActivity() {
                 id = 1,
                 idInventario = 23,
                 idIngrediente = 3,
-                nombre = "Arroz blanco",
-                cantidad = 24.0,
+                nombre = "Arroz",
+                cantidad = 20.0,
                 unidadMedida = "kg",
                 categoria = "Granos",
                 descripcion = "Arroz blanco seleccionado",
@@ -81,7 +81,7 @@ class InventarioJefaActivity : AppCompatActivity() {
                 idInventario = 25,
                 idIngrediente = 12,
                 nombre = "Frijoles",
-                cantidad = 50.0,
+                cantidad = 20.0,
                 unidadMedida = "kg",
                 categoria = "Granos",
                 descripcion = "Frijol bolón",
@@ -98,19 +98,6 @@ class InventarioJefaActivity : AppCompatActivity() {
                 unidadMedida = "kg",
                 categoria = "Granos",
                 descripcion = "Carne de res magra",
-                imagenRes = R.drawable.ic_food
-            )
-        )
-        listaProductosAdmin.add(
-            ProductoAdmin(
-                id = 4,
-                idInventario = 28,
-                idIngrediente = 4,
-                nombre = "Pasta",
-                cantidad = 12.0,
-                unidadMedida = "kg",
-                categoria = "Granos",
-                descripcion = "Fideos y pasta corta",
                 imagenRes = R.drawable.ic_food
             )
         )
@@ -135,23 +122,10 @@ class InventarioJefaActivity : AppCompatActivity() {
                 idInventario = 22,
                 idIngrediente = 1,
                 nombre = "Leche entera",
-                cantidad = 20.0,
+                cantidad = 30.0,
                 unidadMedida = "L",
                 categoria = "Lácteos",
                 descripcion = "Leche pasteurizada",
-                imagenRes = R.drawable.ic_food
-            )
-        )
-        listaProductosAdmin.add(
-            ProductoAdmin(
-                id = 7,
-                idInventario = 29,
-                idIngrediente = 6,
-                nombre = "Queso campesino",
-                cantidad = 10.0,
-                unidadMedida = "kg",
-                categoria = "Lácteos",
-                descripcion = "Queso fresco",
                 imagenRes = R.drawable.ic_food
             )
         )
@@ -180,45 +154,6 @@ class InventarioJefaActivity : AppCompatActivity() {
                 unidadMedida = "kg",
                 categoria = "Verduras",
                 descripcion = "Tomate fresco",
-                imagenRes = R.drawable.ic_food
-            )
-        )
-        listaProductosAdmin.add(
-            ProductoAdmin(
-                id = 10,
-                idInventario = 30,
-                idIngrediente = 5,
-                nombre = "Papa criolla",
-                cantidad = 30.0,
-                unidadMedida = "kg",
-                categoria = "Verduras",
-                descripcion = "Papa criolla lavada",
-                imagenRes = R.drawable.ic_food
-            )
-        )
-        listaProductosAdmin.add(
-            ProductoAdmin(
-                id = 11,
-                idInventario = 31,
-                idIngrediente = 11,
-                nombre = "Zanahoria",
-                cantidad = 8.5,
-                unidadMedida = "kg",
-                categoria = "Verduras",
-                descripcion = "Zanahoria fresca",
-                imagenRes = R.drawable.ic_food
-            )
-        )
-        listaProductosAdmin.add(
-            ProductoAdmin(
-                id = 12,
-                idInventario = 32,
-                idIngrediente = 13,
-                nombre = "Cebolla de rama",
-                cantidad = 6.0,
-                unidadMedida = "kg",
-                categoria = "Verduras",
-                descripcion = "Cebolla junca limpia",
                 imagenRes = R.drawable.ic_food
             )
         )
@@ -363,13 +298,7 @@ class InventarioJefaActivity : AppCompatActivity() {
                                 )
                                 val res = RetrofitClient.apiService.actualizarInventario(idInv, payload)
                                 withContext(Dispatchers.Main) {
-                                    if (res.isSuccessful) {
-                                        Toast.makeText(
-                                            this@InventarioJefaActivity,
-                                            "✅ Sincronizado con el panel del Administrador",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    } else {
+                                    if (!res.isSuccessful) {
                                         android.util.Log.e("INVENTARIO_SYNC", "Error ${res.code()}: ${res.errorBody()?.string()}")
                                         if (res.code() == 403) {
                                             Toast.makeText(
@@ -404,62 +333,56 @@ class InventarioJefaActivity : AppCompatActivity() {
             try {
                 SessionManager.getToken(this@InventarioJefaActivity)
 
-                // 1. Consultar el stock real del inventario del Administrador
+                // 1. Obtener catálogo de ingredientes para nombres, categorías y unidades
+                val ingRes = RetrofitClient.apiService.obtenerIngredientes()
+                val mapIngredientes = if (ingRes.isSuccessful && !ingRes.body().isNullOrEmpty()) {
+                    ingRes.body()!!.associateBy { it.idIngrediente }
+                } else emptyMap()
+
+                // 2. Consultar el inventario real del Administrador
                 val invRes = RetrofitClient.apiService.obtenerInventario()
                 if (invRes.isSuccessful && !invRes.body().isNullOrEmpty()) {
                     val itemsInventario = invRes.body()!!
+                    val listaServidor = mutableListOf<ProductoAdmin>()
+
                     for (inv in itemsInventario) {
                         val stockServidor = inv.cantidadActual?.toDoubleOrNull()
                             ?: inv.cantidad
-                            ?: continue
+                            ?: 0.0
 
-                        // Buscar el producto en la lista local por idInventario o idIngrediente
-                        val producto = listaProductosAdmin.find {
-                            (inv.idInventario > 0 && it.idInventario == inv.idInventario) ||
-                            (inv.idIngrediente != null && it.idIngrediente == inv.idIngrediente)
+                        val ing = inv.idIngrediente?.let { mapIngredientes[it] }
+                        val nombre = ing?.nombreIngrediente ?: "Insumo #${inv.idIngrediente ?: inv.idInventario}"
+                        val catNombre = when (ing?.idCategoriaInventario) {
+                            2, 7 -> "Lácteos"
+                            4 -> "Granos"
+                            5 -> "Verduras"
+                            else -> "Granos"
+                        }
+                        val unidadStr = when (inv.idUnidadMedida ?: ing?.idUnidadMedida) {
+                            1 -> "kg"
+                            2, 8 -> "L"
+                            3 -> "u"
+                            else -> "kg"
                         }
 
-                        if (producto != null) {
-                            producto.cantidad = stockServidor
-                        }
-                    }
-                }
-
-                // 2. Consultar el catálogo de ingredientes para incorporar cualquier insumo nuevo
-                val ingRes = RetrofitClient.apiService.obtenerIngredientes()
-                if (ingRes.isSuccessful && !ingRes.body().isNullOrEmpty()) {
-                    val ingredientesBackend = ingRes.body()!!
-                    for (ing in ingredientesBackend) {
-                        val nombreIng = ing.nombreIngrediente ?: continue
-                        val existente = listaProductosAdmin.find {
-                            it.nombre.contains(nombreIng, ignoreCase = true) ||
-                            nombreIng.contains(it.nombre, ignoreCase = true)
-                        }
-                        if (existente == null) {
-                            val catNombre = when (ing.idCategoriaInventario) {
-                                2, 7 -> "Lácteos"
-                                4 -> "Granos"
-                                5 -> "Verduras"
-                                else -> "Granos"
-                            }
-                            val unidadStr = when (ing.idUnidadMedida) {
-                                1 -> "kg"
-                                2, 8 -> "L"
-                                else -> "u"
-                            }
-                            listaProductosAdmin.add(
-                                ProductoAdmin(
-                                    id = ing.idIngrediente ?: 0,
-                                    idIngrediente = ing.idIngrediente,
-                                    nombre = nombreIng,
-                                    cantidad = 0.0,
-                                    unidadMedida = unidadStr,
-                                    categoria = catNombre,
-                                    descripcion = ing.descripcion ?: "",
-                                    imagenRes = R.drawable.ic_food
-                                )
+                        listaServidor.add(
+                            ProductoAdmin(
+                                id = inv.idInventario,
+                                idInventario = inv.idInventario,
+                                idIngrediente = inv.idIngrediente,
+                                nombre = nombre,
+                                cantidad = stockServidor,
+                                unidadMedida = unidadStr,
+                                categoria = catNombre,
+                                descripcion = ing?.descripcion ?: "",
+                                imagenRes = R.drawable.ic_food
                             )
-                        }
+                        )
+                    }
+
+                    if (listaServidor.isNotEmpty()) {
+                        listaProductosAdmin.clear()
+                        listaProductosAdmin.addAll(listaServidor)
                     }
                 }
 

@@ -8,7 +8,8 @@ import com.example.movilmanupuladora.databinding.ItemProductoAdminBinding
 
 class ProductoAdminAdapter(
     private var listaOriginal: List<ProductoAdmin>,
-    private val onEditarClick: (ProductoAdmin) -> Unit
+    private val modoSoloLectura: Boolean = false,
+    private val onEditarClick: ((ProductoAdmin) -> Unit)? = null
 ) : RecyclerView.Adapter<ProductoAdminAdapter.ProductoViewHolder>() {
 
     private var listaFiltrada: MutableList<ProductoAdmin> = listaOriginal.toMutableList()
@@ -35,8 +36,13 @@ class ProductoAdminAdapter(
             // Dejar el icono general de insumo para todos mientras se configuran las URLs de las fotos reales
             imgProductoAdmin.setImageResource(R.drawable.ic_food)
 
-            btnEditarProductoAdmin.setOnClickListener {
-                onEditarClick(item)
+            if (modoSoloLectura || onEditarClick == null) {
+                btnEditarProductoAdmin.visibility = android.view.View.GONE
+            } else {
+                btnEditarProductoAdmin.visibility = android.view.View.VISIBLE
+                btnEditarProductoAdmin.setOnClickListener {
+                    onEditarClick(item)
+                }
             }
         }
     }
