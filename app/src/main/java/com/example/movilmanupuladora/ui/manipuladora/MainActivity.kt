@@ -21,10 +21,12 @@ import com.example.movilmanupuladora.ui.manipuladora_Jefe.AsistenciaManager
 import com.example.movilmanupuladora.utils.NavigationHelper
 import com.example.movilmanupuladora.utils.SessionManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -36,6 +38,9 @@ class MainActivity : AppCompatActivity() {
     private val menuRepository = MenuRepository(RetrofitClient.apiService)
     private val asistenciaRepository = AsistenciaRepository(RetrofitClient.apiService)
     private var jobPollingAsistencia: Job? = null
+    private var idPrimariaCache: Int = 16
+    private var idSecundariaCache: Int = 19
+    private var gradosCargados: Boolean = false
 
     private var listaPlatos: List<PlatoResponse> = emptyList()
     private var listaSecciones: List<SeccionMenu> = emptyList()
@@ -149,8 +154,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        actualizarSumatoriaAsistencia()
-        cargarAsistenciaDelBackendParaManipuladora()
+        cargarAsistenciaLocal()
         iniciarPollingAsistenciaEnVivo()
     }
 
@@ -170,42 +174,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun actualizarSumatoriaAsistencia() {
-        val totalManana = AsistenciaManager.obtenerManana(this)
-        val totalTarde = AsistenciaManager.obtenerTarde(this)
-        val totalAsistencia = if (jornadaActualInicio == "MANANA") totalManana else totalTarde
-
-        if (totalAsistencia > 0) {
-            val primaria = (totalAsistencia * 0.6).toInt()
-            val bachillerato = totalAsistencia - primaria
-            binding.tvTotalAsistenciaSumatoria.text = "$totalAsistencia Estudiantes registrados"
-            binding.tvDesgloseAsistencia.text = "Primaria: $primaria  |  Bachillerato: $bachillerato"
-        } else {
-            binding.tvTotalAsistenciaSumatoria.text = "Sin datos de asistencia"
-            binding.tvDesgloseAsistencia.text = "Dato suministrado por la jefa"
-        }
-    }
-
-    private fun cargarAsistenciaDelBackendParaManipuladora() {
-        lifecycleScope.launch {
-            try {
-                val res = RetrofitClient.apiService.obtenerAsistenciaDiaria()
-                if (res.isSuccessful && !res.body().isNullOrEmpty()) {
-                    val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-                    val registroHoy = res.body()!!.find { it.fecha == fechaHoy }
-                    if (registroHoy != null) {
-                        val total = registroHoy.ninosPresentes
-                        if (jornadaActualInicio == "MANANA") {
-                            AsistenciaManager.guardarManana(this@MainActivity, total)
-                        } else {
-                            AsistenciaManager.guardarTarde(this@MainActivity, total)
-                        }
-                        actualizarSumatoriaAsistencia()
-                    }
-                }
-            } catch (e: Exception) {
-                // Silencioso en modo offline
-            }
-        }
+        cargarAsistenciaLocal()
     }
 
     // =========================================================
@@ -414,48 +383,83 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun cargarAsistenciaBackend() {
-        try {
-            SessionManager.getToken(this@MainActivity)
-            val gradosRes = asistenciaRepository.obtenerGrados()
-            val listaGrados = gradosRes.body().orEmpty()
-            val idPrimaria = listaGrados.find { it.nombreGrado.contains("primaria", ignoreCase = true) }?.idGrado ?: 16
-            val idSecundaria = listaGrados.find { it.nombreGrado.contains("secundaria", ignoreCase = true) }?.idGrado ?: 19
+        withContext(Dispatchers.IO) {
+            try {
+                SessionManager.getToken(this@MainActivity)
 
-            val asistenciasRes = asistenciaRepository.obtenerAsistencias()
-            if (asistenciasRes.isSuccessful && !asistenciasRes.body().isNullOrEmpty()) {
-                val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-                val asistenciasHoy = asistenciasRes.body()!!.filter { it.fecha.trim().startsWith(fechaHoy) }
-
-                val regPrimaria = asistenciasHoy.filter { it.idGrado == idPrimaria || it.idGrado == 16 }.maxByOrNull { it.idAsistencia ?: 0 }
-                val regSecundaria = asistenciasHoy.filter { it.idGrado == idSecundaria || it.idGrado == 19 }.maxByOrNull { it.idAsistencia ?: 0 }
-
-                var totalPrimaria = regPrimaria?.ninosPresentes ?: 0
-                var totalSecundaria = regSecundaria?.ninosPresentes ?: 0
-
-                if (regPrimaria == null && regSecundaria == null && asistenciasHoy.isNotEmpty()) {
-                    val regLegacy = asistenciasHoy.maxByOrNull { it.idAsistencia ?: 0 }!!
-                    val tot = regLegacy.ninosPresentes
-                    totalPrimaria = (tot * 0.6).toInt()
-                    totalSecundaria = tot - totalPrimaria
+                if (!gradosCargados) {
+                    val gradosRes = asistenciaRepository.obtenerGrados()
+                    if (gradosRes.isSuccessful && !gradosRes.body().isNullOrEmpty()) {
+                        val listaGrados = gradosRes.body()!!
+                        idPrimariaCache = listaGrados.find { it.nombreGrado.contains("primaria", ignoreCase = true) }?.idGrado ?: 16
+                        idSecundariaCache = listaGrados.find { it.nombreGrado.contains("secundaria", ignoreCase = true) }?.idGrado ?: 19
+                        gradosCargados = true
+                    }
                 }
 
-                val totalEstudiantes = totalPrimaria + totalSecundaria
+                val asistenciasRes = asistenciaRepository.obtenerAsistencias()
+                if (asistenciasRes.isSuccessful && !asistenciasRes.body().isNullOrEmpty()) {
+                    val todas = asistenciasRes.body()!!
+                    val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
 
-                AsistenciaManager.guardarPrimaria(this@MainActivity, totalPrimaria)
-                AsistenciaManager.guardarSecundaria(this@MainActivity, totalSecundaria)
-                AsistenciaManager.guardarManana(this@MainActivity, totalEstudiantes)
+                    // 1. Filtrar registros con la fecha exacta de hoy
+                    var registrosFecha = todas.filter { it.fecha.trim().startsWith(fechaHoy) }
 
-                actualizarVistaAsistencia(
-                    primaria = totalPrimaria,
-                    secundaria = totalSecundaria,
-                    total = totalEstudiantes,
-                    hayRegistro = (regPrimaria != null || regSecundaria != null || asistenciasHoy.isNotEmpty())
-                )
-            } else {
-                cargarAsistenciaLocal()
+                    // 2. Si no hay registros de hoy (por posible desfase de reloj o zona horaria UTC entre teléfonos),
+                    // tomar automáticamente los de la fecha más reciente registrada en el servidor
+                    if (registrosFecha.isEmpty()) {
+                        val fechaMasReciente = todas.maxByOrNull { it.idAsistencia ?: 0 }?.fecha?.trim()?.take(10)
+                        if (!fechaMasReciente.isNullOrEmpty()) {
+                            registrosFecha = todas.filter { it.fecha.trim().startsWith(fechaMasReciente) }
+                        }
+                    }
+
+                    // 3. Tomar siempre el registro más reciente para Primaria y Secundaria
+                    val regPrimaria = registrosFecha
+                        .filter { it.idGrado == idPrimariaCache || it.idGrado == 16 }
+                        .maxByOrNull { it.idAsistencia ?: 0 }
+
+                    val regSecundaria = registrosFecha
+                        .filter { it.idGrado == idSecundariaCache || it.idGrado == 19 }
+                        .maxByOrNull { it.idAsistencia ?: 0 }
+
+                    var totalPrimaria = regPrimaria?.ninosPresentes ?: 0
+                    var totalSecundaria = regSecundaria?.ninosPresentes ?: 0
+
+                    if (regPrimaria == null && regSecundaria == null && registrosFecha.isNotEmpty()) {
+                        val regLegacy = registrosFecha.maxByOrNull { it.idAsistencia ?: 0 }!!
+                        val tot = regLegacy.ninosPresentes
+                        totalPrimaria = (tot * 0.6).toInt()
+                        totalSecundaria = tot - totalPrimaria
+                    }
+
+                    val totalEstudiantes = totalPrimaria + totalSecundaria
+                    val existeRegistro = (regPrimaria != null || regSecundaria != null || registrosFecha.isNotEmpty())
+
+                    // Guardar en la caché local del dispositivo de la manipuladora
+                    AsistenciaManager.guardarPrimaria(this@MainActivity, totalPrimaria)
+                    AsistenciaManager.guardarSecundaria(this@MainActivity, totalSecundaria)
+                    AsistenciaManager.guardarManana(this@MainActivity, totalEstudiantes)
+
+                    withContext(Dispatchers.Main) {
+                        actualizarVistaAsistencia(
+                            primaria = totalPrimaria,
+                            secundaria = totalSecundaria,
+                            total = totalEstudiantes,
+                            hayRegistro = existeRegistro
+                        )
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        cargarAsistenciaLocal()
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("ASISTENCIA_SYNC", "Error al sincronizar asistencia con el servidor: ${e.message}")
+                withContext(Dispatchers.Main) {
+                    cargarAsistenciaLocal()
+                }
             }
-        } catch (e: Exception) {
-            cargarAsistenciaLocal()
         }
     }
 
@@ -468,12 +472,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun actualizarVistaAsistencia(primaria: Int, secundaria: Int, total: Int, hayRegistro: Boolean = true) {
         if (hayRegistro) {
-            if (total > 0) {
-                binding.tvTotalAsistenciaSumatoria.text = "$total Estudiantes registrados"
-                binding.tvDesgloseAsistencia.text = "Primaria: $primaria  |  Secundaria: $secundaria"
+            binding.tvTotalAsistenciaSumatoria.text = "$total Estudiantes registrados"
+            if (total == 0) {
+                binding.tvDesgloseAsistencia.text = "Primaria: $primaria  |  Secundaria: $secundaria (Sin asistencia hoy)"
             } else {
-                binding.tvTotalAsistenciaSumatoria.text = "Sin datos de asistencia"
-                binding.tvDesgloseAsistencia.text = "Dato suministrado por la jefa"
+                binding.tvDesgloseAsistencia.text = "Primaria: $primaria  |  Secundaria: $secundaria"
             }
         } else {
             binding.tvTotalAsistenciaSumatoria.text = "Sin datos de asistencia"
@@ -485,35 +488,35 @@ class MainActivity : AppCompatActivity() {
         binding.cardAsistenciaSumatoria.setOnClickListener {
             lifecycleScope.launch {
                 cargarAsistenciaBackend()
-            }
 
-            val p = AsistenciaManager.obtenerPrimaria(this)
-            val s = AsistenciaManager.obtenerSecundaria(this)
-            val total = p + s
+                val p = AsistenciaManager.obtenerPrimaria(this@MainActivity)
+                val s = AsistenciaManager.obtenerSecundaria(this@MainActivity)
+                val total = p + s
 
-            if (total > 0) {
-                val kgPrimaria = p * 0.25
-                val kgSecundaria = s * 0.38
-                val kgTotal = kgPrimaria + kgSecundaria
+                if (total > 0) {
+                    val kgPrimaria = p * 0.25
+                    val kgSecundaria = s * 0.38
+                    val kgTotal = kgPrimaria + kgSecundaria
 
-                MaterialAlertDialogBuilder(this)
-                    .setTitle("Sumatoria Asistencia PAE")
-                    .setMessage(
-                        "📊 Asistencia de estudiantes registrada para hoy:\n\n" +
-                        "• Primaria: $p niños (~${String.format(Locale.US, "%.1f", kgPrimaria)} kg)\n" +
-                        "• Secundaria: $s estudiantes (~${String.format(Locale.US, "%.1f", kgSecundaria)} kg)\n" +
-                        "───────────────────────\n" +
-                        "• Total raciones a servir: $total raciones\n" +
-                        "• Gramaje total PAE: ${String.format(Locale.US, "%.1f", kgTotal)} kg"
-                    )
-                    .setPositiveButton("Entendido", null)
-                    .show()
-            } else {
-                MaterialAlertDialogBuilder(this)
-                    .setTitle("Sumatoria Asistencia PAE")
-                    .setMessage("⚠️ Aún no hay datos de asistencia registrados por la Jefa para la jornada actual.")
-                    .setPositiveButton("Entendido", null)
-                    .show()
+                    MaterialAlertDialogBuilder(this@MainActivity)
+                        .setTitle("Sumatoria Asistencia PAE")
+                        .setMessage(
+                            "📊 Asistencia de estudiantes registrada para hoy:\n\n" +
+                            "• Primaria: $p niños (~${String.format(Locale.US, "%.1f", kgPrimaria)} kg)\n" +
+                            "• Secundaria: $s estudiantes (~${String.format(Locale.US, "%.1f", kgSecundaria)} kg)\n" +
+                            "───────────────────────\n" +
+                            "• Total raciones a servir: $total raciones\n" +
+                            "• Gramaje total PAE: ${String.format(Locale.US, "%.1f", kgTotal)} kg"
+                        )
+                        .setPositiveButton("Entendido", null)
+                        .show()
+                } else {
+                    MaterialAlertDialogBuilder(this@MainActivity)
+                        .setTitle("Sumatoria Asistencia PAE")
+                        .setMessage("📊 Asistencia registrada para hoy: 0 raciones.\n(Primaria: 0 | Secundaria: 0 - Sin jornada escolar hoy).")
+                        .setPositiveButton("Entendido", null)
+                        .show()
+                }
             }
         }
     }

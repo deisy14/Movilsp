@@ -115,7 +115,13 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                 val res = asistenciaRepository.obtenerAsistencias()
                 if (res.isSuccessful && res.body() != null) {
                     val lista = res.body()!!
-                    val registrosHoy = lista.filter { it.fecha.trim().startsWith(fechaHoy) }
+                    var registrosHoy = lista.filter { it.fecha.trim().startsWith(fechaHoy) }
+                    if (registrosHoy.isEmpty() && lista.isNotEmpty()) {
+                        val fechaMasReciente = lista.maxByOrNull { it.idAsistencia ?: 0 }?.fecha?.trim()?.take(10)
+                        if (!fechaMasReciente.isNullOrEmpty()) {
+                            registrosHoy = lista.filter { it.fecha.trim().startsWith(fechaMasReciente) }
+                        }
+                    }
 
                     // Obtener siempre el registro MÁS RECIENTE para Primaria y Secundaria
                     val regPrimaria = registrosHoy.filter { it.idGrado == idGradoPrimaria || it.idGrado == 16 }.maxByOrNull { it.idAsistencia ?: 0 }
@@ -474,9 +480,9 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                 } else {
                     btnGuardar.isEnabled = true
                     btnGuardar.text = "Guardar"
-                    val errP = if (!resP.isSuccessful) "Primaria: ${resP.code()} " else ""
-                    val errS = if (!resS.isSuccessful) "Secundaria: ${resS.code()}" else ""
-                    Toast.makeText(this@AsistenciaJefaActivity, "Error al guardar en el servidor ($errP$errS)", Toast.LENGTH_SHORT).show()
+                    val errP = if (!resP.isSuccessful) resP.errorBody()?.string()?.take(80) ?: "Primaria error ${resP.code()}" else ""
+                    val errS = if (!resS.isSuccessful) resS.errorBody()?.string()?.take(80) ?: "Secundaria error ${resS.code()}" else ""
+                    Toast.makeText(this@AsistenciaJefaActivity, "Error del servidor: $errP $errS", Toast.LENGTH_LONG).show()
                 }
             } catch (e: Exception) {
                 btnGuardar.isEnabled = true

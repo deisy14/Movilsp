@@ -8,37 +8,39 @@
     android:background="#FAF9F5"
     tools:context=".ui.auth.LoginActivity">
 
-    <!-- FONDO -->
+    <!-- FONDO DE ALIMENTOS -->
     <ImageView
         android:id="@+id/imgFondo"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:contentDescription="@null"
         android:scaleType="centerCrop"
-        android:src="@drawable/fondo_sirae"
+        android:src="@drawable/sirae_fondo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- CAPA DEL FONDO: transparente -->
     <View
         android:id="@+id/capaFondo"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#00000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- CONTENIDO SCROLLABLE -->
+    <!-- CONTENIDO DESPLAZABLE -->
     <ScrollView
         android:id="@+id/scrollLogin"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:clipToPadding="false"
         android:fillViewport="true"
-        android:paddingBottom="24dp"
         android:paddingTop="24dp"
+        android:paddingBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -49,14 +51,16 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical"
-            android:paddingHorizontal="24dp">
+            android:paddingHorizontal="32dp">
 
             <!-- TARJETA LOGIN -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardLogin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="#FFFFFF"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="#D9FFFFFF"
                 app:cardCornerRadius="28dp"
                 app:cardElevation="8dp">
 
@@ -69,18 +73,18 @@
                     android:paddingEnd="26dp"
                     android:paddingBottom="32dp">
 
-                    <!-- LOGO -->
+                    <!-- LOGO SIRAE -->
                     <ImageView
                         android:id="@+id/imgLogo"
-                        android:layout_width="160dp"
-                        android:layout_height="72dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="120dp"
                         android:layout_gravity="center_horizontal"
                         android:adjustViewBounds="true"
                         android:contentDescription="Logo SIRAE"
                         android:scaleType="centerInside"
                         android:src="@drawable/logo_sirae" />
 
-                    <!-- TITULO -->
+                    <!-- TÍTULO -->
                     <TextView
                         android:id="@+id/txtTitulo"
                         android:layout_width="match_parent"
@@ -92,6 +96,7 @@
                         android:textSize="22sp"
                         android:textStyle="bold" />
 
+                    <!-- SUBTÍTULO -->
                     <TextView
                         android:id="@+id/txtSubtitulo"
                         android:layout_width="match_parent"
@@ -99,10 +104,10 @@
                         android:layout_marginTop="6dp"
                         android:gravity="center"
                         android:text="Ingresa tus credenciales para continuar"
-                        android:textColor="#64748B"
+                        android:textColor="#52685B"
                         android:textSize="13sp" />
 
-                    <!-- CORREO -->
+                    <!-- ETIQUETA CORREO -->
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -112,6 +117,7 @@
                         android:textSize="13sp"
                         android:textStyle="bold" />
 
+                    <!-- CAMPO CORREO -->
                     <EditText
                         android:id="@+id/txtCorreo"
                         android:layout_width="match_parent"
@@ -123,10 +129,10 @@
                         android:paddingHorizontal="14dp"
                         android:singleLine="true"
                         android:textColor="#1B3317"
-                        android:textColorHint="#94A3B8"
+                        android:textColorHint="#64776B"
                         android:textSize="14sp" />
 
-                    <!-- CONTRASEÑA -->
+                    <!-- ETIQUETA CONTRASEÑA -->
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -136,6 +142,7 @@
                         android:textSize="13sp"
                         android:textStyle="bold" />
 
+                    <!-- CAMPO CONTRASEÑA -->
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
@@ -148,11 +155,11 @@
                             android:background="@drawable/bg_edittext"
                             android:hint="Ingresa tu contraseña"
                             android:inputType="textPassword"
-                            android:paddingHorizontal="14dp"
+                            android:paddingStart="14dp"
                             android:paddingEnd="48dp"
                             android:singleLine="true"
                             android:textColor="#1B3317"
-                            android:textColorHint="#94A3B8"
+                            android:textColorHint="#64776B"
                             android:textSize="14sp" />
 
                         <ImageView
@@ -170,20 +177,22 @@
 
                     </FrameLayout>
 
-                    <!-- OLVIDASTE CONTRASEÑA -->
+                    <!-- OLVIDÉ MI CONTRASEÑA -->
                     <TextView
                         android:id="@+id/txtOlvide"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="end"
                         android:layout_marginTop="14dp"
                         android:clickable="true"
                         android:focusable="true"
                         android:text="¿Olvidaste tu contraseña?"
-                        android:textColor="#000000"
+                        android:textColor="#1B3317"
                         android:textSize="12sp"
                         android:textStyle="bold" />
 
-                    <!-- BOTON INGRESAR -->
+                    <!-- BOTÓN INGRESAR -->
+                    <!-- AMARILLO SIRAE: #F4B41F -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnIngresar"
                         android:layout_width="match_parent"
@@ -194,9 +203,11 @@
                         android:textColor="#1B3317"
                         android:textSize="14sp"
                         android:textStyle="bold"
-                        app:cornerRadius="12dp" />
+                        app:cornerRadius="14dp"
+                        app:elevation="2dp"
+                        app:rippleColor="#40FFFFFF" />
 
-                    <!-- REGISTRO -->
+                    <!-- MENSAJE DE REGISTRO -->
                     <TextView
                         android:id="@+id/txtNoCuenta"
                         android:layout_width="match_parent"
@@ -204,9 +215,10 @@
                         android:layout_marginTop="18dp"
                         android:gravity="center"
                         android:text="¿No tienes cuenta?"
-                        android:textColor="#64748B"
+                        android:textColor="#52685B"
                         android:textSize="12sp" />
 
+                    <!-- CONTACTO ADMINISTRADOR -->
                     <TextView
                         android:id="@+id/txtAdministrador"
                         android:layout_width="match_parent"
@@ -216,7 +228,7 @@
                         android:focusable="true"
                         android:gravity="center"
                         android:text="Contacta al administrador"
-                        android:textColor="#000000"
+                        android:textColor="#1B3317"
                         android:textSize="12sp"
                         android:textStyle="bold" />
 
