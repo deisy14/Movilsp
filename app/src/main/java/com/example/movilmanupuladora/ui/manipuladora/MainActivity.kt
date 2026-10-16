@@ -4,7 +4,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
-import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -53,7 +52,6 @@ class MainActivity : AppCompatActivity() {
     private var seccionSeleccionada = 0
 
     private var jornadaActualInicio = "MANANA"
-    private var anguloRotacionActual = 0f
 
     private val platosBaseRespaldo = listOf(
         PlatoResponse(
@@ -280,89 +278,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun configurarGiroRuleta() {
-        var startY = 0f
-        var isSwiping = false
-
-        val touchListener = View.OnTouchListener { view, event ->
-            view.parent?.requestDisallowInterceptTouchEvent(true)
-
-            when (event.actionMasked) {
-                MotionEvent.ACTION_DOWN -> {
-                    startY = event.rawY
-                    isSwiping = false
-                    true
-                }
-                MotionEvent.ACTION_MOVE -> {
-                    val deltaY = event.rawY - startY
-                    if (Math.abs(deltaY) > 15) {
-                        isSwiping = true
-                        val anguloTemp = anguloRotacionActual + (deltaY * 0.4f)
-                        binding.wheelContainer.rotation = anguloTemp
-                        contraRotarImagenes(-anguloTemp)
-                    }
-                    true
-                }
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    view.parent?.requestDisallowInterceptTouchEvent(false)
-                    val deltaY = event.rawY - startY
-
-                    if (isSwiping && Math.abs(deltaY) > 30) {
-                        if (jornadaActualInicio == "MANANA") {
-                            seleccionarSeccion(0)
-                        } else {
-                            if (seccionSeleccionada == 1) {
-                                seleccionarSeccion(2)
-                            } else {
-                                seleccionarSeccion(1)
-                            }
-                        }
-                    } else if (!isSwiping) {
-                        when (view.id) {
-                            R.id.btnSeccionDesayuno -> {
-                                if (jornadaActualInicio == "MANANA") seleccionarSeccion(0)
-                            }
-                            R.id.btnSeccionAlmuerzo -> {
-                                if (jornadaActualInicio == "TARDE") seleccionarSeccion(1)
-                            }
-                            R.id.btnSeccionMerienda -> {
-                                if (jornadaActualInicio == "TARDE") seleccionarSeccion(2)
-                            }
-                        }
-                    } else {
-                        seleccionarSeccion(seccionSeleccionada)
-                    }
-                    isSwiping = false
-                    true
-                }
-                else -> false
+        binding.btnSeccionDesayuno.setOnClickListener {
+            if (jornadaActualInicio == "MANANA") {
+                seleccionarSeccion(0)
             }
         }
 
-        binding.wheelAreaContainer.setOnTouchListener(touchListener)
-        binding.wheelContainer.setOnTouchListener(touchListener)
-        binding.btnSeccionDesayuno.setOnTouchListener(touchListener)
-        binding.btnSeccionAlmuerzo.setOnTouchListener(touchListener)
-        binding.btnSeccionMerienda.setOnTouchListener(touchListener)
+        binding.btnSeccionAlmuerzo.setOnClickListener {
+            if (jornadaActualInicio == "TARDE") {
+                seleccionarSeccion(1)
+            }
+        }
+
+        binding.btnSeccionMerienda.setOnClickListener {
+            if (jornadaActualInicio == "TARDE") {
+                seleccionarSeccion(2)
+            }
+        }
     }
 
     private fun seleccionarSeccion(index: Int) {
         seccionSeleccionada = index
-
-        val targetAngle = when (index) {
-            0 -> 120f
-            1 -> 0f
-            2 -> -120f
-            else -> 0f
-        }
-
-        anguloRotacionActual = targetAngle
-
-        binding.wheelContainer.animate()
-            .rotation(targetAngle)
-            .setDuration(220)
-            .start()
-
-        contraRotarImagenes(-targetAngle)
 
         when (index) {
             0 -> {
@@ -385,25 +321,19 @@ class MainActivity : AppCompatActivity() {
         actualizarInformacionSeccion()
     }
 
-    private fun contraRotarImagenes(anguloInverso: Float) {
-        binding.cardDesayuno.rotation = anguloInverso
-        binding.cardAlmuerzo.rotation = anguloInverso
-        binding.cardMerienda.rotation = anguloInverso
-    }
-
     private fun resaltarCard(card: com.google.android.material.card.MaterialCardView, activa: Boolean) {
+        val density = resources.displayMetrics.density
         val params = card.layoutParams
-        if (activa) {
-            params.width = (76 * resources.displayMetrics.density).toInt()
-            params.height = (76 * resources.displayMetrics.density).toInt()
-            card.strokeWidth = (3.5 * resources.displayMetrics.density).toInt()
-            card.cardElevation = 6 * resources.displayMetrics.density
-        } else {
-            params.width = (64 * resources.displayMetrics.density).toInt()
-            params.height = (64 * resources.displayMetrics.density).toInt()
-            card.strokeWidth = (2.5 * resources.displayMetrics.density).toInt()
-            card.cardElevation = 3 * resources.displayMetrics.density
-        }
+        val sizePx = if (activa) (78 * density).toInt() else (58 * density).toInt()
+        params.width = sizePx
+        params.height = sizePx
+        card.radius = sizePx / 2f
+        card.shapeAppearanceModel = card.shapeAppearanceModel
+            .toBuilder()
+            .setAllCornerSizes(sizePx / 2f)
+            .build()
+        card.strokeWidth = if (activa) (3.5 * density).toInt() else (2.5 * density).toInt()
+        card.cardElevation = if (activa) 8 * density else 3 * density
         card.layoutParams = params
     }
 
