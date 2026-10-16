@@ -32,36 +32,8 @@ class ProductoAdminAdapter(
             txtCategoriaProductoAdmin.text = "${item.categoria} • Inventario Admin"
             txtCantidadUnidadAdmin.text = item.cantidadConUnidad
 
-            // Mostrar imagen según el alimento para que "se vea o parezca que va una imagen" real
-            when {
-                item.nombre.contains("arroz", ignoreCase = true) -> {
-                    imgProductoAdmin.setImageResource(R.drawable.arroz_pollo)
-                }
-                item.nombre.contains("frijol", ignoreCase = true) -> {
-                    imgProductoAdmin.setImageResource(R.drawable.frijoles)
-                }
-                item.nombre.contains("lenteja", ignoreCase = true) -> {
-                    imgProductoAdmin.setImageResource(R.drawable.lentejas_arroz)
-                }
-                item.nombre.contains("pasta", ignoreCase = true) -> {
-                    imgProductoAdmin.setImageResource(R.drawable.pasta_carne)
-                }
-                item.nombre.contains("leche", ignoreCase = true) -> {
-                    imgProductoAdmin.setImageResource(R.drawable.ic_leche)
-                }
-                item.nombre.contains("huevo", ignoreCase = true) -> {
-                    imgProductoAdmin.setImageResource(R.drawable.huevo_perico)
-                }
-                item.nombre.contains("pollo", ignoreCase = true) || item.nombre.contains("carne", ignoreCase = true) -> {
-                    imgProductoAdmin.setImageResource(R.drawable.pollo_guisado)
-                }
-                item.categoria.equals("Lácteos", ignoreCase = true) || item.categoria.equals("Lacteos", ignoreCase = true) -> {
-                    imgProductoAdmin.setImageResource(R.drawable.ic_leche)
-                }
-                else -> {
-                    imgProductoAdmin.setImageResource(item.imagenRes)
-                }
-            }
+            // Dejar el icono general de insumo para todos mientras se configuran las URLs de las fotos reales
+            imgProductoAdmin.setImageResource(R.drawable.ic_food)
 
             btnEditarProductoAdmin.setOnClickListener {
                 onEditarClick(item)
