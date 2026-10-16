@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,221 +7,190 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FAF9F5"
+    android:orientation="vertical"
     tools:context=".ui.manipuladora.InventarioActivity">
 
-    <!-- ENCABEZADO Y TÍTULO -->
-    <LinearLayout
-        android:id="@+id/headerInventario"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="28dp"
-        android:orientation="vertical"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/txtTituloInventario"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="INVENTARIO DE COCINA"
-            android:textColor="#1B3317"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/txtSubtituloInventario"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:text="Existencias e insumos en tiempo real"
-            android:textColor="#3D5C37"
-            android:textSize="12sp" />
-
-    </LinearLayout>
-
-    <!-- LOGO SIRAE PEQUEÑO -->
-    <TextView
-        android:id="@+id/txtSirae"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/bg_pill_yellow"
-        android:paddingHorizontal="10dp"
-        android:paddingVertical="4dp"
-        android:text="SIRAE PAE"
-        android:textColor="#7A5500"
-        android:textSize="11sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/headerInventario"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/headerInventario" />
-
-    <!-- BUSCADOR MODERNO -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/contenedorBusqueda"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="20dp"
-        app:cardBackgroundColor="#FFFFFF"
-        app:cardCornerRadius="14dp"
-        app:cardElevation="2dp"
-        app:strokeColor="#E2E8F0"
-        app:strokeWidth="1dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/headerInventario">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingHorizontal="14dp">
-
-            <ImageView
-                android:id="@+id/icBuscar"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:contentDescription="Buscar"
-                android:src="@drawable/ic_search"
-                app:tint="#64748B" />
-
-            <EditText
-                android:id="@+id/edtBuscarIngrediente"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="10dp"
-                android:layout_weight="1"
-                android:background="@null"
-                android:hint="Buscar insumo o ingrediente..."
-                android:importantForAutofill="no"
-                android:inputType="text"
-                android:singleLine="true"
-                android:textColor="#1B3317"
-                android:textColorHint="#94A3B8"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- BARRAS DE CATEGORÍAS EN CAPSULAS -->
-    <HorizontalScrollView
-        android:id="@+id/scrollCategorias"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginTop="12dp"
-        android:clipToPadding="false"
-        android:overScrollMode="never"
-        android:paddingHorizontal="20dp"
-        android:scrollbars="none"
-        app:layout_constraintTop_toBottomOf="@id/contenedorBusqueda">
-
-        <LinearLayout
-            android:id="@+id/contenedorCategorias"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/btnLacteos"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:background="@drawable/bg_pill_yellow"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center"
-                android:paddingHorizontal="16dp"
-                android:text="Lácteos"
-                android:textColor="#7A5500"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/btnProteina"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:layout_marginStart="8dp"
-                android:background="@drawable/bg_tag_plato"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center"
-                android:paddingHorizontal="16dp"
-                android:text="Proteína"
-                android:textColor="#1B3317"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/btnFrutas"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:layout_marginStart="8dp"
-                android:background="@drawable/bg_tag_plato"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center"
-                android:paddingHorizontal="16dp"
-                android:text="Frutas"
-                android:textColor="#1B3317"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/btnVerduras"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:layout_marginStart="8dp"
-                android:background="@drawable/bg_tag_plato"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center"
-                android:paddingHorizontal="16dp"
-                android:text="Verduras"
-                android:textColor="#1B3317"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-        </LinearLayout>
-
-    </HorizontalScrollView>
-
-    <!-- LISTA DE INSUMOS DE INVENTARIO (OCUPA TODAS LAS EXISTENCIAS HASTA LA BARRA) -->
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/scrollInventario"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="12dp"
+        android:layout_weight="1"
         android:fillViewport="true"
         android:overScrollMode="never"
-        android:scrollbars="none"
-        app:layout_constraintBottom_toTopOf="@+id/barra_navegacion"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/scrollCategorias">
+        android:scrollbars="none">
 
         <LinearLayout
-            android:id="@+id/contenedorInventario"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingHorizontal="20dp"
-            android:paddingBottom="24dp" />
+            android:paddingTop="28dp"
+            android:paddingBottom="24dp">
+
+            <!-- ENCABEZADO -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="INVENTARIO DE INSUMOS PAE"
+                        android:textColor="#1B3317"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtJornadaTitulo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Control general de alimentos en bodega y cocina"
+                        android:textColor="#3D5C37"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <!-- CHIP PAE -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_pill_yellow"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:text="PAE Cocina"
+                    android:textColor="#7A5500"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- 3 BOTONES DE CATEGORÍAS HORIZONTALMENTE (GRANOS, LÁCTEOS, VERDURAS) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:weightSum="3">
+
+                <!-- BOTÓN 1: GRANOS -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCategoriaGranos"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:text="Granos"
+                    android:textAllCaps="false"
+                    android:textColor="#1B3317"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="#FFFFFF"
+                    app:cornerRadius="12dp"
+                    app:strokeColor="#CBD5E1"
+                    app:strokeWidth="1.5dp" />
+
+                <!-- BOTÓN 2: LÁCTEOS -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCategoriaLacteos"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_marginHorizontal="3dp"
+                    android:layout_weight="1"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:text="Lácteos"
+                    android:textAllCaps="false"
+                    android:textColor="#1B3317"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="#FFFFFF"
+                    app:cornerRadius="12dp"
+                    app:strokeColor="#CBD5E1"
+                    app:strokeWidth="1.5dp" />
+
+                <!-- BOTÓN 3: VERDURAS -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCategoriaVerduras"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:text="Verduras"
+                    android:textAllCaps="false"
+                    android:textColor="#1B3317"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="#FFFFFF"
+                    app:cornerRadius="12dp"
+                    app:strokeColor="#CBD5E1"
+                    app:strokeWidth="1.5dp" />
+
+            </LinearLayout>
+
+            <!-- ENCABEZADO DE PRODUCTOS DEL ADMIN -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:layout_marginBottom="12dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/txtTituloSeccionProductos"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Inventario del Administrador"
+                    android:textColor="#1B3317"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/txtConteoProductos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Todos los insumos"
+                    android:textColor="#64748B"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- LISTA DE PRODUCTOS DEL ADMIN (MODO SOLO LECTURA, SIN LÁPIZ DE EDICIÓN) -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvProductosAdmin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                tools:itemCount="5"
+                tools:listitem="@layout/item_producto_manipuladora" />
+
+        </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
 
-    <!-- BARRA DE NAVEGACIÓN -->
+    <!-- BARRA DE NAVEGACIÓN DE LA MANIPULADORA -->
     <include
         android:id="@+id/barra_navegacion"
         layout="@layout/activity_barra_navegacion"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
