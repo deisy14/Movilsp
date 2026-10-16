@@ -125,7 +125,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="📦 Cantidad programada: 50 lb"
+                    android:text="Cantidad programada: 50 lb"
                     android:textColor="#176B35"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -137,7 +137,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
                     android:checked="true"
-                    android:text="✓ Llegó completo tal cual lo enviado"
+                    android:text="Llegó completo tal cual lo enviado"
                     android:textColor="#1D2939"
                     android:textSize="14sp"
                     android:textStyle="bold" />
