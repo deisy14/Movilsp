@@ -133,7 +133,7 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center"
-                    android:text="☀️ MAÑANA"
+                    android:text="MAÑANA"
                     android:textColor="#7A5500"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -146,7 +146,7 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center"
-                    android:text="🌤️ TARDE"
+                    android:text="TARDE"
                     android:textColor="#64748B"
                     android:textSize="13sp"
                     android:textStyle="bold" />
