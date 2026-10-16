@@ -79,6 +79,12 @@ class InventarioActivity : AppCompatActivity() {
         cargarDatosDeInventario()
     }
 
+    override fun onResume() {
+        super.onResume()
+        RetrofitClient.authToken = sessionManager.fetchAuthToken()
+        cargarDatosDeInventario()
+    }
+
     private fun cargarDatosDeInventario() {
         lifecycleScope.launch {
             try {
@@ -119,7 +125,12 @@ class InventarioActivity : AppCompatActivity() {
             val marcaTexto = if (!ingrediente?.marcaIngrediente.isNullOrEmpty()) " · ${ingrediente?.marcaIngrediente}" else ""
 
             val cantidadItem = item.cantidadActual?.toDoubleOrNull() ?: item.cantidad ?: 0.0
-            val unidadItem = item.unidad_medida ?: "kg"
+            val unidadItem = when (item.idUnidadMedida) {
+                1 -> "kg"
+                2 -> "L"
+                3 -> "u"
+                else -> item.unidad_medida ?: "kg"
+            }
 
             txtNombre.text = "$nombreItem$marcaTexto"
             txtDetalle.text = "$cantidadItem $unidadItem disponibles"
