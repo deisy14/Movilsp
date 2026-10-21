@@ -17,16 +17,19 @@ class TurnoActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTurnoBinding
 
     private val handler = Handler(Looper.getMainLooper())
+    private var isNavigating = false
 
     private val irSiguientePantalla = Runnable {
+        if (!isNavigating) {
+            isNavigating = true
+            val intent = Intent(
+                this,
+                MainActivity::class.java
+            )
 
-        val intent = Intent(
-            this,
-            MainActivity::class.java
-        )
-
-        startActivity(intent)
-        finish()
+            startActivity(intent)
+            finish()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -31,7 +31,7 @@
             android:paddingBottom="30dp">
 
             <!-- ================================================= -->
-            <!-- ENCABEZADO Y NOTIFICACIONES                      -->
+            <!-- ENCABEZADO Y ACCIONES (REDACCIÓN, NOTIFICACIONES, PERFIL) -->
             <!-- ================================================= -->
 
             <LinearLayout
@@ -40,30 +40,9 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/btnPerfilHeader"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    app:cardBackgroundColor="#F4B41F"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="2dp"
-                    app:strokeWidth="0dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="JF"
-                        android:textColor="#1B3317"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                </com.google.android.material.card.MaterialCardView>
-
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
                     android:layout_weight="1"
                     android:orientation="vertical">
 
@@ -87,27 +66,62 @@
 
                 </LinearLayout>
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/btnNotificaciones"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground"
-                    app:cardBackgroundColor="#FFFFFF"
-                    app:cardCornerRadius="22dp"
-                    app:cardElevation="3dp"
-                    app:strokeWidth="0dp">
+                <!-- BOTONES DE ACCIÓN EN EL ENCABEZADO (NOTIFICACIONES, PERFIL) -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:layout_gravity="center"
-                        android:contentDescription="Notificaciones"
-                        android:src="@drawable/ic_notificaciones"
-                        app:tint="#1B3317" />
+                    <!-- BOTÓN DE NOTIFICACIONES -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/btnNotificaciones"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:layout_marginEnd="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="22dp"
+                        app:cardElevation="3dp"
+                        app:strokeWidth="0dp">
 
-                </com.google.android.material.card.MaterialCardView>
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="Notificaciones"
+                            android:src="@drawable/ic_notificaciones"
+                            app:tint="#1B3317" />
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- BOTÓN DE PERFIL -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/btnPerfilHeader"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        app:cardBackgroundColor="#F4B41F"
+                        app:cardCornerRadius="22dp"
+                        app:cardElevation="3dp"
+                        app:strokeWidth="0dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="JF"
+                            android:textColor="#1B3317"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -162,6 +176,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
+                android:clipChildren="false"
+                android:clipToPadding="false"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -197,7 +213,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Plato recomendado teniendo en cuenta inventario y asistencia"
+                    android:text="Platos recomendados para la jornada de la mañana"
                     android:textColor="#64748B"
                     android:textSize="12sp" />
 
@@ -205,17 +221,19 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp">
+                    android:layout_marginTop="12dp"
+                    android:clipChildren="false"
+                    android:clipToPadding="false">
 
                     <androidx.viewpager2.widget.ViewPager2
                         android:id="@+id/viewPagerSugerenciasIA"
                         android:layout_width="0dp"
-                        android:layout_height="225dp"
+                        android:layout_height="235dp"
                         android:clipChildren="false"
                         android:clipToPadding="false"
                         android:overScrollMode="never"
-                        android:paddingStart="42dp"
-                        android:paddingEnd="42dp"
+                        android:paddingStart="68dp"
+                        android:paddingEnd="68dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -228,6 +246,7 @@
                         android:layout_marginStart="4dp"
                         android:background="@drawable/bg_flecha"
                         android:contentDescription="Plato anterior"
+                        android:elevation="8dp"
                         android:padding="10dp"
                         android:src="@drawable/ic_arrow"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -242,6 +261,7 @@
                         android:layout_marginEnd="4dp"
                         android:background="@drawable/bg_flecha"
                         android:contentDescription="Plato siguiente"
+                        android:elevation="8dp"
                         android:padding="10dp"
                         android:src="@drawable/ic_arrow_forward"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -625,7 +645,7 @@
     <!-- BARRA DE NAVEGACIÓN INFERIOR EXCLUSIVA DE JEFA -->
     <include
         android:id="@+id/barra_navegacion_jefa"
-        layout="@layout/barra_navegacion_jefa"
+        layout="@layout/view_bottom_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

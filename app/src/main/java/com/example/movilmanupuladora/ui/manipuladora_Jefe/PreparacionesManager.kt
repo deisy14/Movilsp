@@ -22,6 +22,11 @@ object PreparacionesManager {
 
     fun obtenerPreparaciones(): List<Preparacion> = preparaciones.toList()
 
+    fun agregarPreparacion(menu: String, jornada: String, ninos: Int = 120) {
+        val nuevoId = (preparaciones.maxOfOrNull { it.id } ?: 0) + 1
+        preparaciones.add(0, Preparacion(nuevoId, menu, jornada, ninos, "Pendiente"))
+    }
+
     fun actualizarEstado(id: Int, nuevoEstado: String, horaInicio: String = "", observaciones: String = "") {
         preparaciones.find { it.id == id }?.let {
             it.estado = nuevoEstado

@@ -4,12 +4,14 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.CompositePageTransformer
-import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.data.api.RetrofitClient
@@ -40,10 +42,9 @@ class InicioJefaActivity : AppCompatActivity() {
     )
 
     private val platosManana = mutableListOf(
-        Plato(id = 5, nombre = "Pollo Guisado Criollo", componente = "Pollo y Guiso", imagen = R.drawable.pollo_guisado),
-        Plato(id = 6, nombre = "Café con Pan y Huevo", componente = "Desayuno", imagen = R.drawable.comida_desayuno),
-        Plato(id = 7, nombre = "Bandeja Paisa Tradicional", componente = "Frijoles y carne", imagen = R.drawable.bandeja_paisa),
-        Plato(id = 10, nombre = "Pasta con Carne Molida", componente = "Proteína", imagen = R.drawable.pasta_carne)
+        Plato(id = 5, nombre = "arroz chino", componente = "Arroz", imagen = R.drawable.pollo_guisado),
+        Plato(id = 6, nombre = "cafe con pan", componente = "Desayuno", imagen = R.drawable.pollo_guisado),
+        Plato(id = 7, nombre = "polloooo", componente = "Proteína", imagen = R.drawable.pollo_guisado)
     )
 
     private val platosTarde = mutableListOf(
@@ -61,9 +62,16 @@ class InicioJefaActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
 
         binding = ActivityInicioJefaBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         sessionManager = SessionManager(this)
 
@@ -112,13 +120,30 @@ class InicioJefaActivity : AppCompatActivity() {
         binding.viewPagerSugerenciasIA.adapter = adapter
         binding.viewPagerSugerenciasIA.offscreenPageLimit = 3
 
+        // Desactivar recortes en el RecyclerView interno de ViewPager2
+        (binding.viewPagerSugerenciasIA.getChildAt(0) as? RecyclerView)?.apply {
+            clipChildren = false
+            clipToPadding = false
+        }
+
         val pageTransformer = CompositePageTransformer().apply {
-            addTransformer(MarginPageTransformer((12 * resources.displayMetrics.density).toInt()))
             addTransformer { page, position ->
-                val r = 1 - Math.abs(position)
-                page.scaleY = 0.85f + r * 0.15f
-                page.scaleX = 0.85f + r * 0.15f
-                page.alpha = 0.6f + r * 0.4f
+                val absPosition = Math.abs(position)
+
+                // 1. Escala: La tarjeta principal seleccionada (centro, position = 0) destaca al 108%, laterales al 70%
+                val scale = 0.70f + (1.08f - 0.70f) * (1.0f - Math.min(1.0f, absPosition))
+                page.scaleX = scale
+                page.scaleY = scale
+
+                // 2. Opacidad: La seleccionada al 100%, laterales al 80%
+                page.alpha = 0.80f + (1.0f - 0.80f) * (1.0f - Math.min(1.0f, absPosition))
+
+                // 3. Elevación Z: La tarjeta central seleccionada se ubica SIEMPRE POR ENCIMA DE TODAS
+                page.translationZ = (1.0f - Math.min(1.0f, absPosition)) * 30f
+
+                // 4. Traslape Horizontal: Desplaza los discos laterales hacia adentro para que queden DETRÁS
+                val overlap = page.width * 0.32f
+                page.translationX = -position * overlap
             }
         }
 
@@ -133,7 +158,10 @@ class InicioJefaActivity : AppCompatActivity() {
             }
         })
 
-        actualizarIndicadorPuntos(0, platosActuales.size)
+        val initialPos = if (platosActuales.size >= 3) 1 else 0
+        binding.viewPagerSugerenciasIA.setCurrentItem(initialPos, false)
+        posicionPlato = initialPos
+        actualizarIndicadorPuntos(initialPos, platosActuales.size)
     }
 
     private fun configurarMenuDisponiblePAE() {

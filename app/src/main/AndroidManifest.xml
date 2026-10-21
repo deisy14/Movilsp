@@ -178,6 +178,10 @@
             android:name=".ui.manipuladora_Jefe.ResumenDiaActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora_Jefe.RedactarRecetaActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

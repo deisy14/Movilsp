@@ -187,7 +187,7 @@
     <!-- BARRA NAVEGACIÓN EXCLUSIVA JEFA -->
     <include
         android:id="@+id/barra_navegacion_jefa"
-        layout="@layout/barra_navegacion_jefa"
+        layout="@layout/view_bottom_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

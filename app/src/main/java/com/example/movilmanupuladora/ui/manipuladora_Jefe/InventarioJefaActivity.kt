@@ -8,13 +8,17 @@ import android.text.InputType
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.databinding.ActivityInventarioJefaBinding
+import com.example.movilmanupuladora.utils.NavigationHelperJefa
 import com.example.movilmanupuladora.utils.SessionManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -35,8 +39,16 @@ class InventarioJefaActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+
         binding = ActivityInventarioJefaBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         inicializarListaProductos()
         configurarRecyclerView()
@@ -405,40 +417,11 @@ class InventarioJefaActivity : AppCompatActivity() {
      * Configuración de la barra de navegación exclusiva de la Jefa
      */
     private fun configurarNavegacionInferior() {
-        val barra = binding.barraNavegacionJefa
-
-        // Marcar la pestaña actual (Inventario) como activa
-        barra.iconNavInventario.setColorFilter(Color.parseColor("#1B3317"))
-        barra.txtNavInventario.setTextColor(Color.parseColor("#1B3317"))
-        barra.txtNavInventario.paint.isFakeBoldText = true
-
-        barra.navInicio.setOnClickListener {
-            val intent = Intent(this, InicioJefaActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(intent)
-            finish()
-        }
-
-        barra.navPreparaciones.setOnClickListener {
-            val intent = Intent(this, PreparacionesJefaActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(intent)
-            finish()
-        }
-
-        barra.navManipuladoras.setOnClickListener {
-            val intent = Intent(this, ManipuladorasJefaActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(intent)
-            finish()
-        }
-
-        barra.navPerfil.setOnClickListener {
-            val intent = Intent(this, PerfilJefaActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(intent)
-            finish()
-        }
+        NavigationHelperJefa.setupBarraNavegacionJefa(
+            this,
+            binding.barraNavegacionJefa,
+            NavigationHelperJefa.TabJefa.INVENTARIO
+        )
     }
 
     private fun dpToPx(dp: Float): Int {

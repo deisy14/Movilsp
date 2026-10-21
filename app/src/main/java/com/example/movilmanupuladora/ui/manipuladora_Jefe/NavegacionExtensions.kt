@@ -1,44 +1,23 @@
 package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
-import com.example.movilmanupuladora.R
-
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
+import com.example.movilmanupuladora.R
+import com.example.movilmanupuladora.utils.NavigationHelperJefa
 
 fun AppCompatActivity.configurarNavegacionInferior() {
-    findViewById<android.view.View>(R.id.navInicio)?.setOnClickListener {
-        if (this !is InicioJefaActivity) {
-            val intent = Intent(this, InicioJefaActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            startActivity(intent)
-        }
+    val tabActual = when (this) {
+        is InicioJefaActivity -> NavigationHelperJefa.TabJefa.INICIO
+        is InventarioJefaActivity -> NavigationHelperJefa.TabJefa.INVENTARIO
+        is PreparacionesJefaActivity -> NavigationHelperJefa.TabJefa.PREPARACIONES
+        is ManipuladorasJefaActivity -> NavigationHelperJefa.TabJefa.MANIPULADORAS
+        is PerfilJefaActivity -> NavigationHelperJefa.TabJefa.PERFIL
+        else -> NavigationHelperJefa.TabJefa.INICIO
     }
-    findViewById<android.view.View>(R.id.navInventario)?.setOnClickListener {
-        if (this !is InventarioJefaActivity) {
-            val intent = Intent(this, InventarioJefaActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            startActivity(intent)
-        }
-    }
-    findViewById<android.view.View>(R.id.navPreparaciones)?.setOnClickListener {
-        if (this !is PreparacionesJefaActivity) {
-            val intent = Intent(this, PreparacionesJefaActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            startActivity(intent)
-        }
-    }
-    findViewById<android.view.View>(R.id.navManipuladoras)?.setOnClickListener {
-        if (this !is ManipuladorasJefaActivity) {
-            val intent = Intent(this, ManipuladorasJefaActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            startActivity(intent)
-        }
-    }
-    findViewById<android.view.View>(R.id.navPerfil)?.setOnClickListener {
-        if (this !is PerfilJefaActivity) {
-            val intent = Intent(this, PerfilJefaActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            startActivity(intent)
-        }
-    }
+
+    val bottomBarView = findViewById<android.view.View>(R.id.viewBottomBarContainer)
+        ?: findViewById<android.view.View>(R.id.barraNavegacionJefaContainer)
+        ?: findViewById<android.view.View>(R.id.barra_navegacion_jefa)
+        ?: window.decorView
+
+    NavigationHelperJefa.setupBarraNavegacionJefaView(this, bottomBarView, tabActual)
 }

@@ -63,11 +63,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:orientation="vertical"
                 app:layout_constraintTop_toTopOf="@id/layoutLogoPae"
                 app:layout_constraintStart_toEndOf="@id/layoutLogoPae"
-                app:layout_constraintEnd_toStartOf="@id/btnNotificaciones">
+                app:layout_constraintEnd_toStartOf="@id/layoutAccionesHeader">
 
                 <TextView
                     android:id="@+id/tvBienvenidaLabel"
@@ -110,50 +110,86 @@
 
             </LinearLayout>
 
-            <!-- NOTIFICACIONES -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/btnNotificaciones"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
+            <!-- ACCIONES DEL ENCABEZADO (NOTIFICACIONES Y PERFIL) -->
+            <LinearLayout
+                android:id="@+id/layoutAccionesHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="22dp"
-                app:cardElevation="3dp"
-                app:strokeWidth="0dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
                 app:layout_constraintTop_toTopOf="@id/layoutLogoPae"
                 app:layout_constraintEnd_toEndOf="parent">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                <!-- NOTIFICACIONES -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/btnNotificaciones"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:layout_marginEnd="8dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="22dp"
+                    app:cardElevation="3dp"
+                    app:strokeWidth="0dp">
 
-                    <ImageView
-                        android:id="@+id/imgCampana"
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:contentDescription="Notificaciones"
-                        android:src="@drawable/ic_notificaciones"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent" />
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
 
-                    <View
-                        android:id="@+id/viewRedDot"
-                        android:layout_width="8dp"
-                        android:layout_height="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:background="@drawable/bg_pill_yellow"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent" />
+                        <ImageView
+                            android:id="@+id/imgCampana"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:contentDescription="Notificaciones"
+                            android:src="@drawable/ic_notificaciones"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent" />
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        <View
+                            android:id="@+id/viewRedDot"
+                            android:layout_width="8dp"
+                            android:layout_height="8dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:background="@drawable/bg_icono_circular"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent" />
 
-            </com.google.android.material.card.MaterialCardView>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- PERFIL -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/btnPerfilHeader"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardBackgroundColor="#F4B41F"
+                    app:cardCornerRadius="22dp"
+                    app:cardElevation="3dp"
+                    app:strokeWidth="0dp">
+
+                    <TextView
+                        android:id="@+id/txtInicialesPerfilHeader"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="ML"
+                        android:textColor="#1B3317"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
 
             <!-- SELECTOR DE JORNADA -->
             <LinearLayout

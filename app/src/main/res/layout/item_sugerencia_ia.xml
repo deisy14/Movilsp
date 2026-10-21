@@ -1,65 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:cardBackgroundColor="#FFFFFF"
-    app:cardCornerRadius="20dp"
-    app:cardElevation="4dp"
-    app:strokeColor="#F4B41F"
-    app:strokeWidth="2.5dp">
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:padding="2dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="12dp">
+    <!-- Tarjeta Circular Completa (Disco Perfecto 100% Redondo) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardPlatoContenedor"
+        android:layout_width="215dp"
+        android:layout_height="215dp"
+        android:layout_gravity="center"
+        app:cardBackgroundColor="#FFFFFF"
+        app:cardCornerRadius="107.5dp"
+        app:cardElevation="8dp"
+        app:strokeColor="#1B3317"
+        app:strokeWidth="6dp">
 
-        <com.google.android.material.card.MaterialCardView
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp"
-            app:strokeWidth="0dp">
+            android:layout_height="match_parent">
 
+            <!-- Imagen Circular del Plato -->
             <ImageView
                 android:id="@+id/imgPlatoCarousel"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:contentDescription="Sugerencia de plato"
+                android:contentDescription="Sugerencia de plato IA"
                 android:scaleType="centerCrop"
                 android:src="@drawable/pollo_guisado" />
 
-        </com.google.android.material.card.MaterialCardView>
+            <!-- Sombra Gradiente de Fondo Corto -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="90dp"
+                android:layout_gravity="bottom"
+                android:background="@drawable/bg_gradient_bottom_overlay" />
 
-        <TextView
-            android:id="@+id/tvNombrePlatoCarousel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="Pollo guisado"
-            android:textColor="#1B3317"
-            android:textSize="17sp"
-            android:textStyle="bold" />
+            <!-- Contenedor con la Nube/Píldora Blanca Central dentro del Círculo -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvBadgeDisponibilidad"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:background="@drawable/bg_pill_green"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="4dp"
-            android:text="✓ Ingredientes disponibles"
-            android:textColor="#2A5226"
-            android:textSize="11sp"
-            android:textStyle="bold" />
+                <!-- Ícono Circular Flotante (Sol / Reloj) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardIconoMomento"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginBottom="-9dp"
+                    android:translationZ="6dp"
+                    app:cardBackgroundColor="#FFF1A8"
+                    app:cardCornerRadius="15dp"
+                    app:cardElevation="4dp"
+                    app:strokeWidth="0dp">
 
-    </LinearLayout>
+                    <ImageView
+                        android:id="@+id/imgIconoMomento"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="Ícono"
+                        android:src="@drawable/ic_reloj"
+                        app:tint="#7A5500" />
+                </com.google.android.material.card.MaterialCardView>
 
-</com.google.android.material.card.MaterialCardView>
+                <!-- Etiqueta Blanca Tipo Nube Central dentro del Disco -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="165dp"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="5dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="8dp"
+                        android:paddingTop="11dp"
+                        android:paddingBottom="6dp">
+
+                        <!-- NOMBRE DEL PLATO (ej. Pollo Guisado Criollo) en lugar de "Almuerzo" -->
+                        <TextView
+                            android:id="@+id/tvNombrePlatoCarousel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:gravity="center"
+                            android:maxLines="2"
+                            android:text="Pollo Guisado Criollo"
+                            android:textColor="#1B3317"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <!-- Píldora Verde de Estado / Disponibilidad -->
+                        <TextView
+                            android:id="@+id/tvBadgeDisponibilidad"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:background="@drawable/bg_pill_green"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="2dp"
+                            android:text="✓ Recom. IA"
+                            android:textColor="#2A5226"
+                            android:textSize="9.5sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</FrameLayout>
