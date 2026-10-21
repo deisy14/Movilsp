@@ -41,6 +41,10 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name=".ui.auth.RecuperarPasswordActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".ui.manipuladora.TurnoActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />

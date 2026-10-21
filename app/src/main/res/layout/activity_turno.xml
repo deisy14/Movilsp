@@ -18,7 +18,7 @@
         android:id="@+id/imgFondo"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:src="@drawable/sirae_fondo"
+        android:src="@drawable/fondo_sirae"
         android:scaleType="centerCrop"
         android:contentDescription="@null"
         app:layout_constraintTop_toTopOf="parent"

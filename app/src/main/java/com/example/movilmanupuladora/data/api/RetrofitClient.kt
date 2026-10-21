@@ -22,8 +22,8 @@ object RetrofitClient {
         val request = chain.request()
         val requestBuilder = request.newBuilder()
 
-        // No adjuntar token en login o registro inicial
-        val isAuthEndpoint = request.url.encodedPath.contains("auth/login") ||
+        // No adjuntar token en login, recuperación o registro inicial
+        val isAuthEndpoint = request.url.encodedPath.contains("auth/") ||
                 (request.url.encodedPath.contains("usuarios") && request.method == "POST")
 
         if (!isAuthEndpoint && !authToken.isNullOrEmpty()) {

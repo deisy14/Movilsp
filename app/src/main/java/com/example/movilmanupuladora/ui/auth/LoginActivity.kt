@@ -27,6 +27,19 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var sessionManager: SessionManager
 
+    private val recuperarPasswordLauncher = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            val correo = result.data?.getStringExtra(RecuperarPasswordActivity.EXTRA_CORREO)
+            if (!correo.isNullOrEmpty()) {
+                binding.txtCorreo.setText(correo)
+                binding.txtPassword.setText("")
+                binding.txtPassword.requestFocus()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -53,11 +66,11 @@ class LoginActivity : AppCompatActivity() {
             if (passwordVisible) {
                 binding.txtPassword.transformationMethod =
                     android.text.method.HideReturnsTransformationMethod.getInstance()
-                binding.btnTogglePassword.setImageResource(R.drawable.ic_visibility)
+                binding.btnTogglePassword.setImageResource(R.drawable.ic_visibility_white)
             } else {
                 binding.txtPassword.transformationMethod =
                     android.text.method.PasswordTransformationMethod.getInstance()
-                binding.btnTogglePassword.setImageResource(R.drawable.ic_visibility_off)
+                binding.btnTogglePassword.setImageResource(R.drawable.ic_visibility_off_white)
             }
             binding.txtPassword.setSelection(binding.txtPassword.text.length)
         }
@@ -98,20 +111,25 @@ class LoginActivity : AppCompatActivity() {
         // =====================================================
 
         binding.txtOlvide.setOnClickListener {
-            androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Recuperar contraseña")
-                .setMessage("Para restablecer tu contraseña, por favor solicita la actualización a tu Administrador o comunícate con la coordinación del PAE.")
-                .setPositiveButton("Aceptar", null)
-                .show()
+            val correoActual = binding.txtCorreo.text.toString().trim()
+            val intent = Intent(this, RecuperarPasswordActivity::class.java).apply {
+                if (correoActual.isNotEmpty()) {
+                    putExtra(RecuperarPasswordActivity.EXTRA_CORREO, correoActual)
+                }
+            }
+            recuperarPasswordLauncher.launch(intent)
         }
 
-        binding.txtAdministrador.setOnClickListener {
+        val clickAdminListener = View.OnClickListener {
             androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("Contactar Administrador")
                 .setMessage("Si tienes inconvenientes para ingresar a la aplicación móvil, comunícate con el Administrador institucional del sistema SIRAE.")
                 .setPositiveButton("Aceptar", null)
                 .show()
         }
+
+        binding.txtAdministrador.setOnClickListener(clickAdminListener)
+        binding.layoutAdminContacto.setOnClickListener(clickAdminListener)
     }
 
     // =========================================================
@@ -289,20 +307,25 @@ class LoginActivity : AppCompatActivity() {
         if (cargando) {
 
             binding.btnIngresar.text = "Ingresando..."
+            binding.btnIngresar.icon = null
 
             binding.txtCorreo.isEnabled = false
             binding.txtPassword.isEnabled = false
             binding.txtOlvide.isEnabled = false
             binding.txtAdministrador.isEnabled = false
+            binding.layoutAdminContacto.isEnabled = false
 
         } else {
 
             binding.btnIngresar.text = "Ingresar"
+            binding.btnIngresar.icon = androidx.core.content.ContextCompat.getDrawable(this, R.drawable.ic_arrow_forward)
+            binding.btnIngresar.iconTint = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#181B1F"))
 
             binding.txtCorreo.isEnabled = true
             binding.txtPassword.isEnabled = true
             binding.txtOlvide.isEnabled = true
             binding.txtAdministrador.isEnabled = true
+            binding.layoutAdminContacto.isEnabled = true
         }
     }
 
