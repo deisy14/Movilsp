@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.movilmanupuladora.R
@@ -82,9 +83,16 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         SessionManager.getToken(this)
 
@@ -108,6 +116,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnNotificaciones.setOnClickListener {
             mostrarPopupNotificaciones()
+        }
+
+        binding.btnPerfilHeader.setOnClickListener {
+            startActivity(Intent(this, PerfilActivity::class.java))
         }
 
         binding.btnVerPreparacion.setOnClickListener {
@@ -205,16 +217,17 @@ class MainActivity : AppCompatActivity() {
             binding.btnJornadaTarde.setBackgroundResource(R.drawable.bg_tag_plato)
             binding.btnJornadaTarde.setTextColor(Color.parseColor("#64748B"))
 
+            // Jornada Mañana: Desayuno y Almuerzo activos
             binding.btnSeccionDesayuno.alpha = 1.0f
             binding.btnSeccionDesayuno.isEnabled = true
 
-            binding.btnSeccionAlmuerzo.alpha = 0.35f
-            binding.btnSeccionAlmuerzo.isEnabled = false
+            binding.btnSeccionAlmuerzo.alpha = 1.0f
+            binding.btnSeccionAlmuerzo.isEnabled = true
 
             binding.btnSeccionMerienda.alpha = 0.35f
             binding.btnSeccionMerienda.isEnabled = false
 
-            seleccionarSeccion(0)
+            seleccionarSeccion(0) // Selecciona Desayuno por defecto
         } else {
             binding.btnJornadaTarde.setBackgroundResource(R.drawable.bg_pill_yellow)
             binding.btnJornadaTarde.setTextColor(Color.parseColor("#7A5500"))
@@ -222,16 +235,17 @@ class MainActivity : AppCompatActivity() {
             binding.btnJornadaManana.setBackgroundResource(R.drawable.bg_tag_plato)
             binding.btnJornadaManana.setTextColor(Color.parseColor("#64748B"))
 
+            // Jornada Tarde: Solo Merienda activa
             binding.btnSeccionDesayuno.alpha = 0.35f
             binding.btnSeccionDesayuno.isEnabled = false
 
-            binding.btnSeccionAlmuerzo.alpha = 1.0f
-            binding.btnSeccionAlmuerzo.isEnabled = true
+            binding.btnSeccionAlmuerzo.alpha = 0.35f
+            binding.btnSeccionAlmuerzo.isEnabled = false
 
             binding.btnSeccionMerienda.alpha = 1.0f
             binding.btnSeccionMerienda.isEnabled = true
 
-            seleccionarSeccion(1)
+            seleccionarSeccion(2) // Selecciona Merienda por defecto
         }
     }
 
@@ -285,7 +299,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnSeccionAlmuerzo.setOnClickListener {
-            if (jornadaActualInicio == "TARDE") {
+            if (jornadaActualInicio == "MANANA") {
                 seleccionarSeccion(1)
             }
         }
@@ -324,7 +338,7 @@ class MainActivity : AppCompatActivity() {
     private fun resaltarCard(card: com.google.android.material.card.MaterialCardView, activa: Boolean) {
         val density = resources.displayMetrics.density
         val params = card.layoutParams
-        val sizePx = if (activa) (78 * density).toInt() else (58 * density).toInt()
+        val sizePx = if (activa) (92 * density).toInt() else (52 * density).toInt()
         params.width = sizePx
         params.height = sizePx
         card.radius = sizePx / 2f
@@ -332,8 +346,8 @@ class MainActivity : AppCompatActivity() {
             .toBuilder()
             .setAllCornerSizes(sizePx / 2f)
             .build()
-        card.strokeWidth = if (activa) (3.5 * density).toInt() else (2.5 * density).toInt()
-        card.cardElevation = if (activa) 8 * density else 3 * density
+        card.strokeWidth = if (activa) (4 * density).toInt() else (2 * density).toInt()
+        card.cardElevation = if (activa) 12 * density else 2 * density
         card.layoutParams = params
     }
 
@@ -488,37 +502,98 @@ class MainActivity : AppCompatActivity() {
         binding.cardAsistenciaSumatoria.setOnClickListener {
             lifecycleScope.launch {
                 cargarAsistenciaBackend()
-
-                val p = AsistenciaManager.obtenerPrimaria(this@MainActivity)
-                val s = AsistenciaManager.obtenerSecundaria(this@MainActivity)
-                val total = p + s
-
-                if (total > 0) {
-                    val kgPrimaria = p * 0.25
-                    val kgSecundaria = s * 0.38
-                    val kgTotal = kgPrimaria + kgSecundaria
-
-                    MaterialAlertDialogBuilder(this@MainActivity)
-                        .setTitle("Sumatoria Asistencia PAE")
-                        .setMessage(
-                            "📊 Asistencia de estudiantes registrada para hoy:\n\n" +
-                            "• Primaria: $p niños (~${String.format(Locale.US, "%.1f", kgPrimaria)} kg)\n" +
-                            "• Secundaria: $s estudiantes (~${String.format(Locale.US, "%.1f", kgSecundaria)} kg)\n" +
-                            "───────────────────────\n" +
-                            "• Total raciones a servir: $total raciones\n" +
-                            "• Gramaje total PAE: ${String.format(Locale.US, "%.1f", kgTotal)} kg"
-                        )
-                        .setPositiveButton("Entendido", null)
-                        .show()
-                } else {
-                    MaterialAlertDialogBuilder(this@MainActivity)
-                        .setTitle("Sumatoria Asistencia PAE")
-                        .setMessage("📊 Asistencia registrada para hoy: 0 raciones.\n(Primaria: 0 | Secundaria: 0 - Sin jornada escolar hoy).")
-                        .setPositiveButton("Entendido", null)
-                        .show()
-                }
+                mostrarDialogoAsistenciaPorGrados()
             }
         }
+    }
+
+    private fun mostrarDialogoAsistenciaPorGrados() {
+        val vistaDialogo = android.view.LayoutInflater.from(this).inflate(
+            R.layout.dialog_registrar_asistencia,
+            null
+        )
+
+        val txtTitulo = vistaDialogo.findViewById<android.widget.TextView>(R.id.txtTituloDialog)
+        txtTitulo.text = "Asistencia de Estudiantes por Grado"
+
+        val edtJardin = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoJardin)
+        val edtP1 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoPrimero)
+        val edtP2 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoSegundo)
+        val edtP3 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoTercero)
+        val edtP4 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoCuarto)
+        val edtP5 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoQuinto)
+
+        val edtS6 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoSexto)
+        val edtS7 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoSeptimo)
+        val edtS8 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoOctavo)
+        val edtS9 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoNoveno)
+        val edtS10 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoDecimo)
+        val edtS11 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtCantidadSecundaria)
+
+        val txtTotalCalc = vistaDialogo.findViewById<android.widget.TextView>(R.id.txtTotalEstudiantesCalculado)
+        val txtGramajeCalc = vistaDialogo.findViewById<android.widget.TextView>(R.id.txtGramajeTotalEstimado)
+
+        val btnCancelar = vistaDialogo.findViewById<android.widget.Button>(R.id.btnCancelarAsistencia)
+        val btnGuardar = vistaDialogo.findViewById<android.widget.Button>(R.id.btnGuardarAsistencia)
+
+        btnGuardar.text = "Entendido"
+        btnCancelar.visibility = View.GONE
+
+        // Cargar valores guardados en AsistenciaManager
+        val detalle = AsistenciaManager.obtenerDetalleGradosHoy(this)
+        edtJardin.setText(detalle["jar"].orEmpty())
+        edtP1.setText(detalle["p1"].orEmpty())
+        edtP2.setText(detalle["p2"].orEmpty())
+        edtP3.setText(detalle["p3"].orEmpty())
+        edtP4.setText(detalle["p4"].orEmpty())
+        edtP5.setText(detalle["p5"].orEmpty())
+
+        edtS6.setText(detalle["s6"].orEmpty())
+        edtS7.setText(detalle["s7"].orEmpty())
+        edtS8.setText(detalle["s8"].orEmpty())
+        edtS9.setText(detalle["s9"].orEmpty())
+        edtS10.setText(detalle["s10"].orEmpty())
+        edtS11.setText(detalle["s11"].orEmpty())
+
+        // Deshabilitar edición para la manipuladora (modo consulta)
+        listOf(edtJardin, edtP1, edtP2, edtP3, edtP4, edtP5, edtS6, edtS7, edtS8, edtS9, edtS10, edtS11).forEach {
+            it.isEnabled = false
+            it.setTextColor(Color.parseColor("#1B3317"))
+        }
+
+        val pTotal = (edtJardin.text.toString().trim().toIntOrNull() ?: 0) +
+                     (edtP1.text.toString().trim().toIntOrNull() ?: 0) +
+                     (edtP2.text.toString().trim().toIntOrNull() ?: 0) +
+                     (edtP3.text.toString().trim().toIntOrNull() ?: 0) +
+                     (edtP4.text.toString().trim().toIntOrNull() ?: 0) +
+                     (edtP5.text.toString().trim().toIntOrNull() ?: 0)
+
+        val sTotal = (edtS6.text.toString().trim().toIntOrNull() ?: 0) +
+                     (edtS7.text.toString().trim().toIntOrNull() ?: 0) +
+                     (edtS8.text.toString().trim().toIntOrNull() ?: 0) +
+                     (edtS9.text.toString().trim().toIntOrNull() ?: 0) +
+                     (edtS10.text.toString().trim().toIntOrNull() ?: 0) +
+                     (edtS11.text.toString().trim().toIntOrNull() ?: 0)
+
+        val finalP = if (pTotal > 0) pTotal else AsistenciaManager.obtenerPrimaria(this)
+        val finalS = if (sTotal > 0) sTotal else AsistenciaManager.obtenerSecundaria(this)
+        val total = finalP + finalS
+
+        val gramajeKg = (finalP * 0.25) + (finalS * 0.38)
+        txtTotalCalc.text = "Total Estudiantes: $total (Primaria: $finalP | Secundaria: $finalS)"
+        txtGramajeCalc.text = String.format(Locale.US, "Gramaje total estimado: %.1f kg a cocinar", gramajeKg)
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(vistaDialogo)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        btnGuardar.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun obtenerPlatoPorSeccion(nombreSeccion: String): PlatoResponse? {

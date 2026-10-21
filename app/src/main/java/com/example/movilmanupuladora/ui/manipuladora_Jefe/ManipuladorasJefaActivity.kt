@@ -3,12 +3,15 @@ package com.example.movilmanupuladora.ui.manipuladora_Jefe
 import com.example.movilmanupuladora.R
 
 import android.app.AlertDialog
-import android.content.Intent
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.example.movilmanupuladora.databinding.ActivityManipuladorasJefaBinding
+import com.example.movilmanupuladora.utils.NavigationHelperJefa
 
 class ManipuladorasJefaActivity : AppCompatActivity() {
 
@@ -16,9 +19,16 @@ class ManipuladorasJefaActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
 
         binding = ActivityManipuladorasJefaBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         configurarEventos()
         configurarNavegacionInferior()
@@ -26,10 +36,6 @@ class ManipuladorasJefaActivity : AppCompatActivity() {
     }
 
     private fun configurarEventos() {
-        binding.btnAgregarManipuladora.setOnClickListener {
-            mostrarDialogoAgregar()
-        }
-
         binding.cardManipuladora1.setOnClickListener {
             mostrarDetalleManipuladora(0)
         }
@@ -44,24 +50,11 @@ class ManipuladorasJefaActivity : AppCompatActivity() {
     }
 
     private fun configurarNavegacionInferior() {
-        val barra = binding.root.findViewById<android.view.View>(R.id.barraNavegacionJefa)
-        barra?.let {
-            it.findViewById<android.view.View>(R.id.navInicio)?.setOnClickListener {
-                startActivity(Intent(this, InicioJefaActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
-            }
-            it.findViewById<android.view.View>(R.id.navInventario)?.setOnClickListener {
-                startActivity(Intent(this, InventarioJefaActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
-            }
-            it.findViewById<android.view.View>(R.id.navPreparaciones)?.setOnClickListener {
-                startActivity(Intent(this, PreparacionesJefaActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
-            }
-            it.findViewById<android.view.View>(R.id.navManipuladoras)?.setOnClickListener {
-                // Ya estamos aquí
-            }
-            it.findViewById<android.view.View>(R.id.navPerfil)?.setOnClickListener {
-                startActivity(Intent(this, PerfilJefaActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
-            }
-        }
+        NavigationHelperJefa.setupBarraNavegacionJefa(
+            this,
+            binding.barraNavegacionJefa,
+            NavigationHelperJefa.TabJefa.MANIPULADORAS
+        )
     }
 
     private fun cargarDatos() {
@@ -132,27 +125,6 @@ class ManipuladorasJefaActivity : AppCompatActivity() {
             estado.setTextColor(getColor(R.color.blanco))
             estado.setBackgroundResource(R.drawable.bg_estado_inactivo)
         }
-    }
-
-    private fun mostrarDialogoAgregar() {
-        val input = EditText(this)
-        input.hint = "Nombre de la manipuladora"
-
-        AlertDialog.Builder(this)
-            .setTitle("Agregar Manipuladora")
-            .setView(input)
-            .setPositiveButton("Guardar") { _, _ ->
-                val nombre = input.text.toString().trim()
-                if (nombre.isNotEmpty()) {
-                    ManipuladorasManager.agregarManipuladora(nombre, "Preparación de alimentos", "Mañana", true)
-                    cargarDatos()
-                    Toast.makeText(this, "Manipuladora agregada", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "El nombre no puede estar vacío", Toast.LENGTH_SHORT).show()
-                }
-            }
-            .setNegativeButton("Cancelar", null)
-            .show()
     }
 
     private fun mostrarDetalleManipuladora(posicion: Int) {

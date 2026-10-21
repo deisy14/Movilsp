@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
+import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.databinding.ActivityBarraNavegacionBinding
 import com.example.movilmanupuladora.ui.manipuladora.AsignadasActivity
 import com.example.movilmanupuladora.ui.manipuladora.AvisosActivity
@@ -22,8 +23,8 @@ object NavigationHelper {
         PERFIL
     }
 
-    private const val COLOR_ACTIVO_HEX = "#1B3317"
-    private const val COLOR_INACTIVO_HEX = "#94A3B8"
+    private const val COLOR_ACTIVO_HEX = "#F4B41F"
+    private const val COLOR_INACTIVO_HEX = "#000000"
 
     fun setupBarraNavegacion(
         activity: Activity,
@@ -53,31 +54,40 @@ object NavigationHelper {
         binding.tvNavPerfil.typeface = Typeface.DEFAULT
         binding.icNavPerfil.imageTintList = ColorStateList.valueOf(colorInactivo)
 
+        fun selectTab(icon: android.widget.ImageView?, text: android.widget.TextView?) {
+            icon?.imageTintList = ColorStateList.valueOf(colorActivo)
+            text?.setTextColor(colorActivo)
+            text?.typeface = Typeface.DEFAULT_BOLD
+        }
+
         when (tabActual) {
-            Tab.INICIO -> {
-                binding.tvNavInicio.setTextColor(colorActivo)
-                binding.tvNavInicio.typeface = Typeface.DEFAULT_BOLD
-                binding.icNavInicio.imageTintList = ColorStateList.valueOf(colorActivo)
-            }
-            Tab.ASIGNADAS -> {
-                binding.tvNavAsignadas.setTextColor(colorActivo)
-                binding.tvNavAsignadas.typeface = Typeface.DEFAULT_BOLD
-                binding.icNavAsignadas.imageTintList = ColorStateList.valueOf(colorActivo)
-            }
-            Tab.INVENTARIO -> {
-                binding.tvNavInventario.setTextColor(colorActivo)
-                binding.tvNavInventario.typeface = Typeface.DEFAULT_BOLD
-                binding.icNavInventario.imageTintList = ColorStateList.valueOf(colorActivo)
-            }
-            Tab.AVISOS -> {
-                binding.tvNavAvisos.setTextColor(colorActivo)
-                binding.tvNavAvisos.typeface = Typeface.DEFAULT_BOLD
-                binding.icNavAvisos.imageTintList = ColorStateList.valueOf(colorActivo)
-            }
+            Tab.INICIO -> selectTab(binding.icNavInicio, binding.tvNavInicio)
+            Tab.ASIGNADAS -> selectTab(binding.icNavAsignadas, binding.tvNavAsignadas)
+            Tab.INVENTARIO -> selectTab(binding.icNavInventario, binding.tvNavInventario)
+            Tab.AVISOS -> selectTab(binding.icNavAvisos, binding.tvNavAvisos)
             Tab.PERFIL -> {
-                binding.tvNavPerfil.setTextColor(colorActivo)
-                binding.tvNavPerfil.typeface = Typeface.DEFAULT_BOLD
-                binding.icNavPerfil.imageTintList = ColorStateList.valueOf(colorActivo)
+                // Perfil sin marcar abajo
+            }
+        }
+
+        val bottomBarBg = binding.root.findViewById<com.example.movilmanupuladora.ui.manipuladora.BottomBarBackground>(R.id.bottomBarBg)
+        bottomBarBg?.post {
+            val width = bottomBarBg.width.toFloat()
+            if (width > 0) {
+                if (tabActual == Tab.PERFIL) {
+                    bottomBarBg.drawNotch = false
+                    bottomBarBg.notchX = -1f
+                } else {
+                    bottomBarBg.drawNotch = true
+                    val targetX = when (tabActual) {
+                        Tab.INICIO -> width * 0.10f
+                        Tab.ASIGNADAS -> width * 0.30f
+                        Tab.INVENTARIO -> width * 0.50f
+                        Tab.AVISOS -> width * 0.70f
+                        Tab.PERFIL -> width * 0.90f
+                    }
+                    bottomBarBg.notchX = targetX
+                }
             }
         }
 
