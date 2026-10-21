@@ -58,18 +58,6 @@
 
                 </LinearLayout>
 
-                <!-- BOTÓN AGREGAR -->
-
-                <ImageButton
-                    android:id="@+id/btnAgregarManipuladora"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="@drawable/bg_icono_circular"
-                    android:padding="11dp"
-                    android:src="@drawable/ic_add"
-                    android:tint="@color/negro_principal"
-                    android:contentDescription="Agregar manipuladora"/>
-
             </LinearLayout>
 
 
@@ -446,8 +434,9 @@
     <!-- BARRA DE NAVEGACIÓN                                  -->
     <!-- ===================================================== -->
     <include
-        layout="@layout/barra_navegacion_jefa"
+        android:id="@+id/barra_navegacion_jefa"
+        layout="@layout/view_bottom_bar"
         android:layout_width="match_parent"
-        android:layout_height="88dp"/>
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

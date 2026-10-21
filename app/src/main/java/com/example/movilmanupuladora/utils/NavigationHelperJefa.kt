@@ -5,11 +5,15 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
+import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.databinding.BarraNavegacionJefaBinding
+import com.example.movilmanupuladora.databinding.ViewBottomBarBinding
 import com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity
 import com.example.movilmanupuladora.ui.manipuladora_Jefe.InventarioJefaActivity
 import com.example.movilmanupuladora.ui.manipuladora_Jefe.ManipuladorasJefaActivity
-import com.example.movilmanupuladora.ui.manipuladora_Jefe.PerfilJefaActivity
 import com.example.movilmanupuladora.ui.manipuladora_Jefe.PreparacionesJefaActivity
 
 object NavigationHelperJefa {
@@ -22,61 +26,100 @@ object NavigationHelperJefa {
         PERFIL
     }
 
-    private const val COLOR_ACTIVO_HEX = "#1B3317"
-    private const val COLOR_INACTIVO_HEX = "#94A3B8"
+    private const val COLOR_ACTIVO_HEX = "#F4B41F"
+    private const val COLOR_INACTIVO_HEX = "#000000"
 
     fun setupBarraNavegacionJefa(
         activity: Activity,
         binding: BarraNavegacionJefaBinding,
         tabActual: TabJefa
     ) {
+        setupBarraNavegacionJefaView(activity, binding.root, tabActual)
+    }
+
+    fun setupBarraNavegacionJefa(
+        activity: Activity,
+        binding: ViewBottomBarBinding,
+        tabActual: TabJefa
+    ) {
+        setupBarraNavegacionJefaView(activity, binding.root, tabActual)
+    }
+
+    fun setupBarraNavegacionJefaView(
+        activity: Activity,
+        rootView: View,
+        tabActual: TabJefa
+    ) {
         val colorActivo = Color.parseColor(COLOR_ACTIVO_HEX)
         val colorInactivo = Color.parseColor(COLOR_INACTIVO_HEX)
 
-        binding.txtNavInicio.setTextColor(colorInactivo)
-        binding.iconNavInicio.imageTintList = ColorStateList.valueOf(colorInactivo)
+        val navInicio = rootView.findViewById<View>(R.id.navInicio)
+        val iconNavInicio = rootView.findViewById<ImageView>(R.id.iconNavInicio)
+        val txtNavInicio = rootView.findViewById<TextView>(R.id.txtNavInicio)
 
-        binding.txtNavInventario.setTextColor(colorInactivo)
-        binding.iconNavInventario.imageTintList = ColorStateList.valueOf(colorInactivo)
+        val navInventario = rootView.findViewById<View>(R.id.navInventario)
+        val iconNavInventario = rootView.findViewById<ImageView>(R.id.iconNavInventario)
+        val txtNavInventario = rootView.findViewById<TextView>(R.id.txtNavInventario)
 
-        binding.txtNavPreparaciones.setTextColor(colorInactivo)
-        binding.iconNavPreparaciones.imageTintList = ColorStateList.valueOf(colorInactivo)
+        val navPreparaciones = rootView.findViewById<View>(R.id.navPreparaciones)
+        val iconNavPreparaciones = rootView.findViewById<ImageView>(R.id.iconNavPreparaciones)
+        val txtNavPreparaciones = rootView.findViewById<TextView>(R.id.txtNavPreparaciones)
 
-        binding.txtNavManipuladoras.setTextColor(colorInactivo)
-        binding.iconNavManipuladoras.imageTintList = ColorStateList.valueOf(colorInactivo)
+        val navEquipo = rootView.findViewById<View>(R.id.navEquipo) ?: rootView.findViewById<View>(R.id.navManipuladoras)
+        val iconNavEquipo = rootView.findViewById<ImageView>(R.id.iconNavEquipo) ?: rootView.findViewById<ImageView>(R.id.iconNavManipuladoras)
+        val txtNavEquipo = rootView.findViewById<TextView>(R.id.txtNavEquipo) ?: rootView.findViewById<TextView>(R.id.txtNavManipuladoras)
 
-        binding.txtNavPerfil.setTextColor(colorInactivo)
-        binding.iconNavPerfil.imageTintList = ColorStateList.valueOf(colorInactivo)
+        val fabAdd = rootView.findViewById<View>(R.id.fabAdd)
+
+        fun resetTab(icon: ImageView?, text: TextView?) {
+            icon?.imageTintList = ColorStateList.valueOf(colorInactivo)
+            text?.setTextColor(colorInactivo)
+            text?.typeface = Typeface.DEFAULT
+        }
+
+        fun selectTab(icon: ImageView?, text: TextView?) {
+            icon?.imageTintList = ColorStateList.valueOf(colorActivo)
+            text?.setTextColor(colorActivo)
+            text?.typeface = Typeface.DEFAULT_BOLD
+        }
+
+        resetTab(iconNavInicio, txtNavInicio)
+        resetTab(iconNavInventario, txtNavInventario)
+        resetTab(iconNavPreparaciones, txtNavPreparaciones)
+        resetTab(iconNavEquipo, txtNavEquipo)
 
         when (tabActual) {
-            TabJefa.INICIO -> {
-                binding.txtNavInicio.setTextColor(colorActivo)
-                binding.txtNavInicio.typeface = Typeface.DEFAULT_BOLD
-                binding.iconNavInicio.imageTintList = ColorStateList.valueOf(colorActivo)
-            }
-            TabJefa.INVENTARIO -> {
-                binding.txtNavInventario.setTextColor(colorActivo)
-                binding.txtNavInventario.typeface = Typeface.DEFAULT_BOLD
-                binding.iconNavInventario.imageTintList = ColorStateList.valueOf(colorActivo)
-            }
-            TabJefa.PREPARACIONES -> {
-                binding.txtNavPreparaciones.setTextColor(colorActivo)
-                binding.txtNavPreparaciones.typeface = Typeface.DEFAULT_BOLD
-                binding.iconNavPreparaciones.imageTintList = ColorStateList.valueOf(colorActivo)
-            }
-            TabJefa.MANIPULADORAS -> {
-                binding.txtNavManipuladoras.setTextColor(colorActivo)
-                binding.txtNavManipuladoras.typeface = Typeface.DEFAULT_BOLD
-                binding.iconNavManipuladoras.imageTintList = ColorStateList.valueOf(colorActivo)
-            }
+            TabJefa.INICIO -> selectTab(iconNavInicio, txtNavInicio)
+            TabJefa.INVENTARIO -> selectTab(iconNavInventario, txtNavInventario)
+            TabJefa.PREPARACIONES -> selectTab(iconNavPreparaciones, txtNavPreparaciones)
+            TabJefa.MANIPULADORAS -> selectTab(iconNavEquipo, txtNavEquipo)
             TabJefa.PERFIL -> {
-                binding.txtNavPerfil.setTextColor(colorActivo)
-                binding.txtNavPerfil.typeface = Typeface.DEFAULT_BOLD
-                binding.iconNavPerfil.imageTintList = ColorStateList.valueOf(colorActivo)
+                // Perfil no marca ninguna pestaña abajo
             }
         }
 
-        binding.navInicio.setOnClickListener {
+        val bottomBarBg = rootView.findViewById<com.example.movilmanupuladora.ui.manipuladora.BottomBarBackground>(R.id.bottomBarBg)
+        bottomBarBg?.post {
+            val width = bottomBarBg.width.toFloat()
+            if (width > 0) {
+                if (tabActual == TabJefa.PERFIL) {
+                    bottomBarBg.drawNotch = false
+                    bottomBarBg.notchX = -1f
+                } else {
+                    bottomBarBg.drawNotch = true
+                    val targetX = when (tabActual) {
+                        TabJefa.INICIO -> width * 0.10f
+                        TabJefa.INVENTARIO -> width * 0.30f
+                        TabJefa.PREPARACIONES -> width * 0.70f
+                        TabJefa.MANIPULADORAS -> width * 0.90f
+                        else -> width * 0.10f
+                    }
+                    bottomBarBg.notchX = targetX
+                }
+            }
+        }
+
+        navInicio?.setOnClickListener {
             if (tabActual != TabJefa.INICIO) {
                 val intent = Intent(activity, InicioJefaActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -85,7 +128,7 @@ object NavigationHelperJefa {
             }
         }
 
-        binding.navInventario.setOnClickListener {
+        navInventario?.setOnClickListener {
             if (tabActual != TabJefa.INVENTARIO) {
                 val intent = Intent(activity, InventarioJefaActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -94,7 +137,7 @@ object NavigationHelperJefa {
             }
         }
 
-        binding.navPreparaciones.setOnClickListener {
+        navPreparaciones?.setOnClickListener {
             if (tabActual != TabJefa.PREPARACIONES) {
                 val intent = Intent(activity, PreparacionesJefaActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -103,7 +146,7 @@ object NavigationHelperJefa {
             }
         }
 
-        binding.navManipuladoras.setOnClickListener {
+        navEquipo?.setOnClickListener {
             if (tabActual != TabJefa.MANIPULADORAS) {
                 val intent = Intent(activity, ManipuladorasJefaActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -112,13 +155,9 @@ object NavigationHelperJefa {
             }
         }
 
-        binding.navPerfil.setOnClickListener {
-            if (tabActual != TabJefa.PERFIL) {
-                val intent = Intent(activity, PerfilJefaActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                activity.startActivity(intent)
-                activity.finish()
-            }
+        fabAdd?.setOnClickListener {
+            val intent = Intent(activity, com.example.movilmanupuladora.ui.manipuladora_Jefe.RedactarRecetaActivity::class.java)
+            activity.startActivity(intent)
         }
     }
 }
