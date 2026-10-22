@@ -68,3 +68,25 @@ data class RegistroResponse(
     val mensaje: String,
     val data: Usuario
 )
+
+// Modelos para recuperación de contraseña con código
+data class SolicitarRecuperacionRequest(
+    val correo: String
+)
+
+data class ConfirmarRecuperacionRequest(
+    val correo: String,
+    val codigo: String,
+    val nueva_password: String,
+    val confirmar_password: String
+)
+
+data class MensajeResponse(
+    val mensaje: String? = null,
+    val error: String? = null,
+    val status: String? = null,
+    @SerializedName("debug_code")
+    val debugCode: String? = null,
+    @SerializedName("debug_link")
+    val debugLink: String? = null
+)

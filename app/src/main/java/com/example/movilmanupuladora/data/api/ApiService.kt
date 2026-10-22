@@ -30,6 +30,17 @@ interface ApiService {
     @POST("auth/login/")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
 
+    // Recuperación de Contraseña por Código
+    @POST("auth/recuperar-password/")
+    suspend fun solicitarCodigoRecuperacion(
+        @Body request: com.example.movilmanupuladora.data.model.SolicitarRecuperacionRequest
+    ): Response<com.example.movilmanupuladora.data.model.MensajeResponse>
+
+    @POST("auth/confirmar-recuperacion-password/")
+    suspend fun confirmarCodigoRecuperacion(
+        @Body request: com.example.movilmanupuladora.data.model.ConfirmarRecuperacionRequest
+    ): Response<com.example.movilmanupuladora.data.model.MensajeResponse>
+
     // Usuarios
     @POST("usuarios/")
     suspend fun registrarUsuario(@Body usuario: Usuario): Response<RegistroResponse>
