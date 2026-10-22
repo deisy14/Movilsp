@@ -84,5 +84,9 @@ data class ConfirmarRecuperacionRequest(
 data class MensajeResponse(
     val mensaje: String? = null,
     val error: String? = null,
-    val status: String? = null
+    val status: String? = null,
+    @SerializedName("debug_code")
+    val debugCode: String? = null,
+    @SerializedName("debug_link")
+    val debugLink: String? = null
 )

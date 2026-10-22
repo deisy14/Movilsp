@@ -125,6 +125,11 @@ class RecuperarPasswordActivity : AppCompatActivity() {
                     binding.txtCorreoEnviado.text = correo
                     binding.layoutPaso2.visibility = View.VISIBLE
 
+                    cuerpo?.debugCode?.let { code ->
+                        binding.txtCodigoVerificacion.setText(code)
+                        binding.txtAvisoEnvio.text = "Código de prueba: $code (úsalo para cambiar tu contraseña)"
+                    }
+
                     Toast.makeText(this@RecuperarPasswordActivity, mensaje, Toast.LENGTH_LONG).show()
 
                     // Scroll suave hacia abajo para mostrar el paso 2
@@ -132,7 +137,11 @@ class RecuperarPasswordActivity : AppCompatActivity() {
                         binding.scrollRecuperar.smoothScrollTo(0, binding.layoutPaso2.top)
                     }
 
-                    binding.txtCodigoVerificacion.requestFocus()
+                    if (cuerpo?.debugCode.isNullOrEmpty()) {
+                        binding.txtCodigoVerificacion.requestFocus()
+                    } else {
+                        binding.txtNuevaPassword.requestFocus()
+                    }
 
                 } else {
                     val errorBody = response.errorBody()?.string()

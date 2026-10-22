@@ -8,6 +8,8 @@
     android:background="#181D24"
     android:fillViewport="true"
     android:fitsSystemWindows="false"
+    android:forceDarkAllowed="false"
+    tools:targetApi="q"
     tools:context=".ui.auth.LoginActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -193,21 +195,24 @@
                     android:layout_width="match_parent"
                     android:layout_height="54dp"
                     android:layout_marginTop="20dp"
-                    android:backgroundTint="#EAA32B"
                     android:elevation="0dp"
+                    android:forceDarkAllowed="false"
                     android:stateListAnimator="@null"
                     android:text="Ingresar"
                     android:textAllCaps="false"
                     android:textColor="#181B1F"
                     android:textSize="16.5sp"
                     android:textStyle="bold"
+                    app:backgroundTint="#F4B41F"
+                    android:backgroundTint="#F4B41F"
                     app:cornerRadius="27dp"
                     app:icon="@drawable/ic_arrow_forward"
                     app:iconGravity="textEnd"
                     app:iconPadding="10dp"
                     app:iconSize="20dp"
                     app:iconTint="#181B1F"
-                    app:rippleColor="#30000000" />
+                    app:rippleColor="#30000000"
+                    tools:targetApi="q" />
 
                 <!-- MENSAJE DE CONTACTO CON ADMINISTRADOR -->
                 <LinearLayout
