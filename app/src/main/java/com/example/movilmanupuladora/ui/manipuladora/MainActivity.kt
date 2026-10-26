@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
 
         androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
             insets
         }
 
@@ -116,10 +116,6 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnNotificaciones.setOnClickListener {
             mostrarPopupNotificaciones()
-        }
-
-        binding.btnPerfilHeader.setOnClickListener {
-            startActivity(Intent(this, PerfilActivity::class.java))
         }
 
         binding.btnVerPreparacion.setOnClickListener {

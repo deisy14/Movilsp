@@ -124,6 +124,7 @@ object NavigationHelperJefa {
                 val intent = Intent(activity, InicioJefaActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
+                activity.overridePendingTransition(0, 0)
                 activity.finish()
             }
         }
@@ -133,6 +134,7 @@ object NavigationHelperJefa {
                 val intent = Intent(activity, InventarioJefaActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
+                activity.overridePendingTransition(0, 0)
                 activity.finish()
             }
         }
@@ -142,6 +144,7 @@ object NavigationHelperJefa {
                 val intent = Intent(activity, PreparacionesJefaActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
+                activity.overridePendingTransition(0, 0)
                 activity.finish()
             }
         }
@@ -151,6 +154,7 @@ object NavigationHelperJefa {
                 val intent = Intent(activity, ManipuladorasJefaActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
+                activity.overridePendingTransition(0, 0)
                 activity.finish()
             }
         }

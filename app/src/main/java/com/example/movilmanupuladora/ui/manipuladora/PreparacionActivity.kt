@@ -52,7 +52,7 @@ class PreparacionActivity : AppCompatActivity() {
         NavigationHelper.setupBarraNavegacion(
             this,
             binding.barraNavegacion,
-            NavigationHelper.Tab.ASIGNADAS,
+            NavigationHelper.Tab.INICIO,
         )
 
         nombrePlatoActual = intent.getStringExtra("nombre_plato") ?: "Pollo Guisado Criollo"

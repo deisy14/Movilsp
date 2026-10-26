@@ -36,6 +36,12 @@ class InventarioActivity : AppCompatActivity() {
         binding = ActivityInventarioBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+            insets
+        }
+
         sessionManager = SessionManager(this)
         RetrofitClient.authToken = sessionManager.fetchAuthToken()
 
