@@ -164,31 +164,6 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- PERFIL -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/btnPerfilHeader"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground"
-                    app:cardBackgroundColor="#F4B41F"
-                    app:cardCornerRadius="22dp"
-                    app:cardElevation="3dp"
-                    app:strokeWidth="0dp">
-
-                    <TextView
-                        android:id="@+id/txtInicialesPerfilHeader"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="ML"
-                        android:textColor="#1B3317"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                </com.google.android.material.card.MaterialCardView>
-
             </LinearLayout>
 
             <!-- SELECTOR DE JORNADA -->

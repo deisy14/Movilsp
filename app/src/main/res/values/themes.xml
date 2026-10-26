@@ -2,7 +2,16 @@
     <!-- Base application theme: forzado a Light para que nunca cambie de color -->
     <style name="Base.Theme.Movilmanupuladora" parent="Theme.Material3.Light.NoActionBar">
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <item name="android:windowAnimationStyle">@style/WhatsAppWindowAnimation</item>
     </style>
 
     <style name="Theme.Movilmanupuladora" parent="Base.Theme.Movilmanupuladora" />
+
+    <!-- Estilo de animación de transiciones tipo WhatsApp -->
+    <style name="WhatsAppWindowAnimation" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:activityOpenExitAnimation">@anim/slide_out_left</item>
+        <item name="android:activityCloseEnterAnimation">@anim/slide_in_left</item>
+        <item name="android:activityCloseExitAnimation">@anim/slide_out_right</item>
+    </style>
 </resources>

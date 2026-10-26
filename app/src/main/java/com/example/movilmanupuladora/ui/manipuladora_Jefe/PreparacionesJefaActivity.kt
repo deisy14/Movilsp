@@ -35,7 +35,7 @@ class PreparacionesJefaActivity : AppCompatActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
             insets
         }
 
@@ -147,5 +147,13 @@ class PreparacionesJefaActivity : AppCompatActivity() {
             binding.txtEstadoPreparacion.setTextColor(Color.parseColor("#D92D20"))
             binding.btnIniciarPreparacion.text = "Iniciar preparación"
         }
+    }
+
+    private fun configurarNavegacionInferior() {
+        com.example.movilmanupuladora.utils.NavigationHelperJefa.setupBarraNavegacionJefa(
+            this,
+            binding.barraNavegacionJefa,
+            com.example.movilmanupuladora.utils.NavigationHelperJefa.TabJefa.PREPARACIONES
+        )
     }
 }
