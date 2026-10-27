@@ -65,29 +65,22 @@ object NavigationHelper {
             Tab.ASIGNADAS -> selectTab(binding.icNavAsignadas, binding.tvNavAsignadas)
             Tab.INVENTARIO -> selectTab(binding.icNavInventario, binding.tvNavInventario)
             Tab.AVISOS -> selectTab(binding.icNavAvisos, binding.tvNavAvisos)
-            Tab.PERFIL -> {
-                // Perfil sin marcar abajo
-            }
+            Tab.PERFIL -> selectTab(binding.icNavPerfil, binding.tvNavPerfil)
         }
 
         val bottomBarBg = binding.root.findViewById<com.example.movilmanupuladora.ui.manipuladora.BottomBarBackground>(R.id.bottomBarBg)
         bottomBarBg?.post {
             val width = bottomBarBg.width.toFloat()
             if (width > 0) {
-                if (tabActual == Tab.PERFIL) {
-                    bottomBarBg.drawNotch = false
-                    bottomBarBg.notchX = -1f
-                } else {
-                    bottomBarBg.drawNotch = true
-                    val targetX = when (tabActual) {
-                        Tab.INICIO -> width * 0.10f
-                        Tab.ASIGNADAS -> width * 0.30f
-                        Tab.INVENTARIO -> width * 0.50f
-                        Tab.AVISOS -> width * 0.70f
-                        Tab.PERFIL -> width * 0.90f
-                    }
-                    bottomBarBg.notchX = targetX
+                bottomBarBg.drawNotch = true
+                val targetX = when (tabActual) {
+                    Tab.INICIO -> width * 0.10f
+                    Tab.ASIGNADAS -> width * 0.30f
+                    Tab.INVENTARIO -> width * 0.50f
+                    Tab.AVISOS -> width * 0.70f
+                    Tab.PERFIL -> width * 0.90f
                 }
+                bottomBarBg.notchX = targetX
             }
         }
 
@@ -96,6 +89,7 @@ object NavigationHelper {
                 val intent = Intent(activity, MainActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
+                activity.overridePendingTransition(0, 0)
                 activity.finish()
             }
         }
@@ -105,6 +99,7 @@ object NavigationHelper {
                 val intent = Intent(activity, AsignadasActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
+                activity.overridePendingTransition(0, 0)
                 activity.finish()
             }
         }
@@ -114,6 +109,7 @@ object NavigationHelper {
                 val intent = Intent(activity, InventarioActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
+                activity.overridePendingTransition(0, 0)
                 activity.finish()
             }
         }
@@ -123,6 +119,7 @@ object NavigationHelper {
                 val intent = Intent(activity, AvisosActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
+                activity.overridePendingTransition(0, 0)
                 activity.finish()
             }
         }
@@ -132,6 +129,7 @@ object NavigationHelper {
                 val intent = Intent(activity, PerfilActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
+                activity.overridePendingTransition(0, 0)
                 activity.finish()
             }
         }

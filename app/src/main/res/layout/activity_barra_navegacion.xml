@@ -3,10 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/viewBottomBarContainer"
     android:layout_width="match_parent"
-    android:layout_height="96dp"
+    android:layout_height="116dp"
     android:clipChildren="false"
     android:clipToPadding="false"
     android:paddingHorizontal="12dp"
+    android:paddingBottom="24dp"
     android:background="@android:color/transparent">
 
     <!-- Background with Notch (White, No Shadow, Levelled) -->

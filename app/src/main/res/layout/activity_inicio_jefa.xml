@@ -10,10 +10,7 @@
     android:orientation="vertical"
     tools:context=".ui.manipuladora_Jefe.InicioJefaActivity">
 
-    <!-- ===================================================== -->
-    <!-- CONTENIDO CON SCROLL PARA NAVEGACIÓN COMPLETA         -->
-    <!-- ===================================================== -->
-
+    <!-- CONTENIDO CON SCROLL -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -25,627 +22,731 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingHorizontal="20dp"
-            android:paddingTop="28dp"
-            android:paddingBottom="30dp">
+            android:orientation="vertical">
 
-            <!-- ================================================= -->
-            <!-- ENCABEZADO Y ACCIONES (REDACCIÓN, NOTIFICACIONES, PERFIL) -->
-            <!-- ================================================= -->
+            <!-- FRANJA SUPERIOR AMARILLA (TOP CAP) -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:background="#F5B81F" />
 
+            <!-- TARJETA PRINCIPAL BLANCA CURVADA -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:layout_marginTop="-24dp"
+                android:background="@drawable/rounded_white_background"
+                android:orientation="vertical"
+                android:paddingHorizontal="20dp"
+                android:paddingTop="22dp"
+                android:paddingBottom="24dp">
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/txtSaludo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Hola, Jefa de Cocina"
-                        android:textColor="#1B3317"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/txtFecha"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="Lunes, 29 de septiembre"
-                        android:textColor="#3D5C37"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-                <!-- BOTONES DE ACCIÓN EN EL ENCABEZADO (NOTIFICACIONES, PERFIL) -->
-                <LinearLayout
+                <!-- ENCABEZADO "MI SEMANA" -->
+                <TextView
+                    android:id="@+id/txtTituloMiSemana"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <!-- BOTÓN DE NOTIFICACIONES -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/btnNotificaciones"
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:layout_marginEnd="8dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground"
-                        app:cardBackgroundColor="#FFFFFF"
-                        app:cardCornerRadius="22dp"
-                        app:cardElevation="3dp"
-                        app:strokeWidth="0dp">
-
-                        <ImageView
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="Notificaciones"
-                            android:src="@drawable/ic_notificaciones"
-                            app:tint="#1B3317" />
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- BOTÓN DE PERFIL -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/btnPerfilHeader"
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground"
-                        app:cardBackgroundColor="#F4B41F"
-                        app:cardCornerRadius="22dp"
-                        app:cardElevation="3dp"
-                        app:strokeWidth="0dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:text="JF"
-                            android:textColor="#1B3317"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <!-- ================================================= -->
-            <!-- CONMUTADOR DE JORNADA: MAÑANA Y TARDE             -->
-            <!-- ================================================= -->
-
-            <LinearLayout
-                android:id="@+id/contenedorJornadas"
-                android:layout_width="match_parent"
-                android:layout_height="46dp"
-                android:layout_marginTop="20dp"
-                android:background="@drawable/bg_tag_plato"
-                android:orientation="horizontal"
-                android:padding="3dp">
-
-                <TextView
-                    android:id="@+id/btnManana"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_pill_yellow"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center"
-                    android:text="MAÑANA"
-                    android:textColor="#7A5500"
-                    android:textSize="13sp"
+                    android:text="Mi semana"
+                    android:textColor="#1E293B"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/btnTarde"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center"
-                    android:text="TARDE"
-                    android:textColor="#64748B"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <!-- ================================================= -->
-            <!-- CAROUSEL VISTA PREVIA DE SUGERENCIAS IA           -->
-            <!-- ================================================= -->
-
-            <LinearLayout
-                android:id="@+id/seccionIA"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:clipChildren="false"
-                android:clipToPadding="false"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
+                    android:id="@+id/txtRangoSemana"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/txtTituloIA"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Sugerencias de IA para hoy"
-                        android:textColor="#1B3317"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                    <ImageButton
-                        android:id="@+id/btnInfoIA"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@android:color/transparent"
-                        android:contentDescription="Información de IA"
-                        android:padding="6dp"
-                        android:src="@drawable/ic_info"
-                        app:tint="#000000" />
-
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/txtSubtituloIA"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="Platos recomendados para la jornada de la mañana"
+                    android:layout_marginTop="3dp"
+                    android:text="Menús programados · 26 – 30 de octubre"
                     android:textColor="#64748B"
                     android:textSize="12sp" />
 
-                <!-- CONTENEDOR DE CAROUSEL CON FLECHAS LATERALES NEGRAS (< y >) -->
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:clipChildren="false"
-                    android:clipToPadding="false">
-
-                    <androidx.viewpager2.widget.ViewPager2
-                        android:id="@+id/viewPagerSugerenciasIA"
-                        android:layout_width="0dp"
-                        android:layout_height="235dp"
-                        android:clipChildren="false"
-                        android:clipToPadding="false"
-                        android:overScrollMode="never"
-                        android:paddingStart="68dp"
-                        android:paddingEnd="68dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <ImageButton
-                        android:id="@+id/btnPlatoAnterior"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="4dp"
-                        android:background="@drawable/bg_flecha"
-                        android:contentDescription="Plato anterior"
-                        android:elevation="8dp"
-                        android:padding="10dp"
-                        android:src="@drawable/ic_arrow"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:tint="#000000" />
-
-                    <ImageButton
-                        android:id="@+id/btnPlatoSiguiente"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="4dp"
-                        android:background="@drawable/bg_flecha"
-                        android:contentDescription="Plato siguiente"
-                        android:elevation="8dp"
-                        android:padding="10dp"
-                        android:src="@drawable/ic_arrow_forward"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:tint="#000000" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <!-- INDICADOR DE PUNTOS DE NAVEGACIÓN -->
-                <TextView
-                    android:id="@+id/txtIndicadorPlatos"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:gravity="center"
-                    android:text="●  ○  ○  ○"
-                    android:textColor="#F4B41F"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <!-- BOTÓN SELECCIONAR O INICIAR -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnSeleccionarPlato"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="12dp"
-                    android:backgroundTint="#F4B41F"
-                    android:text="Seleccionar este plato"
-                    android:textColor="#1B3317"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="12dp" />
-
-            </LinearLayout>
-
-            <!-- ================================================= -->
-            <!-- SECCIÓN: MENÚ DISPONIBLE DEL PAE                  -->
-            <!-- ================================================= -->
-
-            <LinearLayout
-                android:id="@+id/seccionMenuDisponiblePAE"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:orientation="vertical">
-
+                <!-- TIRA DE 5 DÍAS DE LA SEMANA (LUN - VIE) -->
                 <LinearLayout
+                    android:id="@+id/layoutTiraDiasSemana"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
                     android:orientation="horizontal">
 
-                    <TextView
+                    <!-- LUNES -->
+                    <LinearLayout
+                        android:id="@+id/btnDiaLun"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="68dp"
+                        android:layout_marginEnd="6dp"
                         android:layout_weight="1"
-                        android:text="Menú disponible del PAE"
-                        android:textColor="#1B3317"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
+                        android:background="@drawable/bg_dia_semana_activo"
+                        android:clickable="true"
+                        android:elevation="2dp"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/btnVerTodosPlatos"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        <TextView
+                            android:id="@+id/txtNomDiaLun"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Lun"
+                            android:textColor="#1E293B"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/txtNumDiaLun"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="26"
+                            android:textColor="#1E293B"
+                            android:textSize="19sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- MARTES -->
+                    <LinearLayout
+                        android:id="@+id/btnDiaMar"
+                        android:layout_width="0dp"
+                        android:layout_height="68dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_dia_semana_inactivo"
                         android:clickable="true"
                         android:focusable="true"
-                        android:text="Ver todos los platos"
-                        android:textColor="#2E7D32"
-                        android:textSize="12sp"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/txtNomDiaMar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Mar"
+                            android:textColor="#64748B"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/txtNumDiaMar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="27"
+                            android:textColor="#1E293B"
+                            android:textSize="19sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- MIÉRCOLES -->
+                    <LinearLayout
+                        android:id="@+id/btnDiaMie"
+                        android:layout_width="0dp"
+                        android:layout_height="68dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_dia_semana_inactivo"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/txtNomDiaMie"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Mié"
+                            android:textColor="#64748B"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/txtNumDiaMie"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="28"
+                            android:textColor="#1E293B"
+                            android:textSize="19sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- JUEVES -->
+                    <LinearLayout
+                        android:id="@+id/btnDiaJue"
+                        android:layout_width="0dp"
+                        android:layout_height="68dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_dia_semana_inactivo"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/txtNomDiaJue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Jue"
+                            android:textColor="#64748B"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/txtNumDiaJue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="29"
+                            android:textColor="#1E293B"
+                            android:textSize="19sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- VIERNES -->
+                    <LinearLayout
+                        android:id="@+id/btnDiaVie"
+                        android:layout_width="0dp"
+                        android:layout_height="68dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_dia_semana_inactivo"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/txtNomDiaVie"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Vie"
+                            android:textColor="#64748B"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/txtNumDiaVie"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="30"
+                            android:textColor="#1E293B"
+                            android:textSize="19sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- BANNER AMARILLO INTERACTIVO DE FECHA (LLEVA A PANTALLA 2) -->
+                <LinearLayout
+                    android:id="@+id/bannerCalendarioMes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/bg_banner_amarillo_borde"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="14dp">
+
+                    <TextView
+                        android:id="@+id/txtFechaSeleccionadaBanner"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Lun, 26 de octubre"
+                        android:textColor="#1E293B"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="›"
+                        android:textColor="#D97706"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerMenuDisponiblePAE"
+                <!-- TÍTULO SECCIÓN MENÚS ASIGNADOS -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="Menús asignados a las manipuladoras"
+                    android:textColor="#1E293B"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <!-- SCROLL HORIZONTAL DE TARJETAS DE MENÚS (DESAYUNO, ALMUERZO, MERIENDA) -->
+                <HorizontalScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="14dp"
                     android:clipToPadding="false"
-                    android:orientation="horizontal"
                     android:overScrollMode="never"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:listitem="@layout/item_menu_disponible_pae" />
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <!-- TARJETA 1: DESAYUNO -->
+                        <LinearLayout
+                            android:id="@+id/cardDesayuno"
+                            android:layout_width="180dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="12dp"
+                            android:background="@drawable/bg_card_desayuno"
+                            android:clickable="true"
+                            android:elevation="1dp"
+                            android:focusable="true"
+                            android:orientation="vertical"
+                            android:padding="14dp">
+
+                            <com.google.android.material.imageview.ShapeableImageView
+                                android:id="@+id/imgDesayuno"
+                                android:layout_width="match_parent"
+                                android:layout_height="110dp"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/plato1"
+                                app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.MediumComponent" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:background="@drawable/bg_chip_desayuno"
+                                android:paddingHorizontal="8dp"
+                                android:paddingVertical="3dp"
+                                android:text="☀️ Desayuno"
+                                android:textColor="#B45309"
+                                android:textSize="10sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/txtNombreDesayuno"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:ellipsize="end"
+                                android:maxLines="2"
+                                android:text="Huevos pericos con arroz blanco"
+                                android:textColor="#1E293B"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="👥 Componente"
+                                android:textColor="#64748B"
+                                android:textSize="10sp" />
+
+                            <TextView
+                                android:id="@+id/txtComponenteDesayuno"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="1dp"
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                android:text="Refresco de avena, huevos pericos, arroz blanco"
+                                android:textColor="#475569"
+                                android:textSize="11sp" />
+
+                        </LinearLayout>
+
+                        <!-- TARJETA 2: ALMUERZO -->
+                        <LinearLayout
+                            android:id="@+id/cardAlmuerzo"
+                            android:layout_width="180dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="12dp"
+                            android:background="@drawable/bg_card_almuerzo"
+                            android:clickable="true"
+                            android:elevation="1dp"
+                            android:focusable="true"
+                            android:orientation="vertical"
+                            android:padding="14dp">
+
+                            <com.google.android.material.imageview.ShapeableImageView
+                                android:id="@+id/imgAlmuerzo"
+                                android:layout_width="match_parent"
+                                android:layout_height="110dp"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/plato2"
+                                app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.MediumComponent" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:background="@drawable/bg_chip_almuerzo"
+                                android:paddingHorizontal="8dp"
+                                android:paddingVertical="3dp"
+                                android:text="🍴 Almuerzo"
+                                android:textColor="#15803D"
+                                android:textSize="10sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/txtNombreAlmuerzo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:ellipsize="end"
+                                android:maxLines="2"
+                                android:text="Pollo en salsa blanca con pasta"
+                                android:textColor="#1E293B"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="👥 Componente"
+                                android:textColor="#64748B"
+                                android:textSize="10sp" />
+
+                            <TextView
+                                android:id="@+id/txtComponenteAlmuerzo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="1dp"
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                android:text="Jugo de fruta en leche, pollo en salsa blanca, pasta"
+                                android:textColor="#475569"
+                                android:textSize="11sp" />
+
+                        </LinearLayout>
+
+                        <!-- TARJETA 3: MERIENDA -->
+                        <LinearLayout
+                            android:id="@+id/cardMerienda"
+                            android:layout_width="180dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_card_merienda"
+                            android:clickable="true"
+                            android:elevation="1dp"
+                            android:focusable="true"
+                            android:orientation="vertical"
+                            android:padding="14dp">
+
+                            <com.google.android.material.imageview.ShapeableImageView
+                                android:id="@+id/imgMerienda"
+                                android:layout_width="match_parent"
+                                android:layout_height="110dp"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/plato3"
+                                app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.MediumComponent" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:background="@drawable/bg_chip_merienda"
+                                android:paddingHorizontal="8dp"
+                                android:paddingVertical="3dp"
+                                android:text="🍎 Merienda"
+                                android:textColor="#BE123C"
+                                android:textSize="10sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/txtNombreMerienda"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:ellipsize="end"
+                                android:maxLines="2"
+                                android:text="Chocolate en leche con arepa"
+                                android:textColor="#1E293B"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="👥 Componente"
+                                android:textColor="#64748B"
+                                android:textSize="10sp" />
+
+                            <TextView
+                                android:id="@+id/txtComponenteMerienda"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="1dp"
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                android:text="Chocolate en leche, arepa de maíz, banano"
+                                android:textColor="#475569"
+                                android:textSize="11sp" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <!-- BANNER AMARILLO: "REGISTRA LA ASISTENCIA" -->
+                <LinearLayout
+                    android:id="@+id/bannerRegistraAsistencia"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="22dp"
+                    android:background="@drawable/bg_banner_amarillo_borde"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="14dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Registra la asistencia"
+                        android:textColor="#1E293B"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="›"
+                        android:textColor="#D97706"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <!-- SECCIÓN RESUMEN DEL DÍA -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardResumenDia"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="#F1F5F9"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Resumen del día"
+                                    android:textColor="#1E293B"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/txtFechaResumenDia"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Mar, 20 de octubre"
+                                    android:textColor="#64748B"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="›"
+                                android:textColor="#94A3B8"
+                                android:textSize="20sp" />
+
+                        </LinearLayout>
+
+                        <!-- TRES MÉTRICAS CON DIVISORES -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+
+                            <!-- MÉTRICA 1: RACIONES TOTALES -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <FrameLayout
+                                    android:layout_width="38dp"
+                                    android:layout_height="38dp"
+                                    android:background="@drawable/circulo_amarillo_badge">
+
+                                    <ImageView
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:layout_gravity="center"
+                                        android:src="@drawable/ic_nav_manipuladoras"
+                                        app:tint="#1E293B" />
+                                </FrameLayout>
+
+                                <TextView
+                                    android:id="@+id/txtRacionesTotales"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:text="124"
+                                    android:textColor="#1E293B"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Raciones totales"
+                                    android:textColor="#64748B"
+                                    android:textSize="10sp" />
+
+                            </LinearLayout>
+
+                            <!-- DIVISOR 1 -->
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="44dp"
+                                android:background="#F1F5F9" />
+
+                            <!-- MÉTRICA 2: MENÚS ACTIVOS -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <FrameLayout
+                                    android:layout_width="38dp"
+                                    android:layout_height="38dp"
+                                    android:background="@drawable/bg_chip_almuerzo">
+
+                                    <ImageView
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:layout_gravity="center"
+                                        android:src="@drawable/ic_check"
+                                        app:tint="#15803D" />
+                                </FrameLayout>
+
+                                <TextView
+                                    android:id="@+id/txtMenusActivos"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:text="3"
+                                    android:textColor="#1E293B"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Menús activos"
+                                    android:textColor="#64748B"
+                                    android:textSize="10sp" />
+
+                            </LinearLayout>
+
+                            <!-- DIVISOR 2 -->
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="44dp"
+                                android:background="#F1F5F9" />
+
+                            <!-- MÉTRICA 3: MANIPULADORAS -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <FrameLayout
+                                    android:layout_width="38dp"
+                                    android:layout_height="38dp"
+                                    android:background="@drawable/bg_chip_desayuno">
+
+                                    <ImageView
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:layout_gravity="center"
+                                        android:src="@drawable/ic_assignment_black"
+                                        app:tint="#B45309" />
+                                </FrameLayout>
+
+                                <TextView
+                                    android:id="@+id/txtCantManipuladoras"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:text="8"
+                                    android:textColor="#1E293B"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Manipuladoras"
+                                    android:textColor="#64748B"
+                                    android:textSize="10sp" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
             </LinearLayout>
-
-            <!-- ================================================= -->
-            <!-- TARJETAS DE NAVEGACIÓN DEL DASHBOARD              -->
-            <!-- ================================================= -->
-
-            <TextView
-                android:id="@+id/txtTituloResumen"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="Resumen y Control Operativo"
-                android:textColor="#1B3317"
-                android:textSize="17sp"
-                android:textStyle="bold" />
-
-            <!-- CARD ASISTENCIA Y REGISTRO NIÑOS -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardResumen"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#E2E8F0"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_pill_yellow"
-                        android:contentDescription="Asistencia"
-                        android:padding="9dp"
-                        android:src="@drawable/ic_people"
-                        app:tint="#1B3317" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="14dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Asistencia y Niños Registrados"
-                            android:textColor="#1B3317"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/txtNinos"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="120 niños asistirán hoy"
-                            android:textColor="#64748B"
-                            android:textSize="12sp" />
-
-                    </LinearLayout>
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:contentDescription="Ir"
-                        android:src="@drawable/ic_arrow_forward"
-                        app:tint="#1B3317" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- CARD MIS PREPARACIONES -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardMisPreparaciones"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#E2E8F0"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_pill_green"
-                        android:contentDescription="Preparaciones"
-                        android:padding="9dp"
-                        android:src="@drawable/ic_food"
-                        app:tint="#2A5226" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="14dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/txtMisPreparaciones"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Estado de Preparaciones"
-                            android:textColor="#1B3317"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/txtEstadoMisPreparaciones"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="1 en curso, 2 pendientes"
-                            android:textColor="#64748B"
-                            android:textSize="12sp" />
-
-                    </LinearLayout>
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:contentDescription="Ir"
-                        android:src="@drawable/ic_arrow_forward"
-                        app:tint="#1B3317" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- CARD CALENDARIO Y PROGRAMACIÓN SEMANAL -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardCalendario"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#E2E8F0"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_pill_yellow"
-                        android:contentDescription="Calendario"
-                        android:padding="9dp"
-                        android:src="@drawable/ic_calendar"
-                        app:tint="#1B3317" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="14dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/txtCalendario"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Programación Semanal y Menú"
-                            android:textColor="#1B3317"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/txtProgramacion"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Planificación y asignaciones de la semana"
-                            android:textColor="#64748B"
-                            android:textSize="12sp" />
-
-                    </LinearLayout>
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:contentDescription="Ir"
-                        android:src="@drawable/ic_arrow_forward"
-                        app:tint="#1B3317" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- CARD EVOLUCIÓN / RESUMEN DE COCCIÓN -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardEvolucionAlmuerzo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#E2E8F0"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_pill_green"
-                        android:contentDescription="Evolución"
-                        android:padding="9dp"
-                        android:src="@drawable/ic_status"
-                        app:tint="#2A5226" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="14dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Evolución y Estado del Día"
-                            android:textColor="#1B3317"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/txtDetalleEvolucion"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="2 de 4 preparaciones completadas"
-                            android:textColor="#64748B"
-                            android:textSize="12sp" />
-
-                    </LinearLayout>
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:contentDescription="Ir"
-                        android:src="@drawable/ic_arrow_forward"
-                        app:tint="#1B3317" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
 
-    <!-- BARRA DE NAVEGACIÓN INFERIOR EXCLUSIVA DE JEFA -->
+    <!-- BARRA DE NAVEGACIÓN INFERIOR (PERMANECE INTACTA) -->
     <include
-        android:id="@+id/barra_navegacion_jefa"
-        layout="@layout/view_bottom_bar"
+        android:id="@+id/barraNavegacionJefa"
+        layout="@layout/barra_navegacion_jefa"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

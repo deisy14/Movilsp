@@ -29,6 +29,10 @@ class IniciarPreparacionActivity : AppCompatActivity() {
 
     private val menuRepository = MenuRepository(RetrofitClient.apiService)
 
+    private var nombreMenuIntent: String = "Arroz con Pollo Criollo"
+    private var jornadaIntent: String = "Mañana"
+    private var idPlatoIntent: Int = -1
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -46,6 +50,11 @@ class IniciarPreparacionActivity : AppCompatActivity() {
         configurarBotones()
     }
 
+    override fun onResume() {
+        super.onResume()
+        actualizarInfoEquipo()
+    }
+
     private fun inicializarVistas() {
         txtEstadoPreparacion = findViewById(R.id.txtEstadoPreparacion)
         txtCantidadNinos = findViewById(R.id.txtCantidadNinos)
@@ -57,10 +66,11 @@ class IniciarPreparacionActivity : AppCompatActivity() {
     }
 
     private fun cargarDatos() {
-        val nombreMenuIntent = intent.getStringExtra("nombre_menu") ?: "Arroz con Pollo Criollo"
+        nombreMenuIntent = intent.getStringExtra("nombre_menu") ?: "Arroz con Pollo Criollo"
         findViewById<TextView>(R.id.txtNombreMenu)?.text = nombreMenuIntent
 
-        val jornadaIntent = intent.getStringExtra("jornada") ?: "Mañana"
+        jornadaIntent = intent.getStringExtra("jornada") ?: "Mañana"
+        idPlatoIntent = intent.getIntExtra("id_plato", -1)
         findViewById<TextView>(R.id.txtJornada)?.text = "Jornada: $jornadaIntent"
 
         val p = AsistenciaManager.obtenerPrimaria(this)
@@ -76,12 +86,27 @@ class IniciarPreparacionActivity : AppCompatActivity() {
 
         val ninos = if (guardados > 0) guardados else 0
         txtCantidadNinos.text = "$ninos niños"
-        txtCantidadManipuladoras.text = "2 operarias"
+        actualizarInfoEquipo()
+    }
+
+    private fun actualizarInfoEquipo() {
+        val prefs = getSharedPreferences("ManipuladoraJefe", MODE_PRIVATE)
+        val cant = prefs.getInt("cantidad_manipuladoras", 3)
+        txtCantidadManipuladoras.text = "$cant operarias"
     }
 
     private fun configurarBotones() {
         btnCerrar.setOnClickListener { finish() }
         btnCancelar.setOnClickListener { finish() }
+
+        findViewById<android.view.View>(R.id.cardEquipo)?.setOnClickListener {
+            val intentEquipo = Intent(this, ManipuladorasAsignadasActivity::class.java).apply {
+                putExtra("nombre_menu", nombreMenuIntent)
+                putExtra("id_plato", idPlatoIntent)
+                putExtra("jornada", jornadaIntent)
+            }
+            startActivity(intentEquipo)
+        }
 
         btnIniciarPreparacion.setOnClickListener {
             val obs = edtObservaciones.text.toString().trim()
@@ -89,12 +114,34 @@ class IniciarPreparacionActivity : AppCompatActivity() {
             preferencias.edit().putString("observaciones_preparacion", obs).apply()
             preferencias.edit().putString("estado_plato", "EN_PREPARACION").apply()
 
+            // Guardar plato aprobado para que las manipuladoras lo vean al ingresar
+            val jefaPrefs = getSharedPreferences("ManipuladoraJefe", MODE_PRIVATE)
+            jefaPrefs.edit().putString("plato_actual", nombreMenuIntent).apply()
+
+            val prefTurno = getSharedPreferences("TURNO_PAE", MODE_PRIVATE)
+            prefTurno.edit()
+                .putString("plato_nombre", nombreMenuIntent)
+                .putString("plato_jornada", jornadaIntent)
+                .putInt("plato_id", idPlatoIntent)
+                .apply()
+
+            com.example.movilmanupuladora.utils.SessionManager(this)
+                .savePlatoSeleccionado(nombreMenuIntent, idPlatoIntent)
+
+            lifecycleScope.launch {
+                com.example.movilmanupuladora.utils.PreparacionSyncManager.guardarPlatoSeleccionado(
+                    this@IniciarPreparacionActivity,
+                    nombreMenuIntent,
+                    idPlatoIntent,
+                    jornadaIntent
+                )
+            }
+
             Toast.makeText(this, "¡Preparación del menú iniciada exitosamente!", Toast.LENGTH_SHORT).show()
 
             val intentJefa = Intent(this, InicioJefaActivity::class.java)
             intentJefa.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intentJefa)
-            finish()
         }
     }
 }

@@ -64,13 +64,13 @@ class IngredientesActivity : AppCompatActivity() {
         // Asignar imagen adecuada según el plato
         val imgPlato = findViewById<android.widget.ImageView>(R.id.imgPlatoIngredientes)
         val imgRes = when {
-            nombrePlato.contains("bandeja", ignoreCase = true) -> R.drawable.bandeja_paisa
-            nombrePlato.contains("frijol", ignoreCase = true) -> R.drawable.frijoles
-            nombrePlato.contains("chocolate", ignoreCase = true) -> R.drawable.chocolate
-            nombrePlato.contains("huevo", ignoreCase = true) -> R.drawable.huevo_perico
-            nombrePlato.contains("pollo", ignoreCase = true) -> R.drawable.apanado
-            nombrePlato.contains("arroz", ignoreCase = true) -> R.drawable.arroz_de_leche
-            else -> R.drawable.frijoles
+            nombrePlato.contains("bandeja", ignoreCase = true) -> R.drawable.plato1
+            nombrePlato.contains("frijol", ignoreCase = true) -> R.drawable.plato2
+            nombrePlato.contains("chocolate", ignoreCase = true) -> R.drawable.plato3
+            nombrePlato.contains("huevo", ignoreCase = true) -> R.drawable.plato4
+            nombrePlato.contains("pollo", ignoreCase = true) -> R.drawable.plato5
+            nombrePlato.contains("arroz", ignoreCase = true) -> R.drawable.plato6
+            else -> R.drawable.plato7
         }
         imgPlato?.setImageResource(imgRes)
 

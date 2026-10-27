@@ -35,7 +35,7 @@ class PreparacionesJefaActivity : AppCompatActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
             insets
         }
 
@@ -66,11 +66,23 @@ class PreparacionesJefaActivity : AppCompatActivity() {
             val plato = binding.txtPlatoPreparacion.text.toString()
             val jornadaNombre = if (jornadaActual == Jornada.MANANA) "Mañana" else "Tarde"
 
-            val intent = Intent(this, IniciarPreparacionActivity::class.java).apply {
-                putExtra("nombre_menu", plato)
-                putExtra("jornada", jornadaNombre)
+            val jefaPrefs = getSharedPreferences("ManipuladoraJefe", MODE_PRIVATE)
+            val compJefa = jefaPrefs.getString("comp_jefa", null)
+
+            if (!compJefa.isNullOrBlank()) {
+                val intent = Intent(this, com.example.movilmanupuladora.ui.manipuladora.PreparacionActivity::class.java).apply {
+                    putExtra("nombre_plato", plato)
+                    putExtra("componente_seleccionado", compJefa)
+                    putExtra("id_imagen", InicioJefaActivity.obtenerImagenPlatoPorNombre(plato))
+                }
+                startActivity(intent)
+            } else {
+                val intent = Intent(this, IniciarPreparacionActivity::class.java).apply {
+                    putExtra("nombre_menu", plato)
+                    putExtra("jornada", jornadaNombre)
+                }
+                startActivity(intent)
             }
-            startActivity(intent)
         }
 
         binding.btnVerManipuladoras.setOnClickListener {
@@ -121,7 +133,23 @@ class PreparacionesJefaActivity : AppCompatActivity() {
 
         val platoSeleccionado = getSharedPreferences("SIRAE", MODE_PRIVATE).getString("plato_seleccionado", "Pollo Guisado Criollo") ?: "Pollo Guisado Criollo"
         binding.txtPlatoPreparacion.text = platoSeleccionado
-        binding.txtDescripcionPlato.text = "Plato programado para la jornada de ${if (jornadaActual == Jornada.MANANA) "la mañana" else "la tarde"}."
+
+        val jefaPrefs = getSharedPreferences("ManipuladoraJefe", MODE_PRIVATE)
+        val compJefa = jefaPrefs.getString("comp_jefa", null)
+        val miNombre = sessionManager.getUserName() ?: "Isa Pérez"
+        val miCorreo = sessionManager.getUserEmail() ?: ""
+
+        val estadoJefa = if (!compJefa.isNullOrBlank()) {
+            PreparacionEstadoManager.obtenerEstado(this, miNombre, compJefa, miCorreo)
+        } else {
+            null
+        }
+
+        if (!compJefa.isNullOrBlank()) {
+            binding.txtDescripcionPlato.text = "Plato de ${if (jornadaActual == Jornada.MANANA) "la mañana" else "la tarde"}.\n👨‍🍳 Tu componente asignado: $compJefa ($estadoJefa)"
+        } else {
+            binding.txtDescripcionPlato.text = "Plato programado para la jornada de ${if (jornadaActual == Jornada.MANANA) "la mañana" else "la tarde"}."
+        }
 
         val arrozKg = (ninos * 0.1).toInt().coerceAtLeast(10)
         val polloKg = (ninos * 0.15).toInt().coerceAtLeast(15)
@@ -134,18 +162,26 @@ class PreparacionesJefaActivity : AppCompatActivity() {
         binding.txtCantidadPasta.text = "$pastaKg kg"
 
         val estado = getSharedPreferences("SIRAE_JEFA", MODE_PRIVATE).getString("estado_plato", "PENDIENTE")
-        if (estado == "EN_PREPARACION") {
-            binding.txtEstadoPreparacion.text = "En proceso"
+        if (estado == "EN_PREPARACION" || estadoJefa == PreparacionEstadoManager.ESTADO_EN_PROCESO) {
+            binding.txtEstadoPreparacion.text = "En proceso 🔥"
             binding.txtEstadoPreparacion.setTextColor(Color.parseColor("#7A5500"))
-            binding.btnIniciarPreparacion.text = "Continuar preparación"
-        } else if (estado == "FINALIZADO") {
-            binding.txtEstadoPreparacion.text = "Completado"
+            binding.btnIniciarPreparacion.text = if (!compJefa.isNullOrBlank()) "👨‍🍳 Preparar mi componente: $compJefa" else "Continuar preparación"
+        } else if (estado == "FINALIZADO" || estadoJefa == PreparacionEstadoManager.ESTADO_FINALIZADA) {
+            binding.txtEstadoPreparacion.text = "Completado ✅"
             binding.txtEstadoPreparacion.setTextColor(Color.parseColor("#2A5226"))
-            binding.btnIniciarPreparacion.text = "Preparación completada"
+            binding.btnIniciarPreparacion.text = if (!compJefa.isNullOrBlank()) "Preparación completada ($compJefa)" else "Preparación completada"
         } else {
-            binding.txtEstadoPreparacion.text = "Pendiente"
+            binding.txtEstadoPreparacion.text = "Pendiente ⏳"
             binding.txtEstadoPreparacion.setTextColor(Color.parseColor("#D92D20"))
-            binding.btnIniciarPreparacion.text = "Iniciar preparación"
+            binding.btnIniciarPreparacion.text = if (!compJefa.isNullOrBlank()) "👨‍🍳 Iniciar mi componente: $compJefa" else "Iniciar preparación"
         }
+    }
+
+    private fun configurarNavegacionInferior() {
+        com.example.movilmanupuladora.utils.NavigationHelperJefa.setupBarraNavegacionJefa(
+            this,
+            binding.barraNavegacionJefa,
+            com.example.movilmanupuladora.utils.NavigationHelperJefa.TabJefa.PREPARACIONES
+        )
     }
 }

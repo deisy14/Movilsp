@@ -64,7 +64,7 @@
                     android:layout_height="match_parent"
                     android:contentDescription="Imagen del componente"
                     android:scaleType="centerInside"
-                    android:src="@drawable/apanado" />
+                    android:src="@drawable/plato9" />
 
             </FrameLayout>
 

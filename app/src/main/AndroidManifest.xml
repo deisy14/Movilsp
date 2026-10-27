@@ -103,6 +103,14 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name=".ui.manipuladora_Jefe.MenuDelDiaMesActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora_Jefe.PlanificacionSemanalJefaActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".ui.manipuladora_Jefe.AlimentosDisponiblesActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />

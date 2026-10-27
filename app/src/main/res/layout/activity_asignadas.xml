@@ -132,7 +132,7 @@
                                 android:layout_height="match_parent"
                                 android:contentDescription="Plato Asignado"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/pollo_guisado" />
+                                android:src="@drawable/plato1" />
 
                         </com.google.android.material.card.MaterialCardView>
 

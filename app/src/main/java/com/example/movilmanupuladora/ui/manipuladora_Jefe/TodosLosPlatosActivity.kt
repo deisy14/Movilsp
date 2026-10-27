@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.data.api.RetrofitClient
+import com.example.movilmanupuladora.data.model.MenuPaeCatalog
 import com.example.movilmanupuladora.data.model.PlatoResponse
 import com.example.movilmanupuladora.data.repository.MenuRepository
 import com.example.movilmanupuladora.databinding.ActivityTodosLosPlatosBinding
@@ -22,13 +23,9 @@ class TodosLosPlatosActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTodosLosPlatosBinding
     private val menuRepository = MenuRepository(RetrofitClient.apiService)
 
-    private val platosRespaldo = listOf(
-        PlatoResponse(idPlato = 1, nombrePlato = "Pollo Guisado Criollo", componente = "Pollo y Guiso"),
-        PlatoResponse(idPlato = 2, nombrePlato = "Arroz con Pollo Especial", componente = "Arroz y Pollo"),
-        PlatoResponse(idPlato = 3, nombrePlato = "Bandeja Paisa Tradicional", componente = "Frijoles y Carne"),
-        PlatoResponse(idPlato = 4, nombrePlato = "Lentejas con Arroz", componente = "Leguminosa"),
-        PlatoResponse(idPlato = 5, nombrePlato = "Pasta con Carne Molida", componente = "Proteína y Pasta")
-    )
+    private val platosRespaldo = MenuPaeCatalog.menus.map {
+        PlatoResponse(idPlato = it.id, nombrePlato = it.nombre, componente = it.componente)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,14 +79,10 @@ class TodosLosPlatosActivity : AppCompatActivity() {
         dialogBinding.tvTotalPrepararModal.text = "120 porciones"
         dialogBinding.tvBadgeEstadoModal.text = "Disponible"
 
-        val imgRes = when {
-            (plato.nombrePlato ?: "").lowercase().contains("bandeja") -> R.drawable.bandeja_paisa
-            (plato.nombrePlato ?: "").lowercase().contains("frijol") -> R.drawable.frijoles
-            (plato.nombrePlato ?: "").lowercase().contains("chocolate") -> R.drawable.chocolate
-            (plato.nombrePlato ?: "").lowercase().contains("huevo") -> R.drawable.huevo_perico
-            (plato.nombrePlato ?: "").lowercase().contains("pasta") -> R.drawable.pasta_carne
-            (plato.nombrePlato ?: "").lowercase().contains("lenteja") -> R.drawable.lentejas_arroz
-            else -> R.drawable.pollo_guisado
+        val imgRes = if (plato.idPlato in 1..20) {
+            MenuPaeCatalog.obtenerMenuPorId(plato.idPlato).imagenRes
+        } else {
+            MenuPaeCatalog.obtenerImagenPorNombre(plato.nombrePlato ?: plato.componente)
         }
         dialogBinding.imgPlatoModal.setImageResource(imgRes)
 

@@ -93,26 +93,33 @@ class TurnoActivity : AppCompatActivity() {
     private fun cargarTurno() {
         lifecycleScope.launch {
             try {
-                // Mantener el título original del diseño XML
-                binding.txtTituloTurno.text = "Iniciando tu turno"
-                binding.txtSubtituloTurno.text = "Tu plato asignado es:"
+                // Sincronizar desde la nube para que en cualquier móvil aparezca el plato y componente
+                com.example.movilmanupuladora.utils.PreparacionSyncManager.sincronizarDesdeBackend(this@TurnoActivity)
 
-                // Cargar plato si está disponible
-                try {
-                    val resPlatos = com.example.movilmanupuladora.data.api.RetrofitClient.apiService.obtenerPlatos()
-                    if (resPlatos.isSuccessful && !resPlatos.body().isNullOrEmpty()) {
-                        binding.txtPlatoAsignado.text = resPlatos.body()!!.first().nombrePlato
-                    } else {
-                        binding.txtPlatoAsignado.text = "Pollo guisado"
-                    }
-                } catch (e: Exception) {
-                    binding.txtPlatoAsignado.text = "Pollo guisado"
+                val sessionMgr = com.example.movilmanupuladora.utils.SessionManager(this@TurnoActivity)
+                val platoJefa = sessionMgr.getPlatoJefa(this@TurnoActivity)
+                val componenteAsignado = sessionMgr.getComponenteAsignado(this@TurnoActivity)
+                val nombreUser = sessionMgr.getUserName() ?: ""
+
+                if (nombreUser.isNotBlank()) {
+                    binding.txtTituloTurno.text = "¡Hola, $nombreUser!"
+                } else {
+                    binding.txtTituloTurno.text = "Iniciando tu turno"
                 }
 
-                // Cargar horario de turno
+                binding.txtPlatoAsignado.text = platoJefa
+
+                if (!componenteAsignado.isNullOrBlank()) {
+                    binding.txtSubtituloTurno.text = "🥣 Tu componente: $componenteAsignado"
+                } else {
+                    binding.txtSubtituloTurno.text = "Plato seleccionado por la Jefa:"
+                }
+
+                // Cargar horario de turno institucional (filtrando los registros PAE)
                 val res = com.example.movilmanupuladora.data.api.RetrofitClient.apiService.obtenerTurnos()
                 if (res.isSuccessful && !res.body().isNullOrEmpty()) {
-                    val turno = res.body()!!.first()
+                    val turno = res.body()!!.firstOrNull { !it.nombreTurno.orEmpty().startsWith("PAE_") }
+                        ?: res.body()!!.first()
                     val nombreRaw = turno.nombreTurno ?: "Mañana"
                     // Evitar repetir la palabra "Turno" si el backend ya la trae (ej. "Turno Mañana MOD")
                     val nombreLimpio = if (nombreRaw.trim().startsWith("Turno", ignoreCase = true)) {
@@ -127,8 +134,14 @@ class TurnoActivity : AppCompatActivity() {
                     binding.txtMensajeTurno.text = "Turno Mañana · 6:00 a. m. - 2:00 p. m. · Ingresando..."
                 }
             } catch (e: Exception) {
+                val sessionMgr = com.example.movilmanupuladora.utils.SessionManager(this@TurnoActivity)
+                val platoJefa = sessionMgr.getPlatoJefa(this@TurnoActivity)
+                val comp = sessionMgr.getComponenteAsignado(this@TurnoActivity)
                 binding.txtTituloTurno.text = "Iniciando tu turno"
-                binding.txtPlatoAsignado.text = "Pollo guisado"
+                binding.txtPlatoAsignado.text = platoJefa
+                if (!comp.isNullOrBlank()) {
+                    binding.txtSubtituloTurno.text = "🥣 Tu componente: $comp"
+                }
                 binding.txtMensajeTurno.text = "Turno Mañana · 6:00 a. m. - 2:00 p. m. · Ingresando..."
             }
         }

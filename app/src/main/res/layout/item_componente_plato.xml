@@ -15,7 +15,7 @@
         android:layout_height="40dp"
         android:contentDescription="Icono componente"
         android:scaleType="centerInside"
-        android:src="@drawable/ic_leche" />
+        android:src="@drawable/ic_food" />
 
     <TextView
         android:id="@+id/tvNombreComponente"

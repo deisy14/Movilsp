@@ -8,17 +8,22 @@ data class Usuario(
     val idUsuario: Int? = null,
 
     val nombre: String,
-    val apellido: String,
-    val correo: String,
+    val apellido: String = "",
+    val correo: String = "",
 
     @SerializedName("tipo_documento")
-    val tipoDocumento: String,
+    val tipoDocumento: String = "",
 
     @SerializedName("numero_documento")
-    val numeroDocumento: String,
+    val numeroDocumento: String = "",
 
     // ID del rol seleccionado al registrar
+    @SerializedName("rol", alternate = ["rol_id", "id_rol"])
     val rol: Int? = null,
+
+    // Nombre del rol (viene en el listado de usuarios)
+    @SerializedName("nombre_rol", alternate = ["rol_nombre", "nombreRol", "role"])
+    val nombreRol: String? = null,
 
     val password: String? = null,
 
@@ -27,7 +32,11 @@ data class Usuario(
 
     @SerializedName("is_staff")
     val isStaff: Boolean? = false
-)
+) {
+    /** Nombre completo del usuario */
+    val nombreCompleto: String
+        get() = if (apellido.isNotBlank()) "$nombre $apellido" else nombre
+}
 
 // Modelo para la petición de Login
 data class LoginRequest(

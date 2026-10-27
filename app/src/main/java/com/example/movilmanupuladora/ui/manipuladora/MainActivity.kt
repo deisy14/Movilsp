@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.model.DetallePlato
+import com.example.movilmanupuladora.data.model.MenuPaeCatalog
 import com.example.movilmanupuladora.data.model.PlatoResponse
 import com.example.movilmanupuladora.data.model.SeccionMenu
 import com.example.movilmanupuladora.data.repository.AsistenciaRepository
@@ -19,6 +20,7 @@ import com.example.movilmanupuladora.databinding.ActivityMainBinding
 import com.example.movilmanupuladora.databinding.DialogDetallePlatoBinding
 import com.example.movilmanupuladora.databinding.PopupNotificacionesBinding
 import com.example.movilmanupuladora.ui.manipuladora_Jefe.AsistenciaManager
+import com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity
 import com.example.movilmanupuladora.utils.NavigationHelper
 import com.example.movilmanupuladora.utils.SessionManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -90,7 +92,7 @@ class MainActivity : AppCompatActivity() {
 
         androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
             insets
         }
 
@@ -118,34 +120,36 @@ class MainActivity : AppCompatActivity() {
             mostrarPopupNotificaciones()
         }
 
-        binding.btnPerfilHeader.setOnClickListener {
-            startActivity(Intent(this, PerfilActivity::class.java))
-        }
-
+        // Detectar plato y componente asignado por la Jefa
         binding.btnVerPreparacion.setOnClickListener {
             val intent = Intent(this, PreparacionActivity::class.java).apply {
-                platoActualSeleccionado?.let { plato ->
-                    putExtra("id_plato", plato.idPlato)
-                    putExtra("nombre_plato", plato.nombrePlato)
-                    putExtra("componente_seleccionado", plato.componente)
-                }
+                val platoJefa = sessionMgr.getPlatoJefa(this@MainActivity)
+                val compJefa = sessionMgr.getComponenteAsignado(this@MainActivity)
+                putExtra("nombre_plato", platoJefa)
+                putExtra("componente_seleccionado", compJefa)
+                putExtra("id_imagen", com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity.obtenerImagenPlatoPorNombre(platoJefa))
             }
             startActivity(intent)
         }
 
         binding.cardPlatoMain.setOnClickListener {
-            platoActualSeleccionado?.let { plato ->
-                mostrarDialogoPlato(plato)
+            val intent = Intent(this, PreparacionActivity::class.java).apply {
+                val platoJefa = sessionMgr.getPlatoJefa(this@MainActivity)
+                val compJefa = sessionMgr.getComponenteAsignado(this@MainActivity)
+                putExtra("nombre_plato", platoJefa)
+                putExtra("componente_seleccionado", compJefa)
+                putExtra("id_imagen", com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity.obtenerImagenPlatoPorNombre(platoJefa))
             }
+            startActivity(intent)
         }
 
         binding.cardAccesoAsignadas.setOnClickListener {
             val intent = Intent(this, PreparacionActivity::class.java).apply {
-                platoActualSeleccionado?.let { plato ->
-                    putExtra("id_plato", plato.idPlato)
-                    putExtra("nombre_plato", plato.nombrePlato)
-                    putExtra("componente_seleccionado", plato.componente)
-                }
+                val platoJefa = sessionMgr.getPlatoJefa(this@MainActivity)
+                val compJefa = sessionMgr.getComponenteAsignado(this@MainActivity)
+                putExtra("nombre_plato", platoJefa)
+                putExtra("componente_seleccionado", compJefa)
+                putExtra("id_imagen", com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity.obtenerImagenPlatoPorNombre(platoJefa))
             }
             startActivity(intent)
         }
@@ -168,6 +172,11 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         cargarAsistenciaLocal()
         iniciarPollingAsistenciaEnVivo()
+        lifecycleScope.launch {
+            try {
+                com.example.movilmanupuladora.utils.PreparacionSyncManager.sincronizarDesdeBackend(this@MainActivity)
+            } catch (_: Exception) { }
+        }
     }
 
     override fun onPause() {
@@ -352,19 +361,34 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun actualizarInformacionSeccion() {
+        val sessionMgr = SessionManager(this)
+        val platoJefa = sessionMgr.getPlatoJefa(this)
+        val componenteJefa = sessionMgr.getComponenteAsignado(this)
+
         val nombreSeccion = seccionesNombres[seccionSeleccionada]
         binding.tvSeccionSeleccionada.text = nombreSeccion.uppercase()
 
-        val plato = obtenerPlatoPorSeccion(nombreSeccion)
-
-        if (plato != null) {
-            platoActualSeleccionado = plato
-            binding.tvPlatoSeleccionado.text = formatearNombrePlato(plato.nombrePlato)
-            binding.imgPlatoMain.setImageResource(obtenerImagenPlato(plato))
+        // Mostrar prioritariamente el plato seleccionado por la Jefa
+        if (platoJefa.isNotBlank()) {
+            if (!componenteJefa.isNullOrBlank()) {
+                binding.tvPlatoSeleccionado.text = "$platoJefa\n(Mi componente: $componenteJefa)"
+            } else {
+                binding.tvPlatoSeleccionado.text = platoJefa
+            }
+            binding.imgPlatoMain.setImageResource(
+                com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity.obtenerImagenPlatoPorNombre(platoJefa)
+            )
         } else {
-            platoActualSeleccionado = null
-            binding.tvPlatoSeleccionado.text = "Sin menú asignado"
-            binding.imgPlatoMain.setImageResource(R.drawable.arroz_pollo)
+            val plato = obtenerPlatoPorSeccion(nombreSeccion)
+            if (plato != null) {
+                platoActualSeleccionado = plato
+                binding.tvPlatoSeleccionado.text = formatearNombrePlato(plato.nombrePlato)
+                binding.imgPlatoMain.setImageResource(obtenerImagenPlato(plato))
+            } else {
+                platoActualSeleccionado = null
+                binding.tvPlatoSeleccionado.text = "Sin menú asignado"
+                binding.imgPlatoMain.setImageResource(R.drawable.plato1)
+            }
         }
     }
 
@@ -633,19 +657,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun obtenerImagenPlato(plato: PlatoResponse): Int {
-        val nombre = plato.nombrePlato?.lowercase() ?: ""
-
-        return when {
-            nombre.contains("bandeja") -> R.drawable.bandeja_paisa
-            nombre.contains("frijol") -> R.drawable.frijoles
-            nombre.contains("chocolate") -> R.drawable.chocolate
-            nombre.contains("huevo") || nombre.contains("café") || nombre.contains("pan") -> R.drawable.comida_desayuno
-            nombre.contains("pasta") || nombre.contains("carne") -> R.drawable.pasta_carne
-            nombre.contains("lenteja") -> R.drawable.lentejas_arroz
-            nombre.contains("pollo") -> R.drawable.arroz_pollo
-            nombre.contains("muffin") || nombre.contains("leche") -> R.drawable.comida_merienda
-            else -> R.drawable.arroz_pollo
+        if (plato.idPlato in 1..20) {
+            return MenuPaeCatalog.obtenerMenuPorId(plato.idPlato).imagenRes
         }
+        return MenuPaeCatalog.obtenerImagenPorNombre(plato.nombrePlato ?: plato.componente)
     }
 
     private fun configurarMenusAnteriores() {
