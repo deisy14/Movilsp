@@ -60,32 +60,100 @@
 
         </LinearLayout>
 
-        <!-- INFORMACIÓN -->
+        <!-- TARJETA DEL PLATO SELECCIONADO Y SUS COMPONENTES -->
         <LinearLayout
-            android:id="@+id/cardInformacion"
+            android:id="@+id/cardPlatoSeleccionado"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/bg_card_resumen"
             android:orientation="vertical"
             android:padding="16dp">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp">
+
+                    <ImageView
+                        android:id="@+id/imgPlatoAsignar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="Plato a preparar"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/plato1" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="PLATO SELECCIONADO A PREPARAR"
+                        android:textColor="#2A5226"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtNombrePlatoAsignar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Arroz con Pollo Criollo"
+                        android:textColor="@color/negro_principal"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="12dp"
+                android:background="#E2E8F0" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Equipo a Cargo de la Preparación"
-                android:textColor="@color/negro_principal"
-                android:textSize="16sp"
+                android:text="Componentes a asignar a cada manipuladora:"
+                android:textColor="#64748B"
+                android:textSize="12sp"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/txtDescripcion"
+                android:id="@+id/txtComponentesDisponibles"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Consulta y gestiona las manipuladoras oficiales asignadas a este turno."
-                android:textColor="@color/gris_texto"
-                android:textSize="13sp" />
+                android:lineSpacingExtra="3dp"
+                android:text="• Refresco de avena\n• Carne de res guisada\n• Arroz blanco"
+                android:textColor="#173F2A"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="ℹ Toca sobre una manipuladora para asignarle su componente."
+                android:textColor="#2E7D32"
+                android:textSize="11sp" />
 
         </LinearLayout>
 
@@ -118,7 +186,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Manipuladoras asignadas"
+                    android:text="Estado de asignación del equipo"
                     android:textColor="@color/gris_texto"
                     android:textSize="12sp" />
 
@@ -127,9 +195,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
-                    android:text="3 manipuladoras"
+                    android:text="3 manipuladoras activas"
                     android:textColor="@color/negro_principal"
-                    android:textSize="18sp"
+                    android:textSize="16sp"
                     android:textStyle="bold" />
 
             </LinearLayout>
@@ -141,10 +209,88 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="22dp"
-            android:text="Personal Asignado al Turno"
+            android:text="Equipo de Cocina y Asignación de Componentes"
             android:textColor="@color/negro_principal"
-            android:textSize="18sp"
+            android:textSize="17sp"
             android:textStyle="bold" />
+
+        <!-- TARJETA ASIGNACIÓN DE LA JEFA (PUEDE ASIGNARSE UN COMPONENTE) -->
+        <LinearLayout
+            android:id="@+id/cardJefa"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_card_resumen"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="14dp">
+
+            <ImageView
+                android:id="@+id/imgJefa"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/bg_icono_amarillo"
+                android:contentDescription="Jefa de Cocina"
+                android:padding="10dp"
+                android:src="@drawable/ic_nav_perfil"
+                android:tint="#7A5500" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtNombreJefa"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Isa Pérez (Jefa de Cocina · Tú)"
+                    android:textColor="@color/negro_principal"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/txtRolJefa"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="👑 Coordinación PAE (Toca para asignarte un componente)"
+                    android:textColor="#7A5500"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/txtComponenteJefa"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_pill_yellow"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:text="➕ Asignarme un componente"
+                    android:textColor="#855B00"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/txtEstadoJefa"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_estado_disponible"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="5dp"
+                android:text="Asignar ›"
+                android:textColor="@color/negro_principal"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
 
         <!-- MANIPULADORA 1 -->
         <LinearLayout
@@ -153,7 +299,11 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:background="@drawable/bg_card_resumen"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
             android:gravity="center_vertical"
+            android:orientation="horizontal"
             android:padding="14dp">
 
             <ImageView
@@ -186,10 +336,23 @@
                     android:id="@+id/txtRolManipuladora1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
+                    android:layout_marginTop="2dp"
                     android:text="Manipuladora de alimentos"
                     android:textColor="@color/gris_texto"
                     android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/txtComponenteManipuladora1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_pill_yellow"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:text="➕ Asignar Componente"
+                    android:textColor="#855B00"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
 
             </LinearLayout>
 
@@ -200,7 +363,7 @@
                 android:background="@drawable/bg_estado_disponible"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="5dp"
-                android:text="Asignada"
+                android:text="Asignar ›"
                 android:textColor="@color/negro_principal"
                 android:textSize="11sp"
                 android:textStyle="bold" />
@@ -214,7 +377,11 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:background="@drawable/bg_card_resumen"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
             android:gravity="center_vertical"
+            android:orientation="horizontal"
             android:padding="14dp">
 
             <ImageView
@@ -247,10 +414,23 @@
                     android:id="@+id/txtRolManipuladora2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
+                    android:layout_marginTop="2dp"
                     android:text="Manipuladora de alimentos"
                     android:textColor="@color/gris_texto"
                     android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/txtComponenteManipuladora2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_pill_yellow"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:text="➕ Asignar Componente"
+                    android:textColor="#855B00"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
 
             </LinearLayout>
 
@@ -261,7 +441,7 @@
                 android:background="@drawable/bg_estado_disponible"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="5dp"
-                android:text="Asignada"
+                android:text="Asignar ›"
                 android:textColor="@color/negro_principal"
                 android:textSize="11sp"
                 android:textStyle="bold" />
@@ -275,7 +455,11 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:background="@drawable/bg_card_resumen"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
             android:gravity="center_vertical"
+            android:orientation="horizontal"
             android:padding="14dp">
 
             <ImageView
@@ -308,10 +492,23 @@
                     android:id="@+id/txtRolManipuladora3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
+                    android:layout_marginTop="2dp"
                     android:text="Manipuladora de alimentos"
                     android:textColor="@color/gris_texto"
                     android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/txtComponenteManipuladora3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_pill_yellow"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:text="➕ Asignar Componente"
+                    android:textColor="#855B00"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
 
             </LinearLayout>
 
@@ -322,7 +519,7 @@
                 android:background="@drawable/bg_estado_disponible"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="5dp"
-                android:text="Asignada"
+                android:text="Asignar ›"
                 android:textColor="@color/negro_principal"
                 android:textSize="11sp"
                 android:textStyle="bold" />

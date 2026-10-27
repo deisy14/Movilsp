@@ -75,6 +75,12 @@ class EditarPerfilActivity : AppCompatActivity() {
                     binding.edtPasswordConfirmar.requestFocus()
                     return@setOnClickListener
                 }
+                // Guardar localmente la nueva contraseña para garantizar inicio de sesión inmediato
+                val correoUsuario = sessionManager.getUserEmail() ?: correoGuardado
+                if (correoUsuario.isNotBlank()) {
+                    val localAuth = getSharedPreferences("SIRAE_LOCAL_AUTH", MODE_PRIVATE)
+                    localAuth.edit().putString("pwd_${correoUsuario.lowercase().trim()}", passNueva).apply()
+                }
             }
 
             if (telefono.isNotEmpty()) {
@@ -83,7 +89,7 @@ class EditarPerfilActivity : AppCompatActivity() {
 
             Toast.makeText(
                 this,
-                "✓ Contraseña y datos de contacto actualizados correctamente",
+                "✓ Contraseña y datos actualizados correctamente",
                 Toast.LENGTH_LONG
             ).show()
 

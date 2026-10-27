@@ -30,7 +30,7 @@
                 android:layout_height="match_parent"
                 android:contentDescription="Sugerencia de plato IA"
                 android:scaleType="centerCrop"
-                android:src="@drawable/pollo_guisado" />
+                android:src="@drawable/plato3" />
 
             <!-- Sombra Gradiente de Fondo Corto -->
             <View

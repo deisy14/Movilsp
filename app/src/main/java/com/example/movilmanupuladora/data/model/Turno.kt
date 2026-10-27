@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class Turno(
     @SerializedName("id_turno")
-    val idTurno: Int,
+    val idTurno: Int? = null,
 
     @SerializedName("nombre_turno")
     val nombreTurno: String? = null,

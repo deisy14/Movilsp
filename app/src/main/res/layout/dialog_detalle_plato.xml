@@ -69,7 +69,7 @@
                     android:layout_height="match_parent"
                     android:contentDescription="Imagen del plato"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/frijoles" />
+                    android:src="@drawable/plato8" />
 
             </FrameLayout>
 

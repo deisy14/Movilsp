@@ -81,7 +81,7 @@
                     android:id="@+id/imgChocolate"
                     android:layout_width="105dp"
                     android:layout_height="90dp"
-                    android:src="@drawable/chocolate"
+                    android:src="@drawable/plato2"
                     android:contentDescription="Chocolate"
                     android:scaleType="centerInside" />
 

@@ -50,7 +50,7 @@ class AsignacionDialogFragment : DialogFragment() {
             ?: "Plato asignado"
 
         val imagen = arguments?.getInt(ARG_IMAGEN)
-            ?: R.drawable.frijoles
+            ?: R.drawable.plato1
 
         val pasos = arguments?.getStringArrayList(ARG_PASOS)
             ?: arrayListOf()

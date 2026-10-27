@@ -106,4 +106,100 @@ class SessionManager(context: Context) {
 
     fun getPlatoSeleccionadoNombre(): String = prefs.getString("plato_seleccionado_nombre", "Arroz con pollo") ?: "Arroz con pollo"
     fun getPlatoSeleccionadoId(): Int = prefs.getInt("plato_seleccionado_id", -1)
+
+    /**
+     * Obtiene el plato que la Jefa seleccionó para el turno actual (desde TURNO_PAE)
+     */
+    fun getPlatoJefa(context: Context): String {
+        val turnoPref = context.getSharedPreferences("TURNO_PAE", Context.MODE_PRIVATE)
+        return turnoPref.getString("plato_nombre", null)
+            ?: context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE)
+                .getString("plato_actual", "Arroz con Pollo")
+            ?: "Arroz con Pollo"
+    }
+
+    /**
+     * Obtiene el ID del plato que la Jefa seleccionó
+     */
+    fun getPlatoJefaId(context: Context): Int {
+        return context.getSharedPreferences("TURNO_PAE", Context.MODE_PRIVATE)
+            .getInt("plato_id", -1)
+    }
+
+    /**
+     * Busca el componente asignado al usuario actualmente logueado.
+     * La Jefa guarda las asignaciones en SharedPreferences "ManipuladoraJefe"
+     * con claves: comp_correo_{email} y comp_{nombre}
+     */
+    fun getComponenteAsignado(context: Context): String? {
+        val jefaPrefs = context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE)
+
+        // 0. Si el usuario actual es la Jefa o tiene rol de coordinación/jefa
+        val rol = getUserRole()?.lowercase() ?: ""
+        val compJefa = jefaPrefs.getString("comp_jefa", null)
+        val correoUser = getUserEmail()?.trim()?.lowercase()
+        val nombreUser = getUserName()?.trim()?.lowercase()
+        if (!compJefa.isNullOrBlank() && (rol.contains("jef") || rol.contains("coord") || nombreUser?.contains("isa") == true || correoUser?.contains("isa") == true)) {
+            return compJefa
+        }
+
+        // 0.1 Intentar buscar por ID directo de usuario (sincronizado desde la nube)
+        val myUid = getUserId()
+        if (myUid > 0) {
+            val compUid = jefaPrefs.getString("comp_uid_$myUid", null)
+            if (!compUid.isNullOrBlank()) return compUid
+        }
+
+        // 1. Intentar buscar por correo del usuario logueado
+        if (!correoUser.isNullOrBlank()) {
+            val keyCorreo = "comp_correo_" + correoUser.replace("@", "_").replace(".", "_")
+            val comp = jefaPrefs.getString(keyCorreo, null)
+            if (!comp.isNullOrBlank()) return comp
+        }
+
+        // 2. Intentar buscar por nombre del usuario logueado
+        if (!nombreUser.isNullOrBlank()) {
+            val keyNombre = "comp_" + nombreUser.replace(" ", "_")
+            val comp = jefaPrefs.getString(keyNombre, null)
+            if (!comp.isNullOrBlank()) return comp
+
+            // Sin acentos
+            val nombreSinTilde = java.text.Normalizer.normalize(nombreUser, java.text.Normalizer.Form.NFD)
+                .replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
+                .replace(" ", "_")
+            val compSinTilde = jefaPrefs.getString("comp_$nombreSinTilde", null)
+            if (!compSinTilde.isNullOrBlank()) return compSinTilde
+
+            // Por primer nombre (ej. "andrea")
+            val primerNombre = nombreUser.split(" ").firstOrNull()?.trim() ?: ""
+            if (primerNombre.isNotBlank()) {
+                val compPrimerNombre = jefaPrefs.getString("comp_$primerNombre", null)
+                if (!compPrimerNombre.isNullOrBlank()) return compPrimerNombre
+            }
+
+            // Búsqueda parcial en todas las claves
+            val all = jefaPrefs.all
+            for ((key, value) in all) {
+                if (key.startsWith("comp_") && !key.startsWith("comp_correo_") && value is String && value.isNotBlank()) {
+                    val nombreEnClave = key.removePrefix("comp_")
+                    if (nombreUser.contains(nombreEnClave) || nombreEnClave.contains(nombreUser) ||
+                        nombreSinTilde.contains(nombreEnClave) || nombreEnClave.contains(nombreSinTilde)) {
+                        return value
+                    }
+                }
+            }
+        }
+
+        // 3. Fallback especial para Andrea Sánchez
+        if (correoUser?.contains("andrea") == true || nombreUser?.contains("andrea") == true) {
+            val all = jefaPrefs.all
+            for ((key, value) in all) {
+                if ((key.contains("andrea") || key.contains("sanchez")) && value is String && value.isNotBlank()) {
+                    return value
+                }
+            }
+        }
+
+        return null
+    }
 }

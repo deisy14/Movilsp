@@ -279,7 +279,7 @@
                                 android:layout_height="match_parent"
                                 android:contentDescription="Almuerzo"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/arroz_pollo"
+                                android:src="@drawable/plato4"
                                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full" />
 
                         </com.google.android.material.card.MaterialCardView>
@@ -466,7 +466,7 @@
                         android:layout_height="match_parent"
                         android:contentDescription="Plato principal"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/arroz_pollo" />
+                        android:src="@drawable/plato5" />
 
                 </com.google.android.material.card.MaterialCardView>
 
@@ -691,7 +691,7 @@
                                 android:layout_height="match_parent"
                                 android:contentDescription="Almuerzo"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/arroz_pollo" />
+                                android:src="@drawable/plato6" />
 
                         </com.google.android.material.card.MaterialCardView>
 

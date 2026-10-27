@@ -31,7 +31,7 @@
                 android:layout_height="match_parent"
                 android:contentDescription="Plato PAE"
                 android:scaleType="centerCrop"
-                android:src="@drawable/pollo_guisado" />
+                android:src="@drawable/plato2" />
 
         </com.google.android.material.card.MaterialCardView>
 

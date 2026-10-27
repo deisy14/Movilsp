@@ -42,6 +42,9 @@ interface ApiService {
     ): Response<com.example.movilmanupuladora.data.model.MensajeResponse>
 
     // Usuarios
+    @GET("usuarios/")
+    suspend fun obtenerUsuarios(): Response<List<Usuario>>
+
     @POST("usuarios/")
     suspend fun registrarUsuario(@Body usuario: Usuario): Response<RegistroResponse>
 
@@ -87,6 +90,15 @@ interface ApiService {
     // Turnos
     @GET("turnos/")
     suspend fun obtenerTurnos(): Response<List<com.example.movilmanupuladora.data.model.Turno>>
+
+    @POST("turnos/")
+    suspend fun crearTurno(@Body turno: com.example.movilmanupuladora.data.model.Turno): Response<com.example.movilmanupuladora.data.model.Turno>
+
+    @retrofit2.http.PATCH("turnos/{id}/")
+    suspend fun patchTurno(@Path("id") id: Int, @Body body: Map<String, String>): Response<com.example.movilmanupuladora.data.model.Turno>
+
+    @retrofit2.http.DELETE("turnos/{id}/")
+    suspend fun eliminarTurno(@Path("id") id: Int): Response<Unit>
 
     // Ingredientes
     @GET("ingredientes/")

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:bottom="-4dp">
+        <shape android:shape="rectangle">
+
+            <!-- Esquinas superiores curvadas para panel de borde a borde -->
+            <corners
+                android:topLeftRadius="28dp"
+                android:topRightRadius="28dp"
+                android:bottomLeftRadius="0dp"
+                android:bottomRightRadius="0dp" />
+
+            <!-- Tinte translúcido de vidrio esmerilado ahumado (frosted glass) -->
+            <gradient
+                android:angle="270"
+                android:startColor="#401B2026"
+                android:centerColor="#5416191E"
+                android:endColor="#66101215" />
+
+            <!-- Borde fino y luminoso característico del cristal -->
+            <stroke
+                android:width="1.2dp"
+                android:color="#55FFFFFF" />
+
+        </shape>
+    </item>
+</layer-list>

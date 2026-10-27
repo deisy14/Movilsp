@@ -29,15 +29,7 @@ class PlatoCatalogoAdapter(
         holder.binding.tvNombrePlatoCatalogo.text = plato.nombrePlato ?: "Plato PAE"
         holder.binding.tvComponenteCatalogo.text = plato.componente ?: "Sopas, Sazón y Proteína"
 
-        val imgRes = when {
-            (plato.nombrePlato ?: "").lowercase().contains("bandeja") -> R.drawable.bandeja_paisa
-            (plato.nombrePlato ?: "").lowercase().contains("frijol") -> R.drawable.frijoles
-            (plato.nombrePlato ?: "").lowercase().contains("chocolate") -> R.drawable.chocolate
-            (plato.nombrePlato ?: "").lowercase().contains("huevo") -> R.drawable.huevo_perico
-            (plato.nombrePlato ?: "").lowercase().contains("pasta") -> R.drawable.pasta_carne
-            (plato.nombrePlato ?: "").lowercase().contains("lenteja") -> R.drawable.lentejas_arroz
-            else -> R.drawable.pollo_guisado
-        }
+        val imgRes = InicioJefaActivity.obtenerImagenPlato(plato.idPlato, position)
         holder.binding.imgPlatoCatalogo.setImageResource(imgRes)
 
         holder.itemView.setOnClickListener {
