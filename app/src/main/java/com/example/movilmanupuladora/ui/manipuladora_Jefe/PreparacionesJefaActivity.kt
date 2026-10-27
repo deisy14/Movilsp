@@ -163,17 +163,17 @@ class PreparacionesJefaActivity : AppCompatActivity() {
 
         val estado = getSharedPreferences("SIRAE_JEFA", MODE_PRIVATE).getString("estado_plato", "PENDIENTE")
         if (estado == "EN_PREPARACION" || estadoJefa == PreparacionEstadoManager.ESTADO_EN_PROCESO) {
-            binding.txtEstadoPreparacion.text = "En proceso 🔥"
+            binding.txtEstadoPreparacion.text = "En proceso"
             binding.txtEstadoPreparacion.setTextColor(Color.parseColor("#7A5500"))
-            binding.btnIniciarPreparacion.text = if (!compJefa.isNullOrBlank()) "👨‍🍳 Preparar mi componente: $compJefa" else "Continuar preparación"
+            binding.btnIniciarPreparacion.text = if (!compJefa.isNullOrBlank()) "Preparar mi componente: $compJefa" else "Continuar preparación"
         } else if (estado == "FINALIZADO" || estadoJefa == PreparacionEstadoManager.ESTADO_FINALIZADA) {
-            binding.txtEstadoPreparacion.text = "Completado ✅"
+            binding.txtEstadoPreparacion.text = "Completado"
             binding.txtEstadoPreparacion.setTextColor(Color.parseColor("#2A5226"))
             binding.btnIniciarPreparacion.text = if (!compJefa.isNullOrBlank()) "Preparación completada ($compJefa)" else "Preparación completada"
         } else {
-            binding.txtEstadoPreparacion.text = "Pendiente ⏳"
+            binding.txtEstadoPreparacion.text = "Pendiente"
             binding.txtEstadoPreparacion.setTextColor(Color.parseColor("#D92D20"))
-            binding.btnIniciarPreparacion.text = if (!compJefa.isNullOrBlank()) "👨‍🍳 Iniciar mi componente: $compJefa" else "Iniciar preparación"
+            binding.btnIniciarPreparacion.text = if (!compJefa.isNullOrBlank()) "Iniciar mi componente: $compJefa" else "Iniciar preparación"
         }
     }
 

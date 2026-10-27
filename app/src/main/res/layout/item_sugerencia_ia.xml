@@ -110,7 +110,7 @@
                             android:background="@drawable/bg_pill_green"
                             android:paddingHorizontal="10dp"
                             android:paddingVertical="2dp"
-                            android:text="✓ Recom. IA"
+                            android:text="Recom. IA"
                             android:textColor="#2A5226"
                             android:textSize="9.5sp"
                             android:textStyle="bold" />

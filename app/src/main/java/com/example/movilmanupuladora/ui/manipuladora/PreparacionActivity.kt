@@ -98,17 +98,17 @@ class PreparacionActivity : AppCompatActivity() {
                 binding.btnMarcarPreparado.alpha = 1.0f
             }
             PreparacionEstadoManager.ESTADO_EN_PROCESO -> {
-                binding.badgeTurnoPreparacion.text = "Estado: En proceso 🔥"
+                binding.badgeTurnoPreparacion.text = "Estado: En proceso"
                 binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_pill_yellow)
                 binding.badgeTurnoPreparacion.setTextColor(0xFF855B00.toInt())
                 binding.btnMarcarPreparado.text = "En proceso (Cambiar Estado)"
                 binding.btnMarcarPreparado.alpha = 1.0f
             }
             PreparacionEstadoManager.ESTADO_FINALIZADA -> {
-                binding.badgeTurnoPreparacion.text = "Estado: Finalizada ✅"
+                binding.badgeTurnoPreparacion.text = "Estado: Finalizada"
                 binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_pill_green)
                 binding.badgeTurnoPreparacion.setTextColor(0xFF176B35.toInt())
-                binding.btnMarcarPreparado.text = "Preparación Finalizada ✅ (Cambiar)"
+                binding.btnMarcarPreparado.text = "Preparación Finalizada (Cambiar)"
                 binding.btnMarcarPreparado.alpha = 1.0f
             }
             else -> {
@@ -200,9 +200,9 @@ class PreparacionActivity : AppCompatActivity() {
 
     private fun mostrarDialogoEstadoPreparacion() {
         val opciones = arrayOf(
-            "⏳ Por hacer / Pendiente",
-            "🔥 En proceso / En preparación",
-            "✅ Finalizada / Completada"
+            "Por hacer / Pendiente",
+            "En proceso / En preparación",
+            "Finalizada / Completada"
         )
 
         MaterialAlertDialogBuilder(this)
@@ -234,12 +234,12 @@ class PreparacionActivity : AppCompatActivity() {
                     0 -> { // Por hacer
                         preferencias.edit().putString("estado_plato", "PENDIENTE").apply()
                         actualizarVistaEstado(nuevoEstado)
-                        Toast.makeText(this, "Estado actualizado: Por hacer ⏳", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Estado actualizado: Por hacer", Toast.LENGTH_SHORT).show()
                     }
                     1 -> { // En proceso
                         preferencias.edit().putString("estado_plato", "EN_PREPARACION").apply()
                         actualizarVistaEstado(nuevoEstado)
-                        Toast.makeText(this, "Estado actualizado: En proceso 🔥", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Estado actualizado: En proceso", Toast.LENGTH_SHORT).show()
                     }
                     2 -> { // Finalizada
                         preferencias.edit().putBoolean("plato_preparado", true).apply()
@@ -247,7 +247,7 @@ class PreparacionActivity : AppCompatActivity() {
                         actualizarVistaEstado(nuevoEstado)
 
                         MaterialAlertDialogBuilder(this)
-                            .setTitle("¡Preparación Finalizada!")
+                            .setTitle("Preparación Finalizada")
                             .setMessage("El componente '${componenteAsignado ?: nombrePlatoActual}' ha sido marcado como Finalizado con éxito.\n\n¿Deseas ver la pantalla de confirmación?")
                             .setPositiveButton("Ver Confirmación") { _, _ ->
                                 val intentConf = Intent(this, ConfirmacionActivity::class.java).apply {

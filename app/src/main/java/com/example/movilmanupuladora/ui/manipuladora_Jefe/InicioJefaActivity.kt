@@ -83,6 +83,7 @@ class InicioJefaActivity : AppCompatActivity() {
 
         sessionManager = SessionManager(this)
 
+        configurarHeaderJefa()
         configurarSemanaActual()
         configurarEventos()
         configurarNavegacionInferior()
@@ -265,6 +266,55 @@ class InicioJefaActivity : AppCompatActivity() {
                 putExtra("fecha_milisegundos", diaSeleccionado.timeInMillis)
             }
             startActivity(intent)
+        }
+    }
+
+    private fun configurarHeaderJefa() {
+        val nombreUser = sessionManager.getUserName() ?: "Jefa de Cocina"
+        binding.txtSaludoJefa.text = "Hola, $nombreUser"
+        val iniciales = nombreUser.split(" ")
+            .filter { it.isNotEmpty() }
+            .take(2)
+            .joinToString("") { it.first().uppercase() }
+            .ifEmpty { "JF" }
+        binding.txtInicialesJefa.text = iniciales
+
+        binding.btnPerfilHeader.setOnClickListener {
+            val intent = Intent(this, PerfilJefaActivity::class.java)
+            startActivity(intent)
+        }
+
+        binding.btnNotificacionesJefa.setOnClickListener {
+            val popupBinding = com.example.movilmanupuladora.databinding.PopupNotificacionesBinding.inflate(layoutInflater)
+            popupBinding.txtCantidadNotificaciones.text = "3"
+
+            val dialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setView(popupBinding.root)
+                .create()
+
+            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+            popupBinding.notificacionPreparacion.setOnClickListener {
+                dialog.dismiss()
+                startActivity(Intent(this, HistorialPreparacionesActivity::class.java))
+            }
+
+            popupBinding.notificacionInventario.setOnClickListener {
+                dialog.dismiss()
+                startActivity(Intent(this, InventarioJefaActivity::class.java))
+            }
+
+            popupBinding.notificacionAsistencia.setOnClickListener {
+                dialog.dismiss()
+                startActivity(Intent(this, AsistenciaJefaActivity::class.java))
+            }
+
+            popupBinding.btnVerTodasNotificaciones.setOnClickListener {
+                dialog.dismiss()
+                startActivity(Intent(this, com.example.movilmanupuladora.ui.manipuladora.AvisosActivity::class.java))
+            }
+
+            dialog.show()
         }
     }
 

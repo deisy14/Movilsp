@@ -1,6 +1,6 @@
 package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
-import android.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -333,13 +333,13 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
 
         val estadoActual = PreparacionEstadoManager.obtenerEstado(this, nombreJefa, componenteJefa, correoJefa)
         val opciones = arrayOf(
-            "👨‍🍳 Ir a preparar mi componente (Ver pasos e insumos)",
-            "⚡ Cambiar estado (Actual: $estadoActual)",
-            "🥣 Cambiar componente asignado",
-            "❌ Quitar mi asignación"
+            "Ir a preparar mi componente (Ver pasos e insumos)",
+            "Cambiar estado (Actual: $estadoActual)",
+            "Cambiar componente asignado",
+            "Quitar mi asignación"
         )
 
-        AlertDialog.Builder(this)
+        MaterialAlertDialogBuilder(this)
             .setTitle("Opciones Jefa: $nombreJefa")
             .setItems(opciones) { _, which ->
                 when (which) {
@@ -368,12 +368,12 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
 
         val estadoActual = PreparacionEstadoManager.obtenerEstado(this, manipuladora.nombre, manipuladora.componenteAsignado, manipuladora.correo)
         val opciones = arrayOf(
-            "⚡ Cambiar estado de preparación (Actual: $estadoActual)",
-            "🥣 Cambiar componente asignado",
-            "❌ Quitar componente asignado"
+            "Cambiar estado de preparación (Actual: $estadoActual)",
+            "Cambiar componente asignado",
+            "Quitar componente asignado"
         )
 
-        AlertDialog.Builder(this)
+        MaterialAlertDialogBuilder(this)
             .setTitle("Opciones: ${manipuladora.nombre}")
             .setItems(opciones) { _, which ->
                 when (which) {
@@ -388,13 +388,14 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
 
     private fun mostrarDialogoCambiarEstado(persona: String, componente: String?, correo: String?) {
         val opciones = arrayOf(
-            "⏳ Por hacer / Pendiente",
-            "🔥 En proceso / En preparación",
-            "✅ Finalizada / Completada"
+            "Por hacer / Pendiente",
+            "En proceso / En preparación",
+            "Finalizada / Completada"
         )
         val estadoActual = PreparacionEstadoManager.obtenerEstado(this, persona, componente, correo)
 
-        AlertDialog.Builder(this)
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Actualizar estado de preparación")
             .setTitle("Actualizar estado de preparación")
             .setMessage("Responsable: $persona\nComponente: ${componente ?: "General"}\nEstado actual: $estadoActual")
             .setItems(opciones) { _, which ->
@@ -467,12 +468,12 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
             }
         }
 
-        opciones.add("✏️ Ingresar otro componente personalizado...")
+        opciones.add("Ingresar otro componente personalizado...")
         if (!componenteJefa.isNullOrBlank()) {
-            opciones.add("❌ Quitar componente asignado")
+            opciones.add("Quitar componente asignado")
         }
 
-        AlertDialog.Builder(this)
+        MaterialAlertDialogBuilder(this)
             .setTitle("Asignarme componente para preparar")
             .setItems(opciones.toTypedArray()) { _, posicion ->
                 when {
@@ -480,7 +481,7 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
                         val compElegido = componentes[posicion]
                         val otra = manipuladoras.firstOrNull { it.componenteAsignado?.equals(compElegido, ignoreCase = true) == true }
                         if (otra != null) {
-                            AlertDialog.Builder(this)
+                            MaterialAlertDialogBuilder(this)
                                 .setTitle("Componente ya asignado")
                                 .setMessage("El componente '$compElegido' ya se encuentra asignado a ${otra.nombre}.\n\nNo se permite duplicar componentes en el equipo.\n\n¿Deseas transferirlo a ti misma?")
                                 .setPositiveButton("Sí, transferir a mí") { _, _ ->
@@ -510,7 +511,7 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
         input.hint = "Ej: Porción de fruta, Ensalada dulce..."
         input.setPadding(48, 32, 48, 32)
 
-        AlertDialog.Builder(this)
+        MaterialAlertDialogBuilder(this)
             .setTitle("Componente personalizado (Jefa)")
             .setMessage("Escribe el componente que prepararás:")
             .setView(input)
@@ -519,7 +520,7 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
                 if (nuevoComp.isNotEmpty()) {
                     val otra = manipuladoras.firstOrNull { it.componenteAsignado?.equals(nuevoComp, ignoreCase = true) == true }
                     if (otra != null) {
-                        AlertDialog.Builder(this)
+                        MaterialAlertDialogBuilder(this)
                             .setTitle("Componente ya asignado")
                             .setMessage("El componente '$nuevoComp' ya está asignado a ${otra.nombre}.\n\n¿Deseas transferirlo a ti misma?")
                             .setPositiveButton("Sí, transferir") { _, _ ->
@@ -580,19 +581,19 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
             val ocupadoPorJefa = componenteJefa?.equals(c, ignoreCase = true) == true
 
             when {
-                ocupadoPorJefa -> opciones.add("$emoji $c  (⚠️ Ocupado por la Jefa)")
-                otra != null -> opciones.add("$emoji $c  (⚠️ Ocupado por ${otra.nombre})")
-                manipuladora.componenteAsignado?.equals(c, ignoreCase = true) == true -> opciones.add("$emoji $c  (✓ Asignado)")
-                else -> opciones.add("$emoji $c")
+                ocupadoPorJefa -> opciones.add("$c  (Ocupado por la Jefa)")
+                otra != null -> opciones.add("$c  (Ocupado por ${otra.nombre})")
+                manipuladora.componenteAsignado?.equals(c, ignoreCase = true) == true -> opciones.add("$c  (Asignado)")
+                else -> opciones.add(c)
             }
         }
 
-        opciones.add("✏️ Ingresar otro componente personalizado...")
+        opciones.add("Ingresar otro componente personalizado...")
         if (!manipuladora.componenteAsignado.isNullOrBlank()) {
-            opciones.add("❌ Quitar componente asignado")
+            opciones.add("Quitar componente asignado")
         }
 
-        AlertDialog.Builder(this)
+        MaterialAlertDialogBuilder(this)
             .setTitle("Asignar componente a ${manipuladora.nombre}")
             .setItems(opciones.toTypedArray()) { _, posicion ->
                 when {
@@ -603,7 +604,7 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
 
                         when {
                             ocupadoPorJefa -> {
-                                AlertDialog.Builder(this)
+                                MaterialAlertDialogBuilder(this)
                                     .setTitle("Componente asignado a la Jefa")
                                     .setMessage("El componente '$compElegido' está asignado a ti (Jefa de Cocina).\n\n¿Deseas transferirlo a ${manipuladora.nombre}?")
                                     .setPositiveButton("Sí, transferir") { _, _ ->
@@ -614,7 +615,7 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
                                     .show()
                             }
                             otra != null -> {
-                                AlertDialog.Builder(this)
+                                MaterialAlertDialogBuilder(this)
                                     .setTitle("Componente ya asignado")
                                     .setMessage("El componente '$compElegido' ya se encuentra asignado a ${otra.nombre}.\n\nNo se permite que dos personas tengan el mismo componente.\n\n¿Deseas transferirlo a ${manipuladora.nombre}?")
                                     .setPositiveButton("Sí, transferir") { _, _ ->
@@ -646,7 +647,7 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
         input.hint = "Ej: Porción de fruta, Ensalada dulce..."
         input.setPadding(48, 32, 48, 32)
 
-        AlertDialog.Builder(this)
+        MaterialAlertDialogBuilder(this)
             .setTitle("Componente personalizado")
             .setMessage("Escribe el componente que preparará ${manipuladora.nombre}:")
             .setView(input)
@@ -658,7 +659,7 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
 
                     when {
                         ocupadoPorJefa -> {
-                            AlertDialog.Builder(this)
+                            MaterialAlertDialogBuilder(this)
                                 .setTitle("Componente asignado a la Jefa")
                                 .setMessage("El componente '$nuevoComp' está asignado a ti (Jefa de Cocina).\n\n¿Deseas transferirlo a ${manipuladora.nombre}?")
                                 .setPositiveButton("Sí, transferir") { _, _ ->
@@ -669,7 +670,7 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
                                 .show()
                         }
                         otra != null -> {
-                            AlertDialog.Builder(this)
+                            MaterialAlertDialogBuilder(this)
                                 .setTitle("Componente ya asignado")
                                 .setMessage("El componente '$nuevoComp' ya está asignado a ${otra.nombre}.\n\n¿Deseas transferirlo a ${manipuladora.nombre}?")
                                 .setPositiveButton("Sí, transferir") { _, _ ->
@@ -745,7 +746,7 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
             return
         }
 
-        AlertDialog.Builder(this)
+        MaterialAlertDialogBuilder(this)
             .setTitle("Seleccionar manipuladora")
             .setItems(disponibles) { _, posicion ->
                 val nombreSeleccionado = disponibles[posicion]
@@ -801,7 +802,7 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
             resumen.append("• ${m.nombre}: $comp ($estM)\n")
         }
 
-        AlertDialog.Builder(this)
+        MaterialAlertDialogBuilder(this)
             .setTitle("Confirmar Asignación de Componentes")
             .setMessage("Plato: $nombreMenu ($jornada)\n\nDistribución:\n$resumen")
             .setPositiveButton("Confirmar y Guardar") { _, _ ->
@@ -927,7 +928,7 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
 
         Toast.makeText(
             this,
-            "¡Asignación de componentes confirmada exitosamente!",
+            "Asignación de componentes confirmada exitosamente",
             Toast.LENGTH_LONG
         ).show()
 
@@ -936,7 +937,7 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
     }
 
     private fun confirmarCancelar() {
-        AlertDialog.Builder(this)
+        MaterialAlertDialogBuilder(this)
             .setTitle("Volver")
             .setMessage("¿Deseas volver a la pantalla de preparación?")
             .setPositiveButton("Sí, volver") { _, _ ->
