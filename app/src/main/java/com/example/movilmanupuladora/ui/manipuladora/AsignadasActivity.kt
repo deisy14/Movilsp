@@ -100,7 +100,7 @@ class AsignadasActivity : AppCompatActivity() {
             val miNombre = sessionMgr.getUserName() ?: ""
             val miCorreo = sessionMgr.getUserEmail() ?: ""
             val miEstado = PreparacionEstadoManager.obtenerEstado(this, miNombre, compAsignado, miCorreo)
-            binding.tvComponenteMiPlato.text = "🥣 Tu componente: $compAsignado • $miEstado"
+            binding.tvComponenteMiPlato.text = "Tu componente: $compAsignado • $miEstado"
         } else {
             binding.tvComponenteMiPlato.text = "Componente pendiente de asignación"
         }
@@ -243,7 +243,7 @@ class AsignadasActivity : AppCompatActivity() {
             }
 
             val tvCargoJ = TextView(this).apply {
-                text = "🥣 Componente: $compJefa • $estadoJefa"
+                text = "Componente: $compJefa • $estadoJefa"
                 val color = when (estadoJefa) {
                     PreparacionEstadoManager.ESTADO_FINALIZADA -> 0xFF176B35.toInt()
                     PreparacionEstadoManager.ESTADO_EN_PROCESO -> 0xFF855B00.toInt()
@@ -323,7 +323,7 @@ class AsignadasActivity : AppCompatActivity() {
 
             val tvCargo = TextView(this).apply {
                 text = if (!comp.isNullOrBlank()) {
-                    "🥣 Componente: $comp • $estadoOperaria"
+                    "Componente: $comp • $estadoOperaria"
                 } else {
                     "${m.funcion} • Sin asignar"
                 }

@@ -103,15 +103,5 @@ class EditarPerfilActivity : AppCompatActivity() {
         binding.btnCancelar.setOnClickListener {
             finish()
         }
-
-        // ==========================================
-        // BARRA DE NAVEGACIÓN
-        // ==========================================
-
-        com.example.movilmanupuladora.utils.NavigationHelper.setupBarraNavegacion(
-            this,
-            binding.barraNavegacion,
-            com.example.movilmanupuladora.utils.NavigationHelper.Tab.PERFIL,
-        )
     }
 }

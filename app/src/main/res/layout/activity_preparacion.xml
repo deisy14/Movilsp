@@ -125,7 +125,7 @@
                         android:background="@drawable/bg_pill_green"
                         android:paddingHorizontal="14dp"
                         android:paddingVertical="5dp"
-                        android:text="🥣 Componente a preparar: -"
+                        android:text="Componente a preparar: -"
                         android:textColor="#176B35"
                         android:textSize="13sp"
                         android:textStyle="bold" />

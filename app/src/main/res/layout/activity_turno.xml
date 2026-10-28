@@ -97,7 +97,7 @@
                         android:adjustViewBounds="true"
                         android:contentDescription="Logo SIRAE"
                         android:scaleType="centerInside"
-                        android:src="@drawable/logo_sirae" />
+                        android:src="@drawable/logosira" />
 
                     <!-- ========================================= -->
                     <!-- ICONO                                     -->

@@ -200,17 +200,17 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
     private fun actualizarTarjetaJefa() {
         binding.cardJefa.visibility = View.VISIBLE
         binding.txtNombreJefa.text = "$nombreJefa (Jefa de Cocina · Tú)"
-        binding.txtRolJefa.text = "👑 Coordinación PAE (Toca para opciones de preparación)"
+        binding.txtRolJefa.text = "Coordinación PAE (Toca para opciones de preparación)"
 
         if (!componenteJefa.isNullOrBlank()) {
-            binding.txtComponenteJefa.text = "🥣 Tu componente: $componenteJefa"
+            binding.txtComponenteJefa.text = "Tu componente: $componenteJefa"
             binding.txtComponenteJefa.setBackgroundResource(R.drawable.bg_pill_green)
             binding.txtComponenteJefa.setTextColor(Color.parseColor("#176B35"))
 
             val estadoJ = PreparacionEstadoManager.obtenerEstado(this, nombreJefa, componenteJefa, correoJefa)
             configurarBadgeEstado(binding.txtEstadoJefa, estadoJ)
         } else {
-            binding.txtComponenteJefa.text = "➕ Toca para asignarte un componente"
+            binding.txtComponenteJefa.text = "Toca para asignarte un componente"
             binding.txtComponenteJefa.setBackgroundResource(R.drawable.bg_pill_yellow)
             binding.txtComponenteJefa.setTextColor(Color.parseColor("#855B00"))
 
@@ -230,14 +230,14 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
                     binding.txtRolManipuladora1.text = persona.rol
 
                     if (!persona.componenteAsignado.isNullOrBlank()) {
-                        binding.txtComponenteManipuladora1.text = "🥣 Componente: ${persona.componenteAsignado}"
+                        binding.txtComponenteManipuladora1.text = "Componente: ${persona.componenteAsignado}"
                         binding.txtComponenteManipuladora1.setBackgroundResource(R.drawable.bg_pill_green)
                         binding.txtComponenteManipuladora1.setTextColor(Color.parseColor("#176B35"))
 
                         val estadoPrep = PreparacionEstadoManager.obtenerEstado(this, persona.nombre, persona.componenteAsignado, persona.correo)
                         configurarBadgeEstado(binding.txtEstadoManipuladora1, estadoPrep)
                     } else {
-                        binding.txtComponenteManipuladora1.text = "➕ Toca para asignar componente"
+                        binding.txtComponenteManipuladora1.text = "Toca para asignar componente"
                         binding.txtComponenteManipuladora1.setBackgroundResource(R.drawable.bg_pill_yellow)
                         binding.txtComponenteManipuladora1.setTextColor(Color.parseColor("#855B00"))
                         binding.txtEstadoManipuladora1.text = "Asignar ›"
@@ -256,14 +256,14 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
                     binding.txtRolManipuladora2.text = persona.rol
 
                     if (!persona.componenteAsignado.isNullOrBlank()) {
-                        binding.txtComponenteManipuladora2.text = "🥣 Componente: ${persona.componenteAsignado}"
+                        binding.txtComponenteManipuladora2.text = "Componente: ${persona.componenteAsignado}"
                         binding.txtComponenteManipuladora2.setBackgroundResource(R.drawable.bg_pill_green)
                         binding.txtComponenteManipuladora2.setTextColor(Color.parseColor("#176B35"))
 
                         val estadoPrep = PreparacionEstadoManager.obtenerEstado(this, persona.nombre, persona.componenteAsignado, persona.correo)
                         configurarBadgeEstado(binding.txtEstadoManipuladora2, estadoPrep)
                     } else {
-                        binding.txtComponenteManipuladora2.text = "➕ Toca para asignar componente"
+                        binding.txtComponenteManipuladora2.text = "Toca para asignar componente"
                         binding.txtComponenteManipuladora2.setBackgroundResource(R.drawable.bg_pill_yellow)
                         binding.txtComponenteManipuladora2.setTextColor(Color.parseColor("#855B00"))
                         binding.txtEstadoManipuladora2.text = "Asignar ›"
@@ -282,14 +282,14 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
                     binding.txtRolManipuladora3.text = persona.rol
 
                     if (!persona.componenteAsignado.isNullOrBlank()) {
-                        binding.txtComponenteManipuladora3.text = "🥣 Componente: ${persona.componenteAsignado}"
+                        binding.txtComponenteManipuladora3.text = "Componente: ${persona.componenteAsignado}"
                         binding.txtComponenteManipuladora3.setBackgroundResource(R.drawable.bg_pill_green)
                         binding.txtComponenteManipuladora3.setTextColor(Color.parseColor("#176B35"))
 
                         val estadoPrep = PreparacionEstadoManager.obtenerEstado(this, persona.nombre, persona.componenteAsignado, persona.correo)
                         configurarBadgeEstado(binding.txtEstadoManipuladora3, estadoPrep)
                     } else {
-                        binding.txtComponenteManipuladora3.text = "➕ Toca para asignar componente"
+                        binding.txtComponenteManipuladora3.text = "Toca para asignar componente"
                         binding.txtComponenteManipuladora3.setBackgroundResource(R.drawable.bg_pill_yellow)
                         binding.txtComponenteManipuladora3.setTextColor(Color.parseColor("#855B00"))
                         binding.txtEstadoManipuladora3.text = "Asignar ›"
@@ -339,7 +339,7 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
             "Ir a preparar mi componente (Ver pasos e insumos)",
             "Cambiar estado (Actual: $estadoActual)",
             "Cambiar componente asignado",
-            "Quitar mi asignación"
+            "Quitar mi asignación",
             "⚡ Cambiar estado (Actual: $estadoActual)",
             "🥣 Cambiar componente asignado",
             "❌ Quitar mi asignación"
@@ -437,17 +437,7 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
     }
 
     private fun obtenerEmojiComponente(c: String): String {
-        return when {
-            c.contains("avena", true) || c.contains("jugo", true) || c.contains("refresco", true) || c.contains("bebida", true) || c.contains("chocolate", true) -> "🥤"
-            c.contains("leche", true) || c.contains("yogurt", true) -> "🥛"
-            c.contains("galleta", true) || c.contains("cuca", true) || c.contains("hojaldra", true) || c.contains("torta", true) || c.contains("pastel", true) || c.contains("pan", true) -> "🍪"
-            c.contains("maní", true) || c.contains("mani", true) -> "🥜"
-            c.contains("mango", true) || c.contains("papaya", true) || c.contains("manzana", true) || c.contains("fruta", true) -> "🍎"
-            c.contains("carne", true) || c.contains("pollo", true) || c.contains("huevo", true) -> "🥩"
-            c.contains("arroz", true) -> "🍚"
-            c.contains("ensalada", true) || c.contains("verdura", true) -> "🥗"
-            else -> "🥣"
-        }
+        return ""
     }
 
     private fun mostrarDialogoAsignarComponenteJefa() {
@@ -455,14 +445,13 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
         val opciones = mutableListOf<String>()
 
         for (c in componentes) {
-            val emoji = obtenerEmojiComponente(c)
             val otra = manipuladoras.firstOrNull { it.componenteAsignado?.equals(c, ignoreCase = true) == true }
             if (otra != null) {
-                opciones.add("$emoji $c  (⚠️ Ocupado por ${otra.nombre})")
+                opciones.add("$c  (Ocupado por ${otra.nombre})")
             } else if (componenteJefa?.equals(c, ignoreCase = true) == true) {
-                opciones.add("$emoji $c  (✓ Asignado a ti)")
+                opciones.add("$c  (Asignado a ti)")
             } else {
-                opciones.add("$emoji $c")
+                opciones.add(c)
             }
         }
 
@@ -555,7 +544,7 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
         if (componente != null) {
             Toast.makeText(
                 this,
-                "✓ '$componente' asignado a la Jefa de Cocina",
+                "'$componente' asignado a la Jefa de Cocina",
                 Toast.LENGTH_SHORT
             ).show()
         } else {
@@ -715,7 +704,7 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
         if (componente != null) {
             Toast.makeText(
                 this,
-                "✓ '$componente' asignado a ${manipuladora.nombre}",
+                "'$componente' asignado a ${manipuladora.nombre}",
                 Toast.LENGTH_SHORT
             ).show()
         } else {
@@ -824,7 +813,8 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
             .trim().replace(" ", "_").lowercase()
         editor.putString("comp_$jefaSinTilde", componenteJefa ?: "")
         if (correoJefa.isNotBlank()) {
-            val keyCorreoJefa = "comp_correo_" + correoJefa.trim().replace("@", "_").replace(".", "_").lowercase()
+            val keyCorreoJefa =
+                "comp_correo_" + correoJefa.trim().replace("@", "_").replace(".", "_").lowercase()
             editor.putString(keyCorreoJefa, componenteJefa ?: "")
         }
 
@@ -847,7 +837,8 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
             }
 
             if (m.correo.isNotBlank()) {
-                val keyCorreo = "comp_correo_" + m.correo.trim().replace("@", "_").replace(".", "_").lowercase()
+                val keyCorreo =
+                    "comp_correo_" + m.correo.trim().replace("@", "_").replace(".", "_").lowercase()
                 editor.putString(keyCorreo, comp)
             }
 
@@ -895,7 +886,10 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
         for (m in manipuladoras) {
             val uid = if (m.idUsuario > 0) m.idUsuario else {
                 val real = ManipuladorasManager.obtenerManipuladoras().firstOrNull {
-                    it.correo.equals(m.correo, ignoreCase = true) || it.nombre.equals(m.nombre, ignoreCase = true)
+                    it.correo.equals(m.correo, ignoreCase = true) || it.nombre.equals(
+                        m.nombre,
+                        ignoreCase = true
+                    )
                 }
                 real?.idUsuario ?: real?.id ?: -1
             }
@@ -926,14 +920,12 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
                     )
                 }
             } catch (e: Exception) {
-                android.util.Log.e("ManipuladorasAsignadas", "Error guardando asignaciones: ${e.message}")
+                android.util.Log.e(
+                    "ManipuladorasAsignadas",
+                    "Error guardando asignaciones: ${e.message}"
+                )
             }
 
-        Toast.makeText(
-            this,
-            "Asignación de componentes confirmada exitosamente",
-            Toast.LENGTH_LONG
-        ).show()
             Toast.makeText(
                 this@ManipuladorasAsignadasActivity,
                 "¡Asignación de componentes y plato confirmados exitosamente!",
@@ -944,7 +936,6 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
             finish()
         }
     }
-
     private fun confirmarCancelar() {
         MaterialAlertDialogBuilder(this)
             .setTitle("Volver")
