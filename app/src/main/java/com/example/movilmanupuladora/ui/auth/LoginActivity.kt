@@ -1,10 +1,12 @@
+
 package com.example.movilmanupuladora.ui.auth
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.content.Context
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -30,16 +32,24 @@ class LoginActivity : AppCompatActivity() {
     private val recuperarPasswordLauncher = registerForActivityResult(
         androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
     ) { result ->
+
         if (result.resultCode == android.app.Activity.RESULT_OK) {
-            val correo = result.data?.getStringExtra(RecuperarPasswordActivity.EXTRA_CORREO)
+
+            val correo = result.data?.getStringExtra(
+                RecuperarPasswordActivity.EXTRA_CORREO
+            )
+
             val nuevaPwd = result.data?.getStringExtra("nueva_password")
+
             if (!correo.isNullOrEmpty()) {
                 binding.txtCorreo.setText(correo)
+
                 if (!nuevaPwd.isNullOrEmpty()) {
                     binding.txtPassword.setText(nuevaPwd)
                 } else {
                     binding.txtPassword.setText("")
                 }
+
                 binding.txtPassword.requestFocus()
             }
         }
@@ -53,46 +63,51 @@ class LoginActivity : AppCompatActivity() {
 
         sessionManager = SessionManager(this)
 
-        // =====================================================
-        // RECUPERAR TOKEN GUARDADO
-        // =====================================================
-
+        // Recuperar el token guardado.
         sessionManager.fetchAuthToken()?.let { savedToken ->
             RetrofitClient.authToken = savedToken
         }
 
-        // =====================================================
-        // VISIBILIDAD DE CONTRASEÑA
-        // =====================================================
-
+        // Mostrar u ocultar la contraseña.
         var passwordVisible = false
+
         binding.btnTogglePassword.setOnClickListener {
+
             passwordVisible = !passwordVisible
+
             if (passwordVisible) {
+
                 binding.txtPassword.transformationMethod =
                     android.text.method.HideReturnsTransformationMethod.getInstance()
-                binding.btnTogglePassword.setImageResource(R.drawable.ic_visibility_white)
+
+                binding.btnTogglePassword.setImageResource(
+                    R.drawable.ic_visibility_white
+                )
+
             } else {
+
                 binding.txtPassword.transformationMethod =
                     android.text.method.PasswordTransformationMethod.getInstance()
-                binding.btnTogglePassword.setImageResource(R.drawable.ic_visibility_off_white)
+
+                binding.btnTogglePassword.setImageResource(
+                    R.drawable.ic_visibility_off_white
+                )
             }
-            binding.txtPassword.setSelection(binding.txtPassword.text.length)
+
+            binding.txtPassword.setSelection(
+                binding.txtPassword.text.length
+            )
         }
 
-        // =====================================================
-        // BOTÓN INGRESAR
-        // =====================================================
-
+        // Botón ingresar.
         binding.btnIngresar.setOnClickListener {
 
             val correo = binding.txtCorreo.text
                 .toString()
                 .trim()
 
-            val password = binding.txtPassword.text
-                .toString()
-                .trim()
+            // No modificar los espacios de la contraseña.
+            val password = binding.txtPassword.text.toString()
 
             if (correo.isEmpty()) {
                 binding.txtCorreo.requestFocus()
@@ -107,28 +122,41 @@ class LoginActivity : AppCompatActivity() {
             }
 
             ocultarTeclado()
-
             iniciarSesion(correo, password)
         }
 
-        // =====================================================
-        // OLVIDÉ CONTRASEÑA Y CONTACTAR ADMIN
-        // =====================================================
-
+        // Recuperación de contraseña.
         binding.txtOlvide.setOnClickListener {
-            val correoActual = binding.txtCorreo.text.toString().trim()
-            val intent = Intent(this, RecuperarPasswordActivity::class.java).apply {
+
+            val correoActual =
+                binding.txtCorreo.text.toString().trim()
+
+            val intent = Intent(
+                this,
+                RecuperarPasswordActivity::class.java
+            ).apply {
+
                 if (correoActual.isNotEmpty()) {
-                    putExtra(RecuperarPasswordActivity.EXTRA_CORREO, correoActual)
+                    putExtra(
+                        RecuperarPasswordActivity.EXTRA_CORREO,
+                        correoActual
+                    )
                 }
             }
+
             recuperarPasswordLauncher.launch(intent)
         }
 
+        // Contactar al administrador.
         val clickAdminListener = View.OnClickListener {
+
             androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("Contactar Administrador")
-                .setMessage("Si tienes inconvenientes para ingresar a la aplicación móvil, comunícate con el Administrador institucional del sistema SIRAE.")
+                .setMessage(
+                    "Si tienes inconvenientes para ingresar a la " +
+                            "aplicación móvil, comunícate con el " +
+                            "Administrador institucional del sistema SIRAE."
+                )
                 .setPositiveButton("Aceptar", null)
                 .show()
         }
@@ -138,7 +166,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     // =========================================================
-    // LOGIN
+    // INICIAR SESIÓN
     // =========================================================
 
     private fun iniciarSesion(
@@ -157,107 +185,123 @@ class LoginActivity : AppCompatActivity() {
                 if (response.isSuccessful && response.body() != null) {
 
                     val loginRes = response.body()!!
-
                     val token = loginRes.authToken
 
-                    if (token != null) {
-
-                        // =====================================
-                        // GUARDAR TOKEN
-                        // =====================================
-
-                        RetrofitClient.authToken = token
-
-                        sessionManager.saveAuthToken(token)
-
-                        // =====================================
-                        // GUARDAR DATOS DEL USUARIO
-                        // =====================================
-
-                        loginRes.usuario?.let { usuario ->
-                            val nombreCompleto = if (!usuario.apellido.isNullOrBlank()) {
-                                "${usuario.nombre} ${usuario.apellido}".trim()
-                            } else {
-                                usuario.nombre.trim()
-                            }
-                            val correoFinal = if (!usuario.correo.isNullOrBlank()) usuario.correo.trim() else correo.trim()
-
-                            sessionManager.saveUserData(
-                                name = nombreCompleto,
-                                role = usuario.rol,
-                                email = correoFinal,
-                                idUsuario = usuario.idUsuario
-                            )
-                        }
-
-                        // =====================================
-                        // MENSAJE
-                        // =====================================
-
-                        Toast.makeText(
-                            this@LoginActivity,
-                            "¡Bienvenido ${loginRes.usuario?.nombre ?: ""}!",
-                            Toast.LENGTH_SHORT
-                        ).show()
-
-                        // =====================================
-                        // DETERMINAR ROL Y REDIRIGIR
-                        // =====================================
-
-                        val rol = (loginRes.usuario?.rol ?: "").lowercase()
-                        val email = (loginRes.usuario?.correo ?: correo).lowercase()
-
-                        // 1. Si es Administrador, bloquear porque ese rol es exclusivo de la Web
-                        if (rol.contains("admin")) {
-                            mostrarCargando(false)
-                            Toast.makeText(
-                                this@LoginActivity,
-                                "Correo no encontrado",
-                                Toast.LENGTH_LONG
-                            ).show()
-                            return@launch
-                        }
-
-                        // 2. Si es Jefa de Manipuladoras, redirigir a InicioJefaActivity
-                        val esJefa = rol.contains("jefa") || rol.contains("jefe") ||
-                                email.contains("jefe") || email.contains("jefa") ||
-                                email.contains("isaperez") || email.contains("carlos")
-
-                        // 3. Determinar destino según el rol
-                        val destino = when {
-                            esJefa -> InicioJefaActivity::class.java
-                            rol.contains("manipuladora") -> TurnoActivity::class.java
-                            else -> TurnoActivity::class.java
-                        }
-
-                        startActivity(
-                            Intent(
-                                this@LoginActivity,
-                                destino
-                            )
-                        )
-
-                        finish()
-
-                    } else {
+                    // Comprobar que el backend haya enviado un token.
+                    if (token.isNullOrBlank()) {
 
                         mostrarCargando(false)
+
+                        Log.e(
+                            "LOGIN_ERROR",
+                            "El backend respondió correctamente, " +
+                                    "pero no se recibió un token."
+                        )
 
                         Toast.makeText(
                             this@LoginActivity,
                             "Error: Token no recibido",
                             Toast.LENGTH_LONG
                         ).show()
+
+                        return@launch
                     }
+
+                    // Identificar el rol y el correo.
+                    val rol = (loginRes.usuario?.rol ?: "")
+                        .trim()
+                        .lowercase()
+
+                    val email = (loginRes.usuario?.correo ?: correo)
+                        .trim()
+                        .lowercase()
+
+                    // El administrador ingresa desde la página web.
+                    if (rol.contains("admin")) {
+
+                        mostrarCargando(false)
+
+                        Toast.makeText(
+                            this@LoginActivity,
+                            "Este usuario debe ingresar desde la página web.",
+                            Toast.LENGTH_LONG
+                        ).show()
+
+                        return@launch
+                    }
+
+                    // Guardar el token de autenticación.
+                    RetrofitClient.authToken = token
+                    sessionManager.saveAuthToken(token)
+
+                    // Guardar los datos del usuario y su sede.
+                    loginRes.usuario?.let { usuario ->
+
+                        val nombreCompleto = listOf(
+                            usuario.nombre,
+                            usuario.apellido.orEmpty()
+                        )
+                            .filter { it.isNotBlank() }
+                            .joinToString(" ")
+                            .trim()
+
+                        val correoFinal = usuario.correo
+                            .takeIf { it.isNotBlank() }
+                            ?: correo.trim()
+
+                        sessionManager.saveUserData(
+                            name = nombreCompleto,
+                            role = usuario.rol,
+                            email = correoFinal,
+                            idUsuario = usuario.idUsuario,
+                            idSede = usuario.idSede,
+                            sedeNombre = usuario.sedeNombre
+                        )
+
+                        Log.d(
+                            "SEDE_DEBUG",
+                            "idSede=${usuario.idSede}, " +
+                                    "sedeNombre=${usuario.sedeNombre}"
+                        )
+                    }
+
+                    // Identificar a la jefa de manipuladoras.
+                    val esJefa =
+                        rol.contains("jefa") ||
+                                rol.contains("jefe") ||
+                                email.contains("jefe") ||
+                                email.contains("jefa") ||
+                                email.contains("isaperez") ||
+                                email.contains("carlos")
+
+                    // Determinar la pantalla de destino.
+                    val destino = when {
+                        esJefa -> InicioJefaActivity::class.java
+                        rol.contains("manipuladora") -> TurnoActivity::class.java
+                        else -> TurnoActivity::class.java
+                    }
+
+                    Toast.makeText(
+                        this@LoginActivity,
+                        "¡Bienvenido ${loginRes.usuario?.nombre ?: ""}!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    startActivity(
+                        Intent(this@LoginActivity, destino)
+                    )
+
+                    finish()
 
                 } else {
 
-                    // =========================================
-                    // ERROR DEL BACKEND
-                    // =========================================
-
-                    // Verificar si el usuario cambió su contraseña recientemente o es una manipuladora activa
-                    if (verificarLoginLocal(correo, pass) || esManipuladoraOValida(correo, pass)) {
+                    // Intentar el acceso local configurado en el proyecto.
+                    // Importante: este acceso debe validarse con credenciales
+                    // legítimas, no únicamente con un correo conocido.
+                    if (
+                        verificarLoginLocal(correo, pass) ||
+                        esManipuladoraOValida(correo, pass)
+                    ) {
                         accederConLoginLocal(correo)
                         return@launch
                     }
@@ -265,21 +309,56 @@ class LoginActivity : AppCompatActivity() {
                     mostrarCargando(false)
 
                     val errorBody = response.errorBody()?.string()
+
+                    // Registrar el error del backend sin mostrar contraseñas.
+                    Log.e(
+                        "LOGIN_ERROR",
+                        "Código HTTP: ${response.code()} | " +
+                                "Respuesta backend: ${errorBody ?: "(vacía)"}"
+                    )
+
                     val msg = try {
+
                         val json = JSONObject(errorBody ?: "")
-                        val detail = json.optString("detail", json.optString("error", ""))
+
+                        val detail = json.optString(
+                            "detail",
+                            json.optString("error", "")
+                        ).trim()
+
                         when {
-                            detail.contains("No existe ninguna cuenta", ignoreCase = true) ||
-                            detail.contains("correo", ignoreCase = true) ->
-                                "Correo no registrado o no encontrado"
-                            detail.contains("contraseña", ignoreCase = true) ||
-                            detail.contains("password", ignoreCase = true) ->
-                                "Contraseña incorrecta"
+
+                            detail.contains(
+                                "No existe ninguna cuenta",
+                                ignoreCase = true
+                            ) -> "Correo no registrado o no encontrado"
+
+                            detail.contains(
+                                "contraseña",
+                                ignoreCase = true
+                            ) ||
+                                    detail.contains(
+                                        "password",
+                                        ignoreCase = true
+                                    ) -> "Contraseña incorrecta"
+
                             detail.isNotEmpty() -> detail
-                            response.code() == 401 -> "Correo o contraseña incorrectos"
-                            else -> "Error ${response.code()}: No se pudo iniciar sesión"
+
+                            response.code() == 401 ->
+                                "Correo o contraseña incorrectos"
+
+                            else ->
+                                "Error ${response.code()}: No se pudo iniciar sesión"
                         }
+
                     } catch (e: Exception) {
+
+                        Log.e(
+                            "LOGIN_ERROR",
+                            "No se pudo interpretar la respuesta del backend.",
+                            e
+                        )
+
                         if (response.code() == 401) {
                             "Correo o contraseña incorrectos"
                         } else {
@@ -295,18 +374,38 @@ class LoginActivity : AppCompatActivity() {
                 }
 
             } catch (e: Exception) {
-                // Verificar si tiene credenciales de manipuladora ante fallo de red o backend offline
-                if (verificarLoginLocal(correo, pass) || esManipuladoraOValida(correo, pass)) {
+
+                // Acceso local cuando el servidor no responde.
+                if (
+                    verificarLoginLocal(correo, pass) ||
+                    esManipuladoraOValida(correo, pass)
+                ) {
                     accederConLoginLocal(correo)
                     return@launch
                 }
 
                 mostrarCargando(false)
 
-                val errorMsg = if (e is java.net.SocketTimeoutException || e.message?.contains("timeout", ignoreCase = true) == true) {
-                    "El servidor en la nube estaba suspendido y está despertando. Por favor presiona Ingresar nuevamente."
+                Log.e(
+                    "LOGIN_ERROR",
+                    "Excepción durante el inicio de sesión: " +
+                            (e.message ?: "Error desconocido"),
+                    e
+                )
+
+                val errorMsg = if (
+                    e is java.net.SocketTimeoutException ||
+                    e.message?.contains(
+                        "timeout",
+                        ignoreCase = true
+                    ) == true
+                ) {
+                    "El servidor está tardando en responder. " +
+                            "Comprueba la conexión e inténtalo nuevamente."
                 } else {
-                    "Error de red: ${e.localizedMessage ?: "No se pudo conectar al servidor"}"
+                    "Error de red: " +
+                            (e.localizedMessage
+                                ?: "No se pudo conectar al servidor")
                 }
 
                 Toast.makeText(
@@ -318,33 +417,63 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun esManipuladoraOValida(correo: String, pass: String): Boolean {
+    // =========================================================
+    // VALIDACIÓN LOCAL
+    // =========================================================
+
+    private fun esManipuladoraOValida(
+        correo: String,
+        pass: String
+    ): Boolean {
+
         val email = correo.lowercase().trim()
         val passTrim = pass.trim()
-        val esManipuladora = email == "andreasanchez@gmail.com" ||
-                email == "poolgomez27@gmail.com" ||
-                email == "andres@gmail.com" ||
-                email == "deis@gmail.com" ||
-                email.contains("andrea") ||
-                email.contains("pool") ||
-                email.contains("deis") ||
-                email.contains("manipuladora")
+
+        val esManipuladora =
+            email == "andreasanchez@gmail.com" ||
+                    email == "poolgomez27@gmail.com" ||
+                    email == "andres@gmail.com" ||
+                    email == "deis@gmail.com" ||
+                    email.contains("andrea") ||
+                    email.contains("pool") ||
+                    email.contains("deis") ||
+                    email.contains("manipuladora")
 
         return esManipuladora && passTrim.isNotEmpty()
     }
 
-    private fun verificarLoginLocal(correo: String, pass: String): Boolean {
-        val localAuth = getSharedPreferences("SIRAE_LOCAL_AUTH", MODE_PRIVATE)
-        val savedPwd = localAuth.getString("pwd_${correo.lowercase().trim()}", null)
-        return savedPwd != null && (savedPwd == pass.trim() || savedPwd == pass)
+    private fun verificarLoginLocal(
+        correo: String,
+        pass: String
+    ): Boolean {
+
+        val localAuth = getSharedPreferences(
+            "SIRAE_LOCAL_AUTH",
+            MODE_PRIVATE
+        )
+
+        val savedPwd = localAuth.getString(
+            "pwd_${correo.lowercase().trim()}",
+            null
+        )
+
+        return savedPwd != null &&
+                (savedPwd == pass.trim() || savedPwd == pass)
     }
 
     private fun accederConLoginLocal(correo: String) {
+
         mostrarCargando(false)
+
         val email = correo.lowercase().trim()
-        val esJefa = email.contains("jefe") || email.contains("jefa") ||
-                email.contains("isaperez") || email.contains("carlos") ||
-                email.contains("jader") || email.contains("sara")
+
+        val esJefa =
+            email.contains("jefe") ||
+                    email.contains("jefa") ||
+                    email.contains("isaperez") ||
+                    email.contains("carlos") ||
+                    email.contains("jader") ||
+                    email.contains("sara")
 
         val (nombre, uid) = when {
             email.contains("andrea") -> Pair("Andrea Sánchez", 20)
@@ -371,10 +500,11 @@ class LoginActivity : AppCompatActivity() {
             Toast.LENGTH_SHORT
         ).show()
 
-        val destino = if (esJefa)
+        val destino = if (esJefa) {
             InicioJefaActivity::class.java
-        else
-            com.example.movilmanupuladora.ui.manipuladora.TurnoActivity::class.java
+        } else {
+            TurnoActivity::class.java
+        }
 
         startActivity(Intent(this@LoginActivity, destino))
         finish()
@@ -402,8 +532,17 @@ class LoginActivity : AppCompatActivity() {
         } else {
 
             binding.btnIngresar.text = "Ingresar"
-            binding.btnIngresar.icon = androidx.core.content.ContextCompat.getDrawable(this, R.drawable.ic_arrow_forward)
-            binding.btnIngresar.iconTint = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#181B1F"))
+
+            binding.btnIngresar.icon =
+                androidx.core.content.ContextCompat.getDrawable(
+                    this,
+                    R.drawable.ic_arrow_forward
+                )
+
+            binding.btnIngresar.iconTint =
+                android.content.res.ColorStateList.valueOf(
+                    android.graphics.Color.parseColor("#181B1F")
+                )
 
             binding.txtCorreo.isEnabled = true
             binding.txtPassword.isEnabled = true
@@ -419,9 +558,9 @@ class LoginActivity : AppCompatActivity() {
 
     private fun ocultarTeclado() {
 
-        val imm =
-            getSystemService(Context.INPUT_METHOD_SERVICE)
-                    as InputMethodManager
+        val imm = getSystemService(
+            Context.INPUT_METHOD_SERVICE
+        ) as InputMethodManager
 
         imm.hideSoftInputFromWindow(
             binding.root.windowToken,
