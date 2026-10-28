@@ -60,20 +60,20 @@ class MainActivity : AppCompatActivity() {
         PlatoResponse(
             idPlato = 1,
             idSeccion = 1,
-            nombrePlato = "Café con Pan y Huevo",
-            componente = "Bebida caliente y proteína"
+            nombrePlato = "Huevos pericos con arroz blanco",
+            componente = "Refresco de avena, huevos pericos, arroz blanco"
         ),
         PlatoResponse(
-            idPlato = 2,
+            idPlato = 11,
             idSeccion = 2,
-            nombrePlato = "Arroz con Pollo",
-            componente = "Sopas, Sazón y Proteína"
+            nombrePlato = "Pollo guisado con arroz blanco",
+            componente = "Refresco de avena, pollo guisado, arroz blanco"
         ),
         PlatoResponse(
-            idPlato = 3,
+            idPlato = 9,
             idSeccion = 3,
-            nombrePlato = "Muffin y Leche",
-            componente = "Cereal y lácteo"
+            nombrePlato = "Leche con galleta cuca y mango",
+            componente = "Leche, galleta cuca, maní salado, mango"
         )
     )
 
@@ -115,6 +115,14 @@ class MainActivity : AppCompatActivity() {
         configurarGiroRuleta()
         cargarDatosDesdeBackend()
         actualizarSumatoriaAsistencia()
+
+        lifecycleScope.launch {
+            try {
+                com.example.movilmanupuladora.utils.PreparacionSyncManager.sincronizarDesdeBackend(this@MainActivity)
+                actualizarInformacionSeccion()
+                cargarAsistenciaLocal()
+            } catch (_: Exception) { }
+        }
 
         binding.btnNotificaciones.setOnClickListener {
             mostrarPopupNotificaciones()
@@ -175,6 +183,8 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 com.example.movilmanupuladora.utils.PreparacionSyncManager.sincronizarDesdeBackend(this@MainActivity)
+                actualizarInformacionSeccion()
+                cargarAsistenciaLocal()
             } catch (_: Exception) { }
         }
     }
@@ -188,7 +198,19 @@ class MainActivity : AppCompatActivity() {
         jobPollingAsistencia?.cancel()
         jobPollingAsistencia = lifecycleScope.launch {
             while (isActive) {
-                cargarAsistenciaBackend()
+                try {
+                    // 1. Sincronizar en tiempo real el plato, componente asignado a la manipuladora y asistencia
+                    com.example.movilmanupuladora.utils.PreparacionSyncManager.sincronizarDesdeBackend(this@MainActivity)
+                    withContext(Dispatchers.Main) {
+                        actualizarInformacionSeccion()
+                        cargarAsistenciaLocal()
+                    }
+
+                    // 2. Sincronizar también con la tabla de asistencia diaria del backend
+                    cargarAsistenciaBackend()
+                } catch (e: Exception) {
+                    Log.e("POLLING_MA", "Error en polling en vivo: ${e.message}")
+                }
                 delay(4000)
             }
         }
@@ -370,15 +392,21 @@ class MainActivity : AppCompatActivity() {
 
         // Mostrar prioritariamente el plato seleccionado por la Jefa
         if (platoJefa.isNotBlank()) {
+            binding.tvPlatoSeleccionado.text = platoJefa
             if (!componenteJefa.isNullOrBlank()) {
-                binding.tvPlatoSeleccionado.text = "$platoJefa\n(Mi componente: $componenteJefa)"
+                binding.layoutComponenteAsignado.visibility = View.VISIBLE
+                binding.tvComponenteAsignado.text = "Tu componente a preparar: $componenteJefa"
+                binding.tvSubtituloCardAsignadas.text = "Plato: $platoJefa · Tarea: $componenteJefa"
             } else {
-                binding.tvPlatoSeleccionado.text = platoJefa
+                binding.layoutComponenteAsignado.visibility = View.GONE
+                binding.tvSubtituloCardAsignadas.text = "Plato: $platoJefa · Continuar preparación"
             }
             binding.imgPlatoMain.setImageResource(
                 com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity.obtenerImagenPlatoPorNombre(platoJefa)
             )
         } else {
+            binding.layoutComponenteAsignado.visibility = View.GONE
+            binding.tvSubtituloCardAsignadas.text = "Continuar preparación de hoy"
             val plato = obtenerPlatoPorSeccion(nombreSeccion)
             if (plato != null) {
                 platoActualSeleccionado = plato
@@ -474,18 +502,27 @@ class MainActivity : AppCompatActivity() {
                     val totalEstudiantes = totalPrimaria + totalSecundaria
                     val existeRegistro = (regPrimaria != null || regSecundaria != null || registrosFecha.isNotEmpty())
 
-                    // Guardar en la caché local del dispositivo de la manipuladora
-                    AsistenciaManager.guardarPrimaria(this@MainActivity, totalPrimaria)
-                    AsistenciaManager.guardarSecundaria(this@MainActivity, totalSecundaria)
-                    AsistenciaManager.guardarManana(this@MainActivity, totalEstudiantes)
+                    // Solo actualizar la caché si el servidor devolvió datos reales (> 0) o si no hay datos locales previos
+                    val guardadoLocal = AsistenciaManager.obtenerTotal(this@MainActivity)
+                    if (totalEstudiantes > 0 || guardadoLocal == 0) {
+                        if (totalEstudiantes > 0) {
+                            AsistenciaManager.guardarPrimaria(this@MainActivity, totalPrimaria)
+                            AsistenciaManager.guardarSecundaria(this@MainActivity, totalSecundaria)
+                            AsistenciaManager.guardarManana(this@MainActivity, totalEstudiantes)
+                        }
 
-                    withContext(Dispatchers.Main) {
-                        actualizarVistaAsistencia(
-                            primaria = totalPrimaria,
-                            secundaria = totalSecundaria,
-                            total = totalEstudiantes,
-                            hayRegistro = existeRegistro
-                        )
+                        withContext(Dispatchers.Main) {
+                            actualizarVistaAsistencia(
+                                primaria = totalPrimaria,
+                                secundaria = totalSecundaria,
+                                total = totalEstudiantes,
+                                hayRegistro = (totalEstudiantes > 0)
+                            )
+                        }
+                    } else {
+                        withContext(Dispatchers.Main) {
+                            cargarAsistenciaLocal()
+                        }
                     }
                 } else {
                     withContext(Dispatchers.Main) {
@@ -504,21 +541,24 @@ class MainActivity : AppCompatActivity() {
     private fun cargarAsistenciaLocal() {
         val p = AsistenciaManager.obtenerPrimaria(this)
         val s = AsistenciaManager.obtenerSecundaria(this)
-        val total = p + s
+        var total = p + s
+        if (total == 0) {
+            total = AsistenciaManager.obtenerManana(this)
+        }
         actualizarVistaAsistencia(p, s, total, hayRegistro = (total > 0))
     }
 
     private fun actualizarVistaAsistencia(primaria: Int, secundaria: Int, total: Int, hayRegistro: Boolean = true) {
-        if (hayRegistro) {
-            binding.tvTotalAsistenciaSumatoria.text = "$total Estudiantes registrados"
-            if (total == 0) {
-                binding.tvDesgloseAsistencia.text = "Primaria: $primaria  |  Secundaria: $secundaria (Sin asistencia hoy)"
-            } else {
-                binding.tvDesgloseAsistencia.text = "Primaria: $primaria  |  Secundaria: $secundaria"
-            }
+        val p = if (primaria > 0) primaria else AsistenciaManager.obtenerPrimaria(this)
+        val s = if (secundaria > 0) secundaria else AsistenciaManager.obtenerSecundaria(this)
+        val tot = if (total > 0) total else (p + s).takeIf { it > 0 } ?: AsistenciaManager.obtenerManana(this)
+
+        if (tot > 0) {
+            binding.tvTotalAsistenciaSumatoria.text = "$tot Estudiantes registrados"
+            binding.tvDesgloseAsistencia.text = "Primaria: $p  |  Secundaria: $s"
         } else {
             binding.tvTotalAsistenciaSumatoria.text = "Sin datos de asistencia"
-            binding.tvDesgloseAsistencia.text = "Dato suministrado por la jefa"
+            binding.tvDesgloseAsistencia.text = "Pendiente de registro por la jefa"
         }
     }
 
@@ -669,11 +709,11 @@ class MainActivity : AppCompatActivity() {
         } ?: platosBaseRespaldo[1]
 
         val plato2 = listaPlatos.firstOrNull {
-            it.nombrePlato?.contains("café", true) == true || it.nombrePlato?.contains("huevo", true) == true
+            it.nombrePlato?.contains("perico", true) == true || it.nombrePlato?.contains("huevo", true) == true
         } ?: platosBaseRespaldo[0]
 
         val plato3 = listaPlatos.firstOrNull {
-            it.nombrePlato?.contains("muffin", true) == true || it.nombrePlato?.contains("leche", true) == true
+            it.nombrePlato?.contains("cuca", true) == true || it.nombrePlato?.contains("leche", true) == true
         } ?: platosBaseRespaldo[2]
 
         binding.tvPlatoAnterior1.text = "Almuerzo"

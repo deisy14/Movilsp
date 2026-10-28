@@ -13,9 +13,12 @@ import androidx.lifecycle.lifecycleScope
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.data.model.MenuPaeCatalog
 import com.example.movilmanupuladora.databinding.ActivityManipuladorasAsignadasBinding
-import com.example.movilmanupuladora.ui.manipuladora.PreparacionActivity
+import com.example.movilmanupuladora.utils.PreparacionSyncManager
 import com.example.movilmanupuladora.utils.SessionManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import java.text.Normalizer
 
 class ManipuladorasAsignadasActivity : AppCompatActivity() {
@@ -333,7 +336,6 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
 
         val estadoActual = PreparacionEstadoManager.obtenerEstado(this, nombreJefa, componenteJefa, correoJefa)
         val opciones = arrayOf(
-            "👨‍🍳 Ir a preparar mi componente (Ver pasos e insumos)",
             "⚡ Cambiar estado (Actual: $estadoActual)",
             "🥣 Cambiar componente asignado",
             "❌ Quitar mi asignación"
@@ -343,17 +345,9 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
             .setTitle("Opciones Jefa: $nombreJefa")
             .setItems(opciones) { _, which ->
                 when (which) {
-                    0 -> {
-                        val intentPrep = Intent(this, PreparacionActivity::class.java).apply {
-                            putExtra("nombre_plato", nombreMenu)
-                            putExtra("componente_seleccionado", componenteJefa)
-                            putExtra("id_imagen", InicioJefaActivity.obtenerImagenPlatoPorNombre(nombreMenu))
-                        }
-                        startActivity(intentPrep)
-                    }
-                    1 -> mostrarDialogoCambiarEstado(nombreJefa, componenteJefa, correoJefa)
-                    2 -> mostrarDialogoAsignarComponenteJefa()
-                    3 -> asignarComponenteJefa(null)
+                    0 -> mostrarDialogoCambiarEstado(nombreJefa, componenteJefa, correoJefa)
+                    1 -> mostrarDialogoAsignarComponenteJefa()
+                    2 -> asignarComponenteJefa(null)
                 }
             }
             .setNegativeButton("Cancelar", null)
@@ -872,67 +866,73 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
 
         SessionManager(this).savePlatoSeleccionado(nombreMenu, idPlato)
 
-        // Sincronizar en tiempo real a la nube para que se refleje en todos los dispositivos
-        lifecycleScope.launch {
-            try {
-                // 1. Guardar plato en la nube
-                com.example.movilmanupuladora.utils.PreparacionSyncManager.guardarPlatoSeleccionado(
-                    this@ManipuladorasAsignadasActivity,
-                    nombreMenu,
-                    idPlato,
-                    jornada
-                )
+        val btnGuardar = binding.btnConfirmarAsignacion
+        btnGuardar.isEnabled = false
+        btnGuardar.text = "Sincronizando con el equipo..."
 
-                // 2. Guardar asignación de la Jefa de Cocina
-                val sessionMgr = SessionManager(this@ManipuladorasAsignadasActivity)
-                val idJefa = sessionMgr.getUserId().let { if (it > 0) it else 19 }
-                val estadoJefa = PreparacionEstadoManager.obtenerEstado(
-                    this@ManipuladorasAsignadasActivity,
-                    nombreJefa,
-                    componenteJefa,
-                    correoJefa
-                )
-                com.example.movilmanupuladora.utils.PreparacionSyncManager.guardarAsignacionEnBackend(
-                    idUsuario = idJefa,
-                    componente = componenteJefa,
-                    estado = estadoJefa
-                )
+        val listaItems = mutableListOf<PreparacionSyncManager.AsignacionItem>()
 
-                // 3. Guardar asignación de cada manipuladora
-                for (m in manipuladoras) {
-                    val uid = if (m.idUsuario > 0) m.idUsuario else {
-                        val real = ManipuladorasManager.obtenerManipuladoras().firstOrNull {
-                            it.correo.equals(m.correo, ignoreCase = true) || it.nombre.equals(m.nombre, ignoreCase = true)
-                        }
-                        real?.idUsuario ?: real?.id ?: -1
-                    }
-                    if (uid > 0) {
-                        val est = PreparacionEstadoManager.obtenerEstado(
-                            this@ManipuladorasAsignadasActivity,
-                            m.nombre,
-                            m.componenteAsignado,
-                            m.correo
-                        )
-                        com.example.movilmanupuladora.utils.PreparacionSyncManager.guardarAsignacionEnBackend(
-                            idUsuario = uid,
-                            componente = m.componenteAsignado,
-                            estado = est
-                        )
-                    }
+        val sessionMgr = SessionManager(this)
+        val idJefa = sessionMgr.getUserId().let { if (it > 0) it else 19 }
+        val estadoJefa = PreparacionEstadoManager.obtenerEstado(
+            this, nombreJefa, componenteJefa, correoJefa
+        )
+        listaItems.add(
+            PreparacionSyncManager.AsignacionItem(
+                idUsuario = idJefa,
+                nombre = nombreJefa,
+                correo = correoJefa,
+                componente = componenteJefa,
+                estado = estadoJefa
+            )
+        )
+
+        for (m in manipuladoras) {
+            val uid = if (m.idUsuario > 0) m.idUsuario else {
+                val real = ManipuladorasManager.obtenerManipuladoras().firstOrNull {
+                    it.correo.equals(m.correo, ignoreCase = true) || it.nombre.equals(m.nombre, ignoreCase = true)
                 }
-            } catch (e: Exception) {
-                android.util.Log.e("ManipuladorasAsignadas", "Error subiendo asignaciones a backend: ${e.message}")
+                real?.idUsuario ?: real?.id ?: -1
             }
+            val est = PreparacionEstadoManager.obtenerEstado(
+                this, m.nombre, m.componenteAsignado, m.correo
+            )
+            listaItems.add(
+                PreparacionSyncManager.AsignacionItem(
+                    idUsuario = uid,
+                    nombre = m.nombre,
+                    correo = m.correo,
+                    componente = m.componenteAsignado,
+                    estado = est
+                )
+            )
         }
 
-        Toast.makeText(
-            this,
-            "¡Asignación de componentes confirmada exitosamente!",
-            Toast.LENGTH_LONG
-        ).show()
+        // Ejecutar en CoroutineScope(Dispatchers.Main) asegurando que no se cancele por el ciclo de vida
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                withTimeoutOrNull(6000) {
+                    PreparacionSyncManager.guardarPlatoYAsignacionesCompleto(
+                        context = applicationContext,
+                        nombreMenu = nombreMenu,
+                        idPlato = idPlato,
+                        jornada = jornada,
+                        asignaciones = listaItems
+                    )
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("ManipuladorasAsignadas", "Error guardando asignaciones: ${e.message}")
+            }
 
-        setResult(RESULT_OK)
-        finish()
+            Toast.makeText(
+                this@ManipuladorasAsignadasActivity,
+                "¡Asignación de componentes y plato confirmados exitosamente!",
+                Toast.LENGTH_LONG
+            ).show()
+
+            setResult(RESULT_OK)
+            finish()
+        }
     }
 
     private fun confirmarCancelar() {

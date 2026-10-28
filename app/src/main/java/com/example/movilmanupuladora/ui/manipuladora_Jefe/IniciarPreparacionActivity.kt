@@ -15,7 +15,10 @@ import androidx.lifecycle.lifecycleScope
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.repository.MenuRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 class IniciarPreparacionActivity : AppCompatActivity() {
 
@@ -114,6 +117,9 @@ class IniciarPreparacionActivity : AppCompatActivity() {
             preferencias.edit().putString("observaciones_preparacion", obs).apply()
             preferencias.edit().putString("estado_plato", "EN_PREPARACION").apply()
 
+            btnIniciarPreparacion.isEnabled = false
+            btnIniciarPreparacion.text = "Iniciando y sincronizando..."
+
             // Guardar plato aprobado para que las manipuladoras lo vean al ingresar
             val jefaPrefs = getSharedPreferences("ManipuladoraJefe", MODE_PRIVATE)
             jefaPrefs.edit().putString("plato_actual", nombreMenuIntent).apply()
@@ -128,20 +134,26 @@ class IniciarPreparacionActivity : AppCompatActivity() {
             com.example.movilmanupuladora.utils.SessionManager(this)
                 .savePlatoSeleccionado(nombreMenuIntent, idPlatoIntent)
 
-            lifecycleScope.launch {
-                com.example.movilmanupuladora.utils.PreparacionSyncManager.guardarPlatoSeleccionado(
-                    this@IniciarPreparacionActivity,
-                    nombreMenuIntent,
-                    idPlatoIntent,
-                    jornadaIntent
-                )
+            // Sincronizar en la nube asegurando que no se cancele por el ciclo de vida
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
+                    withTimeoutOrNull(5000) {
+                        com.example.movilmanupuladora.utils.PreparacionSyncManager.guardarPlatoSeleccionado(
+                            applicationContext,
+                            nombreMenuIntent,
+                            idPlatoIntent,
+                            jornadaIntent
+                        )
+                    }
+                } catch (_: Exception) { }
+
+                Toast.makeText(this@IniciarPreparacionActivity, "¡Preparación del menú iniciada exitosamente!", Toast.LENGTH_SHORT).show()
+
+                val intentJefa = Intent(this@IniciarPreparacionActivity, InicioJefaActivity::class.java)
+                intentJefa.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                startActivity(intentJefa)
+                finish()
             }
-
-            Toast.makeText(this, "¡Preparación del menú iniciada exitosamente!", Toast.LENGTH_SHORT).show()
-
-            val intentJefa = Intent(this, InicioJefaActivity::class.java)
-            intentJefa.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(intentJefa)
         }
     }
 }

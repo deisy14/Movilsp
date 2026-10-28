@@ -373,34 +373,34 @@ object MenuPaeCatalog {
         MenuPaeItem(
             id = 18,
             numeroMenu = 18,
-            nombre = "Arroz con leche y frutas",
-            componente = "Arroz con leche y canela, galleta tipo crackers, mango, papaya, Melon",
+            nombre = "Leche con galleta cuca y mango",
+            componente = "Leche, galleta cuca, maní salado, mango",
             imagenRes = R.drawable.plato9,
-            nombreDesayuno = "Arroz con leche y canela",
-            compDesayuno = "Arroz con leche aromatizado con canela",
+            nombreDesayuno = "Leche con galleta cuca",
+            compDesayuno = "Vaso de leche entera con galleta cuca",
             imgDesayuno = R.drawable.plato9,
             porcionesDesayuno = "40",
-            nombreAlmuerzo = "Menú escolar especial",
-            compAlmuerzo = "Plato fuerte escolar con arroz y proteína",
+            nombreAlmuerzo = "Menú escolar PAE",
+            compAlmuerzo = "Plato escolar PAE con galleta cuca y mango",
             imgAlmuerzo = R.drawable.plato9,
             porcionesAlmuerzo = "58",
-            nombreMerienda = "Fruta picada y galleta crackers",
-            compMerienda = "Mango, papaya y melón picado con galleta crackers",
+            nombreMerienda = "Galleta cuca con maní y mango",
+            compMerienda = "Leche, galleta cuca, maní salado y mango",
             imgMerienda = R.drawable.plato9,
             porcionesMerienda = "28"
         ),
         MenuPaeItem(
             id = 19,
             numeroMenu = 19,
-            nombre = "Pollo en julianas con verduras y papas",
-            componente = "Refresco de avena, pollo en julianas con verduras, papas",
+            nombre = "Pollo guisado con arroz blanco",
+            componente = "Refresco de avena, pollo guisado, arroz blanco",
             imagenRes = R.drawable.plato11,
-            nombreDesayuno = "Papas al vapor con avena",
-            compDesayuno = "Papas al vapor con refresco de avena",
+            nombreDesayuno = "Arroz blanco con avena",
+            compDesayuno = "Arroz blanco con refresco de avena",
             imgDesayuno = R.drawable.plato11,
             porcionesDesayuno = "44",
-            nombreAlmuerzo = "Pollo en julianas con papas",
-            compAlmuerzo = "Pollo en julianas salteado con verduras y papas",
+            nombreAlmuerzo = "Pollo guisado con arroz blanco",
+            compAlmuerzo = "Pollo guisado en salsa criolla con arroz blanco",
             imgAlmuerzo = R.drawable.plato11,
             porcionesAlmuerzo = "62",
             nombreMerienda = "Refresco de avena",
@@ -499,7 +499,7 @@ object MenuPaeCatalog {
             n.contains("carne de res") || n.contains("res guisada") -> R.drawable.plato6
             n.contains("hojaldras") || n.contains("papaya") -> R.drawable.plato7
             n.contains("frijol") || n.contains("frijoles") || n.contains("fideos") -> R.drawable.plato8
-            n.contains("cuca") || n.contains("galleta") || n.contains("maní") || n.contains("arroz con leche") -> R.drawable.plato9
+            n.contains("cuca") || n.contains("galleta") || n.contains("maní") || n.contains("mango") || n.contains("arroz con leche") -> R.drawable.plato9
             n.contains("huevos revueltos") || n.contains("revueltos") -> R.drawable.plato10
             n.contains("pollo guisado") || n.contains("julianas") -> R.drawable.plato11
             n.contains("torta pastel") || n.contains("yogurt") || n.contains("manzana") -> R.drawable.plato14
@@ -582,10 +582,10 @@ object MenuPaeCatalog {
                 else -> MenuDiaPae(menus[12], menus[11], menus[14]) // Vie: Torta quinua (13), Lentejas mango (12), Cerdo verduras (15)
             }
             else -> when (diaIndice) {
-                0 -> MenuDiaPae(menus[16], menus[15], menus[17]) // Lun: Pericos chocolate (17), Lentejas quinua (16), Arroz con leche (18)
-                1 -> MenuDiaPae(menus[16], menus[18], menus[17]) // Mar: Pericos chocolate (17), Pollo julianas (19), Arroz con leche (18)
-                2 -> MenuDiaPae(menus[16], menus[19], menus[17]) // Mié: Pericos chocolate (17), Frijoles fideos (20), Arroz con leche (18)
-                3 -> MenuDiaPae(menus[16], menus[18], menus[17]) // Jue: Pericos chocolate (17), Pollo julianas (19), Arroz con leche (18)
+                0 -> MenuDiaPae(menus[16], menus[15], menus[17]) // Lun: Pericos chocolate (17), Lentejas quinua (16), Cuca y mango (18)
+                1 -> MenuDiaPae(menus[16], menus[18], menus[17]) // Mar: Pericos chocolate (17), Pollo guisado (19), Cuca y mango (18)
+                2 -> MenuDiaPae(menus[16], menus[19], menus[17]) // Mié: Pericos chocolate (17), Frijoles fideos (20), Cuca y mango (18)
+                3 -> MenuDiaPae(menus[16], menus[18], menus[17]) // Jue: Pericos chocolate (17), Pollo guisado (19), Cuca y mango (18)
                 else -> MenuDiaPae(menus[16], menus[19], menus[15]) // Vie: Pericos chocolate (17), Frijoles fideos (20), Lentejas quinua (16)
             }
         }
