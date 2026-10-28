@@ -4,7 +4,9 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
+import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -362,8 +364,34 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
             TipoComida.MERIENDA -> "Merienda"
         }
 
-        val formatoDia = SimpleDateFormat("EEEE d 'de' MMMM", Locale.forLanguageTag("es-CO"))
-        val fechaTexto = formatoDia.format(diaSeleccionadoSemanaSiguiente.time)
+        val cal = diaSeleccionadoSemanaSiguiente
+        val diaSemanaAbrev = when (cal.get(Calendar.DAY_OF_WEEK)) {
+            Calendar.MONDAY -> "Lun."
+            Calendar.TUESDAY -> "Mar."
+            Calendar.WEDNESDAY -> "Mié."
+            Calendar.THURSDAY -> "Jue."
+            Calendar.FRIDAY -> "Vie."
+            Calendar.SATURDAY -> "Sáb."
+            Calendar.SUNDAY -> "Dom."
+            else -> "Lun."
+        }
+        val diaMes = cal.get(Calendar.DAY_OF_MONTH)
+        val mesAbrev = when (cal.get(Calendar.MONTH)) {
+            Calendar.JANUARY -> "ene."
+            Calendar.FEBRUARY -> "feb."
+            Calendar.MARCH -> "mar."
+            Calendar.APRIL -> "abr."
+            Calendar.MAY -> "may."
+            Calendar.JUNE -> "jun."
+            Calendar.JULY -> "jul."
+            Calendar.AUGUST -> "ago."
+            Calendar.SEPTEMBER -> "sep."
+            Calendar.OCTOBER -> "oct."
+            Calendar.NOVEMBER -> "nov."
+            Calendar.DECEMBER -> "dic."
+            else -> ""
+        }
+        val badgeTexto = "$comidaNombre · $diaSemanaAbrev $diaMes $mesAbrev"
 
         // Guardar plato en sesión y en la nube
         sessionManager.savePlatoSeleccionado(plato.nombre, plato.id)
@@ -379,19 +407,45 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
             } catch (_: Exception) { }
         }
 
-        androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("¡Plato Programado con Éxito!")
-            .setMessage("Has seleccionado '${plato.nombre}' para el $comidaNombre del $fechaTexto (Siguiente semana).\n\n¿Deseas iniciar o configurar la preparación ahora?")
-            .setPositiveButton("Configurar equipo") { _, _ ->
-                val intent = Intent(this, IniciarPreparacionActivity::class.java).apply {
-                    putExtra("nombre_menu", plato.nombre)
-                    putExtra("id_plato", plato.id ?: -1)
-                    putExtra("jornada", comidaNombre)
-                }
-                startActivity(intent)
+        // Mostrar modal personalizado idéntico al diseño
+        val viewDialog = layoutInflater.inflate(R.layout.dialog_plato_asignado_exito, null)
+        val imgPlato = viewDialog.findViewById<ImageView>(R.id.imgPlatoAsignadoModal)
+        val tvNombre = viewDialog.findViewById<TextView>(R.id.tvNombrePlatoAsignadoModal)
+        val tvBadge = viewDialog.findViewById<TextView>(R.id.tvBadgePlatoAsignadoModal)
+        val tvSubtitulo = viewDialog.findViewById<TextView>(R.id.tvSubtituloPlatoAsignadoModal)
+        val btnContinuar = viewDialog.findViewById<Button>(R.id.btnContinuarPlanificandoModal)
+        val btnConfigurar = viewDialog.findViewById<Button>(R.id.btnConfigurarEquipoModal)
+
+        val imgRes = if (plato.imagen != 0) plato.imagen else InicioJefaActivity.obtenerImagenPlatoPorNombre(plato.nombre)
+        imgPlato.setImageResource(imgRes)
+        tvNombre.text = plato.nombre
+        tvBadge.text = badgeTexto
+        tvSubtitulo.text = "Tu plato quedó programado para\nla siguiente semana."
+
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
+            .setView(viewDialog)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        btnContinuar.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        btnConfigurar.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(this, IniciarPreparacionActivity::class.java).apply {
+                putExtra("nombre_menu", plato.nombre)
+                putExtra("id_plato", plato.id ?: -1)
+                putExtra("jornada", comidaNombre)
             }
-            .setNegativeButton("Continuar planificando", null)
-            .show()
+            startActivity(intent)
+        }
+
+        dialog.show()
+
+        val width = (resources.displayMetrics.widthPixels * 0.90).toInt()
+        dialog.window?.setLayout(width, android.view.ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
     private fun cargarPlatosDesdeBackend() {
