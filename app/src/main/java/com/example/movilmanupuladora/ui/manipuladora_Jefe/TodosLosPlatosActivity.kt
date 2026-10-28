@@ -46,17 +46,21 @@ class TodosLosPlatosActivity : AppCompatActivity() {
     }
 
     private fun cargarPlatosBackend() {
+        // Mostrar el catálogo oficial completo del PAE con los nombres e imágenes actualizados
+        mostrarLista(platosRespaldo)
+
         lifecycleScope.launch {
             try {
                 val res = menuRepository.obtenerPlatos()
                 if (res.isSuccessful && !res.body().isNullOrEmpty()) {
                     val lista = res.body()!!
-                    mostrarLista(lista)
-                } else {
-                    mostrarLista(platosRespaldo)
+                    // Solo si el backend devuelve el catálogo completo de 15 o más platos
+                    if (lista.size >= 15) {
+                        mostrarLista(lista)
+                    }
                 }
-            } catch (e: Exception) {
-                mostrarLista(platosRespaldo)
+            } catch (_: Exception) {
+                // Mantiene el catálogo oficial del PAE
             }
         }
     }

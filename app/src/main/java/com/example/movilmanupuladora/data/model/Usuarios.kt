@@ -1,3 +1,4 @@
+
 package com.example.movilmanupuladora.data.model
 
 import com.google.gson.annotations.SerializedName
@@ -66,10 +67,30 @@ data class LoginResponse(
 data class UsuarioInfo(
     @SerializedName("id_usuario")
     val idUsuario: Int,
+
     val nombre: String,
     val apellido: String,
     val correo: String,
-    val rol: String?
+    val rol: String?,
+
+    // Sede asignada al usuario autenticado
+    @SerializedName("id_sede")
+    val idSede: Int? = null,
+
+    @SerializedName("sede_nombre")
+    val sedeNombre: String? = null,
+
+    @SerializedName("id_institucion")
+    val idInstitucion: Int? = null,
+
+    @SerializedName("institucion_nombre")
+    val institucionNombre: String? = null,
+
+    @SerializedName("is_superuser")
+    val isSuperuser: Boolean? = false,
+
+    @SerializedName("debe_cambiar_password")
+    val debeCambiarPassword: Boolean? = false
 )
 
 // Modelo para la respuesta del Registro
@@ -94,8 +115,10 @@ data class MensajeResponse(
     val mensaje: String? = null,
     val error: String? = null,
     val status: String? = null,
+
     @SerializedName("debug_code")
     val debugCode: String? = null,
+
     @SerializedName("debug_link")
     val debugLink: String? = null
 )

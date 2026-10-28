@@ -400,24 +400,27 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
                 val platosRes = menuRepository.obtenerPlatos()
                 if (platosRes.isSuccessful && !platosRes.body().isNullOrEmpty()) {
                     val lista = platosRes.body()!!
-                    val temp = mutableListOf<InicioJefaActivity.Plato>()
+                    // Solo reemplazar si el backend contiene el nuevo catálogo completo (15 o más platos)
+                    if (lista.size >= 15) {
+                        val temp = mutableListOf<InicioJefaActivity.Plato>()
 
-                    for ((index, p) in lista.withIndex()) {
-                        val nombre = p.nombrePlato ?: "Plato del día"
-                        val imagen = if (p.idPlato in 1..20) {
-                            MenuPaeCatalog.obtenerMenuPorId(p.idPlato).imagenRes
-                        } else {
-                            MenuPaeCatalog.obtenerImagenPorNombre(p.nombrePlato ?: p.componente)
+                        for (p in lista) {
+                            val nombre = p.nombrePlato ?: "Plato del día"
+                            val imagen = if (p.idPlato in 1..20) {
+                                MenuPaeCatalog.obtenerMenuPorId(p.idPlato).imagenRes
+                            } else {
+                                MenuPaeCatalog.obtenerImagenPorNombre(p.nombrePlato ?: p.componente)
+                            }
+                            val plato = InicioJefaActivity.Plato(id = p.idPlato, nombre = nombre, componente = p.componente ?: "", imagen = imagen)
+                            temp.add(plato)
                         }
-                        val plato = InicioJefaActivity.Plato(id = p.idPlato, nombre = nombre, componente = p.componente ?: "", imagen = imagen)
-                        temp.add(plato)
-                    }
 
-                    if (temp.isNotEmpty()) {
-                        platosAlmuerzo.clear()
-                        platosAlmuerzo.addAll(temp)
-                        configurarViewPagerCarousel()
-                        configurarMenuDisponiblePAE()
+                        if (temp.isNotEmpty()) {
+                            platosAlmuerzo.clear()
+                            platosAlmuerzo.addAll(temp)
+                            configurarViewPagerCarousel()
+                            configurarMenuDisponiblePAE()
+                        }
                     }
                 }
             } catch (_: Exception) { }

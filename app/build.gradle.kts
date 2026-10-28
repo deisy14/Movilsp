@@ -37,6 +37,8 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    // Usamos kotlinOptions para evitar el error de "Unresolved reference" en android {}
     kotlinOptions {
         jvmTarget = "11"
     }

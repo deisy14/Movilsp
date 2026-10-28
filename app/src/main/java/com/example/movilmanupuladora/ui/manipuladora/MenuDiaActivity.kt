@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.data.api.RetrofitClient
+import com.example.movilmanupuladora.data.model.MenuPaeCatalog
 import com.example.movilmanupuladora.data.model.PlatoResponse
 import com.example.movilmanupuladora.databinding.ActivityMenuDiaBinding
 import com.example.movilmanupuladora.utils.SessionManager
@@ -58,22 +59,20 @@ class MenuDiaActivity : AppCompatActivity() {
             try {
                 val response = RetrofitClient.apiService.obtenerPlatos()
 
-                if (response.isSuccessful && !response.body().isNullOrEmpty()) {
+                if (response.isSuccessful && !response.body().isNullOrEmpty() && response.body()!!.size >= 15) {
                     val platos = response.body()!!
                     mostrarPlatos(platos)
                 } else {
-                    Toast.makeText(
-                        this@MenuDiaActivity,
-                        "Sin platos registrados",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    val platosPae = MenuPaeCatalog.menus.map {
+                        PlatoResponse(idPlato = it.id, nombrePlato = it.nombre, componente = it.componente)
+                    }
+                    mostrarPlatos(platosPae)
                 }
-            } catch (e: Exception) {
-                Toast.makeText(
-                    this@MenuDiaActivity,
-                    "Error al conectar: ${e.localizedMessage}",
-                    Toast.LENGTH_SHORT
-                ).show()
+            } catch (_: Exception) {
+                val platosPae = MenuPaeCatalog.menus.map {
+                    PlatoResponse(idPlato = it.id, nombrePlato = it.nombre, componente = it.componente)
+                }
+                mostrarPlatos(platosPae)
             }
         }
     }
