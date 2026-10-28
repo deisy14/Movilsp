@@ -71,7 +71,7 @@ class PreparacionActivity : AppCompatActivity() {
         // Mostrar el componente asignado si existe
         if (!componenteAsignado.isNullOrBlank()) {
             binding.tvComponentePreparacion.visibility = View.VISIBLE
-            binding.tvComponentePreparacion.text = "🥣 Componente a preparar: $componenteAsignado"
+            binding.tvComponentePreparacion.text = "Componente a preparar: $componenteAsignado"
         } else {
             binding.tvComponentePreparacion.visibility = View.GONE
         }
@@ -91,7 +91,7 @@ class PreparacionActivity : AppCompatActivity() {
     private fun actualizarVistaEstado(estado: String) {
         when (estado) {
             PreparacionEstadoManager.ESTADO_POR_HACER -> {
-                binding.badgeTurnoPreparacion.text = "Estado: Por hacer ⏳"
+                binding.badgeTurnoPreparacion.text = "Estado: Por hacer"
                 binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_tag_plato)
                 binding.badgeTurnoPreparacion.setTextColor(0xFF1B3317.toInt())
                 binding.btnMarcarPreparado.text = "Cambiar Estado (Por hacer)"

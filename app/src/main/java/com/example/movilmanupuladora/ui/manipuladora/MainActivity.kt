@@ -716,19 +716,31 @@ class MainActivity : AppCompatActivity() {
             it.nombrePlato?.contains("cuca", true) == true || it.nombrePlato?.contains("leche", true) == true
         } ?: platosBaseRespaldo[2]
 
+        val fmtFechaHistorial = java.text.SimpleDateFormat("dd MMM", java.util.Locale.forLanguageTag("es-CO"))
+        val cal = java.util.Calendar.getInstance()
+
+        cal.add(java.util.Calendar.DAY_OF_YEAR, -1)
+        val fecha1 = fmtFechaHistorial.format(cal.time)
+
+        cal.add(java.util.Calendar.DAY_OF_YEAR, -1)
+        val fecha2 = fmtFechaHistorial.format(cal.time)
+
+        cal.add(java.util.Calendar.DAY_OF_YEAR, -1)
+        val fecha3 = fmtFechaHistorial.format(cal.time)
+
         binding.tvPlatoAnterior1.text = "Almuerzo"
         binding.imgMenuAnterior1.setImageResource(obtenerImagenPlato(plato1))
-        binding.tvFechaAnterior1.text = "01 Oct"
+        binding.tvFechaAnterior1.text = fecha1
         binding.cardMenuAnterior1.setOnClickListener { mostrarDialogoPlato(plato1) }
 
         binding.tvPlatoAnterior2.text = "Desayuno"
         binding.imgMenuAnterior2.setImageResource(obtenerImagenPlato(plato2))
-        binding.tvFechaAnterior2.text = "30 Sep"
+        binding.tvFechaAnterior2.text = fecha2
         binding.cardMenuAnterior2.setOnClickListener { mostrarDialogoPlato(plato2) }
 
         binding.tvPlatoAnterior3.text = "Merienda"
         binding.imgMenuAnterior3.setImageResource(obtenerImagenPlato(plato3))
-        binding.tvFechaAnterior3.text = "29 Sep"
+        binding.tvFechaAnterior3.text = fecha3
         binding.cardMenuAnterior3.setOnClickListener { mostrarDialogoPlato(plato3) }
     }
 

@@ -269,10 +269,15 @@ class LoginActivity : AppCompatActivity() {
                     val esJefa =
                         rol.contains("jefa") ||
                                 rol.contains("jefe") ||
+                                rol.contains("superv") ||
+                                rol.contains("coord") ||
+                                rol == "3" ||
                                 email.contains("jefe") ||
                                 email.contains("jefa") ||
-                                email.contains("isaperez") ||
-                                email.contains("carlos")
+                                email.contains("isa") ||
+                                email.contains("carlos") ||
+                                email.contains("jader") ||
+                                email.contains("sara")
 
                     // Determinar la pantalla de destino.
                     val destino = when {
@@ -425,21 +430,9 @@ class LoginActivity : AppCompatActivity() {
         correo: String,
         pass: String
     ): Boolean {
-
         val email = correo.lowercase().trim()
         val passTrim = pass.trim()
-
-        val esManipuladora =
-            email == "andreasanchez@gmail.com" ||
-                    email == "poolgomez27@gmail.com" ||
-                    email == "andres@gmail.com" ||
-                    email == "deis@gmail.com" ||
-                    email.contains("andrea") ||
-                    email.contains("pool") ||
-                    email.contains("deis") ||
-                    email.contains("manipuladora")
-
-        return esManipuladora && passTrim.isNotEmpty()
+        return email.isNotEmpty() && passTrim.isNotEmpty()
     }
 
     private fun verificarLoginLocal(
@@ -470,10 +463,14 @@ class LoginActivity : AppCompatActivity() {
         val esJefa =
             email.contains("jefe") ||
                     email.contains("jefa") ||
+                    email.contains("isa") ||
                     email.contains("isaperez") ||
                     email.contains("carlos") ||
                     email.contains("jader") ||
-                    email.contains("sara")
+                    email.contains("sara") ||
+                    email.contains("coordinad") ||
+                    email.contains("superv") ||
+                    sessionManager.getUserRole()?.lowercase()?.contains("jef") == true
 
         val (nombre, uid) = when {
             email.contains("andrea") -> Pair("Andrea Sánchez", 20)

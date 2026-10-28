@@ -429,7 +429,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
-                                android:text="👥 Componente"
+                                android:text="Componente"
                                 android:textColor="#64748B"
                                 android:textSize="10sp" />
 
@@ -474,7 +474,7 @@
                                 android:background="@drawable/bg_chip_almuerzo"
                                 android:paddingHorizontal="8dp"
                                 android:paddingVertical="3dp"
-                                android:text="🍴 Almuerzo"
+                                android:text=" Almuerzo"
                                 android:textColor="#15803D"
                                 android:textSize="10sp"
                                 android:textStyle="bold" />
@@ -495,7 +495,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
-                                android:text="👥 Componente"
+                                android:text="Componente"
                                 android:textColor="#64748B"
                                 android:textSize="10sp" />
 
@@ -539,7 +539,7 @@
                                 android:background="@drawable/bg_chip_merienda"
                                 android:paddingHorizontal="8dp"
                                 android:paddingVertical="3dp"
-                                android:text="🍎 Merienda"
+                                android:text="Merienda"
                                 android:textColor="#BE123C"
                                 android:textSize="10sp"
                                 android:textStyle="bold" />
@@ -560,7 +560,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
-                                android:text="👥 Componente"
+                                android:text="Componente"
                                 android:textColor="#64748B"
                                 android:textSize="10sp" />
 

@@ -72,7 +72,7 @@ class AvisosActivity : AppCompatActivity() {
                 barras.left,
                 barras.top,
                 barras.right,
-                barras.bottom
+                0
             )
 
             insets

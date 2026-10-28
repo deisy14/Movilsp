@@ -274,7 +274,7 @@ class InventarioJefaActivity : AppCompatActivity() {
         }
 
         MaterialAlertDialogBuilder(this)
-            .setTitle("✏️ Modificar Stock")
+            .setTitle("Modificar Stock")
             .setMessage("Producto: ${producto.nombre}\nCantidad actual: ${producto.cantidadConUnidad}\nUnidad: ${producto.unidadMedida}\n\nIngresa la nueva cantidad:")
             .setView(container)
             .setPositiveButton("Guardar") { dialog, _ ->
