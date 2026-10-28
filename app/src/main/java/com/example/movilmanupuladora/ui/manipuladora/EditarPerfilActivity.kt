@@ -89,7 +89,7 @@ class EditarPerfilActivity : AppCompatActivity() {
 
             Toast.makeText(
                 this,
-                "✓ Contraseña y datos actualizados correctamente",
+                "Contraseña y datos actualizados correctamente",
                 Toast.LENGTH_LONG
             ).show()
 

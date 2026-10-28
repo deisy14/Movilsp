@@ -27,7 +27,7 @@ class SugerenciaIaAdapter(
         val plato = listaPlatos[position]
         holder.binding.imgPlatoCarousel.setImageResource(plato.imagen)
         holder.binding.tvNombrePlatoCarousel.text = plato.nombre
-        holder.binding.tvBadgeDisponibilidad.text = "✓ Recom. IA"
+        holder.binding.tvBadgeDisponibilidad.text = "Recom. IA"
 
         // Borde de un solo color unificado para todas las tarjetas circulares
         holder.binding.cardPlatoContenedor.strokeColor = Color.parseColor("#1B3317")

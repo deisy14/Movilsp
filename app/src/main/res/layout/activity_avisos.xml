@@ -153,7 +153,7 @@
                         android:layout_height="40dp"
                         android:background="@drawable/bg_pill_green"
                         android:gravity="center"
-                        android:text="✓"
+                        android:text=""
                         android:textColor="#2A5226"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -218,7 +218,7 @@
                         android:layout_height="40dp"
                         android:background="@drawable/bg_pill_yellow"
                         android:gravity="center"
-                        android:text="◷"
+                        android:text=""
                         android:textColor="#7A5500"
                         android:textSize="20sp"
                         android:textStyle="bold" />

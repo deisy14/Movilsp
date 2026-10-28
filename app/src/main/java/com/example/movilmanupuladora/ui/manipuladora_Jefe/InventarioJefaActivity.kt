@@ -315,7 +315,7 @@ class InventarioJefaActivity : AppCompatActivity() {
                                         if (res.code() == 403) {
                                             Toast.makeText(
                                                 this@InventarioJefaActivity,
-                                                "⚠️ Guardado en la app. El servidor requiere permiso de Supervisor/Admin para reflejarlo en la web.",
+                                                "Guardado en la app. El servidor requiere permiso de Supervisor/Admin para reflejarlo en la web.",
                                                 Toast.LENGTH_LONG
                                             ).show()
                                         }

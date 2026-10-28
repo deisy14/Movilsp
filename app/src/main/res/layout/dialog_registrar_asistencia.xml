@@ -1,519 +1,529 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_card"
-    android:orientation="vertical"
-    android:padding="20dp">
+    android:layout_margin="12dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="22dp"
+    app:cardElevation="6dp"
+    app:strokeColor="#E2E8F0"
+    app:strokeWidth="1dp">
 
-    <!-- TÍTULO -->
-    <TextView
-        android:id="@+id/txtTituloDialog"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Registrar Asistencia por Grado (Jardín a 11°)"
-        android:textColor="#1B3317"
-        android:textSize="18sp"
-        android:textStyle="bold"/>
-
-    <TextView
-        android:id="@+id/txtDescripcionDialog"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="Ingresa el número de niños por cada grado desde Jardín hasta 11°."
-        android:textColor="#64748B"
-        android:textSize="12sp"/>
-
-    <TextView
-        android:id="@+id/txtJornadaDialog"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/bg_tag_plato"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="5dp"
-        android:text="Jornada: Mañana"
-        android:textColor="#1B3317"
-        android:textSize="12sp"
-        android:textStyle="bold"/>
-
-    <!-- LISTADO DE GRADOS DE JARDÍN A 11° -->
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="240dp"
-        android:layout_marginTop="10dp"
-        android:overScrollMode="never"
-        android:scrollbars="none">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <!-- JARDÍN / PREESCOLAR -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="🧸 Jardín / Preescolar (150g)"
-                    android:textColor="#1B3317"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:id="@+id/edtGradoJardin"
-                    android:layout_width="80dp"
-                    android:layout_height="38dp"
-                    android:background="@drawable/bg_edittext"
-                    android:gravity="center"
-                    android:hint="0"
-                    android:importantForAutofill="no"
-                    android:inputType="number"
-                    android:maxLines="1"
-                    android:textColor="#1B3317"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
-
-            <!-- 1° PRIMERO -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="1° Primero (250g)"
-                    android:textColor="#1B3317"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:id="@+id/edtGradoPrimero"
-                    android:layout_width="80dp"
-                    android:layout_height="38dp"
-                    android:background="@drawable/bg_edittext"
-                    android:gravity="center"
-                    android:hint="0"
-                    android:importantForAutofill="no"
-                    android:inputType="number"
-                    android:maxLines="1"
-                    android:textColor="#1B3317"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
-
-            <!-- 2° SEGUNDO -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="2° Segundo (250g)"
-                    android:textColor="#1B3317"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:id="@+id/edtGradoSegundo"
-                    android:layout_width="80dp"
-                    android:layout_height="38dp"
-                    android:background="@drawable/bg_edittext"
-                    android:gravity="center"
-                    android:hint="0"
-                    android:importantForAutofill="no"
-                    android:inputType="number"
-                    android:maxLines="1"
-                    android:textColor="#1B3317"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
-
-            <!-- 3° TERCERO -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="3° Tercero (250g)"
-                    android:textColor="#1B3317"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:id="@+id/edtGradoTercero"
-                    android:layout_width="80dp"
-                    android:layout_height="38dp"
-                    android:background="@drawable/bg_edittext"
-                    android:gravity="center"
-                    android:hint="0"
-                    android:importantForAutofill="no"
-                    android:inputType="number"
-                    android:maxLines="1"
-                    android:textColor="#1B3317"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
-
-            <!-- 4° CUARTO -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="4° Cuarto (250g)"
-                    android:textColor="#1B3317"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:id="@+id/edtGradoCuarto"
-                    android:layout_width="80dp"
-                    android:layout_height="38dp"
-                    android:background="@drawable/bg_edittext"
-                    android:gravity="center"
-                    android:hint="0"
-                    android:importantForAutofill="no"
-                    android:inputType="number"
-                    android:maxLines="1"
-                    android:textColor="#1B3317"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
-
-            <!-- 5° QUINTO -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="5° Quinto (250g)"
-                    android:textColor="#1B3317"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:id="@+id/edtGradoQuinto"
-                    android:layout_width="80dp"
-                    android:layout_height="38dp"
-                    android:background="@drawable/bg_edittext"
-                    android:gravity="center"
-                    android:hint="0"
-                    android:importantForAutofill="no"
-                    android:inputType="number"
-                    android:maxLines="1"
-                    android:textColor="#1B3317"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
-
-            <!-- 6° SEXTO -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="6° Sexto (380g)"
-                    android:textColor="#1B3317"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:id="@+id/edtGradoSexto"
-                    android:layout_width="80dp"
-                    android:layout_height="38dp"
-                    android:background="@drawable/bg_edittext"
-                    android:gravity="center"
-                    android:hint="0"
-                    android:importantForAutofill="no"
-                    android:inputType="number"
-                    android:maxLines="1"
-                    android:textColor="#1B3317"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
-
-            <!-- 7° SÉPTIMO -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="7° Séptimo (380g)"
-                    android:textColor="#1B3317"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:id="@+id/edtGradoSeptimo"
-                    android:layout_width="80dp"
-                    android:layout_height="38dp"
-                    android:background="@drawable/bg_edittext"
-                    android:gravity="center"
-                    android:hint="0"
-                    android:importantForAutofill="no"
-                    android:inputType="number"
-                    android:maxLines="1"
-                    android:textColor="#1B3317"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
-
-            <!-- 8° OCTAVO -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="8° Octavo (380g)"
-                    android:textColor="#1B3317"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:id="@+id/edtGradoOctavo"
-                    android:layout_width="80dp"
-                    android:layout_height="38dp"
-                    android:background="@drawable/bg_edittext"
-                    android:gravity="center"
-                    android:hint="0"
-                    android:importantForAutofill="no"
-                    android:inputType="number"
-                    android:maxLines="1"
-                    android:textColor="#1B3317"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
-
-            <!-- 9° NOVENO -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="9° Noveno (380g)"
-                    android:textColor="#1B3317"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:id="@+id/edtGradoNoveno"
-                    android:layout_width="80dp"
-                    android:layout_height="38dp"
-                    android:background="@drawable/bg_edittext"
-                    android:gravity="center"
-                    android:hint="0"
-                    android:importantForAutofill="no"
-                    android:inputType="number"
-                    android:maxLines="1"
-                    android:textColor="#1B3317"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
-
-            <!-- 10° DÉCIMO -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="10° Décimo (380g)"
-                    android:textColor="#1B3317"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:id="@+id/edtGradoDecimo"
-                    android:layout_width="80dp"
-                    android:layout_height="38dp"
-                    android:background="@drawable/bg_edittext"
-                    android:gravity="center"
-                    android:hint="0"
-                    android:importantForAutofill="no"
-                    android:inputType="number"
-                    android:maxLines="1"
-                    android:textColor="#1B3317"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
-
-            <!-- 11° UNDÉCIMO -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="11° Undécimo (380g)"
-                    android:textColor="#1B3317"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:id="@+id/edtCantidadSecundaria"
-                    android:layout_width="80dp"
-                    android:layout_height="38dp"
-                    android:background="@drawable/bg_edittext"
-                    android:gravity="center"
-                    android:hint="0"
-                    android:importantForAutofill="no"
-                    android:inputType="number"
-                    android:maxLines="1"
-                    android:textColor="#1B3317"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
-
-            <EditText
-                android:id="@+id/edtCantidadPrimaria"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:visibility="gone" />
-
-            <EditText
-                android:id="@+id/edtCantidadAsistencia"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:visibility="gone" />
-
-        </LinearLayout>
-
-    </ScrollView>
-
-    <!-- RESUMEN DE GRAMAJE CALCULADO EN TIEMPO REAL -->
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        app:cardBackgroundColor="#FAF9F4"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="0dp"
-        app:strokeColor="#EBE8D8"
-        app:strokeWidth="1dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="12dp">
-
-            <TextView
-                android:id="@+id/txtTotalEstudiantesCalculado"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Total Estudiantes: 0"
-                android:textColor="#1B3317"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/txtGramajeTotalEstimado"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="Gramaje total estimado: 0.0 kg a cocinar"
-                android:textColor="#7A5500"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-        </LinearLayout>
-
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- BOTONES -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginTop="14dp"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnCancelarAsistencia"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="6dp"
-            android:layout_weight="1"
-            android:text="Cancelar"
+        <!-- TÍTULO -->
+        <TextView
+            android:id="@+id/txtTituloDialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Registrar Asistencia por Grado (Jardín a 11°)"
             android:textColor="#1B3317"
-            android:textSize="13sp"
-            app:cornerRadius="12dp"
-            app:strokeColor="#C5DFC3" />
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnGuardarAsistencia"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="6dp"
-            android:layout_weight="1"
-            android:backgroundTint="#F4B41F"
-            android:text="Guardar"
+        <TextView
+            android:id="@+id/txtDescripcionDialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Ingresa el número de niños por cada grado desde Jardín hasta 11°."
+            android:textColor="#64748B"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/txtJornadaDialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_tag_plato"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="5dp"
+            android:text="Jornada: Mañana"
             android:textColor="#1B3317"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            app:cornerRadius="12dp" />
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <!-- LISTADO DE GRADOS DE JARDÍN A 11° -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="240dp"
+            android:layout_marginTop="12dp"
+            android:overScrollMode="never"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- JARDÍN / PREESCOLAR -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Jardín / Preescolar (150g)"
+                        android:textColor="#1B3317"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/edtGradoJardin"
+                        android:layout_width="80dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/bg_edittext"
+                        android:gravity="center"
+                        android:hint="0"
+                        android:importantForAutofill="no"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:textColor="#1B3317"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <!-- 1° PRIMERO -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="1° Primero (250g)"
+                        android:textColor="#1B3317"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/edtGradoPrimero"
+                        android:layout_width="80dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/bg_edittext"
+                        android:gravity="center"
+                        android:hint="0"
+                        android:importantForAutofill="no"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:textColor="#1B3317"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <!-- 2° SEGUNDO -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="2° Segundo (250g)"
+                        android:textColor="#1B3317"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/edtGradoSegundo"
+                        android:layout_width="80dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/bg_edittext"
+                        android:gravity="center"
+                        android:hint="0"
+                        android:importantForAutofill="no"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:textColor="#1B3317"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <!-- 3° TERCERO -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="3° Tercero (250g)"
+                        android:textColor="#1B3317"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/edtGradoTercero"
+                        android:layout_width="80dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/bg_edittext"
+                        android:gravity="center"
+                        android:hint="0"
+                        android:importantForAutofill="no"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:textColor="#1B3317"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <!-- 4° CUARTO -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="4° Cuarto (250g)"
+                        android:textColor="#1B3317"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/edtGradoCuarto"
+                        android:layout_width="80dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/bg_edittext"
+                        android:gravity="center"
+                        android:hint="0"
+                        android:importantForAutofill="no"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:textColor="#1B3317"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <!-- 5° QUINTO -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="5° Quinto (250g)"
+                        android:textColor="#1B3317"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/edtGradoQuinto"
+                        android:layout_width="80dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/bg_edittext"
+                        android:gravity="center"
+                        android:hint="0"
+                        android:importantForAutofill="no"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:textColor="#1B3317"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <!-- 6° SEXTO -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="6° Sexto (380g)"
+                        android:textColor="#1B3317"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/edtGradoSexto"
+                        android:layout_width="80dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/bg_edittext"
+                        android:gravity="center"
+                        android:hint="0"
+                        android:importantForAutofill="no"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:textColor="#1B3317"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <!-- 7° SÉPTIMO -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="7° Séptimo (380g)"
+                        android:textColor="#1B3317"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/edtGradoSeptimo"
+                        android:layout_width="80dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/bg_edittext"
+                        android:gravity="center"
+                        android:hint="0"
+                        android:importantForAutofill="no"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:textColor="#1B3317"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <!-- 8° OCTAVO -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="8° Octavo (380g)"
+                        android:textColor="#1B3317"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/edtGradoOctavo"
+                        android:layout_width="80dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/bg_edittext"
+                        android:gravity="center"
+                        android:hint="0"
+                        android:importantForAutofill="no"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:textColor="#1B3317"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <!-- 9° NOVENO -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="9° Noveno (380g)"
+                        android:textColor="#1B3317"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/edtGradoNoveno"
+                        android:layout_width="80dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/bg_edittext"
+                        android:gravity="center"
+                        android:hint="0"
+                        android:importantForAutofill="no"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:textColor="#1B3317"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <!-- 10° DÉCIMO -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="10° Décimo (380g)"
+                        android:textColor="#1B3317"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/edtGradoDecimo"
+                        android:layout_width="80dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/bg_edittext"
+                        android:gravity="center"
+                        android:hint="0"
+                        android:importantForAutofill="no"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:textColor="#1B3317"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <!-- 11° UNDÉCIMO -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="11° Undécimo (380g)"
+                        android:textColor="#1B3317"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/edtCantidadSecundaria"
+                        android:layout_width="80dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/bg_edittext"
+                        android:gravity="center"
+                        android:hint="0"
+                        android:importantForAutofill="no"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:textColor="#1B3317"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/edtCantidadPrimaria"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone" />
+
+                <EditText
+                    android:id="@+id/edtCantidadAsistencia"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+        </ScrollView>
+
+        <!-- RESUMEN DE GRAMAJE CALCULADO EN TIEMPO REAL -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:cardBackgroundColor="#FAF9F4"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#EBE8D8"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:id="@+id/txtTotalEstudiantesCalculado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total Estudiantes: 0"
+                    android:textColor="#1B3317"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/txtGramajeTotalEstimado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Gramaje total estimado: 0.0 kg a cocinar"
+                    android:textColor="#7A5500"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- BOTONES -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="14dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCancelarAsistencia"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:text="Cancelar"
+                android:textColor="#1B3317"
+                android:textSize="13sp"
+                app:cornerRadius="12dp"
+                app:strokeColor="#CBD5E1" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnGuardarAsistencia"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:backgroundTint="#F4B41F"
+                android:text="Guardar"
+                android:textColor="#1B3317"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                app:cornerRadius="12dp" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
-</LinearLayout>
+</com.google.android.material.card.MaterialCardView>

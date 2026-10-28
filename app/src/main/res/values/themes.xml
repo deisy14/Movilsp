@@ -3,6 +3,15 @@
     <style name="Base.Theme.Movilmanupuladora" parent="Theme.Material3.Light.NoActionBar">
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
         <item name="android:windowAnimationStyle">@style/WhatsAppWindowAnimation</item>
+        <item name="colorPrimary">#F4B41F</item>
+        <item name="colorOnPrimary">#1B3317</item>
+        <item name="colorSecondary">#2A5226</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="colorSurface">#FFFFFF</item>
+        <item name="colorOnSurface">#1B3317</item>
+        <item name="elevationOverlayEnabled">false</item>
+        <item name="materialAlertDialogTheme">@style/SiraeMaterialAlertDialog</item>
+        <item name="alertDialogTheme">@style/SiraeMaterialAlertDialog</item>
     </style>
 
     <style name="Theme.Movilmanupuladora" parent="Base.Theme.Movilmanupuladora" />
@@ -13,5 +22,33 @@
         <item name="android:activityOpenExitAnimation">@anim/slide_out_left</item>
         <item name="android:activityCloseEnterAnimation">@anim/slide_in_left</item>
         <item name="android:activityCloseExitAnimation">@anim/slide_out_right</item>
+    </style>
+
+    <!-- Estilo personalizado para todos los Diálogos de la app -->
+    <style name="SiraeMaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="shapeAppearanceOverlay">@style/SiraeDialogShape</item>
+        <item name="colorSurface">#FFFFFF</item>
+        <item name="elevationOverlayEnabled">false</item>
+        <item name="colorOnSurface">#1B3317</item>
+        <item name="colorOnSurfaceVariant">#64748B</item>
+        <item name="colorPrimary">#7A5500</item>
+        <item name="buttonBarPositiveButtonStyle">@style/SiraeDialogPositiveButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/SiraeDialogNegativeButton</item>
+        <item name="buttonBarNeutralButtonStyle">@style/SiraeDialogNegativeButton</item>
+    </style>
+
+    <style name="SiraeDialogShape" parent="">
+        <item name="cornerSize">22dp</item>
+    </style>
+
+    <style name="SiraeDialogPositiveButton" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textColor">#7A5500</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="SiraeDialogNegativeButton" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textColor">#64748B</item>
+        <item name="android:textSize">14sp</item>
     </style>
 </resources>

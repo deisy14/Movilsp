@@ -26,7 +26,7 @@ class MenuDisponibleAdapter(
         val plato = listaPlatos[position]
         holder.binding.imgPlatoDisponible.setImageResource(plato.imagen)
         holder.binding.txtNombrePlatoDisponible.text = plato.nombre
-        holder.binding.txtDisponibilidadIngredientes.text = "✓ Ingredientes disponibles"
+        holder.binding.txtDisponibilidadIngredientes.text = "Ingredientes disponibles"
 
         holder.binding.btnSeleccionarMenuDisponible.setOnClickListener {
             onItemClick(plato)

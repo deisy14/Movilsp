@@ -41,6 +41,91 @@
                 android:paddingTop="22dp"
                 android:paddingBottom="24dp">
 
+                <!-- ENCABEZADO Y PERFIL PARA JEFA DE COCINA -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="18dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/txtSaludoJefa"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Hola, Jefa de Cocina"
+                            android:textColor="#1B3317"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/txtCargoHeaderJefa"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Coordinación y Gestión PAE"
+                            android:textColor="#64748B"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <!-- NOTIFICACIONES -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/btnNotificacionesJefa"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:layout_marginEnd="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="22dp"
+                        app:cardElevation="3dp"
+                        app:strokeWidth="0dp">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="Notificaciones"
+                            android:src="@drawable/ic_notificaciones"
+                            app:tint="#1B3317" />
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- PERFIL DE LA JEFA -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/btnPerfilHeader"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        app:cardBackgroundColor="#F4B41F"
+                        app:cardCornerRadius="22dp"
+                        app:cardElevation="3dp"
+                        app:strokeWidth="0dp">
+
+                        <TextView
+                            android:id="@+id/txtInicialesJefa"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="JF"
+                            android:textColor="#1B3317"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                </LinearLayout>
+
                 <!-- ENCABEZADO "MI SEMANA" -->
                 <TextView
                     android:id="@+id/txtTituloMiSemana"
@@ -323,7 +408,7 @@
                                 android:background="@drawable/bg_chip_desayuno"
                                 android:paddingHorizontal="8dp"
                                 android:paddingVertical="3dp"
-                                android:text="☀️ Desayuno"
+                                android:text="Desayuno"
                                 android:textColor="#B45309"
                                 android:textSize="10sp"
                                 android:textStyle="bold" />
