@@ -346,22 +346,23 @@ class LoginActivity : AppCompatActivity() {
                 email.contains("isaperez") || email.contains("carlos") ||
                 email.contains("jader") || email.contains("sara")
 
-        val nombre = when {
-            email.contains("andrea") -> "Andrea Sánchez"
-            email.contains("pool") -> "Pool Gómez"
-            email.contains("deis") -> "Deisy"
-            email.contains("andres") -> "Andreas Muñoz"
-            email.contains("carlos") -> "Carlos Ruiz"
-            email.contains("isaperez") -> "Isa Pérez"
-            email.contains("jader") -> "Jader Gómez"
-            email.contains("sara") -> "Sara Rodríguez"
-            else -> sessionManager.getUserName() ?: "Manipuladora PAE"
+        val (nombre, uid) = when {
+            email.contains("andrea") -> Pair("Andrea Sánchez", 20)
+            email.contains("pool") -> Pair("Pool Gómez", 21)
+            email.contains("deis") -> Pair("Deisy", 24)
+            email.contains("andres") -> Pair("Andreas Muñoz", 30)
+            email.contains("carlos") -> Pair("Carlos Ruiz", 15)
+            email.contains("isaperez") -> Pair("Isa Pérez", 19)
+            email.contains("jader") -> Pair("Jader Gómez", 16)
+            email.contains("sara") -> Pair("Sara Rodríguez", 17)
+            else -> Pair(sessionManager.getUserName() ?: "Manipuladora PAE", -1)
         }
 
         sessionManager.saveUserData(
             name = nombre,
             role = if (esJefa) "Jefa de Manipuladoras" else "Manipuladora",
-            email = correo
+            email = correo,
+            idUsuario = if (uid > 0) uid else null
         )
 
         Toast.makeText(

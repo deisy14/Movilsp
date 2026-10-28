@@ -317,9 +317,11 @@ class InicioJefaActivity : AppCompatActivity() {
                     }
 
                     val total = p + s
-                    AsistenciaManager.guardarPrimaria(this@InicioJefaActivity, p)
-                    AsistenciaManager.guardarSecundaria(this@InicioJefaActivity, s)
-                    AsistenciaManager.guardarManana(this@InicioJefaActivity, total)
+                    if (total > 0) {
+                        AsistenciaManager.guardarPrimaria(this@InicioJefaActivity, p)
+                        AsistenciaManager.guardarSecundaria(this@InicioJefaActivity, s)
+                        AsistenciaManager.guardarManana(this@InicioJefaActivity, total)
+                    }
 
                     actualizarResumen()
                 }

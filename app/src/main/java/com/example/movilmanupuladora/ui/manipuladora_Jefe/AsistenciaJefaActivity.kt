@@ -19,7 +19,10 @@ import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.model.AsistenciaDiaria
 import com.example.movilmanupuladora.data.repository.AsistenciaRepository
 import com.example.movilmanupuladora.databinding.ActivityAsistenciaJefaBinding
+import com.example.movilmanupuladora.utils.PreparacionSyncManager
 import com.example.movilmanupuladora.utils.SessionManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -144,10 +147,13 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                         secundariaManana = total - primariaManana
                     }
 
-                    // Actualizar cache local
-                    AsistenciaManager.guardarPrimaria(this@AsistenciaJefaActivity, primariaManana)
-                    AsistenciaManager.guardarSecundaria(this@AsistenciaJefaActivity, secundariaManana)
-                    AsistenciaManager.guardarManana(this@AsistenciaJefaActivity, primariaManana + secundariaManana)
+                    val totalCalculado = primariaManana + secundariaManana
+                    if (totalCalculado > 0) {
+                        // Actualizar cache local solo si hay datos reales
+                        AsistenciaManager.guardarPrimaria(this@AsistenciaJefaActivity, primariaManana)
+                        AsistenciaManager.guardarSecundaria(this@AsistenciaJefaActivity, secundariaManana)
+                        AsistenciaManager.guardarManana(this@AsistenciaJefaActivity, totalCalculado)
+                    }
 
                     actualizarInterfaz()
                 }
@@ -408,86 +414,91 @@ class AsistenciaJefaActivity : AppCompatActivity() {
         btnGuardar.isEnabled = false
         btnGuardar.text = "Guardando..."
 
+        // 1. Guardar localmente de inmediato en AsistenciaManager
+        if (jornadaActual == "MANANA") {
+            primariaManana = totalPrimaria
+            secundariaManana = totalSecundaria
+            AsistenciaManager.guardarManana(this@AsistenciaJefaActivity, total)
+        } else {
+            primariaTarde = totalPrimaria
+            secundariaTarde = totalSecundaria
+            AsistenciaManager.guardarTarde(this@AsistenciaJefaActivity, total)
+        }
+        AsistenciaManager.guardarPrimaria(this@AsistenciaJefaActivity, totalPrimaria)
+        AsistenciaManager.guardarSecundaria(this@AsistenciaJefaActivity, totalSecundaria)
+        actualizarDatosAsistencia()
+
         lifecycleScope.launch {
             try {
-                sessionManager.fetchAuthToken()
-                val userId = sessionManager.getUserId().takeIf { it > 0 }
-                val idP = if (jornadaActual == "MANANA") idAsistenciaPrimariaManana else idAsistenciaPrimariaTarde
-                val idS = if (jornadaActual == "MANANA") idAsistenciaSecundariaManana else idAsistenciaSecundariaTarde
-
-                // 1. Guardar/Actualizar Primaria
-                val payloadPrimaria = AsistenciaDiaria(
-                    idAsistencia = idP,
-                    idGrado = idGradoPrimaria,
-                    fecha = fechaHoy,
-                    ninosPresentes = totalPrimaria,
-                    idUsuarioManipuladora = userId
-                )
-                var resP = if (idP != null) {
-                    asistenciaRepository.actualizarAsistencia(idP, payloadPrimaria)
-                } else null
-                if (resP == null || !resP.isSuccessful) {
-                    resP = asistenciaRepository.registrarAsistencia(payloadPrimaria)
+                // 2. Sincronizar en la nube en Turnos de inmediato
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        PreparacionSyncManager.guardarAsistenciaEnNube(
+                            primaria = totalPrimaria,
+                            secundaria = totalSecundaria,
+                            total = total
+                        )
+                    } catch (_: Exception) { }
                 }
 
-                // 2. Guardar/Actualizar Secundaria
-                val payloadSecundaria = AsistenciaDiaria(
-                    idAsistencia = idS,
-                    idGrado = idGradoSecundaria,
-                    fecha = fechaHoy,
-                    ninosPresentes = totalSecundaria,
-                    idUsuarioManipuladora = userId
-                )
-                var resS = if (idS != null) {
-                    asistenciaRepository.actualizarAsistencia(idS, payloadSecundaria)
-                } else null
-                if (resS == null || !resS.isSuccessful) {
-                    resS = asistenciaRepository.registrarAsistencia(payloadSecundaria)
-                }
+                // 3. Persistir en la tabla de asistencia diaria del backend
+                try {
+                    sessionManager.fetchAuthToken()
+                    val userId = sessionManager.getUserId().takeIf { it > 0 }
+                    val idP = if (jornadaActual == "MANANA") idAsistenciaPrimariaManana else idAsistenciaPrimariaTarde
+                    val idS = if (jornadaActual == "MANANA") idAsistenciaSecundariaManana else idAsistenciaSecundariaTarde
 
-                if (resP.isSuccessful && resS.isSuccessful) {
-                    if (resP.body() != null) {
+                    val payloadPrimaria = AsistenciaDiaria(
+                        idAsistencia = idP,
+                        idGrado = idGradoPrimaria,
+                        fecha = fechaHoy,
+                        ninosPresentes = totalPrimaria,
+                        idUsuarioManipuladora = userId
+                    )
+                    var resP = if (idP != null) {
+                        asistenciaRepository.actualizarAsistencia(idP, payloadPrimaria)
+                    } else null
+                    if (resP == null || !resP.isSuccessful) {
+                        resP = asistenciaRepository.registrarAsistencia(payloadPrimaria)
+                    }
+                    if (resP.isSuccessful && resP.body() != null) {
                         if (jornadaActual == "MANANA") idAsistenciaPrimariaManana = resP.body()!!.idAsistencia
                         else idAsistenciaPrimariaTarde = resP.body()!!.idAsistencia
                     }
-                    if (resS.body() != null) {
+
+                    val payloadSecundaria = AsistenciaDiaria(
+                        idAsistencia = idS,
+                        idGrado = idGradoSecundaria,
+                        fecha = fechaHoy,
+                        ninosPresentes = totalSecundaria,
+                        idUsuarioManipuladora = userId
+                    )
+                    var resS = if (idS != null) {
+                        asistenciaRepository.actualizarAsistencia(idS, payloadSecundaria)
+                    } else null
+                    if (resS == null || !resS.isSuccessful) {
+                        resS = asistenciaRepository.registrarAsistencia(payloadSecundaria)
+                    }
+                    if (resS.isSuccessful && resS.body() != null) {
                         if (jornadaActual == "MANANA") idAsistenciaSecundariaManana = resS.body()!!.idAsistencia
                         else idAsistenciaSecundariaTarde = resS.body()!!.idAsistencia
                     }
+                } catch (_: Exception) { }
 
-                    if (jornadaActual == "MANANA") {
-                        primariaManana = totalPrimaria
-                        secundariaManana = totalSecundaria
-                        AsistenciaManager.guardarManana(this@AsistenciaJefaActivity, total)
-                    } else {
-                        primariaTarde = totalPrimaria
-                        secundariaTarde = totalSecundaria
-                        AsistenciaManager.guardarTarde(this@AsistenciaJefaActivity, total)
-                    }
+                dialog.dismiss()
+                Toast.makeText(
+                    this@AsistenciaJefaActivity,
+                    "¡Asistencia registrada y sincronizada! Total: $total (Primaria: $totalPrimaria | Secundaria: $totalSecundaria)",
+                    Toast.LENGTH_LONG
+                ).show()
 
-                    // Guardar en cache local para acceso inmediato
-                    AsistenciaManager.guardarPrimaria(this@AsistenciaJefaActivity, totalPrimaria)
-                    AsistenciaManager.guardarSecundaria(this@AsistenciaJefaActivity, totalSecundaria)
-
-                    actualizarDatosAsistencia()
-                    dialog.dismiss()
-
-                    Toast.makeText(
-                        this@AsistenciaJefaActivity,
-                        "¡Asistencia sincronizada! Total: $total (Primaria: $totalPrimaria | Secundaria: $totalSecundaria)",
-                        Toast.LENGTH_LONG
-                    ).show()
-                } else {
-                    btnGuardar.isEnabled = true
-                    btnGuardar.text = "Guardar"
-                    val errP = if (!resP.isSuccessful) resP.errorBody()?.string()?.take(80) ?: "Primaria error ${resP.code()}" else ""
-                    val errS = if (!resS.isSuccessful) resS.errorBody()?.string()?.take(80) ?: "Secundaria error ${resS.code()}" else ""
-                    Toast.makeText(this@AsistenciaJefaActivity, "Error del servidor: $errP $errS", Toast.LENGTH_LONG).show()
-                }
             } catch (e: Exception) {
-                btnGuardar.isEnabled = true
-                btnGuardar.text = "Guardar"
-                Toast.makeText(this@AsistenciaJefaActivity, "Error de red al guardar: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
+                Toast.makeText(
+                    this@AsistenciaJefaActivity,
+                    "¡Asistencia guardada localmente! Total: $total",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }

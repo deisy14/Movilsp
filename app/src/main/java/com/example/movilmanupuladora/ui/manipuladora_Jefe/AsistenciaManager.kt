@@ -13,6 +13,7 @@ object AsistenciaManager {
     private const val KEY_PRIMARIA = "asistencia_primaria"
     private const val KEY_SECUNDARIA = "asistencia_secundaria"
     private const val KEY_FECHA_DETALLE = "fecha_detalle_grados"
+    private const val KEY_FECHA_ASISTENCIA = "fecha_asistencia"
 
     // Claves por grado
     private const val KEY_JAR = "grado_jar"
@@ -87,10 +88,12 @@ object AsistenciaManager {
     // =========================================================
 
     fun guardarPrimaria(context: Context, cantidad: Int) {
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putInt(KEY_PRIMARIA, cantidad)
-            .apply()
+        val editor = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit()
+        editor.putInt(KEY_PRIMARIA, cantidad)
+        if (cantidad > 0) {
+            editor.putString(KEY_FECHA_ASISTENCIA, obtenerFechaHoy())
+        }
+        editor.apply()
     }
 
     fun obtenerPrimaria(context: Context): Int {
@@ -103,10 +106,12 @@ object AsistenciaManager {
     // =========================================================
 
     fun guardarSecundaria(context: Context, cantidad: Int) {
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putInt(KEY_SECUNDARIA, cantidad)
-            .apply()
+        val editor = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit()
+        editor.putInt(KEY_SECUNDARIA, cantidad)
+        if (cantidad > 0) {
+            editor.putString(KEY_FECHA_ASISTENCIA, obtenerFechaHoy())
+        }
+        editor.apply()
     }
 
     fun obtenerSecundaria(context: Context): Int {
@@ -119,17 +124,21 @@ object AsistenciaManager {
     // =========================================================
 
     fun guardarManana(context: Context, cantidad: Int) {
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putInt(KEY_MANANA, cantidad)
-            .apply()
+        val editor = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit()
+        editor.putInt(KEY_MANANA, cantidad)
+        if (cantidad > 0) {
+            editor.putString(KEY_FECHA_ASISTENCIA, obtenerFechaHoy())
+        }
+        editor.apply()
     }
 
     fun guardarTarde(context: Context, cantidad: Int) {
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putInt(KEY_TARDE, cantidad)
-            .apply()
+        val editor = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit()
+        editor.putInt(KEY_TARDE, cantidad)
+        if (cantidad > 0) {
+            editor.putString(KEY_FECHA_ASISTENCIA, obtenerFechaHoy())
+        }
+        editor.apply()
     }
 
     fun obtenerManana(context: Context): Int {
@@ -140,6 +149,17 @@ object AsistenciaManager {
     fun obtenerTarde(context: Context): Int {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getInt(KEY_TARDE, 0)
+    }
+
+    fun obtenerTotal(context: Context): Int {
+        val p = obtenerPrimaria(context)
+        val s = obtenerSecundaria(context)
+        val suma = p + s
+        return if (suma > 0) suma else obtenerManana(context)
+    }
+
+    fun tieneAsistenciaValida(context: Context): Boolean {
+        return obtenerTotal(context) > 0
     }
 
     // =========================================================

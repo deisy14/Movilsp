@@ -66,23 +66,11 @@ class PreparacionesJefaActivity : AppCompatActivity() {
             val plato = binding.txtPlatoPreparacion.text.toString()
             val jornadaNombre = if (jornadaActual == Jornada.MANANA) "Mañana" else "Tarde"
 
-            val jefaPrefs = getSharedPreferences("ManipuladoraJefe", MODE_PRIVATE)
-            val compJefa = jefaPrefs.getString("comp_jefa", null)
-
-            if (!compJefa.isNullOrBlank()) {
-                val intent = Intent(this, com.example.movilmanupuladora.ui.manipuladora.PreparacionActivity::class.java).apply {
-                    putExtra("nombre_plato", plato)
-                    putExtra("componente_seleccionado", compJefa)
-                    putExtra("id_imagen", InicioJefaActivity.obtenerImagenPlatoPorNombre(plato))
-                }
-                startActivity(intent)
-            } else {
-                val intent = Intent(this, IniciarPreparacionActivity::class.java).apply {
-                    putExtra("nombre_menu", plato)
-                    putExtra("jornada", jornadaNombre)
-                }
-                startActivity(intent)
+            val intent = Intent(this, IniciarPreparacionActivity::class.java).apply {
+                putExtra("nombre_menu", plato)
+                putExtra("jornada", jornadaNombre)
             }
+            startActivity(intent)
         }
 
         binding.btnVerManipuladoras.setOnClickListener {
