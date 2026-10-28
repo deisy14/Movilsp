@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:background="@drawable/bg_dialog_plato_asignado"
+    android:paddingStart="22dp"
+    android:paddingEnd="22dp"
+    android:paddingTop="26dp"
+    android:paddingBottom="22dp">
+
+    <!-- Icono superior de éxito con rayos festivos -->
+    <ImageView
+        android:id="@+id/imgIconoExitoModal"
+        android:layout_width="66dp"
+        android:layout_height="66dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/ic_celebration_check" />
+
+    <!-- Título principal -->
+    <TextView
+        android:id="@+id/tvTituloPlatoAsignadoModal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:gravity="center"
+        android:text="¡Plato asignado con éxito!"
+        android:textColor="#181B1F"
+        android:textSize="21sp"
+        android:textStyle="bold" />
+
+    <!-- Tarjeta preview del plato seleccionado -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:background="@drawable/bg_card_plato_preview"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <!-- Imagen del plato redondeada -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="85dp"
+            android:layout_height="75dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp">
+
+            <ImageView
+                android:id="@+id/imgPlatoAsignadoModal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="Plato"
+                android:scaleType="centerCrop"
+                android:src="@drawable/plato1" />
+        </androidx.cardview.widget.CardView>
+
+        <!-- Información: Nombre del plato y Badge -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvNombrePlatoAsignadoModal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="Huevos pericos con arroz blanco"
+                android:textColor="#181B1F"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <!-- Pill badge verde de comida y fecha -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_pill_badge_verde"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="10dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="3dp">
+
+                <TextView
+                    android:id="@+id/tvBadgePlatoAsignadoModal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Desayuno · Lun. 2 nov."
+                    android:textColor="#166534"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Subtítulo inferior -->
+    <TextView
+        android:id="@+id/tvSubtituloPlatoAsignadoModal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="22dp"
+        android:gravity="center"
+        android:lineSpacingExtra="2dp"
+        android:text="Tu plato quedó programado para\nla siguiente semana."
+        android:textColor="#4A5568"
+        android:textSize="14sp" />
+
+    <!-- Botón 1: Continuar planificando (amarillo dorado relleno) -->
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnContinuarPlanificandoModal"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/bg_btn_continuar_planificando"
+        android:text="Continuar planificando"
+        android:textAllCaps="false"
+        android:textColor="#181B1F"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <!-- Botón 2: Configurar equipo (borde oscuro transparente) -->
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnConfigurarEquipoModal"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/bg_btn_configurar_equipo"
+        android:text="Configurar equipo"
+        android:textAllCaps="false"
+        android:textColor="#181B1F"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+</LinearLayout>
