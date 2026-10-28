@@ -53,7 +53,7 @@
                     android:layout_height="match_parent"
                     android:contentDescription="PAE"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/logo_sirae" />
+                    android:src="@drawable/logosira" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
