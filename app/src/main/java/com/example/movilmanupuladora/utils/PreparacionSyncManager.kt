@@ -337,11 +337,13 @@ object PreparacionSyncManager {
      * para asegurar disponibilidad inmediata en todos los móviles.
      */
     suspend fun guardarAsistenciaEnNube(
+        context: Context,
         primaria: Int,
         secundaria: Int,
         total: Int
     ): Boolean = withContext(Dispatchers.IO) {
         try {
+            SessionManager.getToken(context)
             val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
             val tag = "$PREFIX_ASIST$primaria:$secundaria:$total:$fechaHoy"
             val res = RetrofitClient.apiService.obtenerTurnos()
@@ -363,8 +365,10 @@ object PreparacionSyncManager {
                 }
                 Log.d(TAG, "Asistencia guardada en Turnos en la nube: $tag")
                 return@withContext true
+            } else {
+                Log.e(TAG, "Error al obtener turnos en guardarAsistenciaEnNube: HTTP ${res.code()}")
+                return@withContext false
             }
-            return@withContext false
         } catch (e: Exception) {
             Log.e(TAG, "Error guardando asistencia en turnos: ${e.message}")
             return@withContext false
