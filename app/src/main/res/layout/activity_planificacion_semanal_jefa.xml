@@ -354,6 +354,22 @@
 
             </LinearLayout>
 
+            <!-- BOTÓN NUEVA RECETA -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnNuevaReceta"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="20dp"
+                android:backgroundTint="#FEF3C7"
+                android:text="+ Nueva receta"
+                android:textColor="#92400E"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:cornerRadius="16dp"
+                app:elevation="0dp"
+                app:strokeColor="#FCD34D"
+                app:strokeWidth="1dp" />
+
             <!-- SECCIÓN: SUGERENCIAS DE IA PARA LA SEMANA -->
             <LinearLayout
                 android:layout_width="match_parent"
