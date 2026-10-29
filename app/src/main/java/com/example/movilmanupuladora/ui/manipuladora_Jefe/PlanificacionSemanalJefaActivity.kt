@@ -93,6 +93,11 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
         })
     }
 
+    override fun onResume() {
+        super.onResume()
+        cargarPlatosDesdeBackend()
+    }
+
     // =========================================================
     // CÁLCULO DE LA SEMANA SIGUIENTE (LUNES A DOMINGO)
     // =========================================================
@@ -318,6 +323,12 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
         binding.btnVolver.setOnClickListener {
             finish()
             overridePendingTransition(R.anim.stay, R.anim.slide_out_bottom)
+        }
+
+        binding.btnNuevaReceta.setOnClickListener {
+            val intent = Intent(this, RedactarRecetaActivity::class.java)
+            startActivity(intent)
+            overridePendingTransition(R.anim.slide_in_bottom, R.anim.stay)
         }
 
         binding.btnPlatoAnterior.setOnClickListener {

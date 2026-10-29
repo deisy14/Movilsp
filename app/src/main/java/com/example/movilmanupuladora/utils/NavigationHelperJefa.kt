@@ -11,10 +11,7 @@ import android.widget.TextView
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.databinding.BarraNavegacionJefaBinding
 import com.example.movilmanupuladora.databinding.ViewBottomBarBinding
-import com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity
-import com.example.movilmanupuladora.ui.manipuladora_Jefe.InventarioJefaActivity
-import com.example.movilmanupuladora.ui.manipuladora_Jefe.ManipuladorasJefaActivity
-import com.example.movilmanupuladora.ui.manipuladora_Jefe.PreparacionesJefaActivity
+import com.example.movilmanupuladora.ui.manipuladora_Jefa.SugerenciaIaActivity
 
 object NavigationHelperJefa {
 
@@ -121,7 +118,7 @@ object NavigationHelperJefa {
 
         navInicio?.setOnClickListener {
             if (tabActual != TabJefa.INICIO) {
-                val intent = Intent(activity, InicioJefaActivity::class.java)
+                val intent = Intent().setClassName(activity, "com.example.movilmanupuladora.ui.manipuladora_Jefa.InicioJefaActivity")
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
                 activity.overridePendingTransition(0, 0)
@@ -131,7 +128,7 @@ object NavigationHelperJefa {
 
         navInventario?.setOnClickListener {
             if (tabActual != TabJefa.INVENTARIO) {
-                val intent = Intent(activity, InventarioJefaActivity::class.java)
+                val intent = Intent().setClassName(activity, "com.example.movilmanupuladora.ui.manipuladora_Jefa.InventarioJefaActivity")
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
                 activity.overridePendingTransition(0, 0)
@@ -141,7 +138,7 @@ object NavigationHelperJefa {
 
         navPreparaciones?.setOnClickListener {
             if (tabActual != TabJefa.PREPARACIONES) {
-                val intent = Intent(activity, PreparacionesJefaActivity::class.java)
+                val intent = Intent().setClassName(activity, "com.example.movilmanupuladora.ui.manipuladora_Jefa.PreparacionesJefaActivity")
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
                 activity.overridePendingTransition(0, 0)
@@ -151,7 +148,7 @@ object NavigationHelperJefa {
 
         navEquipo?.setOnClickListener {
             if (tabActual != TabJefa.MANIPULADORAS) {
-                val intent = Intent(activity, ManipuladorasJefaActivity::class.java)
+                val intent = Intent().setClassName(activity, "com.example.movilmanupuladora.ui.manipuladora_Jefa.ManipuladorasJefaActivity")
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
                 activity.overridePendingTransition(0, 0)
@@ -160,7 +157,7 @@ object NavigationHelperJefa {
         }
 
         fabAdd?.setOnClickListener {
-            val intent = Intent(activity, com.example.movilmanupuladora.ui.manipuladora_Jefe.RedactarRecetaActivity::class.java)
+            val intent = Intent(activity, SugerenciaIaActivity::class.java)
             activity.startActivity(intent)
         }
     }
