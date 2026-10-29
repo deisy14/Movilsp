@@ -258,8 +258,11 @@ class InventarioActivity : AppCompatActivity() {
                 // 1. Obtener catálogo de ingredientes para nombres, categorías y unidades
                 val ingRes = RetrofitClient.apiService.obtenerIngredientes()
                 val mapIngredientes = if (ingRes.isSuccessful && !ingRes.body().isNullOrEmpty()) {
-                    ingRes.body()!!.associateBy { it.idIngrediente }
-                } else emptyMap()
+                    ingRes.body()!!.associateBy { it.obtenerIdReal() }
+                } else {
+                    android.util.Log.e("INVENTARIO_SYNC", "obtenerIngredientes: HTTP ${ingRes.code()}")
+                    emptyMap()
+                }
 
                 // 2. Consultar el inventario real del Administrador
                 val invRes = RetrofitClient.apiService.obtenerInventario()
@@ -272,15 +275,25 @@ class InventarioActivity : AppCompatActivity() {
                             ?: inv.cantidad
                             ?: 0.0
 
-                        val ing = inv.idIngrediente?.let { mapIngredientes[it] }
-                        val nombre = ing?.nombreIngrediente ?: "Insumo #${inv.idIngrediente ?: inv.idInventario}"
-                        val catNombre = when (ing?.idCategoriaInventario) {
+                        val idReal = inv.obtenerIdReal()
+                        val idIng = inv.obtenerIdIngredienteReal()
+                        val ing = idIng?.let { mapIngredientes[it] }
+
+                        val nombre = ing?.obtenerNombreReal()
+                            ?.takeIf { it.isNotBlank() }
+                            ?: inv.nombreIngrediente
+                            ?: inv.nombre
+                            ?: "Insumo #${idIng ?: idReal}"
+
+                        val catId = ing?.obtenerCategoriaReal()
+                        val catNombre = when (catId) {
                             2, 7 -> "Lácteos"
                             4 -> "Granos"
                             5 -> "Verduras"
                             else -> "Granos"
                         }
-                        val unidadStr = when (inv.idUnidadMedida ?: ing?.idUnidadMedida) {
+                        val unidId = inv.obtenerIdUnidadReal() ?: ing?.obtenerUnidadReal()
+                        val unidadStr = when (unidId) {
                             1 -> "kg"
                             2, 8 -> "L"
                             3 -> "u"
@@ -289,9 +302,9 @@ class InventarioActivity : AppCompatActivity() {
 
                         listaServidor.add(
                             ProductoAdmin(
-                                id = inv.idInventario,
-                                idInventario = inv.idInventario,
-                                idIngrediente = inv.idIngrediente,
+                                id = idReal,
+                                idInventario = idReal,
+                                idIngrediente = idIng,
                                 nombre = nombre,
                                 cantidad = stockServidor,
                                 unidadMedida = unidadStr,
@@ -306,6 +319,8 @@ class InventarioActivity : AppCompatActivity() {
                         listaProductosAdmin.clear()
                         listaProductosAdmin.addAll(listaServidor)
                     }
+                } else {
+                    android.util.Log.e("INVENTARIO_SYNC", "obtenerInventario: HTTP ${invRes.code()}")
                 }
 
                 // 3. Refrescar la interfaz en el hilo principal
