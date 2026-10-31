@@ -269,15 +269,10 @@ class LoginActivity : AppCompatActivity() {
                     val esJefa =
                         rol.contains("jefa") ||
                                 rol.contains("jefe") ||
-                                rol.contains("superv") ||
-                                rol.contains("coord") ||
-                                rol == "3" ||
                                 email.contains("jefe") ||
                                 email.contains("jefa") ||
-                                email.contains("isa") ||
-                                email.contains("carlos") ||
-                                email.contains("jader") ||
-                                email.contains("sara")
+                                email.contains("isaperez") ||
+                                email.contains("carlos")
 
                     // Determinar la pantalla de destino.
                     val destino = when {
@@ -299,17 +294,6 @@ class LoginActivity : AppCompatActivity() {
                     finish()
 
                 } else {
-
-                    // Intentar el acceso local configurado en el proyecto.
-                    // Importante: este acceso debe validarse con credenciales
-                    // legítimas, no únicamente con un correo conocido.
-                    if (
-                        verificarLoginLocal(correo, pass) ||
-                        esManipuladoraOValida(correo, pass)
-                    ) {
-                        accederConLoginLocal(correo)
-                        return@launch
-                    }
 
                     mostrarCargando(false)
 
@@ -380,15 +364,6 @@ class LoginActivity : AppCompatActivity() {
 
             } catch (e: Exception) {
 
-                // Acceso local cuando el servidor no responde.
-                if (
-                    verificarLoginLocal(correo, pass) ||
-                    esManipuladoraOValida(correo, pass)
-                ) {
-                    accederConLoginLocal(correo)
-                    return@launch
-                }
-
                 mostrarCargando(false)
 
                 Log.e(
@@ -420,91 +395,6 @@ class LoginActivity : AppCompatActivity() {
                 ).show()
             }
         }
-    }
-
-    // =========================================================
-    // VALIDACIÓN LOCAL
-    // =========================================================
-
-    private fun esManipuladoraOValida(
-        correo: String,
-        pass: String
-    ): Boolean {
-        val email = correo.lowercase().trim()
-        val passTrim = pass.trim()
-        return email.isNotEmpty() && passTrim.isNotEmpty()
-    }
-
-    private fun verificarLoginLocal(
-        correo: String,
-        pass: String
-    ): Boolean {
-
-        val localAuth = getSharedPreferences(
-            "SIRAE_LOCAL_AUTH",
-            MODE_PRIVATE
-        )
-
-        val savedPwd = localAuth.getString(
-            "pwd_${correo.lowercase().trim()}",
-            null
-        )
-
-        return savedPwd != null &&
-                (savedPwd == pass.trim() || savedPwd == pass)
-    }
-
-    private fun accederConLoginLocal(correo: String) {
-
-        mostrarCargando(false)
-
-        val email = correo.lowercase().trim()
-
-        val esJefa =
-            email.contains("jefe") ||
-                    email.contains("jefa") ||
-                    email.contains("isa") ||
-                    email.contains("isaperez") ||
-                    email.contains("carlos") ||
-                    email.contains("jader") ||
-                    email.contains("sara") ||
-                    email.contains("coordinad") ||
-                    email.contains("superv") ||
-                    sessionManager.getUserRole()?.lowercase()?.contains("jef") == true
-
-        val (nombre, uid) = when {
-            email.contains("andrea") -> Pair("Andrea Sánchez", 20)
-            email.contains("pool") -> Pair("Pool Gómez", 21)
-            email.contains("deis") -> Pair("Deisy", 24)
-            email.contains("andres") -> Pair("Andreas Muñoz", 30)
-            email.contains("carlos") -> Pair("Carlos Ruiz", 15)
-            email.contains("isaperez") -> Pair("Isa Pérez", 19)
-            email.contains("jader") -> Pair("Jader Gómez", 16)
-            email.contains("sara") -> Pair("Sara Rodríguez", 17)
-            else -> Pair(sessionManager.getUserName() ?: "Manipuladora PAE", -1)
-        }
-
-        sessionManager.saveUserData(
-            name = nombre,
-            role = if (esJefa) "Jefa de Manipuladoras" else "Manipuladora",
-            email = correo,
-            idUsuario = if (uid > 0) uid else null
-        )
-
-        Toast.makeText(
-            this@LoginActivity,
-            "¡Bienvenido $nombre!",
-            Toast.LENGTH_SHORT
-        ).show()
-
-        val destino = if (esJefa) {
-            InicioJefaActivity::class.java
-        } else {
-            TurnoActivity::class.java
-        }
-
-        startActivity(Intent(this@LoginActivity, destino))
-        finish()
     }
 
     // =========================================================

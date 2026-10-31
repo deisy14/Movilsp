@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="72dp"
+    android:height="72dp"
+    android:viewportWidth="72"
+    android:viewportHeight="72">
+
+    <!-- Rayos alrededor del círculo -->
+    <!-- Superior -->
+    <path
+        android:pathData="M36,7 L36,12"
+        android:strokeWidth="2.5"
+        android:strokeColor="#B45309"
+        android:strokeLineCap="round" />
+    <!-- Inferior -->
+    <path
+        android:pathData="M36,60 L36,65"
+        android:strokeWidth="2.5"
+        android:strokeColor="#B45309"
+        android:strokeLineCap="round" />
+    <!-- Izquierda -->
+    <path
+        android:pathData="M7,36 L12,36"
+        android:strokeWidth="2.5"
+        android:strokeColor="#B45309"
+        android:strokeLineCap="round" />
+    <!-- Derecha -->
+    <path
+        android:pathData="M60,36 L65,36"
+        android:strokeWidth="2.5"
+        android:strokeColor="#B45309"
+        android:strokeLineCap="round" />
+    <!-- Diagonal Superior Izquierda -->
+    <path
+        android:pathData="M16,16 L20,20"
+        android:strokeWidth="2.5"
+        android:strokeColor="#B45309"
+        android:strokeLineCap="round" />
+    <!-- Diagonal Superior Derecha -->
+    <path
+        android:pathData="M56,16 L52,20"
+        android:strokeWidth="2.5"
+        android:strokeColor="#B45309"
+        android:strokeLineCap="round" />
+    <!-- Diagonal Inferior Izquierda -->
+    <path
+        android:pathData="M16,56 L20,52"
+        android:strokeWidth="2.5"
+        android:strokeColor="#B45309"
+        android:strokeLineCap="round" />
+    <!-- Diagonal Inferior Derecha -->
+    <path
+        android:pathData="M56,56 L52,52"
+        android:strokeWidth="2.5"
+        android:strokeColor="#B45309"
+        android:strokeLineCap="round" />
+
+    <!-- Círculo central pastel -->
+    <path
+        android:pathData="M36,36m-19,0a19,19 0 1,1 38,0a19,19 0 1,1 -38,0"
+        android:fillColor="#FDE68A" />
+
+    <!-- Checkmark marrón dorado -->
+    <path
+        android:pathData="M27.5,36.5 L33,42 L44.5,30.5"
+        android:strokeWidth="3.5"
+        android:strokeColor="#78350F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+</vector>
+

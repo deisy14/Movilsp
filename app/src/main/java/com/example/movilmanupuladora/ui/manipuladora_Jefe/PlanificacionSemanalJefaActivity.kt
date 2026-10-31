@@ -4,7 +4,9 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
+import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -381,15 +383,34 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
 
     private fun seleccionarPlatoParaSiguienteSemana(plato: InicioJefaActivity.Plato) {
 
-        try {
-            val comidaNombre = when (comidaSeleccionada) {
-                TipoComida.DESAYUNO -> "Desayuno"
-                TipoComida.ALMUERZO -> "Almuerzo"
-                TipoComida.MERIENDA -> "Merienda"
-            }
-
-            val nombrePlato = plato.nombre ?: "Plato seleccionado"
-            val idPlato = plato.id ?: -1
+        val cal = diaSeleccionadoSemanaSiguiente
+        val diaSemanaAbrev = when (cal.get(Calendar.DAY_OF_WEEK)) {
+            Calendar.MONDAY -> "Lun."
+            Calendar.TUESDAY -> "Mar."
+            Calendar.WEDNESDAY -> "Mié."
+            Calendar.THURSDAY -> "Jue."
+            Calendar.FRIDAY -> "Vie."
+            Calendar.SATURDAY -> "Sáb."
+            Calendar.SUNDAY -> "Dom."
+            else -> "Lun."
+        }
+        val diaMes = cal.get(Calendar.DAY_OF_MONTH)
+        val mesAbrev = when (cal.get(Calendar.MONTH)) {
+            Calendar.JANUARY -> "ene."
+            Calendar.FEBRUARY -> "feb."
+            Calendar.MARCH -> "mar."
+            Calendar.APRIL -> "abr."
+            Calendar.MAY -> "may."
+            Calendar.JUNE -> "jun."
+            Calendar.JULY -> "jul."
+            Calendar.AUGUST -> "ago."
+            Calendar.SEPTEMBER -> "sep."
+            Calendar.OCTOBER -> "oct."
+            Calendar.NOVEMBER -> "nov."
+            Calendar.DECEMBER -> "dic."
+            else -> ""
+        }
+        val badgeTexto = "$comidaNombre · $diaSemanaAbrev $diaMes $mesAbrev"
 
             val formatoDia = try {
                 SimpleDateFormat("EEEE d 'de' MMMM", Locale("es", "CO"))
@@ -410,44 +431,45 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
                 android.util.Log.e("PLANIFICACION", "Error en sessionManager: ${e.message}")
             }
 
-            lifecycleScope.launch {
-                try {
-                    PreparacionSyncManager.guardarPlatoSeleccionado(
-                        this@PlanificacionSemanalJefaActivity,
-                        nombrePlato,
-                        idPlato,
-                        comidaNombre
-                    )
-                } catch (e: Exception) {
-                    android.util.Log.e("PLANIFICACION", "Error en PreparacionSyncManager: ${e.message}")
-                }
-            }
+        // Mostrar modal personalizado idéntico al diseño
+        val viewDialog = layoutInflater.inflate(R.layout.dialog_plato_asignado_exito, null)
+        val imgPlato = viewDialog.findViewById<ImageView>(R.id.imgPlatoAsignadoModal)
+        val tvNombre = viewDialog.findViewById<TextView>(R.id.tvNombrePlatoAsignadoModal)
+        val tvBadge = viewDialog.findViewById<TextView>(R.id.tvBadgePlatoAsignadoModal)
+        val tvSubtitulo = viewDialog.findViewById<TextView>(R.id.tvSubtituloPlatoAsignadoModal)
+        val btnContinuar = viewDialog.findViewById<Button>(R.id.btnContinuarPlanificandoModal)
+        val btnConfigurar = viewDialog.findViewById<Button>(R.id.btnConfigurarEquipoModal)
 
-            if (!isFinishing && !isDestroyed) {
-                com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-                    .setTitle("¡Plato Programado con Éxito!")
-                    .setMessage("Has seleccionado '$nombrePlato' para el $comidaNombre del $fechaTexto (Siguiente semana).\n\n¿Deseas iniciar o configurar la preparación ahora?")
-                    .setPositiveButton("Configurar equipo") { _, _ ->
-                        try {
-                            val intent = Intent(this, IniciarPreparacionActivity::class.java).apply {
-                                putExtra("nombre_menu", nombrePlato)
-                                putExtra("id_plato", idPlato)
-                                putExtra("jornada", comidaNombre)
-                            }
-                            startActivity(intent)
-                        } catch (e: Exception) {
-                            Toast.makeText(this, "Plato programado: $nombrePlato", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                    .setNegativeButton("Continuar planificando", null)
-                    .show()
-            } else {
-                Toast.makeText(this, "Plato '$nombrePlato' programado para $comidaNombre", Toast.LENGTH_SHORT).show()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(this, "Plato seleccionado: ${plato.nombre}", Toast.LENGTH_SHORT).show()
+        val imgRes = if (plato.imagen != 0) plato.imagen else InicioJefaActivity.obtenerImagenPlatoPorNombre(plato.nombre)
+        imgPlato.setImageResource(imgRes)
+        tvNombre.text = plato.nombre
+        tvBadge.text = badgeTexto
+        tvSubtitulo.text = "Tu plato quedó programado para\nla siguiente semana."
+
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
+            .setView(viewDialog)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        btnContinuar.setOnClickListener {
+            dialog.dismiss()
         }
+
+        btnConfigurar.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(this, IniciarPreparacionActivity::class.java).apply {
+                putExtra("nombre_menu", plato.nombre)
+                putExtra("id_plato", plato.id ?: -1)
+                putExtra("jornada", comidaNombre)
+            }
+            startActivity(intent)
+        }
+
+        dialog.show()
+
+        val width = (resources.displayMetrics.widthPixels * 0.90).toInt()
+        dialog.window?.setLayout(width, android.view.ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
     private fun cargarPlatosDesdeBackend() {
