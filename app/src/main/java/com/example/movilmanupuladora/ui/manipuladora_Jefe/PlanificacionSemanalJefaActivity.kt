@@ -50,17 +50,9 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
         MERIENDA
     }
 
-    private val platosDesayuno = MenuPaeCatalog.menus.map {
-        InicioJefaActivity.Plato(id = it.id, nombre = it.nombre, componente = it.componente, imagen = it.imagenRes)
-    }.toMutableList()
-
-    private val platosAlmuerzo = MenuPaeCatalog.menus.map {
-        InicioJefaActivity.Plato(id = it.id, nombre = it.nombre, componente = it.componente, imagen = it.imagenRes)
-    }.toMutableList()
-
-    private val platosMerienda = MenuPaeCatalog.menus.map {
-        InicioJefaActivity.Plato(id = it.id, nombre = it.nombre, componente = it.componente, imagen = it.imagenRes)
-    }.toMutableList()
+    private lateinit var platosDesayuno: MutableList<InicioJefaActivity.Plato>
+    private lateinit var platosAlmuerzo: MutableList<InicioJefaActivity.Plato>
+    private lateinit var platosMerienda: MutableList<InicioJefaActivity.Plato>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,12 +69,29 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
 
         sessionManager = SessionManager(this)
 
-        configurarSemanaSiguiente()
-        configurarEventos()
-        configurarTabsComida()
-        configurarViewPagerCarousel()
-        configurarMenuDisponiblePAE()
-        cargarPlatosDesdeBackend()
+        try {
+            platosDesayuno = MenuPaeCatalog.menus.map {
+                InicioJefaActivity.Plato(id = it.id, nombre = it.nombre, componente = it.componente, imagen = it.imagenRes)
+            }.toMutableList()
+
+            platosAlmuerzo = MenuPaeCatalog.menus.map {
+                InicioJefaActivity.Plato(id = it.id, nombre = it.nombre, componente = it.componente, imagen = it.imagenRes)
+            }.toMutableList()
+
+            platosMerienda = MenuPaeCatalog.menus.map {
+                InicioJefaActivity.Plato(id = it.id, nombre = it.nombre, componente = it.componente, imagen = it.imagenRes)
+            }.toMutableList()
+
+            configurarSemanaSiguiente()
+            configurarEventos()
+            configurarTabsComida()
+            configurarViewPagerCarousel()
+            configurarMenuDisponiblePAE()
+            cargarPlatosDesdeBackend()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Error al abrir planificación: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+        }
 
         // Manejar botón atrás con animación de deslizamiento hacia abajo
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -236,9 +245,13 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
     }
 
     private fun obtenerPlatosActuales(): List<InicioJefaActivity.Plato> {
-        val menusSemana = MenuPaeCatalog.obtenerMenusDeSemana(diaSeleccionadoSemanaSiguiente)
-        return menusSemana.map {
-            InicioJefaActivity.Plato(id = it.id, nombre = it.nombre, componente = it.componente, imagen = it.imagenRes)
+        return try {
+            val menusSemana = MenuPaeCatalog.obtenerMenusDeSemana(diaSeleccionadoSemanaSiguiente)
+            menusSemana.map {
+                InicioJefaActivity.Plato(id = it.id, nombre = it.nombre, componente = it.componente, imagen = it.imagenRes)
+            }
+        } catch (_: Exception) {
+            if (::platosAlmuerzo.isInitialized) platosAlmuerzo.take(5) else emptyList()
         }
     }
 
@@ -369,11 +382,6 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
     }
 
     private fun seleccionarPlatoParaSiguienteSemana(plato: InicioJefaActivity.Plato) {
-        val comidaNombre = when (comidaSeleccionada) {
-            TipoComida.DESAYUNO -> "Desayuno"
-            TipoComida.ALMUERZO -> "Almuerzo"
-            TipoComida.MERIENDA -> "Merienda"
-        }
 
         val cal = diaSeleccionadoSemanaSiguiente
         val diaSemanaAbrev = when (cal.get(Calendar.DAY_OF_WEEK)) {
@@ -404,19 +412,24 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
         }
         val badgeTexto = "$comidaNombre · $diaSemanaAbrev $diaMes $mesAbrev"
 
-        // Guardar plato en sesión y en la nube
-        sessionManager.savePlatoSeleccionado(plato.nombre, plato.id)
+            val formatoDia = try {
+                SimpleDateFormat("EEEE d 'de' MMMM", Locale("es", "CO"))
+            } catch (_: Exception) {
+                SimpleDateFormat("EEEE d 'de' MMMM", Locale.getDefault())
+            }
 
-        lifecycleScope.launch {
+            val fechaTexto = try {
+                formatoDia.format(diaSeleccionadoSemanaSiguiente.time)
+            } catch (_: Exception) {
+                "la fecha seleccionada"
+            }
+
+            // Guardar plato en sesión y en la nube
             try {
-                PreparacionSyncManager.guardarPlatoSeleccionado(
-                    this@PlanificacionSemanalJefaActivity,
-                    plato.nombre,
-                    plato.id,
-                    comidaNombre
-                )
-            } catch (_: Exception) { }
-        }
+                sessionManager.savePlatoSeleccionado(nombrePlato, if (idPlato > 0) idPlato else null)
+            } catch (e: Exception) {
+                android.util.Log.e("PLANIFICACION", "Error en sessionManager: ${e.message}")
+            }
 
         // Mostrar modal personalizado idéntico al diseño
         val viewDialog = layoutInflater.inflate(R.layout.dialog_plato_asignado_exito, null)

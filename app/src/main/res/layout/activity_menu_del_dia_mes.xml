@@ -488,30 +488,6 @@
 
             </LinearLayout>
 
-            <!-- BOTÓN AMARILLO INFERIOR: "SELECCIONA LOS PLATOS DE LA SIGUIENTE SEMANA" -->
-            <LinearLayout
-                android:id="@+id/btnSeleccionarSiguienteSemana"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginBottom="16dp"
-                android:background="@drawable/bg_banner_amarillo_borde"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:paddingHorizontal="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Selecciona los platos de la siguiente semana"
-                    android:textColor="#92400E"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

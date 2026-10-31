@@ -32,6 +32,9 @@ class SugerenciaIaAdapter(
         // Borde de un solo color unificado para todas las tarjetas circulares
         holder.binding.cardPlatoContenedor.strokeColor = Color.parseColor("#1B3317")
 
+        holder.binding.cardPlatoContenedor.setOnClickListener {
+            onItemClick(plato)
+        }
         holder.itemView.setOnClickListener {
             onItemClick(plato)
         }
