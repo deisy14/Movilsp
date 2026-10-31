@@ -48,17 +48,9 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
         MERIENDA
     }
 
-    private val platosDesayuno = MenuPaeCatalog.menus.map {
-        InicioJefaActivity.Plato(id = it.id, nombre = it.nombre, componente = it.componente, imagen = it.imagenRes)
-    }.toMutableList()
-
-    private val platosAlmuerzo = MenuPaeCatalog.menus.map {
-        InicioJefaActivity.Plato(id = it.id, nombre = it.nombre, componente = it.componente, imagen = it.imagenRes)
-    }.toMutableList()
-
-    private val platosMerienda = MenuPaeCatalog.menus.map {
-        InicioJefaActivity.Plato(id = it.id, nombre = it.nombre, componente = it.componente, imagen = it.imagenRes)
-    }.toMutableList()
+    private lateinit var platosDesayuno: MutableList<InicioJefaActivity.Plato>
+    private lateinit var platosAlmuerzo: MutableList<InicioJefaActivity.Plato>
+    private lateinit var platosMerienda: MutableList<InicioJefaActivity.Plato>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,12 +67,29 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
 
         sessionManager = SessionManager(this)
 
-        configurarSemanaSiguiente()
-        configurarEventos()
-        configurarTabsComida()
-        configurarViewPagerCarousel()
-        configurarMenuDisponiblePAE()
-        cargarPlatosDesdeBackend()
+        try {
+            platosDesayuno = MenuPaeCatalog.menus.map {
+                InicioJefaActivity.Plato(id = it.id, nombre = it.nombre, componente = it.componente, imagen = it.imagenRes)
+            }.toMutableList()
+
+            platosAlmuerzo = MenuPaeCatalog.menus.map {
+                InicioJefaActivity.Plato(id = it.id, nombre = it.nombre, componente = it.componente, imagen = it.imagenRes)
+            }.toMutableList()
+
+            platosMerienda = MenuPaeCatalog.menus.map {
+                InicioJefaActivity.Plato(id = it.id, nombre = it.nombre, componente = it.componente, imagen = it.imagenRes)
+            }.toMutableList()
+
+            configurarSemanaSiguiente()
+            configurarEventos()
+            configurarTabsComida()
+            configurarViewPagerCarousel()
+            configurarMenuDisponiblePAE()
+            cargarPlatosDesdeBackend()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Error al abrir planificación: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+        }
 
         // Manejar botón atrás con animación de deslizamiento hacia abajo
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -234,9 +243,13 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
     }
 
     private fun obtenerPlatosActuales(): List<InicioJefaActivity.Plato> {
-        val menusSemana = MenuPaeCatalog.obtenerMenusDeSemana(diaSeleccionadoSemanaSiguiente)
-        return menusSemana.map {
-            InicioJefaActivity.Plato(id = it.id, nombre = it.nombre, componente = it.componente, imagen = it.imagenRes)
+        return try {
+            val menusSemana = MenuPaeCatalog.obtenerMenusDeSemana(diaSeleccionadoSemanaSiguiente)
+            menusSemana.map {
+                InicioJefaActivity.Plato(id = it.id, nombre = it.nombre, componente = it.componente, imagen = it.imagenRes)
+            }
+        } catch (_: Exception) {
+            if (::platosAlmuerzo.isInitialized) platosAlmuerzo.take(5) else emptyList()
         }
     }
 
@@ -367,42 +380,74 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
     }
 
     private fun seleccionarPlatoParaSiguienteSemana(plato: InicioJefaActivity.Plato) {
-        val comidaNombre = when (comidaSeleccionada) {
-            TipoComida.DESAYUNO -> "Desayuno"
-            TipoComida.ALMUERZO -> "Almuerzo"
-            TipoComida.MERIENDA -> "Merienda"
-        }
 
-        val formatoDia = SimpleDateFormat("EEEE d 'de' MMMM", Locale.forLanguageTag("es-CO"))
-        val fechaTexto = formatoDia.format(diaSeleccionadoSemanaSiguiente.time)
-
-        // Guardar plato en sesión y en la nube
-        sessionManager.savePlatoSeleccionado(plato.nombre, plato.id)
-
-        lifecycleScope.launch {
-            try {
-                PreparacionSyncManager.guardarPlatoSeleccionado(
-                    this@PlanificacionSemanalJefaActivity,
-                    plato.nombre,
-                    plato.id,
-                    comidaNombre
-                )
-            } catch (_: Exception) { }
-        }
-
-        androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("¡Plato Programado con Éxito!")
-            .setMessage("Has seleccionado '${plato.nombre}' para el $comidaNombre del $fechaTexto (Siguiente semana).\n\n¿Deseas iniciar o configurar la preparación ahora?")
-            .setPositiveButton("Configurar equipo") { _, _ ->
-                val intent = Intent(this, IniciarPreparacionActivity::class.java).apply {
-                    putExtra("nombre_menu", plato.nombre)
-                    putExtra("id_plato", plato.id ?: -1)
-                    putExtra("jornada", comidaNombre)
-                }
-                startActivity(intent)
+        try {
+            val comidaNombre = when (comidaSeleccionada) {
+                TipoComida.DESAYUNO -> "Desayuno"
+                TipoComida.ALMUERZO -> "Almuerzo"
+                TipoComida.MERIENDA -> "Merienda"
             }
-            .setNegativeButton("Continuar planificando", null)
-            .show()
+
+            val nombrePlato = plato.nombre ?: "Plato seleccionado"
+            val idPlato = plato.id ?: -1
+
+            val formatoDia = try {
+                SimpleDateFormat("EEEE d 'de' MMMM", Locale("es", "CO"))
+            } catch (_: Exception) {
+                SimpleDateFormat("EEEE d 'de' MMMM", Locale.getDefault())
+            }
+
+            val fechaTexto = try {
+                formatoDia.format(diaSeleccionadoSemanaSiguiente.time)
+            } catch (_: Exception) {
+                "la fecha seleccionada"
+            }
+
+            // Guardar plato en sesión y en la nube
+            try {
+                sessionManager.savePlatoSeleccionado(nombrePlato, if (idPlato > 0) idPlato else null)
+            } catch (e: Exception) {
+                android.util.Log.e("PLANIFICACION", "Error en sessionManager: ${e.message}")
+            }
+
+            lifecycleScope.launch {
+                try {
+                    PreparacionSyncManager.guardarPlatoSeleccionado(
+                        this@PlanificacionSemanalJefaActivity,
+                        nombrePlato,
+                        idPlato,
+                        comidaNombre
+                    )
+                } catch (e: Exception) {
+                    android.util.Log.e("PLANIFICACION", "Error en PreparacionSyncManager: ${e.message}")
+                }
+            }
+
+            if (!isFinishing && !isDestroyed) {
+                com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                    .setTitle("¡Plato Programado con Éxito!")
+                    .setMessage("Has seleccionado '$nombrePlato' para el $comidaNombre del $fechaTexto (Siguiente semana).\n\n¿Deseas iniciar o configurar la preparación ahora?")
+                    .setPositiveButton("Configurar equipo") { _, _ ->
+                        try {
+                            val intent = Intent(this, IniciarPreparacionActivity::class.java).apply {
+                                putExtra("nombre_menu", nombrePlato)
+                                putExtra("id_plato", idPlato)
+                                putExtra("jornada", comidaNombre)
+                            }
+                            startActivity(intent)
+                        } catch (e: Exception) {
+                            Toast.makeText(this, "Plato programado: $nombrePlato", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    .setNegativeButton("Continuar planificando", null)
+                    .show()
+            } else {
+                Toast.makeText(this, "Plato '$nombrePlato' programado para $comidaNombre", Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Plato seleccionado: ${plato.nombre}", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun cargarPlatosDesdeBackend() {

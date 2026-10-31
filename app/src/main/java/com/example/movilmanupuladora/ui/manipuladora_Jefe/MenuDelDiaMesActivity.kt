@@ -77,13 +77,6 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
             generarGridMes()
         }
 
-        // Botón amarillo inferior que abre la Pantalla 3 deslizándola hacia arriba
-        binding.btnSeleccionarSiguienteSemana.setOnClickListener {
-            val intent = Intent(this, PlanificacionSemanalJefaActivity::class.java)
-            startActivity(intent)
-            overridePendingTransition(R.anim.slide_in_bottom, R.anim.stay)
-        }
-
         // Clics en el icono de ojo o en la tarjeta para ver detalle del plato
         binding.btnVerDetalleDesayuno.setOnClickListener { platoActualDesayuno?.let { mostrarModalDetalle(it) } }
         binding.cardDetalleDesayuno.setOnClickListener { platoActualDesayuno?.let { mostrarModalDetalle(it) } }
