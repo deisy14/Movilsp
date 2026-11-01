@@ -1,5 +1,7 @@
 package com.example.movilmanupuladora.data.api
 
+import com.example.movilmanupuladora.SiraeApp
+import com.example.movilmanupuladora.utils.SessionManager
 import java.util.concurrent.TimeUnit
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -9,7 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
 
- private const val BASE_URL = "http://10.0.2.2:8000/api/"
+    private const val BASE_URL = "https://backend-sirae-pyim.onrender.com/api/"
 
     // Variable en memoria para autorización con Bearer JWT
     var authToken: String? = null
@@ -26,17 +28,23 @@ object RetrofitClient {
         val isAuthEndpoint = request.url.encodedPath.contains("auth/") ||
                 (request.url.encodedPath.contains("usuarios") && request.method == "POST")
 
-        if (!isAuthEndpoint && !authToken.isNullOrEmpty()) {
-            requestBuilder.header("Authorization", "Bearer $authToken")
+        if (!isAuthEndpoint) {
+            val token = authToken ?: try {
+                SessionManager(SiraeApp.instance).fetchAuthToken()
+            } catch (_: Throwable) { null }
+
+            if (!token.isNullOrEmpty()) {
+                requestBuilder.header("Authorization", "Bearer $token")
+            }
         }
 
         chain.proceed(requestBuilder.build())
     }
 
     private val client = OkHttpClient.Builder()
-        .connectTimeout(3, TimeUnit.SECONDS)
-        .readTimeout(10, TimeUnit.SECONDS)
-        .writeTimeout(10, TimeUnit.SECONDS)
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
         .addInterceptor(logging)
         .addInterceptor(authInterceptor)
         .build()

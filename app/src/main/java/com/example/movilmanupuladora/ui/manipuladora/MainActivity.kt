@@ -503,20 +503,17 @@ class MainActivity : AppCompatActivity() {
                     val existeRegistro = (regPrimaria != null || regSecundaria != null || registrosFecha.isNotEmpty())
 
                     // Solo actualizar la caché si el servidor devolvió datos reales (> 0) o si no hay datos locales previos
-                    val guardadoLocal = AsistenciaManager.obtenerTotal(this@MainActivity)
-                    if (totalEstudiantes > 0 || guardadoLocal == 0) {
-                        if (totalEstudiantes > 0) {
-                            AsistenciaManager.guardarPrimaria(this@MainActivity, totalPrimaria)
-                            AsistenciaManager.guardarSecundaria(this@MainActivity, totalSecundaria)
-                            AsistenciaManager.guardarManana(this@MainActivity, totalEstudiantes)
-                        }
+                    if (totalEstudiantes > 0) {
+                        AsistenciaManager.guardarPrimaria(this@MainActivity, totalPrimaria)
+                        AsistenciaManager.guardarSecundaria(this@MainActivity, totalSecundaria)
+                        AsistenciaManager.guardarManana(this@MainActivity, totalEstudiantes)
 
                         withContext(Dispatchers.Main) {
                             actualizarVistaAsistencia(
                                 primaria = totalPrimaria,
                                 secundaria = totalSecundaria,
                                 total = totalEstudiantes,
-                                hayRegistro = (totalEstudiantes > 0)
+                                hayRegistro = true
                             )
                         }
                     } else {
@@ -544,6 +541,9 @@ class MainActivity : AppCompatActivity() {
         var total = p + s
         if (total == 0) {
             total = AsistenciaManager.obtenerManana(this)
+        }
+        if (total == 0) {
+            total = AsistenciaManager.obtenerTarde(this)
         }
         actualizarVistaAsistencia(p, s, total, hayRegistro = (total > 0))
     }

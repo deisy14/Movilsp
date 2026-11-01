@@ -430,16 +430,13 @@ class AsistenciaJefaActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                // 2. Sincronizar en la nube en Turnos de inmediato
-                CoroutineScope(Dispatchers.IO).launch {
-                    try {
-                        PreparacionSyncManager.guardarAsistenciaEnNube(
-                            primaria = totalPrimaria,
-                            secundaria = totalSecundaria,
-                            total = total
-                        )
-                    } catch (_: Exception) { }
-                }
+                // 2. Sincronizar en la nube en Turnos de inmediato con el token de sesión
+                PreparacionSyncManager.guardarAsistenciaEnNube(
+                    context = applicationContext,
+                    primaria = totalPrimaria,
+                    secundaria = totalSecundaria,
+                    total = total
+                )
 
                 // 3. Persistir en la tabla de asistencia diaria del backend
                 try {
@@ -483,7 +480,9 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                         if (jornadaActual == "MANANA") idAsistenciaSecundariaManana = resS.body()!!.idAsistencia
                         else idAsistenciaSecundariaTarde = resS.body()!!.idAsistencia
                     }
-                } catch (_: Exception) { }
+                } catch (e: Exception) {
+                    android.util.Log.e("AsistenciaJefa", "Error registrando asistencia en backend: ${e.message}")
+                }
 
                 dialog.dismiss()
                 Toast.makeText(
