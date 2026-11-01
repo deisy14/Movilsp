@@ -23,7 +23,7 @@
         <activity
             android:name=".ui.auth.LoginActivity"
             android:exported="true"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -127,6 +127,10 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name=".ui.manipuladora_Jefe.HistorialNotificacionesJefaActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".ui.manipuladora_Jefe.HistorialPreparacionesActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
@@ -189,6 +193,10 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.manipuladora_Jefe.SugerenciaIaActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.manipuladora_Jefe.RedactarAvisoJefaActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity

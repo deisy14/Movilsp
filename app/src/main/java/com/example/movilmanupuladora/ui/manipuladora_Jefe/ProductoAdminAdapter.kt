@@ -1,10 +1,12 @@
 package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.databinding.ItemProductoAdminBinding
+import com.example.movilmanupuladora.ui.manipuladora.AvisosActivity
 
 class ProductoAdminAdapter(
     private var listaOriginal: List<ProductoAdmin>,
@@ -35,6 +37,14 @@ class ProductoAdminAdapter(
 
             // Dejar el icono general de insumo para todos mientras se configuran las URLs de las fotos reales
             imgProductoAdmin.setImageResource(R.drawable.ic_food)
+
+            btnAlertaProductoAdmin.setOnClickListener {
+                val context = holder.itemView.context
+                val intent = Intent(context, RedactarAvisoJefaActivity::class.java).apply {
+                    putExtra("producto_nombre", item.nombre)
+                }
+                context.startActivity(intent)
+            }
 
             if (modoSoloLectura || onEditarClick == null) {
                 btnEditarProductoAdmin.visibility = android.view.View.GONE

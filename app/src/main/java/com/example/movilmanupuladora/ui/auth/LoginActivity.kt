@@ -63,6 +63,23 @@ class LoginActivity : AppCompatActivity() {
 
         sessionManager = SessionManager(this)
 
+        // Hacer scroll automático al enfocar campos de texto cuando sale el teclado
+        binding.txtCorreo.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                binding.scrollLogin.postDelayed({
+                    binding.scrollLogin.smoothScrollTo(0, binding.txtCorreo.top)
+                }, 150)
+            }
+        }
+
+        binding.txtPassword.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                binding.scrollLogin.postDelayed({
+                    binding.scrollLogin.smoothScrollTo(0, binding.txtPassword.top)
+                }, 150)
+            }
+        }
+
         // Recuperar el token guardado.
         sessionManager.fetchAuthToken()?.let { savedToken ->
             RetrofitClient.authToken = savedToken

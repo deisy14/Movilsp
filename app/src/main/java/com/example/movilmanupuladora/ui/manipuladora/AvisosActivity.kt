@@ -283,54 +283,14 @@ class AvisosActivity : AppCompatActivity() {
     }
 
     private fun cargarNotificaciones() {
-        lifecycleScope.launch {
-            val contenedor = binding.contenedorAvisos
+        val contenedor = binding.contenedorAvisos
+        contenedor.removeAllViews()
+        configurarFormulario(contenedor)
 
-            contenedor.removeAllViews()
-            configurarFormulario(contenedor)
-
-            val indicador = crearTexto(
-                "Consultando avisos recibidos...",
-                13f,
-                Color.GRAY
-            )
-
-            contenedor.addView(indicador)
-
-            try {
-                val respuesta =
-                    RetrofitClient.apiService.obtenerNotificaciones()
-
-                contenedor.removeView(indicador)
-
-                if (respuesta.isSuccessful) {
-                    val lista = respuesta.body().orEmpty()
-
-                    mostrarNotificaciones(
-                        lista,
-                        if (lista.isEmpty()) {
-                            "Todavía no tienes avisos recibidos."
-                        } else {
-                            null
-                        }
-                    )
-                } else {
-                    mostrarNotificaciones(
-                        emptyList(),
-                        "No se pudieron consultar los avisos. " +
-                                "Código HTTP: ${respuesta.code()}."
-                    )
-                }
-            } catch (e: Exception) {
-                contenedor.removeView(indicador)
-
-                mostrarNotificaciones(
-                    emptyList(),
-                    "No fue posible conectar con el servidor. " +
-                            "Revisa tu conexión e inténtalo de nuevo."
-                )
-            }
-        }
+        mostrarNotificaciones(
+            emptyList(),
+            "Todavía no tienes avisos recibidos."
+        )
     }
 
     private fun mostrarNotificaciones(
