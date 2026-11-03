@@ -71,11 +71,11 @@ object PreparacionSyncManager {
 
             // 1. Plato seleccionado más reciente en la nube
             val turnoPlatoMasReciente = turnos
-                .filter { it.nombreTurno?.startsWith(PREFIX_PLATO) == true }
-                .maxByOrNull { it.idTurno ?: 0 }
+                .filter { it.obtenerNombreReal()?.startsWith(PREFIX_PLATO) == true }
+                .maxByOrNull { it.obtenerIdReal() ?: 0 }
 
             if (turnoPlatoMasReciente != null) {
-                val data = turnoPlatoMasReciente.nombreTurno!!.removePrefix(PREFIX_PLATO).split("#")
+                val data = turnoPlatoMasReciente.obtenerNombreReal()!!.removePrefix(PREFIX_PLATO).split("#")
                 if (data.isNotEmpty()) {
                     var platoNombre = data[0].trim()
                     val jornada = if (data.size > 1 && data[1].isNotBlank()) data[1].trim() else "Mañana"
@@ -105,22 +105,22 @@ object PreparacionSyncManager {
             }
 
             // 2. Componentes asignados: agrupar por UID y tomar el registro MÁS RECIENTE de cada manipuladora
-            val turnosComp = turnos.filter { it.nombreTurno?.startsWith(PREFIX_COMP) == true }
+            val turnosComp = turnos.filter { it.obtenerNombreReal()?.startsWith(PREFIX_COMP) == true }
             val turnosPorUsuario = mutableMapOf<Int, Turno>()
 
             for (t in turnosComp) {
-                val parts = t.nombreTurno!!.removePrefix(PREFIX_COMP).split(":")
+                val parts = t.obtenerNombreReal()!!.removePrefix(PREFIX_COMP).split(":")
                 if (parts.size >= 3) {
                     val uid = parts[0].trim().toIntOrNull() ?: continue
                     val actual = turnosPorUsuario[uid]
-                    if (actual == null || (t.idTurno ?: 0) > (actual.idTurno ?: 0)) {
+                    if (actual == null || (t.obtenerIdReal() ?: 0) > (actual.obtenerIdReal() ?: 0)) {
                         turnosPorUsuario[uid] = t
                     }
                 }
             }
 
             for ((uid, t) in turnosPorUsuario) {
-                val parts = t.nombreTurno!!.removePrefix(PREFIX_COMP).split(":")
+                val parts = t.obtenerNombreReal()!!.removePrefix(PREFIX_COMP).split(":")
                 if (parts.size >= 3) {
                     val p1 = parts[1].trim()
                     val p2 = parts.subList(2, parts.size).joinToString(":").trim()
@@ -193,20 +193,25 @@ object PreparacionSyncManager {
 
             // 3. Asistencia de estudiantes compartida en tiempo real
             val turnoAsist = turnos
-                .filter { it.nombreTurno?.startsWith(PREFIX_ASIST) == true }
-                .maxByOrNull { it.idTurno ?: 0 }
+                .filter { it.obtenerNombreReal()?.startsWith(PREFIX_ASIST) == true }
+                .maxByOrNull { it.obtenerIdReal() ?: 0 }
 
             if (turnoAsist != null) {
-                val parts = turnoAsist.nombreTurno!!.removePrefix(PREFIX_ASIST).split(":")
+                val parts = turnoAsist.obtenerNombreReal()!!.removePrefix(PREFIX_ASIST).split(":")
                 if (parts.size >= 3) {
                     val prim = parts[0].trim().toIntOrNull() ?: 0
                     val sec = parts[1].trim().toIntOrNull() ?: 0
                     val tot = parts[2].trim().toIntOrNull() ?: (prim + sec)
+                    val jornada = if (parts.size >= 5) parts[4].trim() else "MANANA"
                     if (tot > 0) {
                         AsistenciaManager.guardarPrimaria(context, prim)
                         AsistenciaManager.guardarSecundaria(context, sec)
-                        AsistenciaManager.guardarManana(context, tot)
-                        Log.d(TAG, "Asistencia sincronizada desde Turnos: Primaria=$prim, Secundaria=$sec, Total=$tot")
+                        if (jornada.contains("tarde", ignoreCase = true)) {
+                            AsistenciaManager.guardarTarde(context, tot)
+                        } else {
+                            AsistenciaManager.guardarManana(context, tot)
+                        }
+                        Log.d(TAG, "Asistencia sincronizada desde Turnos: Primaria=$prim, Secundaria=$sec, Total=$tot ($jornada)")
                     }
                 }
             }
@@ -289,9 +294,10 @@ object PreparacionSyncManager {
 
                 // 1. Guardar o actualizar plato
                 val tagPlato = "$PREFIX_PLATO${nombreMenu.trim().take(30)}#${jornada.trim()}#${idPlato ?: -1}"
-                val existentePlato = todosTurnos.firstOrNull { it.nombreTurno?.startsWith(PREFIX_PLATO) == true }
-                if (existentePlato?.idTurno != null) {
-                    RetrofitClient.apiService.patchTurno(existentePlato.idTurno, mapOf("nombre_turno" to tagPlato))
+                val existentePlato = todosTurnos.firstOrNull { it.obtenerNombreReal()?.startsWith(PREFIX_PLATO) == true }
+                val idP = existentePlato?.obtenerIdReal()
+                if (idP != null) {
+                    RetrofitClient.apiService.patchTurno(idP, mapOf("nombre_turno" to tagPlato))
                 } else {
                     RetrofitClient.apiService.crearTurno(Turno(nombreTurno = tagPlato))
                 }
@@ -300,11 +306,12 @@ object PreparacionSyncManager {
                 for (a in asignaciones) {
                     if (a.idUsuario <= 0) continue
                     val prefixUser = "$PREFIX_COMP${a.idUsuario}:"
-                    val existenteComp = todosTurnos.firstOrNull { it.nombreTurno?.startsWith(prefixUser) == true }
+                    val existenteComp = todosTurnos.firstOrNull { it.obtenerNombreReal()?.startsWith(prefixUser) == true }
+                    val idC = existenteComp?.obtenerIdReal()
 
                     if (a.componente.isNullOrBlank()) {
-                        if (existenteComp?.idTurno != null) {
-                            RetrofitClient.apiService.eliminarTurno(existenteComp.idTurno)
+                        if (idC != null) {
+                            RetrofitClient.apiService.eliminarTurno(idC)
                         }
                     } else {
                         val estadoCode = when {
@@ -315,8 +322,8 @@ object PreparacionSyncManager {
                         val compLimpio = a.componente.trim().take(34)
                         val tagComp = "$PREFIX_COMP${a.idUsuario}:$estadoCode:$compLimpio"
 
-                        if (existenteComp?.idTurno != null) {
-                            RetrofitClient.apiService.patchTurno(existenteComp.idTurno, mapOf("nombre_turno" to tagComp))
+                        if (idC != null) {
+                            RetrofitClient.apiService.patchTurno(idC, mapOf("nombre_turno" to tagComp))
                         } else {
                             RetrofitClient.apiService.crearTurno(Turno(nombreTurno = tagComp))
                         }
@@ -340,26 +347,29 @@ object PreparacionSyncManager {
         context: Context,
         primaria: Int,
         secundaria: Int,
-        total: Int
+        total: Int,
+        jornada: String = "MANANA"
     ): Boolean = withContext(Dispatchers.IO) {
         try {
             SessionManager.getToken(context)
             val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-            val tag = "$PREFIX_ASIST$primaria:$secundaria:$total:$fechaHoy"
+            val tag = "$PREFIX_ASIST$primaria:$secundaria:$total:$fechaHoy:$jornada"
             val res = RetrofitClient.apiService.obtenerTurnos()
             if (res.isSuccessful && res.body() != null) {
-                val turnosAsist = res.body()!!.filter { it.nombreTurno?.startsWith(PREFIX_ASIST) == true }
-                val maxTurno = turnosAsist.maxByOrNull { it.idTurno ?: 0 }
-                if (maxTurno?.idTurno != null) {
-                    RetrofitClient.apiService.patchTurno(maxTurno.idTurno, mapOf("nombre_turno" to tag))
+                val turnosAsist = res.body()!!.filter { it.obtenerNombreReal()?.startsWith(PREFIX_ASIST) == true }
+                val maxTurno = turnosAsist.maxByOrNull { it.obtenerIdReal() ?: 0 }
+                val maxId = maxTurno?.obtenerIdReal()
+                if (maxId != null) {
+                    RetrofitClient.apiService.patchTurno(maxId, mapOf("nombre_turno" to tag))
                 } else {
                     RetrofitClient.apiService.crearTurno(Turno(nombreTurno = tag))
                 }
                 // Sincronizar también cualquier otro turno duplicado para consistencia total
                 for (otro in turnosAsist) {
-                    if (otro.idTurno != null && otro.idTurno != maxTurno?.idTurno) {
+                    val otroId = otro.obtenerIdReal()
+                    if (otroId != null && otroId != maxId) {
                         try {
-                            RetrofitClient.apiService.patchTurno(otro.idTurno, mapOf("nombre_turno" to tag))
+                            RetrofitClient.apiService.patchTurno(otroId, mapOf("nombre_turno" to tag))
                         } catch (_: Exception) { }
                     }
                 }
@@ -400,9 +410,10 @@ object PreparacionSyncManager {
             val tag = "$PREFIX_PLATO${nombrePlato.trim().take(30)}#${jornada.trim()}#${idPlato ?: -1}"
             val res = RetrofitClient.apiService.obtenerTurnos()
             if (res.isSuccessful && res.body() != null) {
-                val existente = res.body()!!.firstOrNull { it.nombreTurno?.startsWith(PREFIX_PLATO) == true }
-                if (existente?.idTurno != null) {
-                    RetrofitClient.apiService.patchTurno(existente.idTurno, mapOf("nombre_turno" to tag))
+                val existente = res.body()!!.firstOrNull { it.obtenerNombreReal()?.startsWith(PREFIX_PLATO) == true }
+                val idT = existente?.obtenerIdReal()
+                if (idT != null) {
+                    RetrofitClient.apiService.patchTurno(idT, mapOf("nombre_turno" to tag))
                 } else {
                     RetrofitClient.apiService.crearTurno(Turno(nombreTurno = tag))
                 }
@@ -430,11 +441,12 @@ object PreparacionSyncManager {
             val res = RetrofitClient.apiService.obtenerTurnos()
             if (res.isSuccessful && res.body() != null) {
                 val prefixUser = "$PREFIX_COMP$idUsuario:"
-                val existente = res.body()!!.firstOrNull { it.nombreTurno?.startsWith(prefixUser) == true }
+                val existente = res.body()!!.firstOrNull { it.obtenerNombreReal()?.startsWith(prefixUser) == true }
+                val idT = existente?.obtenerIdReal()
 
                 if (componente.isNullOrBlank()) {
-                    if (existente?.idTurno != null) {
-                        RetrofitClient.apiService.eliminarTurno(existente.idTurno)
+                    if (idT != null) {
+                        RetrofitClient.apiService.eliminarTurno(idT)
                         Log.d(TAG, "Asignación eliminada de la nube para uid=$idUsuario")
                     }
                     return@withContext true
@@ -449,8 +461,8 @@ object PreparacionSyncManager {
                 val compLimpio = componente.trim().take(34)
                 val tag = "$PREFIX_COMP$idUsuario:$estadoCode:$compLimpio"
 
-                if (existente?.idTurno != null) {
-                    RetrofitClient.apiService.patchTurno(existente.idTurno, mapOf("nombre_turno" to tag))
+                if (idT != null) {
+                    RetrofitClient.apiService.patchTurno(idT, mapOf("nombre_turno" to tag))
                 } else {
                     RetrofitClient.apiService.crearTurno(Turno(nombreTurno = tag))
                 }

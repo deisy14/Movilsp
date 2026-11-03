@@ -382,6 +382,11 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
     }
 
     private fun seleccionarPlatoParaSiguienteSemana(plato: InicioJefaActivity.Plato) {
+        val comidaNombre = when (comidaSeleccionada) {
+            TipoComida.DESAYUNO -> "Desayuno"
+            TipoComida.ALMUERZO -> "Almuerzo"
+            TipoComida.MERIENDA -> "Merienda"
+        }
 
         val cal = diaSeleccionadoSemanaSiguiente
         val diaSemanaAbrev = when (cal.get(Calendar.DAY_OF_WEEK)) {
@@ -412,24 +417,38 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
         }
         val badgeTexto = "$comidaNombre · $diaSemanaAbrev $diaMes $mesAbrev"
 
-            val formatoDia = try {
-                SimpleDateFormat("EEEE d 'de' MMMM", Locale("es", "CO"))
-            } catch (_: Exception) {
-                SimpleDateFormat("EEEE d 'de' MMMM", Locale.getDefault())
-            }
+        val formatoDia = try {
+            SimpleDateFormat("EEEE d 'de' MMMM", Locale("es", "CO"))
+        } catch (_: Exception) {
+            SimpleDateFormat("EEEE d 'de' MMMM", Locale.getDefault())
+        }
 
-            val fechaTexto = try {
-                formatoDia.format(diaSeleccionadoSemanaSiguiente.time)
-            } catch (_: Exception) {
-                "la fecha seleccionada"
-            }
+        val fechaTexto = try {
+            formatoDia.format(diaSeleccionadoSemanaSiguiente.time)
+        } catch (_: Exception) {
+            "la fecha seleccionada"
+        }
 
-            // Guardar plato en sesión y en la nube
+        val nombrePlato = plato.nombre
+        val idPlato = plato.id ?: 0
+
+        // Guardar plato en sesión y en la nube
+        try {
+            sessionManager.savePlatoSeleccionado(nombrePlato, if (idPlato > 0) idPlato else null)
+        } catch (e: Exception) {
+            android.util.Log.e("PLANIFICACION", "Error en sessionManager: ${e.message}")
+        }
+
+        lifecycleScope.launch {
             try {
-                sessionManager.savePlatoSeleccionado(nombrePlato, if (idPlato > 0) idPlato else null)
-            } catch (e: Exception) {
-                android.util.Log.e("PLANIFICACION", "Error en sessionManager: ${e.message}")
-            }
+                PreparacionSyncManager.guardarPlatoSeleccionado(
+                    this@PlanificacionSemanalJefaActivity,
+                    nombrePlato,
+                    if (idPlato > 0) idPlato else null,
+                    comidaNombre
+                )
+            } catch (_: Exception) { }
+        }
 
         // Mostrar modal personalizado idéntico al diseño
         val viewDialog = layoutInflater.inflate(R.layout.dialog_plato_asignado_exito, null)
