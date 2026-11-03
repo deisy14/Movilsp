@@ -23,10 +23,10 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingHorizontal="20dp"
-            android:paddingTop="22dp"
-            android:paddingBottom="30dp">
+            android:paddingTop="20dp"
+            android:paddingBottom="28dp">
 
-            <!-- ENCABEZADO -->
+            <!-- ENCABEZADO: Botón Volver Circular + Título y Fecha -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -35,18 +35,19 @@
 
                 <ImageButton
                     android:id="@+id/btnVolver"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="@android:color/transparent"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_boton_volver_circular"
                     android:contentDescription="Volver"
-                    android:padding="8dp"
+                    android:elevation="1dp"
+                    android:padding="10dp"
                     android:src="@drawable/ic_arrow_back"
                     app:tint="#1B3317" />
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="14dp"
                     android:layout_weight="1"
                     android:orientation="vertical">
 
@@ -54,9 +55,9 @@
                         android:id="@+id/txtTituloAsistencia"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Asistencia por Grados"
+                        android:text="Registro de asistencia"
                         android:textColor="#1B3317"
-                        android:textSize="20sp"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -64,42 +65,22 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Hoy es lunes, 29 de septiembre"
-                        android:textColor="#3D5C37"
-                        android:textSize="12sp" />
-
+                        android:text="Viernes, 31 de octubre de 2026"
+                        android:textColor="#64748B"
+                        android:textSize="13sp" />
                 </LinearLayout>
 
             </LinearLayout>
 
-            <!-- DESCRIPCIÓN PAE GRAMAJE -->
-            <TextView
-                android:id="@+id/txtDescripcionAsistencia"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Registra la asistencia separada por grados (Primaria vs. Secundaria) para calcular el gramaje y racionar la cocción exacta."
-                android:textColor="#64748B"
-                android:textSize="13sp" />
-
-            <!-- JORNADA -->
-            <TextView
-                android:id="@+id/txtTituloJornada"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="Selecciona la jornada"
-                android:textColor="#1B3317"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
+            <!-- SELECTOR DE JORNADAS (MAÑANA / TARDE) -->
             <LinearLayout
                 android:id="@+id/contenedorJornadas"
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:layout_marginTop="10dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="22dp"
                 android:orientation="horizontal">
 
+                <!-- Botón Mañana -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnManana"
                     android:layout_width="0dp"
@@ -107,12 +88,19 @@
                     android:layout_marginEnd="6dp"
                     android:layout_weight="1"
                     android:backgroundTint="#F4B41F"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
                     android:text="Mañana"
                     android:textColor="#1B3317"
-                    android:textSize="13sp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
-                    app:cornerRadius="12dp" />
+                    app:cornerRadius="24dp"
+                    app:icon="@drawable/ic_sun"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp"
+                    app:iconTint="#1B3317" />
 
+                <!-- Botón Tarde -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnTarde"
                     style="@style/Widget.Material3.Button.OutlinedButton"
@@ -120,164 +108,76 @@
                     android:layout_height="match_parent"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
+                    android:backgroundTint="#FFFFFF"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
                     android:text="Tarde"
                     android:textColor="#1B3317"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="12dp"
-                    app:strokeColor="#C5DFC3" />
+                    android:textSize="14sp"
+                    app:cornerRadius="24dp"
+                    app:icon="@drawable/ic_moon"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp"
+                    app:iconTint="#1B3317"
+                    app:strokeColor="#CBD5E1"
+                    app:strokeWidth="1dp" />
 
             </LinearLayout>
 
-            <!-- TARJETA DE ASISTENCIA Y GRAMAJE -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardAsistencia"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="3dp"
-                app:strokeColor="#E2E8F0"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="18dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="42dp"
-                            android:layout_height="42dp"
-                            android:background="@drawable/bg_pill_yellow"
-                            android:contentDescription="Asistencia"
-                            android:padding="10dp"
-                            android:src="@drawable/ic_people"
-                            app:tint="#1B3317" />
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/txtTituloCantidad"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="TOTAL ASISTENCIA REGISTRADA"
-                                android:textColor="#7A5500"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/txtCantidadAsistencia"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:text="0 estudiantes"
-                                android:textColor="#1B3317"
-                                android:textSize="22sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                    <!-- DESGROSE POR GRADO (PRIMARIA VS SECUNDARIA) -->
-                    <TextView
-                        android:id="@+id/txtDesglosePrimariaSecundaria"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:background="@drawable/bg_tag_plato"
-                        android:paddingHorizontal="10dp"
-                        android:paddingVertical="5dp"
-                        android:text="Primaria (1°-5°): 0 | Secundaria (6°-11°): 0"
-                        android:textColor="#1B3317"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-
-                    <!-- RESULTADO CÁLCULO TOTAL GRAMAJE -->
-                    <TextView
-                        android:id="@+id/txtGramajeTotalCalculado"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:background="@drawable/bg_pill_yellow"
-                        android:paddingHorizontal="10dp"
-                        android:paddingVertical="5dp"
-                        android:text="Requerimiento Total Gramaje: 0.0 kg"
-                        android:textColor="#7A5500"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-
-                    <!-- JORNADA ACTUAL Y ESTADO -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/txtJornadaActual"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Jornada: Mañana"
-                            android:textColor="#64748B"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:id="@+id/txtEstadoAsistencia"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/bg_pill_green"
-                            android:paddingHorizontal="10dp"
-                            android:paddingVertical="4dp"
-                            android:text="Pendiente"
-                            android:textColor="#2A5226"
-                            android:textSize="11sp"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
-
-                    <!-- BOTÓN REGISTRAR -->
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnRegistrarAsistencia"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:layout_marginTop="16dp"
-                        android:backgroundTint="#F4B41F"
-                        android:text="Registrar asistencia por grados"
-                        android:textColor="#1B3317"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        app:cornerRadius="12dp" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- INFORMACIÓN IA Y PAE -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/infoIA"
+            <!-- BANNER INFORMATIVO -->
+            <LinearLayout
+                android:id="@+id/bannerInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                app:cardBackgroundColor="#E2EFE0"
-                app:cardCornerRadius="14dp"
+                android:background="@drawable/bg_banner_info_asistencia"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="12dp">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:contentDescription="Info"
+                    android:src="@drawable/ic_info"
+                    app:tint="#1B3317" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:lineSpacingExtra="2dp"
+                    android:text="Selecciona la jornada y el nivel educativo para registrar la asistencia."
+                    android:textColor="#1B3317"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+            <!-- SECCIÓN: REGISTRO POR NIVEL -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Registro por nivel"
+                android:textColor="#1B3317"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <!-- TARJETA PRIMARIA -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardNivelPrimaria"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="18dp"
                 app:cardElevation="1dp"
-                app:strokeColor="#C5DFC3"
+                app:strokeColor="#F1F5F9"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -285,27 +185,407 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="13dp">
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="14dp">
 
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:contentDescription="Información"
-                        android:src="@drawable/ic_info"
-                        app:tint="#1B3317" />
+                    <FrameLayout
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_avatar_asistencia">
 
-                    <TextView
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="Primaria"
+                            android:src="@drawable/ic_book"
+                            app:tint="#1B3317" />
+                    </FrameLayout>
+
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
+                        android:layout_marginStart="14dp"
                         android:layout_weight="1"
-                        android:text="El gramaje PAE se diferencia automáticamente según los requerimientos nutricionales de primaria vs. secundaria."
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Primaria"
+                            android:textColor="#1B3317"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/txtSubtituloPrimaria"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Registro de asistencia"
+                            android:textColor="#64748B"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/txtBadgePrimaria"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_badge_grados"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="4dp"
+                        android:text="5 grados"
                         android:textColor="#1B3317"
-                        android:textSize="12sp" />
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="8dp"
+                        android:contentDescription="Abrir"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="#64748B" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- TARJETA SECUNDARIA -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardNivelSecundaria"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="1dp"
+                app:strokeColor="#F1F5F9"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="14dp">
+
+                    <FrameLayout
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_avatar_asistencia">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="Secundaria"
+                            android:src="@drawable/ic_school"
+                            app:tint="#1B3317" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Secundaria"
+                            android:textColor="#1B3317"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/txtSubtituloSecundaria"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Registro de asistencia"
+                            android:textColor="#64748B"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/txtBadgeSecundaria"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_badge_grados"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="4dp"
+                        android:text="6 grados"
+                        android:textColor="#1B3317"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="8dp"
+                        android:contentDescription="Abrir"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="#64748B" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- SECCIÓN: RESUMEN DE ASISTENCIA -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Resumen de asistencia"
+                android:textColor="#1B3317"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <!-- TABLA DE RESUMEN DE ASISTENCIA -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="1dp"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Fila de Encabezados (MAÑANA / TARDE) -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="16dp"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="10dp">
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="1.2" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_pill_yellow"
+                            android:gravity="center"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="6dp"
+                            android:text="MAÑANA"
+                            android:textColor="#1B3317"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <View
+                            android:layout_width="10dp"
+                            android:layout_height="1dp" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_pill_yellow"
+                            android:gravity="center"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="6dp"
+                            android:text="TARDE"
+                            android:textColor="#1B3317"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Fila Primaria -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="16dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.2"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:contentDescription="Primaria"
+                                android:src="@drawable/ic_book"
+                                app:tint="#1B3317" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:text="Primaria"
+                                android:textColor="#1B3317"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvResumenPrimariaManana"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="0"
+                            android:textColor="#1B3317"
+                            android:textSize="14sp" />
+
+                        <View
+                            android:layout_width="10dp"
+                            android:layout_height="1dp" />
+
+                        <TextView
+                            android:id="@+id/tvResumenPrimariaTarde"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="0"
+                            android:textColor="#1B3317"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:background="#F1F5F9" />
+
+                    <!-- Fila Secundaria -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="16dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.2"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:contentDescription="Secundaria"
+                                android:src="@drawable/ic_school"
+                                app:tint="#1B3317" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:text="Secundaria"
+                                android:textColor="#1B3317"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvResumenSecundariaManana"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="0"
+                            android:textColor="#1B3317"
+                            android:textSize="14sp" />
+
+                        <View
+                            android:layout_width="10dp"
+                            android:layout_height="1dp" />
+
+                        <TextView
+                            android:id="@+id/tvResumenSecundariaTarde"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="0"
+                            android:textColor="#1B3317"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <!-- Fila TOTAL (Fondo amarillo suave) -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:background="@drawable/bg_total_asistencia_footer"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="16dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.2"
+                            android:text="Total"
+                            android:textColor="#1B3317"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvResumenTotalManana"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="0"
+                            android:textColor="#1B3317"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <View
+                            android:layout_width="10dp"
+                            android:layout_height="1dp" />
+
+                        <TextView
+                            android:id="@+id/tvResumenTotalTarde"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="0"
+                            android:textColor="#1B3317"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
+
+            <!-- BOTÓN GUARDAR ASISTENCIA (SIN ÍCONO DE TARJETA SEGÚN SOLICITUD) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRegistrarAsistencia"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="26dp"
+                android:backgroundTint="#F4B41F"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="Guardar asistencia"
+                android:textColor="#1B3317"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:cornerRadius="26dp" />
 
         </LinearLayout>
 

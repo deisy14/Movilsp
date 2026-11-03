@@ -342,25 +342,29 @@ class InicioJefaActivity : AppCompatActivity() {
                 sessionManager.fetchAuthToken()
                 val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
 
+                // 1. Sincronizar en tiempo real desde Turnos
+                com.example.movilmanupuladora.utils.PreparacionSyncManager.sincronizarDesdeBackend(this@InicioJefaActivity)
+
+                // 2. Consultar asistencia diaria del backend
                 val asistenciasRes = RetrofitClient.apiService.obtenerAsistenciaDiaria()
                 if (asistenciasRes.isSuccessful && !asistenciasRes.body().isNullOrEmpty()) {
                     val lista = asistenciasRes.body()!!
                     var asistenciasHoy = lista.filter { it.fecha.trim().startsWith(fechaHoy) }
                     if (asistenciasHoy.isEmpty()) {
-                        val fechaMasReciente = lista.maxByOrNull { it.idAsistencia ?: 0 }?.fecha?.trim()?.take(10)
+                        val fechaMasReciente = lista.maxByOrNull { it.obtenerIdReal() ?: 0 }?.fecha?.trim()?.take(10)
                         if (!fechaMasReciente.isNullOrEmpty()) {
                             asistenciasHoy = lista.filter { it.fecha.trim().startsWith(fechaMasReciente) }
                         }
                     }
 
-                    val regPrimaria = asistenciasHoy.filter { it.idGrado == 16 }.maxByOrNull { it.idAsistencia ?: 0 }
-                    val regSecundaria = asistenciasHoy.filter { it.idGrado == 19 }.maxByOrNull { it.idAsistencia ?: 0 }
+                    val regPrimaria = asistenciasHoy.filter { it.obtenerIdGradoReal() == 16 }.maxByOrNull { it.obtenerIdReal() ?: 0 }
+                    val regSecundaria = asistenciasHoy.filter { it.obtenerIdGradoReal() == 19 }.maxByOrNull { it.obtenerIdReal() ?: 0 }
 
                     var p = regPrimaria?.ninosPresentes ?: AsistenciaManager.obtenerPrimaria(this@InicioJefaActivity)
                     var s = regSecundaria?.ninosPresentes ?: AsistenciaManager.obtenerSecundaria(this@InicioJefaActivity)
 
                     if (regPrimaria == null && regSecundaria == null && asistenciasHoy.isNotEmpty()) {
-                        val regLegacy = asistenciasHoy.maxByOrNull { it.idAsistencia ?: 0 }!!
+                        val regLegacy = asistenciasHoy.maxByOrNull { it.obtenerIdReal() ?: 0 }!!
                         val tot = regLegacy.ninosPresentes
                         p = (tot * 0.6).toInt()
                         s = tot - p

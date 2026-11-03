@@ -457,8 +457,8 @@ class MainActivity : AppCompatActivity() {
                     val gradosRes = asistenciaRepository.obtenerGrados()
                     if (gradosRes.isSuccessful && !gradosRes.body().isNullOrEmpty()) {
                         val listaGrados = gradosRes.body()!!
-                        idPrimariaCache = listaGrados.find { it.nombreGrado.contains("primaria", ignoreCase = true) }?.idGrado ?: 16
-                        idSecundariaCache = listaGrados.find { it.nombreGrado.contains("secundaria", ignoreCase = true) }?.idGrado ?: 19
+                        idPrimariaCache = listaGrados.find { it.obtenerNombreReal().contains("primaria", ignoreCase = true) }?.obtenerIdReal() ?: 16
+                        idSecundariaCache = listaGrados.find { it.obtenerNombreReal().contains("secundaria", ignoreCase = true) }?.obtenerIdReal() ?: 19
                         gradosCargados = true
                     }
                 }
@@ -474,7 +474,7 @@ class MainActivity : AppCompatActivity() {
                     // 2. Si no hay registros de hoy (por posible desfase de reloj o zona horaria UTC entre teléfonos),
                     // tomar automáticamente los de la fecha más reciente registrada en el servidor
                     if (registrosFecha.isEmpty()) {
-                        val fechaMasReciente = todas.maxByOrNull { it.idAsistencia ?: 0 }?.fecha?.trim()?.take(10)
+                        val fechaMasReciente = todas.maxByOrNull { it.obtenerIdReal() ?: 0 }?.fecha?.trim()?.take(10)
                         if (!fechaMasReciente.isNullOrEmpty()) {
                             registrosFecha = todas.filter { it.fecha.trim().startsWith(fechaMasReciente) }
                         }
@@ -482,18 +482,18 @@ class MainActivity : AppCompatActivity() {
 
                     // 3. Tomar siempre el registro más reciente para Primaria y Secundaria
                     val regPrimaria = registrosFecha
-                        .filter { it.idGrado == idPrimariaCache || it.idGrado == 16 }
-                        .maxByOrNull { it.idAsistencia ?: 0 }
+                        .filter { it.obtenerIdGradoReal() == idPrimariaCache || it.obtenerIdGradoReal() == 16 }
+                        .maxByOrNull { it.obtenerIdReal() ?: 0 }
 
                     val regSecundaria = registrosFecha
-                        .filter { it.idGrado == idSecundariaCache || it.idGrado == 19 }
-                        .maxByOrNull { it.idAsistencia ?: 0 }
+                        .filter { it.obtenerIdGradoReal() == idSecundariaCache || it.obtenerIdGradoReal() == 19 }
+                        .maxByOrNull { it.obtenerIdReal() ?: 0 }
 
                     var totalPrimaria = regPrimaria?.ninosPresentes ?: 0
                     var totalSecundaria = regSecundaria?.ninosPresentes ?: 0
 
                     if (regPrimaria == null && regSecundaria == null && registrosFecha.isNotEmpty()) {
-                        val regLegacy = registrosFecha.maxByOrNull { it.idAsistencia ?: 0 }!!
+                        val regLegacy = registrosFecha.maxByOrNull { it.obtenerIdReal() ?: 0 }!!
                         val tot = regLegacy.ninosPresentes
                         totalPrimaria = (tot * 0.6).toInt()
                         totalSecundaria = tot - totalPrimaria

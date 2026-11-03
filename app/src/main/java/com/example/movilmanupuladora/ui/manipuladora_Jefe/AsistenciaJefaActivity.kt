@@ -2,6 +2,7 @@ package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
 import android.app.AlertDialog
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -21,9 +22,9 @@ import com.example.movilmanupuladora.data.repository.AsistenciaRepository
 import com.example.movilmanupuladora.databinding.ActivityAsistenciaJefaBinding
 import com.example.movilmanupuladora.utils.PreparacionSyncManager
 import com.example.movilmanupuladora.utils.SessionManager
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -81,23 +82,34 @@ class AsistenciaJefaActivity : AppCompatActivity() {
     }
 
     private fun configurarFecha() {
-        val formato = SimpleDateFormat("EEEE, dd 'de' MMMM", Locale("es", "ES"))
-        val fecha = formato.format(Date())
-        binding.txtFechaAsistencia.text = "Hoy es $fecha"
+        try {
+            val formato = SimpleDateFormat("EEEE, d 'de' MMMM 'de' yyyy", Locale("es", "CO"))
+            val fecha = formato.format(Date()).replaceFirstChar { it.uppercase() }
+            binding.txtFechaAsistencia.text = fecha
+        } catch (_: Exception) {
+            val formato = SimpleDateFormat("EEEE, d 'de' MMMM 'de' yyyy", Locale.getDefault())
+            val fecha = formato.format(Date()).replaceFirstChar { it.uppercase() }
+            binding.txtFechaAsistencia.text = fecha
+        }
     }
 
     private fun cargarAsistenciaGuardada() {
         val p = AsistenciaManager.obtenerPrimaria(this)
         val s = AsistenciaManager.obtenerSecundaria(this)
+        val totM = AsistenciaManager.obtenerManana(this)
+        val totT = AsistenciaManager.obtenerTarde(this)
+
         if (p > 0 || s > 0) {
             primariaManana = p
             secundariaManana = s
-        } else {
-            val totalManana = AsistenciaManager.obtenerManana(this)
-            if (totalManana > 0) {
-                primariaManana = (totalManana * 0.6).toInt()
-                secundariaManana = totalManana - primariaManana
-            }
+        } else if (totM > 0) {
+            primariaManana = (totM * 0.6).toInt()
+            secundariaManana = totM - primariaManana
+        }
+
+        if (totT > 0) {
+            primariaTarde = (totT * 0.6).toInt()
+            secundariaTarde = totT - primariaTarde
         }
     }
 
@@ -106,42 +118,64 @@ class AsistenciaJefaActivity : AppCompatActivity() {
             try {
                 sessionManager.fetchAuthToken()
 
-                // 1. Identificar IDs de grados para Primaria y Secundaria
+                // 1. Primero intentar sincronizar desde Turnos (inmediato en tiempo real)
+                PreparacionSyncManager.sincronizarDesdeBackend(this@AsistenciaJefaActivity)
+                val pSync = AsistenciaManager.obtenerPrimaria(this@AsistenciaJefaActivity)
+                val sSync = AsistenciaManager.obtenerSecundaria(this@AsistenciaJefaActivity)
+                val totMSync = AsistenciaManager.obtenerManana(this@AsistenciaJefaActivity)
+                val totTSync = AsistenciaManager.obtenerTarde(this@AsistenciaJefaActivity)
+
+                if (pSync > 0 || sSync > 0) {
+                    primariaManana = pSync
+                    secundariaManana = sSync
+                } else if (totMSync > 0) {
+                    primariaManana = (totMSync * 0.6).toInt()
+                    secundariaManana = totMSync - primariaManana
+                }
+                if (totTSync > 0) {
+                    primariaTarde = (totTSync * 0.6).toInt()
+                    secundariaTarde = totTSync - primariaTarde
+                }
+
+                // 2. Identificar IDs de grados para Primaria y Secundaria del catálogo
                 val gradosRes = asistenciaRepository.obtenerGrados()
                 if (gradosRes.isSuccessful && !gradosRes.body().isNullOrEmpty()) {
                     val grados = gradosRes.body()!!
-                    idGradoPrimaria = grados.find { it.nombreGrado.contains("primaria", ignoreCase = true) }?.idGrado ?: 16
-                    idGradoSecundaria = grados.find { it.nombreGrado.contains("secundaria", ignoreCase = true) }?.idGrado ?: 19
+                    idGradoPrimaria = grados.find { it.obtenerNombreReal().contains("primaria", ignoreCase = true) }?.obtenerIdReal() ?: 16
+                    idGradoSecundaria = grados.find { it.obtenerNombreReal().contains("secundaria", ignoreCase = true) }?.obtenerIdReal() ?: 19
                 }
 
-                // 2. Obtener asistencias de hoy del servidor
+                // 3. Obtener asistencias de hoy del backend
                 val res = asistenciaRepository.obtenerAsistencias()
                 if (res.isSuccessful && res.body() != null) {
                     val lista = res.body()!!
                     var registrosHoy = lista.filter { it.fecha.trim().startsWith(fechaHoy) }
                     if (registrosHoy.isEmpty() && lista.isNotEmpty()) {
-                        val fechaMasReciente = lista.maxByOrNull { it.idAsistencia ?: 0 }?.fecha?.trim()?.take(10)
+                        val fechaMasReciente = lista.maxByOrNull { it.obtenerIdReal() ?: 0 }?.fecha?.trim()?.take(10)
                         if (!fechaMasReciente.isNullOrEmpty()) {
                             registrosHoy = lista.filter { it.fecha.trim().startsWith(fechaMasReciente) }
                         }
                     }
 
-                    // Obtener siempre el registro MÁS RECIENTE para Primaria y Secundaria
-                    val regPrimaria = registrosHoy.filter { it.idGrado == idGradoPrimaria || it.idGrado == 16 }.maxByOrNull { it.idAsistencia ?: 0 }
-                    val regSecundaria = registrosHoy.filter { it.idGrado == idGradoSecundaria || it.idGrado == 19 }.maxByOrNull { it.idAsistencia ?: 0 }
+                    val regPrimaria = registrosHoy
+                        .filter { it.obtenerIdGradoReal() == idGradoPrimaria || it.obtenerIdGradoReal() == 16 }
+                        .maxByOrNull { it.obtenerIdReal() ?: 0 }
+
+                    val regSecundaria = registrosHoy
+                        .filter { it.obtenerIdGradoReal() == idGradoSecundaria || it.obtenerIdGradoReal() == 19 }
+                        .maxByOrNull { it.obtenerIdReal() ?: 0 }
 
                     if (regPrimaria != null) {
                         primariaManana = regPrimaria.ninosPresentes
-                        idAsistenciaPrimariaManana = regPrimaria.idAsistencia
+                        idAsistenciaPrimariaManana = regPrimaria.obtenerIdReal()
                     }
                     if (regSecundaria != null) {
                         secundariaManana = regSecundaria.ninosPresentes
-                        idAsistenciaSecundariaManana = regSecundaria.idAsistencia
+                        idAsistenciaSecundariaManana = regSecundaria.obtenerIdReal()
                     }
 
-                    // Respaldo de registro legacy (por si existía un único registro sin grado asignado)
                     if (regPrimaria == null && regSecundaria == null && registrosHoy.isNotEmpty()) {
-                        val regLegacy = registrosHoy.maxByOrNull { it.idAsistencia ?: 0 }!!
+                        val regLegacy = registrosHoy.maxByOrNull { it.obtenerIdReal() ?: 0 }!!
                         val total = regLegacy.ninosPresentes
                         primariaManana = (total * 0.6).toInt()
                         secundariaManana = total - primariaManana
@@ -149,16 +183,15 @@ class AsistenciaJefaActivity : AppCompatActivity() {
 
                     val totalCalculado = primariaManana + secundariaManana
                     if (totalCalculado > 0) {
-                        // Actualizar cache local solo si hay datos reales
                         AsistenciaManager.guardarPrimaria(this@AsistenciaJefaActivity, primariaManana)
                         AsistenciaManager.guardarSecundaria(this@AsistenciaJefaActivity, secundariaManana)
                         AsistenciaManager.guardarManana(this@AsistenciaJefaActivity, totalCalculado)
                     }
-
-                    actualizarInterfaz()
                 }
+
+                actualizarInterfaz()
             } catch (e: Exception) {
-                // Si no hay conexión, se mantienen los valores locales cargados
+                actualizarInterfaz()
             }
         }
     }
@@ -180,8 +213,22 @@ class AsistenciaJefaActivity : AppCompatActivity() {
             finish()
         }
 
+        binding.cardNivelPrimaria.setOnClickListener {
+            mostrarDialogoAsistencia(modoInicial = "PRIMARIA")
+        }
+
+        binding.cardNivelSecundaria.setOnClickListener {
+            mostrarDialogoAsistencia(modoInicial = "SECUNDARIA")
+        }
+
         binding.btnRegistrarAsistencia.setOnClickListener {
-            mostrarDialogoAsistencia()
+            val (p, s) = obtenerAsistenciaActualPorGrado()
+            val total = p + s
+            if (total == 0) {
+                mostrarDialogoAsistencia(modoInicial = null)
+            } else {
+                guardarAsistenciaEnBackend(p, s, total, dialog = null, btnGuardarModal = null)
+            }
         }
     }
 
@@ -191,45 +238,68 @@ class AsistenciaJefaActivity : AppCompatActivity() {
     }
 
     private fun actualizarBotonesJornada() {
-        val amarillo = ContextCompat.getColor(this, R.color.amarillo_principal)
-        val gris = ContextCompat.getColor(this, R.color.gris_claro)
-        val negro = ContextCompat.getColor(this, R.color.negro_principal)
+        val colorAmarillo = Color.parseColor("#F4B41F")
+        val colorVerdeOscuro = Color.parseColor("#1B3317")
+        val colorBlanco = Color.WHITE
+        val colorBordeGris = Color.parseColor("#CBD5E1")
 
         if (jornadaActual == "MANANA") {
-            binding.btnManana.backgroundTintList = ColorStateList.valueOf(amarillo)
-            binding.btnManana.setTextColor(negro)
+            binding.btnManana.backgroundTintList = ColorStateList.valueOf(colorAmarillo)
+            binding.btnManana.setTextColor(colorVerdeOscuro)
+            binding.btnManana.iconTint = ColorStateList.valueOf(colorVerdeOscuro)
+            binding.btnManana.strokeWidth = 0
 
-            binding.btnTarde.backgroundTintList = ColorStateList.valueOf(gris)
-            binding.btnTarde.setTextColor(negro)
+            binding.btnTarde.backgroundTintList = ColorStateList.valueOf(colorBlanco)
+            binding.btnTarde.setTextColor(colorVerdeOscuro)
+            binding.btnTarde.iconTint = ColorStateList.valueOf(colorVerdeOscuro)
+            binding.btnTarde.strokeColor = ColorStateList.valueOf(colorBordeGris)
+            binding.btnTarde.strokeWidth = dpToPx(1f)
         } else {
-            binding.btnTarde.backgroundTintList = ColorStateList.valueOf(amarillo)
-            binding.btnTarde.setTextColor(negro)
+            binding.btnTarde.backgroundTintList = ColorStateList.valueOf(colorAmarillo)
+            binding.btnTarde.setTextColor(colorVerdeOscuro)
+            binding.btnTarde.iconTint = ColorStateList.valueOf(colorVerdeOscuro)
+            binding.btnTarde.strokeWidth = 0
 
-            binding.btnManana.backgroundTintList = ColorStateList.valueOf(gris)
-            binding.btnManana.setTextColor(negro)
+            binding.btnManana.backgroundTintList = ColorStateList.valueOf(colorBlanco)
+            binding.btnManana.setTextColor(colorVerdeOscuro)
+            binding.btnManana.iconTint = ColorStateList.valueOf(colorVerdeOscuro)
+            binding.btnManana.strokeColor = ColorStateList.valueOf(colorBordeGris)
+            binding.btnManana.strokeWidth = dpToPx(1f)
         }
     }
 
     private fun actualizarDatosAsistencia() {
         val (prim, sec) = obtenerAsistenciaActualPorGrado()
-        val totalEstudiantes = prim + sec
-        val gramajeTotalKg = (prim * GRAMAJE_KG_PRIMARIA) + (sec * GRAMAJE_KG_SECUNDARIA)
 
-        binding.txtJornadaActual.text = "Jornada: ${obtenerNombreJornada()}"
-        binding.txtDesglosePrimariaSecundaria.text = "Primaria (Transición a 5°): $prim | Secundaria (6°-11°): $sec"
-        binding.txtGramajeTotalCalculado.text = String.format(Locale.US, "Requerimiento Total Gramaje: %.1f kg PAE", gramajeTotalKg)
-
-        if (totalEstudiantes > 0) {
-            binding.txtCantidadAsistencia.text = "$totalEstudiantes estudiantes"
-            binding.txtEstadoAsistencia.text = "Asistencia Registrada"
-            binding.txtEstadoAsistencia.setTextColor(ContextCompat.getColor(this, R.color.verde_prinpipal))
-            binding.btnRegistrarAsistencia.text = "Actualizar asistencia por grados (Transición a 11°)"
+        // Actualizar subtítulos en las tarjetas de nivel según la jornada seleccionada
+        if (prim > 0) {
+            binding.txtSubtituloPrimaria.text = "$prim estudiantes registrados"
+            binding.txtSubtituloPrimaria.setTextColor(Color.parseColor("#1B3317"))
         } else {
-            binding.txtCantidadAsistencia.text = "Sin registrar"
-            binding.txtEstadoAsistencia.text = "Pendiente"
-            binding.txtEstadoAsistencia.setTextColor(ContextCompat.getColor(this, R.color.rojo_principal))
-            binding.btnRegistrarAsistencia.text = "Registrar asistencia por grados (Transición a 11°)"
+            binding.txtSubtituloPrimaria.text = "Registro de asistencia"
+            binding.txtSubtituloPrimaria.setTextColor(Color.parseColor("#64748B"))
         }
+
+        if (sec > 0) {
+            binding.txtSubtituloSecundaria.text = "$sec estudiantes registrados"
+            binding.txtSubtituloSecundaria.setTextColor(Color.parseColor("#1B3317"))
+        } else {
+            binding.txtSubtituloSecundaria.text = "Registro de asistencia"
+            binding.txtSubtituloSecundaria.setTextColor(Color.parseColor("#64748B"))
+        }
+
+        // Actualizar tabla de resumen (Mañana vs Tarde)
+        val totManana = primariaManana + secundariaManana
+        val totTarde = primariaTarde + secundariaTarde
+
+        binding.tvResumenPrimariaManana.text = primariaManana.toString()
+        binding.tvResumenPrimariaTarde.text = primariaTarde.toString()
+
+        binding.tvResumenSecundariaManana.text = secundariaManana.toString()
+        binding.tvResumenSecundariaTarde.text = secundariaTarde.toString()
+
+        binding.tvResumenTotalManana.text = totManana.toString()
+        binding.tvResumenTotalTarde.text = totTarde.toString()
     }
 
     private fun obtenerAsistenciaActualPorGrado(): Pair<Int, Int> {
@@ -240,12 +310,13 @@ class AsistenciaJefaActivity : AppCompatActivity() {
         }
     }
 
-    private fun mostrarDialogoAsistencia() {
+    private fun mostrarDialogoAsistencia(modoInicial: String? = null) {
         val vistaDialogo = LayoutInflater.from(this).inflate(
             R.layout.dialog_registrar_asistencia,
             null
         )
 
+        val txtTitulo = vistaDialogo.findViewById<TextView>(R.id.txtTituloDialog)
         val txtJornada = vistaDialogo.findViewById<TextView>(R.id.txtJornadaDialog)
         val edtJardin = vistaDialogo.findViewById<EditText>(R.id.edtGradoJardin)
         val edtP1 = vistaDialogo.findViewById<EditText>(R.id.edtGradoPrimero)
@@ -268,9 +339,15 @@ class AsistenciaJefaActivity : AppCompatActivity() {
         val btnGuardar = vistaDialogo.findViewById<Button>(R.id.btnGuardarAsistencia)
 
         txtJornada.text = "Jornada: ${obtenerNombreJornada()}"
+        if (modoInicial == "PRIMARIA") {
+            txtTitulo.text = "Registro de Asistencia: Primaria (Jardín a 5°)"
+        } else if (modoInicial == "SECUNDARIA") {
+            txtTitulo.text = "Registro de Asistencia: Secundaria (6° a 11°)"
+        } else {
+            txtTitulo.text = "Registrar Asistencia por Grado"
+        }
 
-        // Cargar los valores guardados exactamente como los ingresó la jefa.
-        // Si un grado no tiene clase, ese campo permanecerá vacío ("")
+        // Cargar los valores guardados previamente
         val detalle = AsistenciaManager.obtenerDetalleGradosHoy(this)
         edtJardin.setText(detalle["jar"].orEmpty())
         edtP1.setText(detalle["p1"].orEmpty())
@@ -384,7 +461,7 @@ class AsistenciaJefaActivity : AppCompatActivity() {
             if (total == 0) {
                 AlertDialog.Builder(this)
                     .setTitle("Sin asistencia registrada")
-                    .setMessage("Todos los campos están vacíos (0 estudiantes). ¿Deseas registrar este día como sin asistencia?")
+                    .setMessage("Todos los campos están en 0. ¿Deseas registrar este día sin estudiantes?")
                     .setPositiveButton("Sí, guardar 0") { _, _ ->
                         guardarAsistenciaEnBackend(0, 0, 0, dialog, btnGuardar)
                     }
@@ -408,11 +485,13 @@ class AsistenciaJefaActivity : AppCompatActivity() {
         totalPrimaria: Int,
         totalSecundaria: Int,
         total: Int,
-        dialog: AlertDialog,
-        btnGuardar: Button
+        dialog: AlertDialog? = null,
+        btnGuardarModal: Button? = null
     ) {
-        btnGuardar.isEnabled = false
-        btnGuardar.text = "Guardando..."
+        btnGuardarModal?.isEnabled = false
+        btnGuardarModal?.text = "Guardando..."
+        binding.btnRegistrarAsistencia.isEnabled = false
+        binding.btnRegistrarAsistencia.text = "Guardando asistencia..."
 
         // 1. Guardar localmente de inmediato en AsistenciaManager
         if (jornadaActual == "MANANA") {
@@ -430,12 +509,13 @@ class AsistenciaJefaActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                // 2. Sincronizar en la nube en Turnos de inmediato con el token de sesión
+                // 2. Sincronizar en la nube en Turnos de inmediato con el token de sesión (para todos los móviles)
                 PreparacionSyncManager.guardarAsistenciaEnNube(
                     context = applicationContext,
                     primaria = totalPrimaria,
                     secundaria = totalSecundaria,
-                    total = total
+                    total = total,
+                    jornada = jornadaActual
                 )
 
                 // 3. Persistir en la tabla de asistencia diaria del backend
@@ -448,9 +528,11 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                     val payloadPrimaria = AsistenciaDiaria(
                         idAsistencia = idP,
                         idGrado = idGradoPrimaria,
+                        grado = idGradoPrimaria,
                         fecha = fechaHoy,
                         ninosPresentes = totalPrimaria,
-                        idUsuarioManipuladora = userId
+                        idUsuarioManipuladora = userId,
+                        usuarioManipuladora = userId
                     )
                     var resP = if (idP != null) {
                         asistenciaRepository.actualizarAsistencia(idP, payloadPrimaria)
@@ -459,16 +541,19 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                         resP = asistenciaRepository.registrarAsistencia(payloadPrimaria)
                     }
                     if (resP.isSuccessful && resP.body() != null) {
-                        if (jornadaActual == "MANANA") idAsistenciaPrimariaManana = resP.body()!!.idAsistencia
-                        else idAsistenciaPrimariaTarde = resP.body()!!.idAsistencia
+                        val nuevoId = resP.body()!!.obtenerIdReal()
+                        if (jornadaActual == "MANANA") idAsistenciaPrimariaManana = nuevoId
+                        else idAsistenciaPrimariaTarde = nuevoId
                     }
 
                     val payloadSecundaria = AsistenciaDiaria(
                         idAsistencia = idS,
                         idGrado = idGradoSecundaria,
+                        grado = idGradoSecundaria,
                         fecha = fechaHoy,
                         ninosPresentes = totalSecundaria,
-                        idUsuarioManipuladora = userId
+                        idUsuarioManipuladora = userId,
+                        usuarioManipuladora = userId
                     )
                     var resS = if (idS != null) {
                         asistenciaRepository.actualizarAsistencia(idS, payloadSecundaria)
@@ -477,22 +562,29 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                         resS = asistenciaRepository.registrarAsistencia(payloadSecundaria)
                     }
                     if (resS.isSuccessful && resS.body() != null) {
-                        if (jornadaActual == "MANANA") idAsistenciaSecundariaManana = resS.body()!!.idAsistencia
-                        else idAsistenciaSecundariaTarde = resS.body()!!.idAsistencia
+                        val nuevoId = resS.body()!!.obtenerIdReal()
+                        if (jornadaActual == "MANANA") idAsistenciaSecundariaManana = nuevoId
+                        else idAsistenciaSecundariaTarde = nuevoId
                     }
                 } catch (e: Exception) {
                     android.util.Log.e("AsistenciaJefa", "Error registrando asistencia en backend: ${e.message}")
                 }
 
-                dialog.dismiss()
+                dialog?.dismiss()
+                binding.btnRegistrarAsistencia.isEnabled = true
+                binding.btnRegistrarAsistencia.text = "Guardar asistencia"
+
                 Toast.makeText(
                     this@AsistenciaJefaActivity,
-                    "¡Asistencia registrada y sincronizada! Total: $total (Primaria: $totalPrimaria | Secundaria: $totalSecundaria)",
+                    "¡Asistencia sincronizada! Total: $total ($jornadaActual - Primaria: $totalPrimaria | Secundaria: $totalSecundaria)",
                     Toast.LENGTH_LONG
                 ).show()
 
             } catch (e: Exception) {
-                dialog.dismiss()
+                dialog?.dismiss()
+                binding.btnRegistrarAsistencia.isEnabled = true
+                binding.btnRegistrarAsistencia.text = "Guardar asistencia"
+
                 Toast.makeText(
                     this@AsistenciaJefaActivity,
                     "¡Asistencia guardada localmente! Total: $total",
@@ -504,5 +596,9 @@ class AsistenciaJefaActivity : AppCompatActivity() {
 
     private fun obtenerNombreJornada(): String {
         return if (jornadaActual == "MANANA") "Mañana" else "Tarde"
+    }
+
+    private fun dpToPx(dp: Float): Int {
+        return (dp * resources.displayMetrics.density).toInt()
     }
 }
