@@ -171,16 +171,41 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
 
                         val calDiaActual = mesActual.clone() as Calendar
                         calDiaActual.set(Calendar.DAY_OF_MONTH, diaLoop)
+                        calDiaActual.set(Calendar.HOUR_OF_DAY, 0)
+                        calDiaActual.set(Calendar.MINUTE, 0)
+                        calDiaActual.set(Calendar.SECOND, 0)
+                        calDiaActual.set(Calendar.MILLISECOND, 0)
 
+                        val hoyCero = Calendar.getInstance().apply {
+                            set(Calendar.HOUR_OF_DAY, 0)
+                            set(Calendar.MINUTE, 0)
+                            set(Calendar.SECOND, 0)
+                            set(Calendar.MILLISECOND, 0)
+                        }
+
+                        val isToday = esMismoDia(calDiaActual, Calendar.getInstance())
+                        val isPast = calDiaActual.before(hoyCero)
                         val isSelected = esMismoDia(calDiaActual, diaSeleccionado)
 
-                        if (isSelected) {
-                            txtDia.setBackgroundResource(R.drawable.circulo_amarillo_badge)
-                            txtDia.setTextColor(Color.parseColor("#1E293B"))
-                            txtDia.typeface = android.graphics.Typeface.DEFAULT_BOLD
-                        } else {
-                            txtDia.setBackgroundColor(Color.TRANSPARENT)
-                            txtDia.setTextColor(Color.parseColor("#1E293B"))
+                        when {
+                            isToday -> {
+                                // EL DÍA DE HOY EN AMARILLO RELLENO
+                                txtDia.setBackgroundResource(R.drawable.circulo_amarillo_badge)
+                                txtDia.setTextColor(Color.parseColor("#1E293B"))
+                                txtDia.typeface = android.graphics.Typeface.DEFAULT_BOLD
+                            }
+                            isPast || isSelected -> {
+                                // LOS DÍAS ANTERIORES EN PUNTICOS / ANILLO AMARILLO
+                                txtDia.setBackgroundResource(R.drawable.bg_date_selected)
+                                txtDia.setTextColor(Color.parseColor("#7A5500"))
+                                txtDia.typeface = android.graphics.Typeface.DEFAULT_BOLD
+                            }
+                            else -> {
+                                // MAÑANA Y LOS OTROS QUE FALTAN EN BLANCO
+                                txtDia.setBackgroundColor(Color.TRANSPARENT)
+                                txtDia.setTextColor(Color.parseColor("#1E293B"))
+                                txtDia.typeface = android.graphics.Typeface.DEFAULT
+                            }
                         }
 
                         cellContainer.isClickable = true

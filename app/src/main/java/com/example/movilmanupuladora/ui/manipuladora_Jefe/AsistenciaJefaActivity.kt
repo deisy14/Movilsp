@@ -7,9 +7,11 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -338,13 +340,22 @@ class AsistenciaJefaActivity : AppCompatActivity() {
         val btnCancelar = vistaDialogo.findViewById<Button>(R.id.btnCancelarAsistencia)
         val btnGuardar = vistaDialogo.findViewById<Button>(R.id.btnGuardarAsistencia)
 
+        val layoutPrimaria = vistaDialogo.findViewById<LinearLayout>(R.id.layoutPrimaria)
+        val layoutSecundaria = vistaDialogo.findViewById<LinearLayout>(R.id.layoutSecundaria)
+
         txtJornada.text = "Jornada: ${obtenerNombreJornada()}"
         if (modoInicial == "PRIMARIA") {
             txtTitulo.text = "Registro de Asistencia: Primaria (Jardín a 5°)"
+            layoutPrimaria.visibility = View.VISIBLE
+            layoutSecundaria.visibility = View.GONE
         } else if (modoInicial == "SECUNDARIA") {
             txtTitulo.text = "Registro de Asistencia: Secundaria (6° a 11°)"
+            layoutPrimaria.visibility = View.GONE
+            layoutSecundaria.visibility = View.VISIBLE
         } else {
             txtTitulo.text = "Registrar Asistencia por Grado"
+            layoutPrimaria.visibility = View.VISIBLE
+            layoutSecundaria.visibility = View.VISIBLE
         }
 
         // Cargar los valores guardados previamente

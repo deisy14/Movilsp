@@ -212,7 +212,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Primaria"
+                            android:text="Primaria (Jardín a 5°)"
                             android:textColor="#1B3317"
                             android:textSize="17sp"
                             android:textStyle="bold" />
@@ -222,7 +222,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Registro de asistencia"
+                            android:text="Jardín, Transición y 1° a 5° grado"
                             android:textColor="#64748B"
                             android:textSize="13sp" />
                     </LinearLayout>
@@ -234,9 +234,9 @@
                         android:background="@drawable/bg_badge_grados"
                         android:paddingHorizontal="10dp"
                         android:paddingVertical="4dp"
-                        android:text="5 grados"
+                        android:text="6 grados (Jardín a 5°)"
                         android:textColor="#1B3317"
-                        android:textSize="12sp"
+                        android:textSize="11sp"
                         android:textStyle="bold" />
 
                     <ImageView
@@ -296,7 +296,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Secundaria"
+                            android:text="Secundaria / Bachillerato (6° a 11°)"
                             android:textColor="#1B3317"
                             android:textSize="17sp"
                             android:textStyle="bold" />
@@ -306,7 +306,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Registro de asistencia"
+                            android:text="Grados 6° a 11°"
                             android:textColor="#64748B"
                             android:textSize="13sp" />
                     </LinearLayout>
@@ -318,9 +318,9 @@
                         android:background="@drawable/bg_badge_grados"
                         android:paddingHorizontal="10dp"
                         android:paddingVertical="4dp"
-                        android:text="6 grados"
+                        android:text="6 grados (6° a 11°)"
                         android:textColor="#1B3317"
-                        android:textSize="12sp"
+                        android:textSize="11sp"
                         android:textStyle="bold" />
 
                     <ImageView
