@@ -741,14 +741,32 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
             resumen.append("• ${m.nombre}: $comp ($estM)\n")
         }
 
-        MaterialAlertDialogBuilder(this)
-            .setTitle("Confirmar Asignación de Componentes")
-            .setMessage("Plato: $nombreMenu ($jornada)\n\nDistribución:\n$resumen")
-            .setPositiveButton("Confirmar y Guardar") { _, _ ->
-                guardarAsignacion()
-            }
-            .setNegativeButton("Seguir editando", null)
-            .show()
+        val dialogBinding = com.example.movilmanupuladora.databinding.DialogConfirmarAsignacionBinding.inflate(layoutInflater)
+        dialogBinding.txtTituloConfirmacion.text = "Confirmar Asignación de Componentes"
+        dialogBinding.txtMensajeConfirmacionAsignacion.text = "Plato: $nombreMenu ($jornada)\n\nDistribución:\n$resumen"
+        dialogBinding.btnConfirmarGuardarAsignacion.text = "Confirmar y Guardar"
+        dialogBinding.btnSeguirEditandoAsignacion.text = "Seguir editando"
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(dialogBinding.root)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        dialogBinding.btnConfirmarGuardarAsignacion.setOnClickListener {
+            dialog.dismiss()
+            guardarAsignacion()
+        }
+
+        dialogBinding.btnSeguirEditandoAsignacion.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.90).toInt(),
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
     }
 
     private fun guardarAsignacion() {
