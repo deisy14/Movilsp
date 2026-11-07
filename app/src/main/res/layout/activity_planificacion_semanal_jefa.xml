@@ -250,116 +250,12 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- TABS DE JORNADA / COMIDA: DESAYUNO, ALMUERZO, MERIENDA -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="46dp"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/bg_card"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:padding="4dp">
-
-                <!-- TAB DESAYUNO -->
-                <LinearLayout
-                    android:id="@+id/tabDesayuno"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_dia_semana_activo"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/txtTabDesayunoTitulo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Desayuno"
-                        android:textColor="#1E293B"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/txtTabDesayunoSub"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Por elegir"
-                        android:textColor="#92400E"
-                        android:textSize="9sp" />
-                </LinearLayout>
-
-                <!-- TAB ALMUERZO -->
-                <LinearLayout
-                    android:id="@+id/tabAlmuerzo"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="4dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_dia_semana_inactivo"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/txtTabAlmuerzoTitulo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Almuerzo"
-                        android:textColor="#64748B"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/txtTabAlmuerzoSub"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Pendiente"
-                        android:textColor="#94A3B8"
-                        android:textSize="9sp" />
-                </LinearLayout>
-
-                <!-- TAB MERIENDA -->
-                <LinearLayout
-                    android:id="@+id/tabMerienda"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="4dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_dia_semana_inactivo"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/txtTabMeriendaTitulo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Merienda"
-                        android:textColor="#64748B"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/txtTabMeriendaSub"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Pendiente"
-                        android:textColor="#94A3B8"
-                        android:textSize="9sp" />
-                </LinearLayout>
-
-            </LinearLayout>
-
             <!-- BOTÓN NUEVA RECETA -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnNuevaReceta"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="16dp"
                 android:backgroundTint="#FEF3C7"
                 android:text="+ Nueva receta"
                 android:textColor="#92400E"
@@ -525,11 +421,125 @@
 
             </LinearLayout>
 
+            <!-- TABS DE SERVICIOS: DESAYUNO, ALMUERZO, MERIENDA -->
+            <LinearLayout
+                android:id="@+id/layoutTabsServicios"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_card"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="4dp">
+
+                <!-- TAB DESAYUNO -->
+                <LinearLayout
+                    android:id="@+id/tabDesayuno"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_dia_semana_activo"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="4dp">
+
+                    <TextView
+                        android:id="@+id/txtTabDesayunoTitulo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Desayuno"
+                        android:textColor="#1E293B"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtTabDesayunoSub"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="Por elegir"
+                        android:textColor="#92400E"
+                        android:textSize="9.5sp" />
+                </LinearLayout>
+
+                <!-- TAB ALMUERZO -->
+                <LinearLayout
+                    android:id="@+id/tabAlmuerzo"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_dia_semana_inactivo"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="4dp">
+
+                    <TextView
+                        android:id="@+id/txtTabAlmuerzoTitulo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Almuerzo"
+                        android:textColor="#64748B"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtTabAlmuerzoSub"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="Pendiente"
+                        android:textColor="#94A3B8"
+                        android:textSize="9.5sp" />
+                </LinearLayout>
+
+                <!-- TAB MERIENDA -->
+                <LinearLayout
+                    android:id="@+id/tabMerienda"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_dia_semana_inactivo"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="4dp">
+
+                    <TextView
+                        android:id="@+id/txtTabMeriendaTitulo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Merienda"
+                        android:textColor="#64748B"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtTabMeriendaSub"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="Pendiente"
+                        android:textColor="#94A3B8"
+                        android:textSize="9.5sp" />
+                </LinearLayout>
+
+            </LinearLayout>
+
             <!-- SECCIÓN: MENÚ DISPONIBLE DEL PAE -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="20dp"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -571,6 +581,22 @@
                     android:overScrollMode="never" />
 
             </LinearLayout>
+
+            <!-- BOTÓN CONFIRMAR Y GUARDAR SELECCIÓN -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnGuardarSeleccion"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="24dp"
+                android:backgroundTint="#F4B41F"
+                android:text="Confirmar y guardar selección"
+                android:textAllCaps="false"
+                android:textColor="#1E293B"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:cornerRadius="14dp"
+                app:elevation="3dp" />
 
         </LinearLayout>
 

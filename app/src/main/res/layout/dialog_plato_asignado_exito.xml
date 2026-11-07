@@ -115,14 +115,14 @@
         android:textColor="#4A5568"
         android:textSize="14sp" />
 
-    <!-- Botón 1: Continuar planificando (amarillo dorado relleno) -->
+    <!-- Botón 1: Guardar (amarillo dorado relleno) -->
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnContinuarPlanificandoModal"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginBottom="10dp"
         android:background="@drawable/bg_btn_continuar_planificando"
-        android:text="Continuar planificando"
+        android:text="Guardar"
         android:textAllCaps="false"
         android:textColor="#181B1F"
         android:textSize="15sp"

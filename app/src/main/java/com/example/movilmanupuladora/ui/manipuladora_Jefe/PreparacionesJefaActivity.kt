@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.databinding.ActivityPreparacionesJefaBinding
@@ -26,22 +27,17 @@ class PreparacionesJefaActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
 
-        binding = ActivityPreparacionesJefaBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        // Barra de estado blanca con iconos oscuros
+        window.statusBarColor = Color.WHITE
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
 
-        sessionManager = SessionManager(this)
-
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
-            insets
-        }
-
-        configurarNavegacionInferior()
-        configurarEventos()
-        actualizarDatosJornada()
+        // Redirigir a AsignarComponentesActivity para mostrar exactamente lo mismo que al configurar equipo
+        val intent = Intent(this, AsignarComponentesActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        startActivity(intent)
+        finish()
+        return
     }
 
     override fun onResume() {
@@ -74,9 +70,9 @@ class PreparacionesJefaActivity : AppCompatActivity() {
         }
 
         binding.btnVerManipuladoras.setOnClickListener {
-            val jornadaNombre = if (jornadaActual == Jornada.MANANA) "Mañana" else "Tarde"
-            val intent = Intent(this, ManipuladorasAsignadasActivity::class.java).apply {
-                putExtra("jornada", jornadaNombre)
+            val serv = if (jornadaActual == Jornada.MANANA) "Desayuno" else "Almuerzo"
+            val intent = Intent(this, AsignarComponentesActivity::class.java).apply {
+                putExtra("servicio", serv)
             }
             startActivity(intent)
         }
