@@ -7,8 +7,9 @@ import com.example.movilmanupuladora.data.api.RetrofitClient
 
 class SessionManager(context: Context) {
 
+    private val appContext: Context = context.applicationContext
     private val prefs: SharedPreferences =
-        context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        appContext.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
 
     companion object {
         private const val PREF_NAME = "SIRAE_SESSION"
@@ -130,18 +131,29 @@ class SessionManager(context: Context) {
     fun getUserPhone(): String? =
         prefs.getString(KEY_USER_PHONE, null)
 
-    // Guarda el plato seleccionado.
+    // Guarda el plato seleccionado en todas las preferencias de sincronización (SIRAE_SESSION, ManipuladoraJefe, TURNO_PAE)
     fun savePlatoSeleccionado(nombre: String, id: Int? = null) {
         val editor = prefs.edit()
             .putString("plato_seleccionado_nombre", nombre)
 
-        if (id != null) {
+        if (id != null && id > 0) {
             editor.putInt("plato_seleccionado_id", id)
         } else {
             editor.remove("plato_seleccionado_id")
         }
-
         editor.apply()
+
+        try {
+            val jefaPrefs = appContext.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE)
+            val jefaEditor = jefaPrefs.edit().putString("plato_actual", nombre)
+            if (id != null && id > 0) jefaEditor.putInt("plato_id", id)
+            jefaEditor.apply()
+
+            val turnoPrefs = appContext.getSharedPreferences("TURNO_PAE", Context.MODE_PRIVATE)
+            val turnoEditor = turnoPrefs.edit().putString("plato_nombre", nombre)
+            if (id != null && id > 0) turnoEditor.putInt("plato_id", id)
+            turnoEditor.apply()
+        } catch (_: Exception) { }
     }
 
     fun getPlatoSeleccionadoNombre(): String =
@@ -161,12 +173,14 @@ class SessionManager(context: Context) {
             "TURNO_PAE",
             Context.MODE_PRIVATE
         )
+        val jefaPref = context.getSharedPreferences(
+            "ManipuladoraJefe",
+            Context.MODE_PRIVATE
+        )
 
         return turnoPref.getString("plato_nombre", null)
-            ?: context.getSharedPreferences(
-                "ManipuladoraJefe",
-                Context.MODE_PRIVATE
-            ).getString("plato_actual", "Arroz con Pollo")
+            ?: jefaPref.getString("plato_actual", null)
+            ?: prefs.getString("plato_seleccionado_nombre", null)
             ?: "Arroz con Pollo"
     }
 
@@ -174,10 +188,13 @@ class SessionManager(context: Context) {
      * Obtiene el ID del plato que seleccionó la Jefa.
      */
     fun getPlatoJefaId(context: Context): Int {
-        return context.getSharedPreferences(
-            "TURNO_PAE",
-            Context.MODE_PRIVATE
-        ).getInt("plato_id", -1)
+        val turnoId = context.getSharedPreferences("TURNO_PAE", Context.MODE_PRIVATE).getInt("plato_id", -1)
+        if (turnoId > 0) return turnoId
+
+        val jefaId = context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE).getInt("plato_id", -1)
+        if (jefaId > 0) return jefaId
+
+        return prefs.getInt("plato_seleccionado_id", -1)
     }
 
     /**
