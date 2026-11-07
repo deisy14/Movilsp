@@ -8,7 +8,7 @@ fun AppCompatActivity.configurarNavegacionInferior() {
     val tabActual = when (this) {
         is InicioJefaActivity -> NavigationHelperJefa.TabJefa.INICIO
         is InventarioJefaActivity -> NavigationHelperJefa.TabJefa.INVENTARIO
-        is PreparacionesJefaActivity -> NavigationHelperJefa.TabJefa.PREPARACIONES
+        is PreparacionesJefaActivity, is AsignarComponentesActivity -> NavigationHelperJefa.TabJefa.PREPARACIONES
         is ManipuladorasJefaActivity -> NavigationHelperJefa.TabJefa.MANIPULADORAS
         is PerfilJefaActivity -> NavigationHelperJefa.TabJefa.PERFIL
         else -> NavigationHelperJefa.TabJefa.INICIO

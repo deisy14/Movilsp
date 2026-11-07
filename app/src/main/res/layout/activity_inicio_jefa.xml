@@ -24,11 +24,95 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- FRANJA SUPERIOR AMARILLA (TOP CAP) -->
-            <View
+            <!-- FRANJA SUPERIOR AMARILLA CON SALUDO, NOTIFICACIONES Y PERFIL -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:background="#F5B81F" />
+                android:layout_height="wrap_content"
+                android:background="#F5B81F"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="20dp"
+                android:paddingTop="14dp"
+                android:paddingBottom="38dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txtSaludoJefa"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="Hola, Jefa de Cocina"
+                        android:textColor="#1B3317"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtCargoHeaderJefa"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Coordinación y Gestión PAE"
+                        android:textColor="#3F4F2A"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <!-- NOTIFICACIONES (BLANCO) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/btnNotificacionesJefa"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:layout_marginEnd="8dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="22dp"
+                    app:cardElevation="3dp"
+                    app:strokeWidth="0dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="Notificaciones"
+                        android:src="@drawable/ic_notificaciones"
+                        app:tint="#1B3317" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- PERFIL DE LA JEFA (BLANCO) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/btnPerfilHeader"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="22dp"
+                    app:cardElevation="3dp"
+                    app:strokeWidth="0dp">
+
+                    <TextView
+                        android:id="@+id/txtInicialesJefa"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="JF"
+                        android:textColor="#1B3317"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
 
             <!-- TARJETA PRINCIPAL BLANCA CURVADA -->
             <LinearLayout
@@ -40,91 +124,6 @@
                 android:paddingHorizontal="20dp"
                 android:paddingTop="22dp"
                 android:paddingBottom="24dp">
-
-                <!-- ENCABEZADO Y PERFIL PARA JEFA DE COCINA -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="18dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/txtSaludoJefa"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Hola, Jefa de Cocina"
-                            android:textColor="#1B3317"
-                            android:textSize="20sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/txtCargoHeaderJefa"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Coordinación y Gestión PAE"
-                            android:textColor="#64748B"
-                            android:textSize="12sp" />
-
-                    </LinearLayout>
-
-                    <!-- NOTIFICACIONES -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/btnNotificacionesJefa"
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:layout_marginEnd="8dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground"
-                        app:cardBackgroundColor="#FFFFFF"
-                        app:cardCornerRadius="22dp"
-                        app:cardElevation="3dp"
-                        app:strokeWidth="0dp">
-
-                        <ImageView
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="Notificaciones"
-                            android:src="@drawable/ic_notificaciones"
-                            app:tint="#1B3317" />
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- PERFIL DE LA JEFA -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/btnPerfilHeader"
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground"
-                        app:cardBackgroundColor="#F4B41F"
-                        app:cardCornerRadius="22dp"
-                        app:cardElevation="3dp"
-                        app:strokeWidth="0dp">
-
-                        <TextView
-                            android:id="@+id/txtInicialesJefa"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:text="JF"
-                            android:textColor="#1B3317"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                </LinearLayout>
 
                 <!-- ENCABEZADO "MI SEMANA" -->
                 <TextView
@@ -145,7 +144,7 @@
                     android:textColor="#64748B"
                     android:textSize="12sp" />
 
-                <!-- TIRA DE 5 DÍAS DE LA SEMANA (LUN - VIE) -->
+                <!-- TIRA DE 7 DÍAS DE LA SEMANA (LUN - DOM) -->
                 <LinearLayout
                     android:id="@+id/layoutTiraDiasSemana"
                     android:layout_width="match_parent"
@@ -159,7 +158,7 @@
                         android:id="@+id/btnDiaLun"
                         android:layout_width="0dp"
                         android:layout_height="68dp"
-                        android:layout_marginEnd="6dp"
+                        android:layout_marginEnd="4dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_dia_semana_activo"
                         android:clickable="true"
@@ -174,7 +173,7 @@
                             android:layout_height="wrap_content"
                             android:text="Lun"
                             android:textColor="#1E293B"
-                            android:textSize="11sp"
+                            android:textSize="10sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -182,9 +181,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="26"
+                            android:text="2"
                             android:textColor="#1E293B"
-                            android:textSize="19sp"
+                            android:textSize="17sp"
                             android:textStyle="bold" />
                     </LinearLayout>
 
@@ -193,7 +192,7 @@
                         android:id="@+id/btnDiaMar"
                         android:layout_width="0dp"
                         android:layout_height="68dp"
-                        android:layout_marginEnd="6dp"
+                        android:layout_marginEnd="4dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_dia_semana_inactivo"
                         android:clickable="true"
@@ -207,7 +206,7 @@
                             android:layout_height="wrap_content"
                             android:text="Mar"
                             android:textColor="#64748B"
-                            android:textSize="11sp"
+                            android:textSize="10sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -215,9 +214,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="27"
+                            android:text="3"
                             android:textColor="#1E293B"
-                            android:textSize="19sp"
+                            android:textSize="17sp"
                             android:textStyle="bold" />
                     </LinearLayout>
 
@@ -226,7 +225,7 @@
                         android:id="@+id/btnDiaMie"
                         android:layout_width="0dp"
                         android:layout_height="68dp"
-                        android:layout_marginEnd="6dp"
+                        android:layout_marginEnd="4dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_dia_semana_inactivo"
                         android:clickable="true"
@@ -240,7 +239,7 @@
                             android:layout_height="wrap_content"
                             android:text="Mié"
                             android:textColor="#64748B"
-                            android:textSize="11sp"
+                            android:textSize="10sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -248,9 +247,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="28"
+                            android:text="4"
                             android:textColor="#1E293B"
-                            android:textSize="19sp"
+                            android:textSize="17sp"
                             android:textStyle="bold" />
                     </LinearLayout>
 
@@ -259,7 +258,7 @@
                         android:id="@+id/btnDiaJue"
                         android:layout_width="0dp"
                         android:layout_height="68dp"
-                        android:layout_marginEnd="6dp"
+                        android:layout_marginEnd="4dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_dia_semana_inactivo"
                         android:clickable="true"
@@ -273,7 +272,7 @@
                             android:layout_height="wrap_content"
                             android:text="Jue"
                             android:textColor="#64748B"
-                            android:textSize="11sp"
+                            android:textSize="10sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -281,9 +280,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="29"
+                            android:text="5"
                             android:textColor="#1E293B"
-                            android:textSize="19sp"
+                            android:textSize="17sp"
                             android:textStyle="bold" />
                     </LinearLayout>
 
@@ -292,6 +291,7 @@
                         android:id="@+id/btnDiaVie"
                         android:layout_width="0dp"
                         android:layout_height="68dp"
+                        android:layout_marginEnd="4dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_dia_semana_inactivo"
                         android:clickable="true"
@@ -305,7 +305,7 @@
                             android:layout_height="wrap_content"
                             android:text="Vie"
                             android:textColor="#64748B"
-                            android:textSize="11sp"
+                            android:textSize="10sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -313,9 +313,74 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="30"
+                            android:text="6"
                             android:textColor="#1E293B"
-                            android:textSize="19sp"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- SÁBADO -->
+                    <LinearLayout
+                        android:id="@+id/btnDiaSab"
+                        android:layout_width="0dp"
+                        android:layout_height="68dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_dia_semana_inactivo"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/txtNomDiaSab"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Sáb"
+                            android:textColor="#64748B"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/txtNumDiaSab"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="7"
+                            android:textColor="#1E293B"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- DOMINGO -->
+                    <LinearLayout
+                        android:id="@+id/btnDiaDom"
+                        android:layout_width="0dp"
+                        android:layout_height="68dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_dia_semana_inactivo"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/txtNomDiaDom"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Dom"
+                            android:textColor="#64748B"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/txtNumDiaDom"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="8"
+                            android:textColor="#1E293B"
+                            android:textSize="17sp"
                             android:textStyle="bold" />
                     </LinearLayout>
 
@@ -368,17 +433,24 @@
 
                 <!-- SCROLL HORIZONTAL DE TARJETAS DE MENÚS (DESAYUNO, ALMUERZO, MERIENDA) -->
                 <HorizontalScrollView
+                    android:id="@+id/scrollMenusAsignados"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
+                    android:layout_marginTop="8dp"
+                    android:clipChildren="false"
                     android:clipToPadding="false"
+                    android:paddingVertical="12dp"
                     android:overScrollMode="never"
                     android:scrollbars="none">
 
                     <LinearLayout
+                        android:id="@+id/layoutContenedorCardsComida"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:clipChildren="false"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="4dp">
 
                         <!-- TARJETA 1: DESAYUNO -->
                         <LinearLayout

@@ -142,11 +142,13 @@ object NavigationHelperJefa {
 
         navPreparaciones?.setOnClickListener {
             if (tabActual != TabJefa.PREPARACIONES) {
-                val intent = Intent(activity, PreparacionesJefaActivity::class.java)
+                val intent = Intent(activity, com.example.movilmanupuladora.ui.manipuladora_Jefe.AsignarComponentesActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
                 activity.overridePendingTransition(0, 0)
-                activity.finish()
+                if (activity !is com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity) {
+                    activity.finish()
+                }
             }
         }
 

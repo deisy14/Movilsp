@@ -278,7 +278,104 @@
             android:textStyle="bold"
             app:cornerRadius="15dp" />
 
-        <!-- BOTÓN SECUNDARIO: VER PASOS DE PREPARACIÓN -->
+        <!-- SECCIÓN: ASIGNAR A UN SERVICIO (DESAYUNO, ALMUERZO, MERIENDA) -->
+        <LinearLayout
+            android:id="@+id/layoutSeleccionServicioModal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvTituloAsignarServicio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Asignar plato a un servicio:"
+                android:textColor="#173F2A"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <!-- BOTÓN ASIGNAR DESAYUNO -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAsignarDesayunoModal"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:paddingHorizontal="4dp"
+                    android:text="Desayuno"
+                    android:textAllCaps="false"
+                    android:textColor="#176B35"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="12dp"
+                    app:strokeColor="#176B35"
+                    app:strokeWidth="1.5dp" />
+
+                <!-- BOTÓN ASIGNAR ALMUERZO -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAsignarAlmuerzoModal"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginHorizontal="2dp"
+                    android:layout_weight="1"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:paddingHorizontal="4dp"
+                    android:text="Almuerzo"
+                    android:textAllCaps="false"
+                    android:textColor="#176B35"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="12dp"
+                    app:strokeColor="#176B35"
+                    app:strokeWidth="1.5dp" />
+
+                <!-- BOTÓN ASIGNAR MERIENDA -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAsignarMeriendaModal"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:paddingHorizontal="4dp"
+                    android:text="Merienda"
+                    android:textAllCaps="false"
+                    android:textColor="#176B35"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="12dp"
+                    app:strokeColor="#176B35"
+                    app:strokeWidth="1.5dp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvEstadoAsignacionPlato"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:text="Toca un servicio para asignar este plato."
+                android:textColor="#65736A"
+                android:textSize="11sp" />
+
+        </LinearLayout>
+
+        <!-- BOTÓN SECUNDARIO: VER PASOS DE PREPARACIÓN (MANTENIDO POR COMPATIBILIDAD) -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnOtroAleatorioModal"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -290,6 +387,7 @@
             android:textColor="#176B35"
             android:textSize="13sp"
             android:textStyle="bold"
+            android:visibility="gone"
             app:cornerRadius="15dp"
             app:strokeColor="#176B35"
             app:strokeWidth="1.5dp" />

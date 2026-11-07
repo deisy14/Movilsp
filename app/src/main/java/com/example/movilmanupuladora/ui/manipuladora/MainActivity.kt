@@ -201,17 +201,19 @@ class MainActivity : AppCompatActivity() {
                 try {
                     // 1. Sincronizar en tiempo real el plato, componente asignado a la manipuladora y asistencia
                     com.example.movilmanupuladora.utils.PreparacionSyncManager.sincronizarDesdeBackend(this@MainActivity)
+
+                    // 2. Sincronizar también con la tabla de asistencia diaria del backend
+                    cargarAsistenciaBackend()
+
+                    // 3. Actualizar interfaz de forma reactiva en el hilo principal
                     withContext(Dispatchers.Main) {
                         actualizarInformacionSeccion()
                         cargarAsistenciaLocal()
                     }
-
-                    // 2. Sincronizar también con la tabla de asistencia diaria del backend
-                    cargarAsistenciaBackend()
                 } catch (e: Exception) {
                     Log.e("POLLING_MA", "Error en polling en vivo: ${e.message}")
                 }
-                delay(4000)
+                delay(3000)
             }
         }
     }
@@ -248,15 +250,15 @@ class MainActivity : AppCompatActivity() {
             binding.btnJornadaTarde.setBackgroundResource(R.drawable.bg_tag_plato)
             binding.btnJornadaTarde.setTextColor(Color.parseColor("#64748B"))
 
-            // Jornada Mañana: Desayuno y Almuerzo activos
+            // Mantener todas las secciones activas para que la manipuladora pueda revisar los 3 servicios
             binding.btnSeccionDesayuno.alpha = 1.0f
             binding.btnSeccionDesayuno.isEnabled = true
 
             binding.btnSeccionAlmuerzo.alpha = 1.0f
             binding.btnSeccionAlmuerzo.isEnabled = true
 
-            binding.btnSeccionMerienda.alpha = 0.35f
-            binding.btnSeccionMerienda.isEnabled = false
+            binding.btnSeccionMerienda.alpha = 1.0f
+            binding.btnSeccionMerienda.isEnabled = true
 
             seleccionarSeccion(0) // Selecciona Desayuno por defecto
         } else {
@@ -266,12 +268,12 @@ class MainActivity : AppCompatActivity() {
             binding.btnJornadaManana.setBackgroundResource(R.drawable.bg_tag_plato)
             binding.btnJornadaManana.setTextColor(Color.parseColor("#64748B"))
 
-            // Jornada Tarde: Solo Merienda activa
-            binding.btnSeccionDesayuno.alpha = 0.35f
-            binding.btnSeccionDesayuno.isEnabled = false
+            // Mantener todas las secciones activas también en la tarde
+            binding.btnSeccionDesayuno.alpha = 1.0f
+            binding.btnSeccionDesayuno.isEnabled = true
 
-            binding.btnSeccionAlmuerzo.alpha = 0.35f
-            binding.btnSeccionAlmuerzo.isEnabled = false
+            binding.btnSeccionAlmuerzo.alpha = 1.0f
+            binding.btnSeccionAlmuerzo.isEnabled = true
 
             binding.btnSeccionMerienda.alpha = 1.0f
             binding.btnSeccionMerienda.isEnabled = true
@@ -384,39 +386,57 @@ class MainActivity : AppCompatActivity() {
 
     private fun actualizarInformacionSeccion() {
         val sessionMgr = SessionManager(this)
-        val platoJefa = sessionMgr.getPlatoJefa(this)
-        val componenteJefa = sessionMgr.getComponenteAsignado(this)
+        val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
 
+        // 1. Obtener los platos asignados por la Jefa para los 3 servicios del día
+        val platoDes = sessionMgr.getPlatoDiaServicio(this, fechaHoy, "Desayuno")
+            ?: sessionMgr.getPlatoServicio(this, "Desayuno")
+            ?: "Huevos pericos con arroz blanco"
+
+        val platoAlm = sessionMgr.getPlatoDiaServicio(this, fechaHoy, "Almuerzo")
+            ?: sessionMgr.getPlatoServicio(this, "Almuerzo")
+            ?: "Arroz con Pollo Criollo"
+
+        val platoMer = sessionMgr.getPlatoDiaServicio(this, fechaHoy, "Merienda")
+            ?: sessionMgr.getPlatoServicio(this, "Merienda")
+            ?: "Chocolate en leche con hojaldras"
+
+        // 2. Asignar imágenes circulares correspondientes a cada sector de la ruleta
+        binding.imgRuletaDesayuno.setImageResource(
+            com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity.obtenerImagenPlatoPorNombre(platoDes)
+        )
+        binding.imgRuletaAlmuerzo.setImageResource(
+            com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity.obtenerImagenPlatoPorNombre(platoAlm)
+        )
+        binding.imgRuletaMerienda.setImageResource(
+            com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity.obtenerImagenPlatoPorNombre(platoMer)
+        )
+
+        // 3. Actualizar información de la sección actualmente seleccionada
         val nombreSeccion = seccionesNombres[seccionSeleccionada]
+        binding.tvTagSeccionSeleccionada.text = "TU COMPONENTE · ${nombreSeccion.uppercase()}"
         binding.tvSeccionSeleccionada.text = nombreSeccion.uppercase()
 
-        // Mostrar prioritariamente el plato seleccionado por la Jefa
-        if (platoJefa.isNotBlank()) {
-            binding.tvPlatoSeleccionado.text = platoJefa
-            if (!componenteJefa.isNullOrBlank()) {
-                binding.layoutComponenteAsignado.visibility = View.VISIBLE
-                binding.tvComponenteAsignado.text = "Tu componente a preparar: $componenteJefa"
-                binding.tvSubtituloCardAsignadas.text = "Plato: $platoJefa · Tarea: $componenteJefa"
-            } else {
-                binding.layoutComponenteAsignado.visibility = View.GONE
-                binding.tvSubtituloCardAsignadas.text = "Plato: $platoJefa · Continuar preparación"
-            }
-            binding.imgPlatoMain.setImageResource(
-                com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity.obtenerImagenPlatoPorNombre(platoJefa)
-            )
+        val platoActivo = when (seccionSeleccionada) {
+            0 -> platoDes
+            1 -> platoAlm
+            else -> platoMer
+        }
+
+        binding.imgPlatoMain.setImageResource(
+            com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity.obtenerImagenPlatoPorNombre(platoActivo)
+        )
+
+        // 4. Mostrar componente asignado a esta manipuladora más grande y en el centro, y abajo el nombre del plato
+        val componenteJefa = sessionMgr.getComponenteAsignado(this, nombreSeccion)
+        if (!componenteJefa.isNullOrBlank()) {
+            binding.tvComponenteAsignado.text = componenteJefa
+            binding.tvPlatoSeleccionado.text = "Plato: $platoActivo"
+            binding.tvSubtituloCardAsignadas.text = "Tu tarea: $componenteJefa · $platoActivo"
         } else {
-            binding.layoutComponenteAsignado.visibility = View.GONE
-            binding.tvSubtituloCardAsignadas.text = "Continuar preparación de hoy"
-            val plato = obtenerPlatoPorSeccion(nombreSeccion)
-            if (plato != null) {
-                platoActualSeleccionado = plato
-                binding.tvPlatoSeleccionado.text = formatearNombrePlato(plato.nombrePlato)
-                binding.imgPlatoMain.setImageResource(obtenerImagenPlato(plato))
-            } else {
-                platoActualSeleccionado = null
-                binding.tvPlatoSeleccionado.text = "Sin menú asignado"
-                binding.imgPlatoMain.setImageResource(R.drawable.plato1)
-            }
+            binding.tvComponenteAsignado.text = platoActivo
+            binding.tvPlatoSeleccionado.text = "Servicio: $nombreSeccion"
+            binding.tvSubtituloCardAsignadas.text = "Plato: $platoActivo · Continuar preparación"
         }
     }
 
@@ -468,19 +488,13 @@ class MainActivity : AppCompatActivity() {
                     val todas = asistenciasRes.body()!!
                     val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
 
-                    // 1. Filtrar registros con la fecha exacta de hoy
-                    var registrosFecha = todas.filter { it.fecha.trim().startsWith(fechaHoy) }
-
-                    // 2. Si no hay registros de hoy (por posible desfase de reloj o zona horaria UTC entre teléfonos),
-                    // tomar automáticamente los de la fecha más reciente registrada en el servidor
-                    if (registrosFecha.isEmpty()) {
-                        val fechaMasReciente = todas.maxByOrNull { it.obtenerIdReal() ?: 0 }?.fecha?.trim()?.take(10)
-                        if (!fechaMasReciente.isNullOrEmpty()) {
-                            registrosFecha = todas.filter { it.fecha.trim().startsWith(fechaMasReciente) }
-                        }
+                    // 1. Filtrar registros con la fecha de hoy (soporta variaciones de formato y ceros)
+                    val registrosFecha = todas.filter {
+                        val f = it.fecha.trim()
+                        f.startsWith(fechaHoy) || f.replace("-0", "-").startsWith(fechaHoy.replace("-0", "-"))
                     }
 
-                    // 3. Tomar siempre el registro más reciente para Primaria y Secundaria
+                    // 2. Tomar el registro de Primaria y Secundaria del día de hoy
                     val regPrimaria = registrosFecha
                         .filter { it.obtenerIdGradoReal() == idPrimariaCache || it.obtenerIdGradoReal() == 16 }
                         .maxByOrNull { it.obtenerIdReal() ?: 0 }
@@ -500,9 +514,8 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     val totalEstudiantes = totalPrimaria + totalSecundaria
-                    val existeRegistro = (regPrimaria != null || regSecundaria != null || registrosFecha.isNotEmpty())
 
-                    // Solo actualizar la caché si el servidor devolvió datos reales (> 0) o si no hay datos locales previos
+                    // Solo actualizar la caché si el servidor devolvió datos reales de hoy (> 0)
                     if (totalEstudiantes > 0) {
                         AsistenciaManager.guardarPrimaria(this@MainActivity, totalPrimaria)
                         AsistenciaManager.guardarSecundaria(this@MainActivity, totalSecundaria)
@@ -618,6 +631,31 @@ class MainActivity : AppCompatActivity() {
         edtS9.setText(detalle["s9"].orEmpty())
         edtS10.setText(detalle["s10"].orEmpty())
         edtS11.setText(detalle["s11"].orEmpty())
+
+        // Si el detalle aún no tiene valores específicos pero hay totales de primaria/secundaria, mostrar la distribución
+        val pSaved = AsistenciaManager.obtenerPrimaria(this)
+        val sSaved = AsistenciaManager.obtenerSecundaria(this)
+        if (detalle.isEmpty() || detalle.values.all { it.isBlank() }) {
+            if (pSaved > 0) {
+                val baseP = pSaved / 5
+                val remP = pSaved % 5
+                edtP1.setText(baseP.toString())
+                edtP2.setText(baseP.toString())
+                edtP3.setText(baseP.toString())
+                edtP4.setText(baseP.toString())
+                edtP5.setText((baseP + remP).toString())
+            }
+            if (sSaved > 0) {
+                val baseS = sSaved / 6
+                val remS = sSaved % 6
+                edtS6.setText(baseS.toString())
+                edtS7.setText(baseS.toString())
+                edtS8.setText(baseS.toString())
+                edtS9.setText(baseS.toString())
+                edtS10.setText(baseS.toString())
+                edtS11.setText((baseS + remS).toString())
+            }
+        }
 
         // Deshabilitar edición para la manipuladora (modo consulta)
         listOf(edtJardin, edtP1, edtP2, edtP3, edtP4, edtP5, edtS6, edtS7, edtS8, edtS9, edtS10, edtS11).forEach {

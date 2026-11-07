@@ -133,10 +133,16 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                 } else if (totMSync > 0) {
                     primariaManana = (totMSync * 0.6).toInt()
                     secundariaManana = totMSync - primariaManana
+                } else {
+                    primariaManana = 0
+                    secundariaManana = 0
                 }
                 if (totTSync > 0) {
                     primariaTarde = (totTSync * 0.6).toInt()
                     secundariaTarde = totTSync - primariaTarde
+                } else {
+                    primariaTarde = 0
+                    secundariaTarde = 0
                 }
 
                 // 2. Identificar IDs de grados para Primaria y Secundaria del catálogo
@@ -147,17 +153,11 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                     idGradoSecundaria = grados.find { it.obtenerNombreReal().contains("secundaria", ignoreCase = true) }?.obtenerIdReal() ?: 19
                 }
 
-                // 3. Obtener asistencias de hoy del backend
+                // 3. Obtener asistencias de hoy del backend exclusivamente
                 val res = asistenciaRepository.obtenerAsistencias()
                 if (res.isSuccessful && res.body() != null) {
                     val lista = res.body()!!
-                    var registrosHoy = lista.filter { it.fecha.trim().startsWith(fechaHoy) }
-                    if (registrosHoy.isEmpty() && lista.isNotEmpty()) {
-                        val fechaMasReciente = lista.maxByOrNull { it.obtenerIdReal() ?: 0 }?.fecha?.trim()?.take(10)
-                        if (!fechaMasReciente.isNullOrEmpty()) {
-                            registrosHoy = lista.filter { it.fecha.trim().startsWith(fechaMasReciente) }
-                        }
-                    }
+                    val registrosHoy = lista.filter { it.fecha.trim().startsWith(fechaHoy) }
 
                     val regPrimaria = registrosHoy
                         .filter { it.obtenerIdGradoReal() == idGradoPrimaria || it.obtenerIdGradoReal() == 16 }
@@ -532,7 +532,7 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                 // 3. Persistir en la tabla de asistencia diaria del backend
                 try {
                     sessionManager.fetchAuthToken()
-                    val userId = sessionManager.getUserId().takeIf { it > 0 }
+                    val userId = sessionManager.getUserId().takeIf { it > 0 } ?: 19
                     val idP = if (jornadaActual == "MANANA") idAsistenciaPrimariaManana else idAsistenciaPrimariaTarde
                     val idS = if (jornadaActual == "MANANA") idAsistenciaSecundariaManana else idAsistenciaSecundariaTarde
 

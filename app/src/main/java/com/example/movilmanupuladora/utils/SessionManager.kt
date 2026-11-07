@@ -4,6 +4,9 @@ package com.example.movilmanupuladora.utils
 import android.content.Context
 import android.content.SharedPreferences
 import com.example.movilmanupuladora.data.api.RetrofitClient
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class SessionManager(context: Context) {
 
@@ -55,6 +58,22 @@ class SessionManager(context: Context) {
         }
 
         return token
+    }
+
+    /**
+     * Valida si existe un token de sesión y si la hora actual está dentro
+     * de la ventana de sesión permitida (7:00 AM a 7:00 PM).
+     */
+    fun esSesionValidaHorario(): Boolean {
+        val token = fetchAuthToken()
+        if (token.isNullOrBlank()) return false
+
+        val cal = java.util.Calendar.getInstance()
+        val hora = cal.get(java.util.Calendar.HOUR_OF_DAY)
+        val minuto = cal.get(java.util.Calendar.MINUTE)
+
+        // De 7:00 AM a 7:00 PM (19:00 inclusive)
+        return (hora in 7..18) || (hora == 19 && minuto == 0)
     }
 
     // Guarda los datos del usuario autenticado y su sede.
@@ -185,6 +204,180 @@ class SessionManager(context: Context) {
     }
 
     /**
+     * Guarda el plato asignado a un servicio específico (Desayuno, Almuerzo, Merienda).
+     */
+    fun savePlatoServicio(context: Context, servicio: String, nombre: String, id: Int? = null) {
+        val servKey = when (servicio.lowercase()) {
+            "desayuno" -> "desayuno"
+            "almuerzo" -> "almuerzo"
+            "merienda" -> "merienda"
+            else -> "desayuno"
+        }
+        val turnoPref = context.getSharedPreferences("TURNO_PAE", Context.MODE_PRIVATE).edit()
+        val jefaPref = context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE).edit()
+
+        turnoPref.putString("plato_$servKey", nombre)
+        jefaPref.putString("plato_$servKey", nombre)
+
+        if (id != null && id > 0) {
+            turnoPref.putInt("plato_${servKey}_id", id)
+            jefaPref.putInt("plato_${servKey}_id", id)
+        } else {
+            turnoPref.remove("plato_${servKey}_id")
+            jefaPref.remove("plato_${servKey}_id")
+        }
+        turnoPref.apply()
+        jefaPref.apply()
+    }
+
+    /**
+     * Elimina la asignación de un servicio específico.
+     */
+    fun desasignarPlatoServicio(context: Context, servicio: String) {
+        val servKey = when (servicio.lowercase()) {
+            "desayuno" -> "desayuno"
+            "almuerzo" -> "almuerzo"
+            "merienda" -> "merienda"
+            else -> "desayuno"
+        }
+        context.getSharedPreferences("TURNO_PAE", Context.MODE_PRIVATE).edit()
+            .remove("plato_$servKey")
+            .remove("plato_${servKey}_id")
+            .apply()
+        context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE).edit()
+            .remove("plato_$servKey")
+            .remove("plato_${servKey}_id")
+            .apply()
+    }
+
+    /**
+     * Obtiene el nombre del plato asignado a un servicio específico.
+     */
+    fun getPlatoServicio(context: Context, servicio: String): String? {
+        val servKey = when (servicio.lowercase()) {
+            "desayuno" -> "desayuno"
+            "almuerzo" -> "almuerzo"
+            "merienda" -> "merienda"
+            else -> "desayuno"
+        }
+        val turnoVal = context.getSharedPreferences("TURNO_PAE", Context.MODE_PRIVATE)
+            .getString("plato_$servKey", null)
+        if (!turnoVal.isNullOrBlank()) return turnoVal
+
+        return context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE)
+            .getString("plato_$servKey", null)
+    }
+
+    /**
+     * Obtiene el ID del plato asignado a un servicio específico.
+     */
+    fun getPlatoServicioId(context: Context, servicio: String): Int {
+        val servKey = when (servicio.lowercase()) {
+            "desayuno" -> "desayuno"
+            "almuerzo" -> "almuerzo"
+            "merienda" -> "merienda"
+            else -> "desayuno"
+        }
+        val tId = context.getSharedPreferences("TURNO_PAE", Context.MODE_PRIVATE)
+            .getInt("plato_${servKey}_id", -1)
+        if (tId != -1) return tId
+
+        return context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE)
+            .getInt("plato_${servKey}_id", -1)
+    }
+
+    /**
+     * Guarda el plato asignado a un día específico (fecha yyyy-MM-dd) y servicio (Desayuno, Almuerzo, Merienda).
+     */
+    fun savePlatoDiaServicio(context: Context, fecha: String, servicio: String, nombre: String, id: Int? = null) {
+        val servKey = when (servicio.lowercase()) {
+            "desayuno" -> "desayuno"
+            "almuerzo" -> "almuerzo"
+            "merienda" -> "merienda"
+            else -> "desayuno"
+        }
+        val turnoPref = context.getSharedPreferences("TURNO_PAE", Context.MODE_PRIVATE).edit()
+        val jefaPref = context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE).edit()
+
+        turnoPref.putString("plan_${fecha}_${servKey}", nombre)
+        jefaPref.putString("plan_${fecha}_${servKey}", nombre)
+
+        if (id != null && id > 0) {
+            turnoPref.putInt("plan_${fecha}_${servKey}_id", id)
+            jefaPref.putInt("plan_${fecha}_${servKey}_id", id)
+        } else {
+            turnoPref.remove("plan_${fecha}_${servKey}_id")
+            jefaPref.remove("plan_${fecha}_${servKey}_id")
+        }
+        turnoPref.apply()
+        jefaPref.apply()
+
+        // También actualiza la clave general del servicio para que la manipuladora lo vea inmediatamente
+        savePlatoServicio(context, servicio, nombre, id)
+    }
+
+    /**
+     * Desasigna el plato de un día y servicio específico.
+     */
+    fun desasignarPlatoDiaServicio(context: Context, fecha: String, servicio: String) {
+        val servKey = when (servicio.lowercase()) {
+            "desayuno" -> "desayuno"
+            "almuerzo" -> "almuerzo"
+            "merienda" -> "merienda"
+            else -> "desayuno"
+        }
+        context.getSharedPreferences("TURNO_PAE", Context.MODE_PRIVATE).edit()
+            .remove("plan_${fecha}_${servKey}")
+            .remove("plan_${fecha}_${servKey}_id")
+            .apply()
+        context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE).edit()
+            .remove("plan_${fecha}_${servKey}")
+            .remove("plan_${fecha}_${servKey}_id")
+            .apply()
+
+        desasignarPlatoServicio(context, servicio)
+    }
+
+    /**
+     * Obtiene el plato de un día y servicio específico.
+     */
+    fun getPlatoDiaServicio(context: Context, fecha: String, servicio: String): String? {
+        val servKey = when (servicio.lowercase()) {
+            "desayuno" -> "desayuno"
+            "almuerzo" -> "almuerzo"
+            "merienda" -> "merienda"
+            else -> "desayuno"
+        }
+        val tVal = context.getSharedPreferences("TURNO_PAE", Context.MODE_PRIVATE)
+            .getString("plan_${fecha}_${servKey}", null)
+        if (!tVal.isNullOrBlank()) return tVal
+
+        val jVal = context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE)
+            .getString("plan_${fecha}_${servKey}", null)
+        if (!jVal.isNullOrBlank()) return jVal
+
+        return null
+    }
+
+    /**
+     * Obtiene el ID del plato de un día y servicio específico.
+     */
+    fun getPlatoDiaServicioId(context: Context, fecha: String, servicio: String): Int {
+        val servKey = when (servicio.lowercase()) {
+            "desayuno" -> "desayuno"
+            "almuerzo" -> "almuerzo"
+            "merienda" -> "merienda"
+            else -> "desayuno"
+        }
+        val tId = context.getSharedPreferences("TURNO_PAE", Context.MODE_PRIVATE)
+            .getInt("plan_${fecha}_${servKey}_id", -1)
+        if (tId != -1) return tId
+
+        return context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE)
+            .getInt("plan_${fecha}_${servKey}_id", -1)
+    }
+
+    /**
      * Obtiene el ID del plato que seleccionó la Jefa.
      */
     fun getPlatoJefaId(context: Context): Int {
@@ -200,12 +393,16 @@ class SessionManager(context: Context) {
     /**
      * Busca el componente asignado al usuario actualmente autenticado.
      *
-     * Las asignaciones de la Jefa se consultan en SharedPreferences
-     * "ManipuladoraJefe".
+     * Permite consultar por servicio específico (Desayuno, Almuerzo, Merienda)
+     * o general del día.
      */
-    fun getComponenteAsignado(context: Context): String? {
+    fun getComponenteAsignado(context: Context, servicio: String? = null): String? {
         val jefaPrefs = context.getSharedPreferences(
             "ManipuladoraJefe",
+            Context.MODE_PRIVATE
+        )
+        val asigPrefs = context.getSharedPreferences(
+            "ASIGNACIONES_PAE",
             Context.MODE_PRIVATE
         )
 
@@ -226,114 +423,124 @@ class SessionManager(context: Context) {
             return compJefa
         }
 
-        // 1. Buscar por ID del usuario.
         val myUid = getUserId()
+        val keyCorreo = correoUser?.replace("@", "_")?.replace(".", "_") ?: ""
+        val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        val serv = servicio ?: "Desayuno"
 
+        // PRIORIDAD 1: Asignación oficial guardada por la Jefa para la fecha de hoy y el servicio actual
+        val prefixServ = "asig_${fechaHoy}_${serv}_"
+        val prefixCorreoServ = "asig_correo_${fechaHoy}_${serv}_"
+        val prefixUidServ = "asig_uid_${fechaHoy}_${serv}_"
+
+        for ((k, v) in asigPrefs.all) {
+            if (k.startsWith(prefixCorreoServ) && v is String && correoUser != null) {
+                if (v.trim().equals(correoUser, ignoreCase = true) || correoUser.contains(v.trim(), ignoreCase = true)) {
+                    return k.removePrefix(prefixCorreoServ)
+                }
+            }
+            if (k.startsWith(prefixUidServ) && v is Int && myUid > 0 && v == myUid) {
+                return k.removePrefix(prefixUidServ)
+            }
+            if (k.startsWith(prefixServ) && v is String) {
+                val cocineraNombre = v.trim().lowercase()
+                if (nombreUser != null && (cocineraNombre.contains(nombreUser) || nombreUser.contains(cocineraNombre))) {
+                    return k.removePrefix(prefixServ)
+                }
+                if (correoUser?.contains("pool") == true && cocineraNombre.contains("pool")) {
+                    return k.removePrefix(prefixServ)
+                }
+                if (correoUser?.contains("deis") == true && cocineraNombre.contains("deis")) {
+                    return k.removePrefix(prefixServ)
+                }
+            }
+        }
+
+        // PRIORIDAD 2: Asignación por servicio específico en claves comp_correo_ / comp_uid_
+        if (correoUser?.contains("pool") == true || nombreUser?.contains("pool") == true || myUid == 21) {
+            val pServ = asigPrefs.getString("asig_pool_${fechaHoy}_${serv}", null)
+                ?: asigPrefs.getString("comp_pool_${serv}", null)
+                ?: asigPrefs.getString("comp_uid_${serv}_21", null)
+                ?: asigPrefs.getString("comp_pool", null)
+                ?: asigPrefs.getString("comp_uid_21", null)
+            if (!pServ.isNullOrBlank()) return pServ
+        }
+        if (correoUser?.contains("deis") == true || nombreUser?.contains("deis") == true || myUid == 24) {
+            val dServ = asigPrefs.getString("asig_deis_${fechaHoy}_${serv}", null)
+                ?: asigPrefs.getString("comp_deis_${serv}", null)
+                ?: asigPrefs.getString("comp_uid_${serv}_24", null)
+                ?: asigPrefs.getString("comp_deis", null)
+                ?: asigPrefs.getString("comp_uid_24", null)
+            if (!dServ.isNullOrBlank()) return dServ
+        }
+
+        if (keyCorreo.isNotBlank()) {
+            val cServ = asigPrefs.getString("comp_correo_${serv}_$keyCorreo", null)
+                ?: jefaPrefs.getString("comp_correo_${serv}_$keyCorreo", null)
+            if (!cServ.isNullOrBlank()) return cServ
+        }
         if (myUid > 0) {
-            val compUid = jefaPrefs.getString("comp_uid_$myUid", null)
-
-            if (!compUid.isNullOrBlank()) {
-                return compUid
-            }
+            val cServUid = asigPrefs.getString("comp_uid_${serv}_$myUid", null)
+                ?: jefaPrefs.getString("comp_uid_${serv}_$myUid", null)
+            if (!cServUid.isNullOrBlank()) return cServUid
         }
 
-        // 2. Buscar por correo electrónico.
-        if (!correoUser.isNullOrBlank()) {
-            val keyCorreo = "comp_correo_" +
-                correoUser.replace("@", "_").replace(".", "_")
-
-            val comp = jefaPrefs.getString(keyCorreo, null)
-
-            if (!comp.isNullOrBlank()) {
-                return comp
-            }
-        }
-
-        // 3. Buscar por nombre.
-        if (!nombreUser.isNullOrBlank()) {
-            val keyNombre = "comp_" + nombreUser.replace(" ", "_")
-            val comp = jefaPrefs.getString(keyNombre, null)
-
-            if (!comp.isNullOrBlank()) {
-                return comp
-            }
-
-            // Buscar también el nombre sin tildes.
-            val nombreSinTilde = java.text.Normalizer
-                .normalize(
-                    nombreUser,
-                    java.text.Normalizer.Form.NFD
-                )
-                .replace(
-                    "\\p{InCombiningDiacriticalMarks}+".toRegex(),
-                    ""
-                )
-                .replace(" ", "_")
-
-            val compSinTilde = jefaPrefs.getString(
-                "comp_$nombreSinTilde",
-                null
-            )
-
-            if (!compSinTilde.isNullOrBlank()) {
-                return compSinTilde
-            }
-
-            // Buscar por el primer nombre.
-            val primerNombre =
-                nombreUser.split(" ").firstOrNull()?.trim() ?: ""
-
-            if (primerNombre.isNotBlank()) {
-                val compPrimerNombre = jefaPrefs.getString(
-                    "comp_$primerNombre",
-                    null
-                )
-
-                if (!compPrimerNombre.isNullOrBlank()) {
-                    return compPrimerNombre
+        // PRIORIDAD 3: Asignación en cualquier servicio de la fecha de hoy
+        val prefixHoy = "asig_${fechaHoy}_"
+        val prefixCorreoHoy = "asig_correo_${fechaHoy}_"
+        for ((k, v) in asigPrefs.all) {
+            if (k.startsWith(prefixCorreoHoy) && v is String && correoUser != null) {
+                if (v.trim().equals(correoUser, ignoreCase = true)) {
+                    val resto = k.removePrefix(prefixCorreoHoy)
+                    val partes = resto.split("_")
+                    if (partes.size >= 2) return partes.subList(1, partes.size).joinToString("_")
                 }
             }
-
-            // Buscar coincidencias parciales entre las claves.
-            val all = jefaPrefs.all
-
-            for ((key, value) in all) {
-                if (
-                    key.startsWith("comp_") &&
-                    !key.startsWith("comp_correo_") &&
-                    value is String &&
-                    value.isNotBlank()
-                ) {
-                    val nombreEnClave = key.removePrefix("comp_")
-
-                    if (
-                        nombreUser.contains(nombreEnClave) ||
-                        nombreEnClave.contains(nombreUser) ||
-                        nombreSinTilde.contains(nombreEnClave) ||
-                        nombreEnClave.contains(nombreSinTilde)
-                    ) {
-                        return value
-                    }
+            if (k.startsWith(prefixHoy) && !k.startsWith("asig_correo_") && !k.startsWith("asig_uid_") && v is String) {
+                val cocineraNombre = v.trim().lowercase()
+                if (nombreUser != null && (cocineraNombre.contains(nombreUser) || nombreUser.contains(cocineraNombre))) {
+                    val resto = k.removePrefix(prefixHoy)
+                    val partes = resto.split("_")
+                    if (partes.size >= 2) return partes.subList(1, partes.size).joinToString("_")
+                }
+                if (correoUser?.contains("pool") == true && cocineraNombre.contains("pool")) {
+                    val resto = k.removePrefix(prefixHoy)
+                    val partes = resto.split("_")
+                    if (partes.size >= 2) return partes.subList(1, partes.size).joinToString("_")
+                }
+                if (correoUser?.contains("deis") == true && cocineraNombre.contains("deis")) {
+                    val resto = k.removePrefix(prefixHoy)
+                    val partes = resto.split("_")
+                    if (partes.size >= 2) return partes.subList(1, partes.size).joinToString("_")
                 }
             }
         }
 
-        // 4. Compatibilidad con asignaciones de Andrea Sánchez.
-        if (
-            correoUser?.contains("andrea") == true ||
-            nombreUser?.contains("andrea") == true
-        ) {
-            val all = jefaPrefs.all
+        // PRIORIDAD 4: Claves directas comp_correo_ / comp_uid_
+        if (keyCorreo.isNotBlank()) {
+            val cGen = asigPrefs.getString("comp_correo_$keyCorreo", null)
+                ?: jefaPrefs.getString("comp_correo_$keyCorreo", null)
+            if (!cGen.isNullOrBlank()) return cGen
+        }
+        if (myUid > 0) {
+            val cGenUid = asigPrefs.getString("comp_uid_$myUid", null)
+                ?: jefaPrefs.getString("comp_uid_$myUid", null)
+            if (!cGenUid.isNullOrBlank()) return cGenUid
+        }
 
-            for ((key, value) in all) {
-                if (
-                    (key.contains("andrea") || key.contains("sanchez")) &&
-                    value is String &&
-                    value.isNotBlank()
-                ) {
-                    return value
-                }
-            }
+        // PRIORIDAD 5: Mapeo por ID conocido o correo de las manipuladoras
+        val uidKnown = when {
+            correoUser?.contains("pool") == true || nombreUser?.contains("pool") == true -> 21
+            correoUser?.contains("deis") == true || nombreUser?.contains("deis") == true -> 24
+            correoUser?.contains("andrea") == true || nombreUser?.contains("andrea") == true -> 20
+            correoUser?.contains("andres") == true || nombreUser?.contains("andres") == true -> 30
+            else -> null
+        }
+        if (uidKnown != null) {
+            val compK = asigPrefs.getString("comp_uid_${serv}_$uidKnown", null)
+                ?: asigPrefs.getString("comp_uid_$uidKnown", null)
+                ?: jefaPrefs.getString("comp_uid_$uidKnown", null)
+            if (!compK.isNullOrBlank()) return compK
         }
 
         return null

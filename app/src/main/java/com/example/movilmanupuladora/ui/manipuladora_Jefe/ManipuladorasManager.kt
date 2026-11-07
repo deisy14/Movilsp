@@ -68,32 +68,51 @@ object ManipuladorasManager {
                             rolNombre == "manipuladora" ||
                             rolNombre.contains("manipuladora") ||
                             correo == "andreasanchez@gmail.com" ||
-                            correo == "manipuladora@sirae.com" ||
-                            correo == "andres@gmail.com"
+                            correo == "poolgomez27@gmail.com" ||
+                            correo == "deis@gmail.com" ||
+                            correo == "andres@gmail.com" ||
+                            correo == "manipuladora@sirae.com"
                     )
 
                     esManipuladora
                 }
 
                 if (manipuladorasBackend.isNotEmpty()) {
-                    listaManipuladoras.clear()
-                    for ((index, u) in manipuladorasBackend.withIndex()) {
-                        listaManipuladoras.add(
-                            Manipuladora(
-                                id = u.idUsuario ?: (index + 1),
-                                nombre = u.nombreCompleto,
-                                funcion = "Manipuladora de alimentos",
-                                jornada = "Mañana",
-                                activa = u.isActive ?: true,
-                                estado = if (u.isActive == true) "Activa" else "Inactiva",
-                                correo = u.correo,
-                                idUsuario = u.idUsuario ?: -1
+                    // Actualizar IDs reales del backend sobre las manipuladoras base
+                    for (u in manipuladorasBackend) {
+                        val c = u.correo.lowercase().trim()
+                        val n = u.nombreCompleto.lowercase().trim()
+                        val existente = listaManipuladoras.firstOrNull {
+                            it.correo.equals(c, ignoreCase = true) ||
+                            (c.isNotBlank() && it.correo.contains(c, ignoreCase = true)) ||
+                            (n.isNotBlank() && it.nombre.lowercase().contains(n))
+                        }
+                        if (existente != null) {
+                            if (u.idUsuario != null && u.idUsuario > 0) {
+                                existente.idUsuario = u.idUsuario
+                            }
+                            if (u.nombreCompleto.isNotBlank()) {
+                                existente.nombre = u.nombreCompleto
+                            }
+                            if (u.isActive != null) {
+                                existente.activa = u.isActive
+                                existente.estado = if (u.isActive) "Activa" else "Inactiva"
+                            }
+                        } else {
+                            val nuevoId = u.idUsuario ?: ((listaManipuladoras.maxOfOrNull { it.id } ?: 50) + 1)
+                            listaManipuladoras.add(
+                                Manipuladora(
+                                    id = nuevoId,
+                                    nombre = u.nombreCompleto,
+                                    funcion = "Manipuladora de alimentos",
+                                    jornada = "Mañana",
+                                    activa = u.isActive ?: true,
+                                    estado = if (u.isActive == true) "Activa" else "Inactiva",
+                                    correo = u.correo,
+                                    idUsuario = u.idUsuario ?: nuevoId
+                                )
                             )
-                        )
-                    }
-                    // Asegurar que Andrea Sánchez esté siempre en el equipo
-                    if (listaManipuladoras.none { it.correo.equals("andreasanchez@gmail.com", ignoreCase = true) || it.nombre.contains("andrea", ignoreCase = true) }) {
-                        listaManipuladoras.add(0, Manipuladora(20, "Andrea Sánchez", "Preparación de alimentos", "Mañana", true, "Activa", "andreasanchez@gmail.com", 20))
+                        }
                     }
                     cargadoDesdeBackend = true
                     Log.d("ManipuladorasManager", "Cargadas ${listaManipuladoras.size} manipuladoras estrictas")

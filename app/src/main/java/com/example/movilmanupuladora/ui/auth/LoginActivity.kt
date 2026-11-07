@@ -22,6 +22,15 @@ import org.json.JSONObject
 
 class LoginActivity : AppCompatActivity() {
 
+    companion object {
+        fun esUsuarioJefa(rol: String?, email: String?): Boolean {
+            val r = rol?.lowercase()?.trim() ?: ""
+            val e = email?.lowercase()?.trim() ?: ""
+            return r.contains("jefe") || r.contains("jefa") || r.contains("coordinad") ||
+                    e.contains("jefe") || e.contains("jefa") || e.contains("isaperez") || e.contains("carlos")
+        }
+    }
+
     private lateinit var binding: ActivityLoginBinding
 
     private val usuarioRepository =
@@ -62,6 +71,21 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         sessionManager = SessionManager(this)
+
+        // Mantener sesión abierta de 7:00 AM a 7:00 PM si el usuario ya está autenticado
+        if (sessionManager.esSesionValidaHorario()) {
+            val rol = sessionManager.getUserRole()
+            val email = sessionManager.getUserEmail()
+            val esJefa = esUsuarioJefa(rol, email)
+            val destino = if (esJefa) {
+                com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity::class.java
+            } else {
+                com.example.movilmanupuladora.ui.manipuladora.TurnoActivity::class.java
+            }
+            startActivity(Intent(this, destino))
+            finish()
+            return
+        }
 
         // Hacer scroll automático al enfocar campos de texto cuando sale el teclado
         binding.txtCorreo.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
@@ -247,6 +271,9 @@ class LoginActivity : AppCompatActivity() {
                         return@launch
                     }
 
+                    // Limpiar datos de la sesión anterior para evitar mezclar usuarios
+                    sessionManager.clearSession()
+
                     // Guardar el token de autenticación.
                     RetrofitClient.authToken = token
                     sessionManager.saveAuthToken(token)
@@ -282,20 +309,14 @@ class LoginActivity : AppCompatActivity() {
                         )
                     }
 
-                    // Identificar a la jefa de manipuladoras.
-                    val esJefa =
-                        rol.contains("jefa") ||
-                                rol.contains("jefe") ||
-                                email.contains("jefe") ||
-                                email.contains("jefa") ||
-                                email.contains("isaperez") ||
-                                email.contains("carlos")
+                    // Identificar a la jefa de manipuladoras sin mezclar roles
+                    val esJefa = esUsuarioJefa(rol, email)
 
                     // Determinar la pantalla de destino.
-                    val destino = when {
-                        esJefa -> InicioJefaActivity::class.java
-                        rol.contains("manipuladora") -> TurnoActivity::class.java
-                        else -> TurnoActivity::class.java
+                    val destino = if (esJefa) {
+                        InicioJefaActivity::class.java
+                    } else {
+                        TurnoActivity::class.java
                     }
 
                     Toast.makeText(
