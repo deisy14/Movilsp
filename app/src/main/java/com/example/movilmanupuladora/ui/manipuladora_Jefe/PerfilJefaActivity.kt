@@ -78,18 +78,36 @@ class PerfilJefaActivity : AppCompatActivity() {
         }
 
         binding.btnCerrarSesion.setOnClickListener {
-            AlertDialog.Builder(this)
-                .setTitle("Cerrar sesión")
-                .setMessage("¿Estás segura de que deseas cerrar sesión?")
-                .setPositiveButton("Sí") { _, _ ->
-                    sessionManager.clearSession()
-                    val intent = Intent(this, LoginActivity::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                    startActivity(intent)
-                    finish()
-                }
-                .setNegativeButton("Cancelar", null)
-                .show()
+            val dialogBinding = com.example.movilmanupuladora.databinding.DialogConfirmarAsignacionBinding.inflate(layoutInflater)
+            dialogBinding.txtTituloConfirmacion.text = "Cerrar sesión"
+            dialogBinding.txtMensajeConfirmacionAsignacion.text = "¿Estás segura de que deseas cerrar sesión?"
+            dialogBinding.btnConfirmarGuardarAsignacion.text = "Sí, cerrar sesión"
+            dialogBinding.btnSeguirEditandoAsignacion.text = "Cancelar"
+
+            val dialog = MaterialAlertDialogBuilder(this)
+                .setView(dialogBinding.root)
+                .create()
+
+            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+            dialogBinding.btnConfirmarGuardarAsignacion.setOnClickListener {
+                dialog.dismiss()
+                sessionManager.clearSession()
+                val intent = Intent(this, LoginActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                startActivity(intent)
+                finish()
+            }
+
+            dialogBinding.btnSeguirEditandoAsignacion.setOnClickListener {
+                dialog.dismiss()
+            }
+
+            dialog.show()
+            dialog.window?.setLayout(
+                (resources.displayMetrics.widthPixels * 0.90).toInt(),
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+            )
         }
     }
 

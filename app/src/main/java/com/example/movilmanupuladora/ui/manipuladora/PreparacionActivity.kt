@@ -1,6 +1,7 @@
 package com.example.movilmanupuladora.ui.manipuladora
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
@@ -199,70 +200,102 @@ class PreparacionActivity : AppCompatActivity() {
     }
 
     private fun mostrarDialogoEstadoPreparacion() {
-        val opciones = arrayOf(
+        val opciones = listOf(
             "Por hacer / Pendiente",
             "En proceso / En preparación",
             "Finalizada / Completada"
         )
 
-        MaterialAlertDialogBuilder(this)
-            .setTitle("Actualizar Estado de Preparación")
-            .setItems(opciones) { _, which ->
-                val session = SessionManager(this)
-                val miNombre = session.getUserName() ?: "Manipuladora"
-                val miCorreo = session.getUserEmail() ?: ""
-                val preferencias = getSharedPreferences("SIRAE", MODE_PRIVATE)
+        val dialogBinding = com.example.movilmanupuladora.databinding.DialogOpcionesJefaBinding.inflate(layoutInflater)
+        dialogBinding.txtTituloOpciones.text = "Actualizar Estado de Preparación"
+        dialogBinding.contenedorBotonesOpciones.removeAllViews()
 
-                val nuevoEstado = when (which) {
-                    1 -> PreparacionEstadoManager.ESTADO_EN_PROCESO
-                    2 -> PreparacionEstadoManager.ESTADO_FINALIZADA
-                    else -> PreparacionEstadoManager.ESTADO_POR_HACER
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(dialogBinding.root)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        for ((index, opcion) in opciones.withIndex()) {
+            val btn = com.google.android.material.button.MaterialButton(this).apply {
+                text = opcion
+                isAllCaps = false
+                setTextColor(Color.parseColor("#1E293B"))
+                textSize = 14f
+                backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFFFFF"))
+                strokeColor = android.content.res.ColorStateList.valueOf(Color.parseColor("#CBD5E1"))
+                strokeWidth = (1 * resources.displayMetrics.density).toInt()
+                cornerRadius = (12 * resources.displayMetrics.density).toInt()
+                gravity = android.view.Gravity.START or android.view.Gravity.CENTER_VERTICAL
+                setPadding((14 * resources.displayMetrics.density).toInt(), (12 * resources.displayMetrics.density).toInt(), (14 * resources.displayMetrics.density).toInt(), (12 * resources.displayMetrics.density).toInt())
+
+                layoutParams = android.widget.LinearLayout.LayoutParams(
+                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    bottomMargin = (8 * resources.displayMetrics.density).toInt()
                 }
 
-                PreparacionEstadoManager.guardarEstado(this, miNombre, componenteAsignado, nuevoEstado, miCorreo)
-
-                // Sincronizar en tiempo real al backend para que la Jefa y el equipo lo vean de inmediato
-                lifecycleScope.launch {
-                    com.example.movilmanupuladora.utils.PreparacionSyncManager.actualizarEstadoEnBackend(
-                        this@PreparacionActivity,
-                        nuevoEstado,
-                        componenteAsignado
-                    )
-                }
-
-                when (which) {
-                    0 -> { // Por hacer
-                        preferencias.edit().putString("estado_plato", "PENDIENTE").apply()
-                        actualizarVistaEstado(nuevoEstado)
-                        Toast.makeText(this, "Estado actualizado: Por hacer", Toast.LENGTH_SHORT).show()
-                    }
-                    1 -> { // En proceso
-                        preferencias.edit().putString("estado_plato", "EN_PREPARACION").apply()
-                        actualizarVistaEstado(nuevoEstado)
-                        Toast.makeText(this, "Estado actualizado: En proceso", Toast.LENGTH_SHORT).show()
-                    }
-                    2 -> { // Finalizada
-                        preferencias.edit().putBoolean("plato_preparado", true).apply()
-                        preferencias.edit().putString("estado_plato", "FINALIZADO").apply()
-                        actualizarVistaEstado(nuevoEstado)
-
-                        MaterialAlertDialogBuilder(this)
-                            .setTitle("Preparación Finalizada")
-                            .setMessage("El componente '${componenteAsignado ?: nombrePlatoActual}' ha sido marcado como Finalizado con éxito.\n\n¿Deseas ver la pantalla de confirmación?")
-                            .setPositiveButton("Ver Confirmación") { _, _ ->
-                                val intentConf = Intent(this, ConfirmacionActivity::class.java).apply {
-                                    putExtra("nombre_plato", nombrePlatoActual)
-                                }
-                                startActivity(intentConf)
-                                finish()
-                            }
-                            .setNegativeButton("Permanecer aquí", null)
-                            .show()
-                    }
+                setOnClickListener {
+                    dialog.dismiss()
+                    ejecutarCambioEstadoPreparacion(index)
                 }
             }
-            .setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
-            .show()
+            dialogBinding.contenedorBotonesOpciones.addView(btn)
+        }
+
+        dialogBinding.btnCancelarOpciones.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.90).toInt(),
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+    }
+
+    private fun ejecutarCambioEstadoPreparacion(which: Int) {
+        val session = SessionManager(this)
+        val miNombre = session.getUserName() ?: "Manipuladora"
+        val miCorreo = session.getUserEmail() ?: ""
+        val preferencias = getSharedPreferences("SIRAE", MODE_PRIVATE)
+
+        val nuevoEstado = when (which) {
+            1 -> PreparacionEstadoManager.ESTADO_EN_PROCESO
+            2 -> PreparacionEstadoManager.ESTADO_FINALIZADA
+            else -> PreparacionEstadoManager.ESTADO_POR_HACER
+        }
+
+        PreparacionEstadoManager.guardarEstado(this, miNombre, componenteAsignado, nuevoEstado, miCorreo)
+
+        // Sincronizar en tiempo real al backend para que la Jefa y el equipo lo vean de inmediato
+        lifecycleScope.launch {
+            com.example.movilmanupuladora.utils.PreparacionSyncManager.actualizarEstadoEnBackend(
+                this@PreparacionActivity,
+                nuevoEstado,
+                componenteAsignado
+            )
+        }
+
+        when (which) {
+            0 -> { // Por hacer
+                preferencias.edit().putString("estado_plato", "PENDIENTE").apply()
+                actualizarVistaEstado(nuevoEstado)
+                Toast.makeText(this, "Estado actualizado: Por hacer", Toast.LENGTH_SHORT).show()
+            }
+            1 -> { // En proceso
+                preferencias.edit().putString("estado_plato", "EN_PREPARACION").apply()
+                actualizarVistaEstado(nuevoEstado)
+                Toast.makeText(this, "Estado actualizado: En proceso", Toast.LENGTH_SHORT).show()
+            }
+            2 -> { // Finalizada
+                preferencias.edit().putBoolean("plato_preparado", true).apply()
+                preferencias.edit().putString("estado_plato", "FINALIZADO").apply()
+                actualizarVistaEstado(nuevoEstado)
+                Toast.makeText(this, "Estado actualizado: Finalizada", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private val pasosFallback = listOf(

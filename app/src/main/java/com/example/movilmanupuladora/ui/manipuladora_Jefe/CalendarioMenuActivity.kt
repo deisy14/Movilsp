@@ -80,29 +80,56 @@ class CalendarioMenuActivity : AppCompatActivity() {
         val totalDiasMes = calBase.getActualMaximum(Calendar.DAY_OF_MONTH)
         val formatoNombreMes = SimpleDateFormat("MMMM yyyy", Locale.forLanguageTag("es-CO"))
         val nombreMesAnio = formatoNombreMes.format(calBase.time).uppercase()
-        binding.txtSubtitulo.text = "Mes: $nombreMesAnio · Hoy está marcado · Toca cualquier día"
+        binding.txtSubtitulo.text = "Mes: $nombreMesAnio · Días pasados destacados · Toca cualquier día"
 
-        val hoy = Calendar.getInstance()
+        val hoyCero = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
 
         for (i in 1..totalDiasMes) {
             val fechaDia = calBase.clone() as Calendar
+            fechaDia.set(Calendar.HOUR_OF_DAY, 0)
+            fechaDia.set(Calendar.MINUTE, 0)
+            fechaDia.set(Calendar.SECOND, 0)
+            fechaDia.set(Calendar.MILLISECOND, 0)
+
             listaDiasSemana.add(fechaDia)
 
+            val isToday = esMismoDia(fechaDia, Calendar.getInstance())
+            val isPast = fechaDia.before(hoyCero)
             val isSelected = esMismoDia(fechaDia, diaSeleccionado)
-            val isToday = esMismoDia(fechaDia, hoy)
 
             val cardDia = com.google.android.material.card.MaterialCardView(this).apply {
                 radius = (14 * resources.displayMetrics.density)
                 elevation = if (isSelected) (4 * resources.displayMetrics.density) else (1 * resources.displayMetrics.density)
-                strokeWidth = if (isSelected) (2.5 * resources.displayMetrics.density).toInt() else if (isToday) (1.5 * resources.displayMetrics.density).toInt() else (1 * resources.displayMetrics.density).toInt()
-                setStrokeColor(if (isSelected) Color.parseColor("#F4B41F") else if (isToday) Color.parseColor("#1B3317") else Color.parseColor("#E2E8F0"))
-                setCardBackgroundColor(if (isSelected) Color.parseColor("#FDF2CA") else if (isToday) Color.parseColor("#EEF4DF") else Color.parseColor("#FFFFFF"))
 
-                val params = LinearLayout.LayoutParams(
-                    (62 * resources.displayMetrics.density).toInt(),
-                    (58 * resources.displayMetrics.density).toInt()
-                ).also {
-                    it.setMargins((4 * resources.displayMetrics.density).toInt(), 0, (4 * resources.displayMetrics.density).toInt(), 0)
+                when {
+                    isToday -> {
+                        // HOY EN AMARILLO RELLENO
+                        strokeWidth = (2 * resources.displayMetrics.density).toInt()
+                        setStrokeColor(Color.parseColor("#F4B41F"))
+                        setCardBackgroundColor(Color.parseColor("#F4B41F"))
+                    }
+                    isPast || isSelected -> {
+                        // ANTERIORES Y SELECCIONADO EN PUNTICOS / BORDE AMARILLO
+                        strokeWidth = (1.5 * resources.displayMetrics.density).toInt()
+                        setStrokeColor(Color.parseColor("#F4B41F"))
+                        setCardBackgroundColor(Color.parseColor("#FEF3C7"))
+                    }
+                    else -> {
+                        // MAÑANA Y LOS RESTANTES EN BLANCO
+                        strokeWidth = (1 * resources.displayMetrics.density).toInt()
+                        setStrokeColor(Color.parseColor("#E2E8F0"))
+                        setCardBackgroundColor(Color.parseColor("#FFFFFF"))
+                    }
+                }
+
+                val sizePx = (58 * resources.displayMetrics.density).toInt()
+                val params = LinearLayout.LayoutParams(sizePx, sizePx).apply {
+                    setMargins((5 * resources.displayMetrics.density).toInt(), 0, (5 * resources.displayMetrics.density).toInt(), 0)
                 }
                 layoutParams = params
             }
@@ -115,38 +142,65 @@ class CalendarioMenuActivity : AppCompatActivity() {
             val formatoNombreDia = SimpleDateFormat("EEE", Locale.forLanguageTag("es-CO"))
             val tvNombreDia = TextView(this).apply {
                 text = formatoNombreDia.format(fechaDia.time).uppercase()
-                setTextColor(if (isSelected) Color.parseColor("#7A5500") else if (isToday) Color.parseColor("#2A5226") else Color.parseColor("#64748B"))
-                textSize = 11f
+                setTextColor(
+                    when {
+                        isToday -> Color.parseColor("#FFFFFF")
+                        isSelected || isPast -> Color.parseColor("#7A5500")
+                        else -> Color.parseColor("#94A3B8") // BLANCO / GRIS SUAVE
+                    }
+                )
+                textSize = 9.5f
                 setTypeface(typeface, android.graphics.Typeface.BOLD)
             }
 
             val tvNumDia = TextView(this).apply {
                 text = SimpleDateFormat("dd", Locale.getDefault()).format(fechaDia.time)
-                setTextColor(Color.parseColor("#1B3317"))
-                textSize = 16f
+                setTextColor(
+                    when {
+                        isToday -> Color.parseColor("#FFFFFF")
+                        isSelected || isPast -> Color.parseColor("#1B3317")
+                        else -> Color.parseColor("#64748B") // BLANCO / GRIS SUAVE
+                    }
+                )
+                textSize = 15f
                 setTypeface(typeface, android.graphics.Typeface.BOLD)
             }
 
             layoutInterno.addView(tvNombreDia)
             layoutInterno.addView(tvNumDia)
+
+            // Puntico amarillo de efecto en días anteriores o seleccionado
+            if (isPast || isSelected) {
+                val dotView = android.view.View(this).apply {
+                    val dotParams = LinearLayout.LayoutParams(
+                        (5 * resources.displayMetrics.density).toInt(),
+                        (5 * resources.displayMetrics.density).toInt()
+                    ).apply {
+                        topMargin = (2 * resources.displayMetrics.density).toInt()
+                    }
+                    layoutParams = dotParams
+                    setBackgroundResource(R.drawable.ic_dot_yellow)
+                }
+                layoutInterno.addView(dotView)
+            }
+
             cardDia.addView(layoutInterno)
 
             cardDia.setOnClickListener {
                 diaSeleccionado = fechaDia
                 generarTiraDiasSemana()
                 mostrarInformacionDia()
-                mostrarPantallaFlotanteHistorial()
             }
 
             binding.contenedorDiasStrip.addView(cardDia)
             calBase.add(Calendar.DAY_OF_MONTH, 1)
         }
 
-        // Auto-scroll to today's date card on open
+        // Auto-scroll al día seleccionado
         binding.scrollDiasSemana.post {
-            val todayDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH) - 1
-            val cardWidth = (70 * resources.displayMetrics.density).toInt()
-            binding.scrollDiasSemana.smoothScrollTo(todayDay * cardWidth, 0)
+            val selectedDay = diaSeleccionado.get(Calendar.DAY_OF_MONTH) - 1
+            val cardWidth = (68 * resources.displayMetrics.density).toInt()
+            binding.scrollDiasSemana.smoothScrollTo(selectedDay * cardWidth, 0)
         }
     }
 
@@ -202,32 +256,49 @@ class CalendarioMenuActivity : AppCompatActivity() {
         val textoFecha = formatoLargo.format(diaSeleccionado.time).replaceFirstChar { it.uppercase() }
 
         val mensajeHistorial = """
-            📅 Fecha: $textoFecha
-            🍲 Plato Mañana: ${binding.txtPlatoManana.text}
-            🍛 Plato Tarde: ${binding.txtPlatoTarde.text}
+            Fecha: $textoFecha
+            Plato Mañana: ${binding.txtPlatoManana.text}
+            Plato Tarde: ${binding.txtPlatoTarde.text}
             
-            👩‍🍳 Manipuladoras a cargo del plato:
+            Manipuladoras a cargo del plato:
             • Ana López (Encargada de cocción)
             • María Rodríguez (Porcionado e inocuidad)
             
-            📊 Estado del turno: Registrado e insumos al día.
+            Estado del turno: Registrado e insumos al día.
         """.trimIndent()
 
-        MaterialAlertDialogBuilder(this)
-            .setTitle("Historial y Responsables del Día")
-            .setMessage(mensajeHistorial)
-            .setPositiveButton("Ver Receta Completa") { dialog, _ ->
-                dialog.dismiss()
-                val intent = Intent(this, DetallePreparacionActivity::class.java).apply {
-                    putExtra("fecha", textoFecha)
-                    putExtra("plato", binding.txtPlatoManana.text.toString())
-                    putExtra("jornada", "Mañana y Tarde")
-                    putExtra("ninos", "120 niños")
-                }
-                startActivity(intent)
+        val dialogBinding = com.example.movilmanupuladora.databinding.DialogConfirmarAsignacionBinding.inflate(layoutInflater)
+        dialogBinding.txtTituloConfirmacion.text = "Historial y Responsables del Día"
+        dialogBinding.txtMensajeConfirmacionAsignacion.text = mensajeHistorial
+        dialogBinding.btnConfirmarGuardarAsignacion.text = "Ver Receta Completa"
+        dialogBinding.btnSeguirEditandoAsignacion.text = "Cerrar"
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(dialogBinding.root)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        dialogBinding.btnConfirmarGuardarAsignacion.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(this, DetallePreparacionActivity::class.java).apply {
+                putExtra("fecha", textoFecha)
+                putExtra("plato", binding.txtPlatoManana.text.toString())
+                putExtra("jornada", "Mañana y Tarde")
+                putExtra("ninos", "120 niños")
             }
-            .setNegativeButton("Cerrar") { dialog, _ -> dialog.dismiss() }
-            .show()
+            startActivity(intent)
+        }
+
+        dialogBinding.btnSeguirEditandoAsignacion.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.90).toInt(),
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
     }
 
     private fun cargarMenusDelBackend() {
