@@ -667,14 +667,25 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
     }
 
     private fun mostrarDialogoConfirmarDesmarcar(plato: InicioJefaActivity.Plato, servicio: String) {
-        MaterialAlertDialogBuilder(this)
-            .setTitle("Quitar plato del servicio")
-            .setMessage("¿Estás segura de que deseas quitar \"${plato.nombre}\" del servicio de $servicio?")
-            .setPositiveButton("Sí, quitar") { _, _ ->
-                desmarcarPlatoActual(servicio)
-            }
-            .setNegativeButton("Cancelar", null)
-            .show()
+        val dialogBinding = com.example.movilmanupuladora.databinding.DialogQuitarPlatoBinding.inflate(layoutInflater)
+        dialogBinding.txtMensajeQuitarPlato.text = "¿Estás segura de que deseas quitar \"${plato.nombre}\" del servicio de $servicio?"
+
+        val dialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setView(dialogBinding.root)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        dialogBinding.btnSiQuitar.setOnClickListener {
+            dialog.dismiss()
+            desmarcarPlatoActual(servicio)
+        }
+
+        dialogBinding.btnCancelarQuitar.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun desmarcarPlatoActual(servicio: String) {

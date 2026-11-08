@@ -72,21 +72,6 @@ class LoginActivity : AppCompatActivity() {
 
         sessionManager = SessionManager(this)
 
-        // Mantener sesión abierta de 7:00 AM a 7:00 PM si el usuario ya está autenticado
-        if (sessionManager.esSesionValidaHorario()) {
-            val rol = sessionManager.getUserRole()
-            val email = sessionManager.getUserEmail()
-            val esJefa = esUsuarioJefa(rol, email)
-            val destino = if (esJefa) {
-                com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity::class.java
-            } else {
-                com.example.movilmanupuladora.ui.manipuladora.TurnoActivity::class.java
-            }
-            startActivity(Intent(this, destino))
-            finish()
-            return
-        }
-
         // Hacer scroll automático al enfocar campos de texto cuando sale el teclado
         binding.txtCorreo.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {

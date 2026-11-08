@@ -270,26 +270,61 @@ class AsignarComponentesActivity : AppCompatActivity() {
             return
         }
 
-        val opciones = mutableListOf<String>()
-        cocinerasActivas.forEach { opciones.add(it.nombre) }
+        val dialogBinding = com.example.movilmanupuladora.databinding.DialogSeleccionarCocineraBinding.inflate(layoutInflater)
+        dialogBinding.txtTituloSeleccionarCocinera.text = "Asignar cocinera para:\n\"$componente\""
+
+        val dialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setView(dialogBinding.root)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        val items = mutableListOf<String>()
+        cocinerasActivas.forEach { items.add(it.nombre) }
         if (cocineraActual != null) {
-            opciones.add("✕ Quitar asignación")
+            items.add("✕ Quitar asignación")
         }
 
-        MaterialAlertDialogBuilder(this)
-            .setTitle("Asignar cocinera para:\n\"$componente\"")
-            .setItems(opciones.toTypedArray()) { _, which ->
-                val mapaServicio = asignacionesPorServicio.getOrPut(servicioActual) { mutableMapOf() }
-                if (cocineraActual != null && which == cocinerasActivas.size) {
-                    mapaServicio.remove(componente)
-                } else {
-                    val elegida = cocinerasActivas[which]
-                    mapaServicio[componente] = elegida
-                }
-                actualizarVistaServicio()
+        val adapter = object : androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
+            override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder {
+                val itemBinding = com.example.movilmanupuladora.databinding.ItemCocineraDialogBinding.inflate(layoutInflater, parent, false)
+                return object : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemBinding.root) {}
             }
-            .setNegativeButton("Cancelar", null)
-            .show()
+
+            override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {
+                val itemBinding = com.example.movilmanupuladora.databinding.ItemCocineraDialogBinding.bind(holder.itemView)
+                val texto = items[position]
+                itemBinding.txtNombreCocineraItem.text = texto
+                if (texto.startsWith("✕")) {
+                    itemBinding.txtNombreCocineraItem.setTextColor(android.graphics.Color.parseColor("#DC2626"))
+                } else {
+                    itemBinding.txtNombreCocineraItem.setTextColor(android.graphics.Color.parseColor("#1E293B"))
+                }
+
+                itemBinding.root.setOnClickListener {
+                    dialog.dismiss()
+                    val mapaServicio = asignacionesPorServicio.getOrPut(servicioActual) { mutableMapOf() }
+                    if (cocineraActual != null && position == cocinerasActivas.size) {
+                        mapaServicio.remove(componente)
+                    } else {
+                        val elegida = cocinerasActivas[position]
+                        mapaServicio[componente] = elegida
+                    }
+                    actualizarVistaServicio()
+                }
+            }
+
+            override fun getItemCount() = items.size
+        }
+
+        dialogBinding.recyclerCocinerasDialog.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+        dialogBinding.recyclerCocinerasDialog.adapter = adapter
+
+        dialogBinding.btnCancelarCocinera.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun guardarAsignacionActual() {

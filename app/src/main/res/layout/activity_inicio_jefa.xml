@@ -7,6 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FAF9F5"
+    android:fitsSystemWindows="true"
     android:orientation="vertical"
     tools:context=".ui.manipuladora_Jefe.InicioJefaActivity">
 
@@ -22,7 +23,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="32dp">
 
             <!-- FRANJA SUPERIOR AMARILLA CON SALUDO, NOTIFICACIONES Y PERFIL -->
             <LinearLayout
@@ -32,7 +34,7 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingHorizontal="20dp"
-                android:paddingTop="14dp"
+                android:paddingTop="48dp"
                 android:paddingBottom="38dp">
 
                 <LinearLayout
@@ -60,6 +62,18 @@
                         android:text="Coordinación y Gestión PAE"
                         android:textColor="#3F4F2A"
                         android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/txtInstitucionHeaderJefa"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="I.E. Técnico San José · Sede Principal"
+                        android:textColor="#2E3D1F"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
 
@@ -158,7 +172,7 @@
                         android:id="@+id/btnDiaLun"
                         android:layout_width="0dp"
                         android:layout_height="68dp"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="2dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_dia_semana_activo"
                         android:clickable="true"
@@ -192,7 +206,7 @@
                         android:id="@+id/btnDiaMar"
                         android:layout_width="0dp"
                         android:layout_height="68dp"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="2dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_dia_semana_inactivo"
                         android:clickable="true"
@@ -225,7 +239,7 @@
                         android:id="@+id/btnDiaMie"
                         android:layout_width="0dp"
                         android:layout_height="68dp"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="2dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_dia_semana_inactivo"
                         android:clickable="true"
@@ -258,7 +272,7 @@
                         android:id="@+id/btnDiaJue"
                         android:layout_width="0dp"
                         android:layout_height="68dp"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="2dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_dia_semana_inactivo"
                         android:clickable="true"
@@ -291,7 +305,7 @@
                         android:id="@+id/btnDiaVie"
                         android:layout_width="0dp"
                         android:layout_height="68dp"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="2dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_dia_semana_inactivo"
                         android:clickable="true"
@@ -324,7 +338,7 @@
                         android:id="@+id/btnDiaSab"
                         android:layout_width="0dp"
                         android:layout_height="68dp"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="2dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_dia_semana_inactivo"
                         android:clickable="true"
