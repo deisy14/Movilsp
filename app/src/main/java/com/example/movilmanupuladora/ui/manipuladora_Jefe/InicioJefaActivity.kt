@@ -82,6 +82,12 @@ class InicioJefaActivity : AppCompatActivity() {
         binding = ActivityInicioJefaBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { vista, insets ->
+            val barras = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            vista.setPadding(0, barras.top, 0, 0)
+            insets
+        }
+
         sessionManager = SessionManager(this)
 
         configurarHeaderJefa()
@@ -386,6 +392,9 @@ class InicioJefaActivity : AppCompatActivity() {
     private fun configurarHeaderJefa() {
         val nombreUser = sessionManager.getUserName() ?: "Jefa de Cocina"
         binding.txtSaludoJefa.text = "Hola, $nombreUser"
+        val sedeNombre = sessionManager.getSedeNombre() ?: "I.E. Técnico San José · Sede Principal"
+        binding.txtInstitucionHeaderJefa.text = sedeNombre
+
         val iniciales = nombreUser.split(" ")
             .filter { it.isNotEmpty() }
             .take(2)

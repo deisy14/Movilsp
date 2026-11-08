@@ -38,12 +38,11 @@
             <!-- LOGO PAE -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/layoutLogoPae"
-                android:layout_width="120dp"
-                android:layout_height="72dp"
+                android:layout_width="110dp"
+                android:layout_height="50dp"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="58dp"
-                android:background="@drawable/bg_logo_pae"
-                android:padding="8dp"
+                android:layout_marginTop="64dp"
+                android:background="@android:color/transparent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent">
 
@@ -53,7 +52,7 @@
                     android:layout_height="match_parent"
                     android:contentDescription="PAE"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/logosira" />
+                    android:src="@drawable/logo_sirae" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -75,7 +74,7 @@
                     android:layout_height="wrap_content"
                     android:letterSpacing="0.05"
                     android:text="BIENVENIDA"
-                    android:textColor="#1B3317"
+                    android:textColor="#000000"
                     android:textSize="11sp"
                     android:textStyle="bold" />
 
@@ -87,7 +86,7 @@
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:text="María López"
-                    android:textColor="#1B3317"
+                    android:textColor="#000000"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -96,8 +95,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Manipuladora de Alimentos"
-                    android:textColor="#355230"
+                    android:textColor="#000000"
                     android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/tvInstitucion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="I.E. Técnico San José · Sede Principal"
+                    android:textColor="#000000"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvFecha"
@@ -105,7 +116,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:text="LUNES / 7 / JUN / 2026"
-                    android:textColor="#3D5C37"
+                    android:textColor="#000000"
                     android:textSize="10sp" />
 
             </LinearLayout>
@@ -172,12 +183,12 @@
                 android:layout_width="0dp"
                 android:layout_height="46dp"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginEnd="16dp"
                 android:background="@drawable/bg_tag_plato"
                 android:orientation="horizontal"
                 android:padding="3dp"
-                app:layout_constraintTop_toBottomOf="@id/layoutLogoPae"
+                app:layout_constraintTop_toBottomOf="@id/layoutUsuarioHeader"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 

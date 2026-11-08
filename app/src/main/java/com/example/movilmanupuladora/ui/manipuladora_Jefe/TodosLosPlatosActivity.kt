@@ -246,22 +246,33 @@ class TodosLosPlatosActivity : AppCompatActivity() {
 
             // 2. Si este plato YA está asignado a este servicio -> Confirmar si desea quitarlo
             if (platoServicioActual != null && platoServicioActual.equals(nombrePlatoActual, ignoreCase = true)) {
-                MaterialAlertDialogBuilder(this)
-                    .setTitle("Quitar plato del servicio")
-                    .setMessage("¿Estás segura de que deseas quitar \"$nombrePlatoActual\" del servicio de $servicio?")
-                    .setPositiveButton("Sí, quitar") { _, _ ->
-                        lifecycleScope.launch {
-                            PreparacionSyncManager.desasignarPlatoServicio(
-                                context = this@TodosLosPlatosActivity,
-                                servicio = servicio,
-                                fecha = fechaSeleccionada
-                            )
-                        }
-                        Toast.makeText(this@TodosLosPlatosActivity, "✓ Plato quitado de $servicio", Toast.LENGTH_SHORT).show()
-                        dialog.dismiss()
+                val dialogBinding = com.example.movilmanupuladora.databinding.DialogQuitarPlatoBinding.inflate(layoutInflater)
+                dialogBinding.txtMensajeQuitarPlato.text = "¿Estás segura de que deseas quitar \"$nombrePlatoActual\" del servicio de $servicio?"
+
+                val confirmDialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                    .setView(dialogBinding.root)
+                    .create()
+
+                confirmDialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+                dialogBinding.btnSiQuitar.setOnClickListener {
+                    confirmDialog.dismiss()
+                    lifecycleScope.launch {
+                        PreparacionSyncManager.desasignarPlatoServicio(
+                            context = this@TodosLosPlatosActivity,
+                            servicio = servicio,
+                            fecha = fechaSeleccionada
+                        )
                     }
-                    .setNegativeButton("Cancelar", null)
-                    .show()
+                    Toast.makeText(this@TodosLosPlatosActivity, "✓ Plato quitado de $servicio", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                }
+
+                dialogBinding.btnCancelarQuitar.setOnClickListener {
+                    confirmDialog.dismiss()
+                }
+
+                confirmDialog.show()
                 return
             }
 

@@ -7,6 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FAF9F5"
+    android:fitsSystemWindows="true"
     android:orientation="vertical"
     tools:context=".ui.manipuladora_Jefe.AsistenciaJefaActivity">
 
@@ -23,8 +24,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingHorizontal="20dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="28dp">
+            android:paddingTop="48dp"
+            android:paddingBottom="32dp">
 
             <!-- ENCABEZADO: Botón Volver Circular + Título y Fecha -->
             <LinearLayout

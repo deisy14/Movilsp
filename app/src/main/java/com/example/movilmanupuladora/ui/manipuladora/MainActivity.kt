@@ -101,6 +101,8 @@ class MainActivity : AppCompatActivity() {
         val sessionMgr = SessionManager(this)
         val nombreUser = sessionMgr.getUserName() ?: "María López"
         binding.tvSaludo.text = nombreUser
+        val sedeNombre = sessionMgr.getSedeNombre() ?: "I.E. Técnico San José · Sede Principal"
+        binding.tvInstitucion.text = sedeNombre
 
         val fechaFormatted = SimpleDateFormat(
             "EEEE / d / MMM / yyyy",
