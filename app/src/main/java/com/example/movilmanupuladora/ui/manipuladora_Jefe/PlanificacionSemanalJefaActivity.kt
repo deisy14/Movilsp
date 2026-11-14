@@ -91,6 +91,7 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
                 InicioJefaActivity.Plato(id = it.id, nombre = it.nombre, componente = it.componente, imagen = it.imagenRes)
             }.toMutableList()
 
+            semanaOffset = intent.getIntExtra("semana_offset", 0)
             configurarSemanaSiguiente()
             configurarEventos()
             configurarTabsComida()
