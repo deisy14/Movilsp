@@ -107,7 +107,7 @@
                 android:orientation="horizontal"
                 android:padding="4dp">
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnTabDesayuno"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -121,9 +121,11 @@
                     android:textSize="13sp"
                     android:textStyle="bold"
                     app:cornerRadius="10dp"
-                    app:elevation="0dp" />
+                    app:elevation="0dp"
+                    app:strokeColor="#CBD5E1"
+                    app:strokeWidth="1dp" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnTabAlmuerzo"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -137,9 +139,11 @@
                     android:textSize="13sp"
                     android:textStyle="bold"
                     app:cornerRadius="10dp"
-                    app:elevation="0dp" />
+                    app:elevation="0dp"
+                    app:strokeColor="#CBD5E1"
+                    app:strokeWidth="1dp" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnTabMerienda"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -153,7 +157,9 @@
                     android:textSize="13sp"
                     android:textStyle="bold"
                     app:cornerRadius="10dp"
-                    app:elevation="0dp" />
+                    app:elevation="0dp"
+                    app:strokeColor="#CBD5E1"
+                    app:strokeWidth="1dp" />
 
             </LinearLayout>
 

@@ -294,6 +294,10 @@ class PreparacionActivity : AppCompatActivity() {
                 preferencias.edit().putString("estado_plato", "FINALIZADO").apply()
                 actualizarVistaEstado(nuevoEstado)
                 Toast.makeText(this, "Estado actualizado: Finalizada", Toast.LENGTH_SHORT).show()
+
+                val intent = Intent(this, ConfirmacionActivity::class.java)
+                startActivity(intent)
+                finish()
             }
         }
     }

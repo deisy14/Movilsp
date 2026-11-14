@@ -1,6 +1,5 @@
 package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
-import android.content.Context
 import android.util.Log
 import com.example.movilmanupuladora.data.api.RetrofitClient
 import kotlinx.coroutines.Dispatchers
@@ -26,30 +25,27 @@ object ManipuladorasManager {
         Manipuladora(30, "Andreas Muñoz", "Preparación y control", "Mañana", true, "Activa", "andres@gmail.com", 30)
     )
 
-    private var cargadoDesdeBackend = false
-
     fun obtenerManipuladoras(): List<Manipuladora> = listaManipuladoras.toList()
 
     /**
-     * Carga usuarios reales desde el backend que tengan estrictamente el rol de Manipuladora.
-     * Excluye sin excepción a Administradores, Jefas de Manipuladoras, Supervisores o roles de gestión.
+     * Carga usuarios reales desde el backend que tengan el rol de Manipuladora.
+     * Excluye Administradores, Jefas de Manipuladoras y Supervisores.
      */
     suspend fun cargarDesdeBackend() {
-        if (cargadoDesdeBackend) return
         try {
             val response = withContext(Dispatchers.IO) {
                 RetrofitClient.apiService.obtenerUsuarios()
             }
             if (response.isSuccessful && !response.body().isNullOrEmpty()) {
                 val todosUsuarios = response.body()!!
-                // Filtrar ESTRICTAMENTE usuarios con rol Manipuladora (excluyendo cualquier otro rol)
+
                 val manipuladorasBackend = todosUsuarios.filter { usuario ->
                     val rolNombre = usuario.nombreRol?.lowercase()?.trim() ?: ""
                     val rolId = usuario.rol
                     val correo = usuario.correo.lowercase().trim()
                     val nombre = usuario.nombreCompleto.lowercase().trim()
 
-                    // Exclusiones categóricas: Administradores, Jefes/Jefas, Supervisores
+                    // Exclusiones: Administradores, Jefes/Jefas, Supervisores
                     val esExcluido = rolNombre.contains("admin") ||
                             rolNombre.contains("jef") ||
                             rolNombre.contains("super") ||
@@ -62,31 +58,30 @@ object ManipuladorasManager {
                             nombre.contains("admin") || nombre.contains("jefe") || nombre.contains("jefa") ||
                             nombre.contains("supervisor")
 
-                    // Solo manipuladoras válidas
                     val esManipuladora = !esExcluido && (
-                            rolId == 24 || rolId == 3 ||
-                            rolNombre == "manipuladora" ||
+                            rolId == 24 || rolId == 3 || rolId == 4 || rolId == 5 ||
                             rolNombre.contains("manipuladora") ||
-                            correo == "andreasanchez@gmail.com" ||
-                            correo == "poolgomez27@gmail.com" ||
-                            correo == "deis@gmail.com" ||
-                            correo == "andres@gmail.com" ||
-                            correo == "manipuladora@sirae.com"
+                            rolNombre.contains("cocin") ||
+                            rolNombre.contains("auxiliar") ||
+                            rolNombre.contains("operari") ||
+                            rolNombre.isBlank() ||
+                            correo.contains("gmail") ||
+                            correo.contains("sirae")
                     )
 
                     esManipuladora
                 }
 
                 if (manipuladorasBackend.isNotEmpty()) {
-                    // Actualizar IDs reales del backend sobre las manipuladoras base
                     for (u in manipuladorasBackend) {
                         val c = u.correo.lowercase().trim()
                         val n = u.nombreCompleto.lowercase().trim()
+
                         val existente = listaManipuladoras.firstOrNull {
-                            it.correo.equals(c, ignoreCase = true) ||
-                            (c.isNotBlank() && it.correo.contains(c, ignoreCase = true)) ||
-                            (n.isNotBlank() && it.nombre.lowercase().contains(n))
+                            (c.isNotBlank() && it.correo.equals(c, ignoreCase = true)) ||
+                            (n.isNotBlank() && it.nombre.lowercase().trim() == n)
                         }
+
                         if (existente != null) {
                             if (u.idUsuario != null && u.idUsuario > 0) {
                                 existente.idUsuario = u.idUsuario
@@ -98,12 +93,16 @@ object ManipuladorasManager {
                                 existente.activa = u.isActive
                                 existente.estado = if (u.isActive) "Activa" else "Inactiva"
                             }
+                            if (c.isNotBlank()) {
+                                existente.correo = u.correo
+                            }
                         } else {
                             val nuevoId = u.idUsuario ?: ((listaManipuladoras.maxOfOrNull { it.id } ?: 50) + 1)
+                            val nombreMostrar = if (u.nombreCompleto.isNotBlank()) u.nombreCompleto else u.correo.substringBefore("@")
                             listaManipuladoras.add(
                                 Manipuladora(
                                     id = nuevoId,
-                                    nombre = u.nombreCompleto,
+                                    nombre = nombreMostrar,
                                     funcion = "Manipuladora de alimentos",
                                     jornada = "Mañana",
                                     activa = u.isActive ?: true,
@@ -114,8 +113,7 @@ object ManipuladorasManager {
                             )
                         }
                     }
-                    cargadoDesdeBackend = true
-                    Log.d("ManipuladorasManager", "Cargadas ${listaManipuladoras.size} manipuladoras estrictas")
+                    Log.d("ManipuladorasManager", "Cargadas ${listaManipuladoras.size} manipuladoras del backend")
                 }
             }
         } catch (e: Exception) {
@@ -141,18 +139,12 @@ object ManipuladorasManager {
         listaManipuladoras.removeAll { it.id == id }
     }
 
-    /**
-     * Busca una manipuladora por su correo electrónico (para mapear con el login)
-     */
     fun buscarPorCorreo(correo: String): Manipuladora? {
         return listaManipuladoras.firstOrNull {
             it.correo.equals(correo, ignoreCase = true)
         }
     }
 
-    /**
-     * Busca una manipuladora por su nombre (parcial, ignore case)
-     */
     fun buscarPorNombre(nombre: String): Manipuladora? {
         return listaManipuladoras.firstOrNull {
             it.nombre.equals(nombre, ignoreCase = true) ||

@@ -18,6 +18,8 @@ import androidx.lifecycle.lifecycleScope
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.data.model.MenuPaeCatalog
 import com.example.movilmanupuladora.databinding.ActivityAsignarComponentesBinding
+import com.example.movilmanupuladora.ui.manipuladora_Jefe.ManipuladorasManager
+import com.example.movilmanupuladora.ui.manipuladora_Jefe.AsistenciaManager
 import com.example.movilmanupuladora.utils.NavigationHelperJefa
 import com.example.movilmanupuladora.utils.PreparacionSyncManager
 import com.example.movilmanupuladora.utils.SessionManager
@@ -83,7 +85,7 @@ class AsignarComponentesActivity : AppCompatActivity() {
                 ManipuladorasManager.cargarDesdeBackend()
             } catch (_: Exception) { }
             cargarAsignacionesGuardadas()
-            actualizarVistaServicio()
+            cambiarServicio(servicioActual)
         }
     }
 
@@ -139,18 +141,29 @@ class AsignarComponentesActivity : AppCompatActivity() {
 
         // Actualizar visual de pestañas
         val colorActivo = Color.parseColor("#F4B41F")
-        val colorInactivo = Color.TRANSPARENT
+        val colorInactivo = Color.parseColor("#FFFFFF")
         val textoActivo = Color.parseColor("#1B3317")
         val textoInactivo = Color.parseColor("#64748B")
+        val strokeActivo = Color.parseColor("#D97706")
+        val strokeInactivo = Color.parseColor("#CBD5E1")
 
-        binding.btnTabDesayuno.backgroundTintList = ColorStateList.valueOf(if (nuevoServicio == "Desayuno") colorActivo else colorInactivo)
-        binding.btnTabDesayuno.setTextColor(if (nuevoServicio == "Desayuno") textoActivo else textoInactivo)
+        val esDes = nuevoServicio.equals("Desayuno", ignoreCase = true)
+        binding.btnTabDesayuno.backgroundTintList = ColorStateList.valueOf(if (esDes) colorActivo else colorInactivo)
+        binding.btnTabDesayuno.setTextColor(if (esDes) textoActivo else textoInactivo)
+        binding.btnTabDesayuno.strokeColor = ColorStateList.valueOf(if (esDes) strokeActivo else strokeInactivo)
+        binding.btnTabDesayuno.strokeWidth = if (esDes) 4 else 2
 
-        binding.btnTabAlmuerzo.backgroundTintList = ColorStateList.valueOf(if (nuevoServicio == "Almuerzo") colorActivo else colorInactivo)
-        binding.btnTabAlmuerzo.setTextColor(if (nuevoServicio == "Almuerzo") textoActivo else textoInactivo)
+        val esAlm = nuevoServicio.equals("Almuerzo", ignoreCase = true)
+        binding.btnTabAlmuerzo.backgroundTintList = ColorStateList.valueOf(if (esAlm) colorActivo else colorInactivo)
+        binding.btnTabAlmuerzo.setTextColor(if (esAlm) textoActivo else textoInactivo)
+        binding.btnTabAlmuerzo.strokeColor = ColorStateList.valueOf(if (esAlm) strokeActivo else strokeInactivo)
+        binding.btnTabAlmuerzo.strokeWidth = if (esAlm) 4 else 2
 
-        binding.btnTabMerienda.backgroundTintList = ColorStateList.valueOf(if (nuevoServicio == "Merienda") colorActivo else colorInactivo)
-        binding.btnTabMerienda.setTextColor(if (nuevoServicio == "Merienda") textoActivo else textoInactivo)
+        val esMer = nuevoServicio.equals("Merienda", ignoreCase = true)
+        binding.btnTabMerienda.backgroundTintList = ColorStateList.valueOf(if (esMer) colorActivo else colorInactivo)
+        binding.btnTabMerienda.setTextColor(if (esMer) textoActivo else textoInactivo)
+        binding.btnTabMerienda.strokeColor = ColorStateList.valueOf(if (esMer) strokeActivo else strokeInactivo)
+        binding.btnTabMerienda.strokeWidth = if (esMer) 4 else 2
 
         actualizarVistaServicio()
     }
@@ -205,7 +218,7 @@ class AsignarComponentesActivity : AppCompatActivity() {
     private fun renderizarComponentes(componentes: List<String>, porciones: Int) {
         binding.layoutListaComponentes.removeAllViews()
 
-        val mapaServicio = asignacionesPorServicio.getOrPut(servicioActual) { mutableMapOf() }
+        val mapaServicio = asignacionesPorServicio.getOrPut(servicioActual) { mutableMapOf<String, ManipuladorasManager.Manipuladora>() }
         val inflater = LayoutInflater.from(this)
 
         var asignadosCount = 0
@@ -303,7 +316,7 @@ class AsignarComponentesActivity : AppCompatActivity() {
 
                 itemBinding.root.setOnClickListener {
                     dialog.dismiss()
-                    val mapaServicio = asignacionesPorServicio.getOrPut(servicioActual) { mutableMapOf() }
+                    val mapaServicio = asignacionesPorServicio.getOrPut(servicioActual) { mutableMapOf<String, ManipuladorasManager.Manipuladora>() }
                     if (cocineraActual != null && position == cocinerasActivas.size) {
                         mapaServicio.remove(componente)
                     } else {
@@ -328,7 +341,7 @@ class AsignarComponentesActivity : AppCompatActivity() {
     }
 
     private fun guardarAsignacionActual() {
-        val mapaServicio = asignacionesPorServicio[servicioActual] ?: mutableMapOf()
+        val mapaServicio = asignacionesPorServicio[servicioActual] ?: mutableMapOf<String, ManipuladorasManager.Manipuladora>()
         val platoNombre = binding.txtNombrePlato.text.toString()
 
         val prefs = getSharedPreferences("ASIGNACIONES_PAE", Context.MODE_PRIVATE)
@@ -338,7 +351,9 @@ class AsignarComponentesActivity : AppCompatActivity() {
 
         val asignacionesList = mutableListOf<PreparacionSyncManager.AsignacionItem>()
 
-        for ((comp, cocinera) in mapaServicio) {
+        for (entry in mapaServicio) {
+            val comp = entry.key
+            val cocinera = entry.value
             val correoNorm = cocinera.correo.lowercase().trim().replace("@", "_").replace(".", "_")
             val nombreNorm = cocinera.nombre.lowercase().trim().replace(" ", "_")
             val primerNombre = cocinera.nombre.trim().split(" ").firstOrNull()?.lowercase() ?: ""
@@ -409,19 +424,28 @@ class AsignarComponentesActivity : AppCompatActivity() {
         for (serv in listOf("Desayuno", "Almuerzo", "Merienda")) {
             val platoNombre = sessionManager.getPlatoDiaServicio(this, fechaSeleccionada, serv) ?: continue
             val componentes = MenuPaeCatalog.obtenerComponentesPorNombre(platoNombre)
-            val mapa = asignacionesPorServicio.getOrPut(serv) { mutableMapOf() }
+            val mapa = asignacionesPorServicio.getOrPut(serv) { mutableMapOf<String, ManipuladorasManager.Manipuladora>() }
 
             for (comp in componentes) {
                 val guardado = prefs.getString("asig_${fechaSeleccionada}_${serv}_$comp", null)
-                if (!guardado.isNullOrBlank()) {
-                    val c = cocineras.firstOrNull { it.nombre.equals(guardado, ignoreCase = true) }
-                        ?: ManipuladorasManager.Manipuladora(
-                            id = 0,
-                            nombre = guardado,
-                            funcion = "Preparación",
-                            jornada = "Mañana",
-                            activa = true
-                        )
+                val uidGuardado = prefs.getInt("asig_uid_${fechaSeleccionada}_${serv}_$comp", -1)
+                val correoGuardado = prefs.getString("asig_correo_${fechaSeleccionada}_${serv}_$comp", null)
+
+                if (!guardado.isNullOrBlank() || uidGuardado > 0 || !correoGuardado.isNullOrBlank()) {
+                    val c = cocineras.firstOrNull {
+                        (uidGuardado > 0 && it.idUsuario == uidGuardado) ||
+                        (!correoGuardado.isNullOrBlank() && it.correo.equals(correoGuardado, ignoreCase = true)) ||
+                        (!guardado.isNullOrBlank() && it.nombre.equals(guardado, ignoreCase = true)) ||
+                        (!guardado.isNullOrBlank() && (it.nombre.contains(guardado, ignoreCase = true) || guardado.contains(it.nombre, ignoreCase = true)))
+                    } ?: ManipuladorasManager.Manipuladora(
+                        id = if (uidGuardado > 0) uidGuardado else 0,
+                        nombre = guardado ?: "Manipuladora de alimentos",
+                        funcion = "Preparación de alimentos",
+                        jornada = serv,
+                        activa = true,
+                        correo = correoGuardado ?: "",
+                        idUsuario = uidGuardado
+                    )
                     mapa[comp] = c
                 }
             }

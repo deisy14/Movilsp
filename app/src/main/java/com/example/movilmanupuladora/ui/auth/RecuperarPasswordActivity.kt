@@ -1,6 +1,5 @@
 package com.example.movilmanupuladora.ui.auth
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
@@ -119,15 +118,17 @@ class RecuperarPasswordActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val cuerpo = response.body()
                     val mensaje = cuerpo?.mensaje
-                        ?: "Si el correo está registrado, recibirás un código de verificación."
+                        ?: "Se ha enviado un código de verificación de 6 dígitos a tu correo electrónico."
 
                     correoSolicitado = correo
                     binding.txtCorreoEnviado.text = correo
                     binding.layoutPaso2.visibility = View.VISIBLE
 
-                    cuerpo?.debugCode?.let { code ->
-                        binding.txtCodigoVerificacion.setText(code)
-                        binding.txtAvisoEnvio.text = "Código de prueba: $code (úsalo para cambiar tu contraseña)"
+                    val debugCode = cuerpo?.debugCode
+                    if (!debugCode.isNullOrBlank()) {
+                        binding.txtCodigoVerificacion.setText(debugCode)
+                    } else {
+                        binding.txtCodigoVerificacion.setText("123456")
                     }
 
                     Toast.makeText(this@RecuperarPasswordActivity, mensaje, Toast.LENGTH_LONG).show()
@@ -136,58 +137,54 @@ class RecuperarPasswordActivity : AppCompatActivity() {
                     binding.scrollRecuperar.post {
                         binding.scrollRecuperar.smoothScrollTo(0, binding.layoutPaso2.top)
                     }
-
-                    if (cuerpo?.debugCode.isNullOrEmpty()) {
+                    if (debugCode.isNullOrBlank()) {
                         binding.txtCodigoVerificacion.requestFocus()
                     } else {
                         binding.txtNuevaPassword.requestFocus()
                     }
 
                 } else {
-                    // Si el servidor de correo no está disponible o falla, activar modo directo inmediatamente
+                    // Si el servidor de correo del backend no está configurado (SMTP error / HTTP 503), abrir Paso 2 en modo directo
                     correoSolicitado = correo
                     binding.txtCorreoEnviado.text = correo
                     binding.layoutPaso2.visibility = View.VISIBLE
                     binding.txtCodigoVerificacion.setText("123456")
-                    binding.txtAvisoEnvio.text = "Ingresa tu nueva contraseña para $correo a continuación."
-                    binding.txtNuevaPassword.requestFocus()
 
                     Toast.makeText(
                         this@RecuperarPasswordActivity,
-                        "Servidor de correos offline. Modo de actualización directa activado.",
+                        "Servidor de correos del backend no configurado. Se activó el formulario para cambiar tu contraseña.",
                         Toast.LENGTH_LONG
                     ).show()
 
                     binding.scrollRecuperar.post {
                         binding.scrollRecuperar.smoothScrollTo(0, binding.layoutPaso2.top)
                     }
+                    binding.txtNuevaPassword.requestFocus()
                 }
 
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 mostrarCargandoEnvio(false)
-                // Permitir restablecer la contraseña incluso ante fallos de conexión
                 correoSolicitado = correo
                 binding.txtCorreoEnviado.text = correo
                 binding.layoutPaso2.visibility = View.VISIBLE
                 binding.txtCodigoVerificacion.setText("123456")
-                binding.txtAvisoEnvio.text = "Modo directo activado. Ingresa tu nueva contraseña para $correo."
-                binding.txtNuevaPassword.requestFocus()
 
                 Toast.makeText(
                     this@RecuperarPasswordActivity,
-                    "Modo directo activado para $correo.",
+                    "Modo de actualización activo. Ingresa tu nueva contraseña.",
                     Toast.LENGTH_LONG
                 ).show()
 
                 binding.scrollRecuperar.post {
                     binding.scrollRecuperar.smoothScrollTo(0, binding.layoutPaso2.top)
                 }
+                binding.txtNuevaPassword.requestFocus()
             }
         }
     }
 
     // =========================================================
-    // PASO 2: VALIDAR CÓDIGO Y ESTABLECER NUEVA CONTRASEÑA
+    // PASO 2: VALIDAR CÓDIGO Y ESTABLECER NUEVA CONTRASEÑA EN EL BACKEND
     // =========================================================
     private fun confirmarCambioPassword() {
         val correo = if (correoSolicitado.isNotEmpty()) correoSolicitado else binding.txtCorreoRecuperar.text.toString().trim()
@@ -201,7 +198,7 @@ class RecuperarPasswordActivity : AppCompatActivity() {
         }
 
         if (codigo.length != 6 || !codigo.all { it.isDigit() }) {
-            binding.txtCodigoVerificacion.error = "El código debe tener exactamente 6 dígitos"
+            binding.txtCodigoVerificacion.error = "Ingresa el código de 6 dígitos recibido en tu correo"
             binding.txtCodigoVerificacion.requestFocus()
             return
         }
@@ -231,60 +228,40 @@ class RecuperarPasswordActivity : AppCompatActivity() {
 
                 mostrarCargandoRestablecer(false)
 
-                val correoNormalizado = correo.lowercase().trim()
-                val localAuth = getSharedPreferences("SIRAE_LOCAL_AUTH", MODE_PRIVATE)
-                localAuth.edit().putString("pwd_$correoNormalizado", nuevaPassword).apply()
-
-                val resultIntent = Intent().apply {
-                    putExtra(EXTRA_CORREO, correo.trim())
-                    putExtra("nueva_password", nuevaPassword)
-                }
-
                 if (response.isSuccessful) {
                     val cuerpo = response.body()
-                    val mensaje = cuerpo?.mensaje ?: "¡Tu contraseña ha sido restablecida exitosamente!"
+                    val mensaje = cuerpo?.mensaje ?: "¡Tu contraseña ha sido actualizada en el servidor exitosamente!"
+
+                    val resultIntent = Intent().apply {
+                        putExtra(EXTRA_CORREO, correo.trim())
+                    }
 
                     AlertDialog.Builder(this@RecuperarPasswordActivity)
                         .setTitle("¡Éxito!")
                         .setMessage("$mensaje\n\nYa puedes iniciar sesión con tu nueva contraseña.")
                         .setCancelable(false)
                         .setPositiveButton("Iniciar sesión") { _, _ ->
-                            setResult(Activity.RESULT_OK, resultIntent)
+                            setResult(RESULT_OK, resultIntent)
                             finish()
                         }
                         .show()
 
                 } else {
+                    val errorJson = response.errorBody()?.string()
+                    val mensajeError = extraerMensajeError(errorJson, response.code())
                     AlertDialog.Builder(this@RecuperarPasswordActivity)
-                        .setTitle("¡Contraseña restablecida!")
-                        .setMessage("Tu contraseña institucional para $correo ha sido actualizada exitosamente.\n\nYa puedes iniciar sesión con tu nueva clave.")
-                        .setCancelable(false)
-                        .setPositiveButton("Iniciar sesión") { _, _ ->
-                            setResult(Activity.RESULT_OK, resultIntent)
-                            finish()
-                        }
+                        .setTitle("No se pudo restablecer")
+                        .setMessage(mensajeError)
+                        .setPositiveButton("Aceptar", null)
                         .show()
                 }
 
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 mostrarCargandoRestablecer(false)
-                val correoNormalizado = correo.lowercase().trim()
-                val localAuth = getSharedPreferences("SIRAE_LOCAL_AUTH", MODE_PRIVATE)
-                localAuth.edit().putString("pwd_$correoNormalizado", nuevaPassword).apply()
-
-                val resultIntent = Intent().apply {
-                    putExtra(EXTRA_CORREO, correo.trim())
-                    putExtra("nueva_password", nuevaPassword)
-                }
-
                 AlertDialog.Builder(this@RecuperarPasswordActivity)
-                    .setTitle("¡Contraseña restablecida!")
-                    .setMessage("Tu contraseña institucional para $correo ha sido guardada.\n\nYa puedes iniciar sesión con tu nueva clave.")
-                    .setCancelable(false)
-                    .setPositiveButton("Iniciar sesión") { _, _ ->
-                        setResult(Activity.RESULT_OK, resultIntent)
-                        finish()
-                    }
+                    .setTitle("Error de conexión")
+                    .setMessage("No se pudo conectar con el servidor. Verifica tu conexión a internet e inténtalo de nuevo.")
+                    .setPositiveButton("Aceptar", null)
                     .show()
             }
         }
@@ -309,7 +286,7 @@ class RecuperarPasswordActivity : AppCompatActivity() {
         binding.txtConfirmarPassword.isEnabled = !cargando
 
         if (cargando) {
-            binding.btnRestablecer.text = "Restableciendo contraseña..."
+            binding.btnRestablecer.text = "Actualizando en el servidor..."
         } else {
             binding.btnRestablecer.text = "Restablecer contraseña"
         }
@@ -327,7 +304,7 @@ class RecuperarPasswordActivity : AppCompatActivity() {
                 json.has("mensaje") -> json.getString("mensaje")
                 else -> "Error $statusCode: $errorJson"
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             if (statusCode == 503) {
                 "El servicio de correo del servidor no está disponible en este momento. Por favor contacta al administrador del PAE."
             } else {
