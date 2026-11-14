@@ -197,9 +197,10 @@ class AsignadasActivity : AppCompatActivity() {
 
         val compJefa = prefs.getString("comp_jefa", null)
         if (!compJefa.isNullOrBlank()) {
-            val nombreJefa = "Isa Pérez (Jefa de Cocina)"
-            val estadoJefa = PreparacionEstadoManager.obtenerEstado(this, "Isa Pérez", compJefa)
-            val esJefaActual = miNombre.contains("isa") || sessionMgr.getUserRole()?.lowercase()?.contains("jef") == true
+            val esJefaActual = sessionMgr.getUserRole()?.lowercase()?.contains("jef") == true
+            val nombreJefa = prefs.getString("jefa_nombre", null)?.takeIf { it.isNotBlank() }
+                ?: (if (esJefaActual) sessionMgr.getUserName() ?: "Jefa de Cocina" else "Jefa de Cocina")
+            val estadoJefa = PreparacionEstadoManager.obtenerEstado(this, nombreJefa, compJefa)
 
             val itemJefaCard = com.google.android.material.card.MaterialCardView(this).apply {
                 cardElevation = if (esJefaActual) 4f else 2f

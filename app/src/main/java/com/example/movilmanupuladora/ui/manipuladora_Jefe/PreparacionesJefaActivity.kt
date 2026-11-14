@@ -120,7 +120,7 @@ class PreparacionesJefaActivity : AppCompatActivity() {
 
         val jefaPrefs = getSharedPreferences("ManipuladoraJefe", MODE_PRIVATE)
         val compJefa = jefaPrefs.getString("comp_jefa", null)
-        val miNombre = sessionManager.getUserName() ?: "Isa Pérez"
+        val miNombre = sessionManager.getUserName() ?: "Jefa de Cocina"
         val miCorreo = sessionManager.getUserEmail() ?: ""
 
         val estadoJefa = if (!compJefa.isNullOrBlank()) {

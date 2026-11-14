@@ -31,6 +31,13 @@ data class MenuDiaPae(
 
 object MenuPaeCatalog {
 
+    private val platosBackendCache = mutableListOf<PlatoResponse>()
+
+    fun registrarPlatosDesdeBackend(platos: List<PlatoResponse>) {
+        platosBackendCache.clear()
+        platosBackendCache.addAll(platos)
+    }
+
     val menus = listOf(
         // ==========================================
         // SEMANA 1 (MENÚS 1 AL 5)
@@ -514,9 +521,24 @@ object MenuPaeCatalog {
 
     fun obtenerComponentesPorNombre(nombre: String?): List<String> {
         if (nombre.isNullOrBlank()) {
-            return listOf("Refresco de avena", "Huevos pericos", "Arroz blanco")
+            return listOf("Bebida con leche", "Alimento proteico", "Cereal acompañante", "Fruta")
         }
         val n = nombre.lowercase().trim()
+
+        // 1. Buscar en los platos configurados por el supervisor en la base de datos
+        val matchBackend = platosBackendCache.firstOrNull {
+            it.nombrePlato?.lowercase()?.trim() == n ||
+            it.nombrePlato?.lowercase()?.contains(n) == true ||
+            n.contains(it.nombrePlato?.lowercase()?.trim() ?: "")
+        }
+        if (matchBackend != null && !matchBackend.componente.isNullOrBlank()) {
+            val comps = matchBackend.componente.split(",", "•", "-", "\n")
+                .map { it.trim() }
+                .filter { it.isNotBlank() && it != "—" }
+            if (comps.isNotEmpty()) return comps
+        }
+
+        // 2. Buscar en el catálogo base PAE
         val match = menus.firstOrNull {
             it.nombre.lowercase().contains(n) ||
             n.contains(it.nombre.lowercase()) ||

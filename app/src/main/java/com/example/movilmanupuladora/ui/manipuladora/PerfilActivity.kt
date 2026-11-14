@@ -158,11 +158,12 @@ class PerfilActivity : AppCompatActivity() {
     }
 
     private fun cargarDatosUsuario() {
-        val nombre = sessionManager.getUserName() ?: "María José Rojas"
-        val cargo = sessionManager.getUserRole() ?: "Manipuladora · Turno mañana"
+        val nombre = sessionManager.getUserName() ?: "Manipuladora PAE"
+        val cargo = sessionManager.getUserRole() ?: "Manipuladora de alimentos"
+        val ubicacion = sessionManager.getUbicacionCompleta()
 
         findViewById<android.widget.TextView>(R.id.txtNombreUsuario)?.text = nombre
-        findViewById<android.widget.TextView>(R.id.txtCargoUsuario)?.text = "$cargo · Sede Institucional"
+        findViewById<android.widget.TextView>(R.id.txtCargoUsuario)?.text = "$cargo · $ubicacion"
     }
 
     private fun mostrarVentanaEmergenteEditarPerfil() {
@@ -170,8 +171,8 @@ class PerfilActivity : AppCompatActivity() {
             val dialogBinding = DialogEditarPerfilBinding.inflate(layoutInflater)
 
             val nombreGuardado = sessionManager.getUserName() ?: "Manipuladora PAE"
-            val correoGuardado = sessionManager.getUserEmail() ?: "manipuladora@sirae.gov.co"
-            val telefonoGuardado = sessionManager.getUserPhone() ?: "310 450 8920"
+            val correoGuardado = sessionManager.getUserEmail() ?: ""
+            val telefonoGuardado = sessionManager.getUserPhone() ?: ""
 
             dialogBinding.edtNombre.setText(nombreGuardado)
             dialogBinding.edtCorreo.setText(correoGuardado)

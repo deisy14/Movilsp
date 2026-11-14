@@ -23,11 +23,43 @@ import org.json.JSONObject
 class LoginActivity : AppCompatActivity() {
 
     companion object {
-        fun esUsuarioJefa(rol: String?, email: String?): Boolean {
-            val r = rol?.lowercase()?.trim() ?: ""
-            val e = email?.lowercase()?.trim() ?: ""
-            return r.contains("jefe") || r.contains("jefa") || r.contains("coordinad") ||
-                    e.contains("jefe") || e.contains("jefa") || e.contains("isaperez") || e.contains("carlos")
+        fun normalizarTexto(texto: String?): String {
+            if (texto.isNullOrBlank()) return ""
+            val nfd = java.text.Normalizer.normalize(texto, java.text.Normalizer.Form.NFD)
+            return nfd.replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
+                .lowercase()
+                .trim()
+        }
+
+        fun esUsuarioJefa(
+            rol: String?,
+            email: String?,
+            idRol: Int? = null,
+            nombreRol: String? = null
+        ): Boolean {
+            val r = normalizarTexto(rol)
+            val nr = normalizarTexto(nombreRol)
+            val e = normalizarTexto(email)
+
+            // 1. Chequeo por ID numérico asignado a Jefa de Manipuladoras en backend
+            if (idRol == 4 || idRol == 26 || idRol == 27 || idRol == 28) return true
+
+            // 2. Si el rol llegó como string numérico ("4")
+            val idParsed = r.toIntOrNull() ?: nr.toIntOrNull()
+            if (idParsed == 4 || idParsed == 26 || idParsed == 27 || idParsed == 28) return true
+
+            // 3. Chequeo dinámico por nombre o descripción de rol (sin datos quemados)
+            val rolTexto = "$r $nr".trim()
+            if (rolTexto.contains("jefa") || rolTexto.contains("jefe") || rolTexto.contains("coordinad")) {
+                return true
+            }
+
+            // 4. Si el correo institucional indica explícitamente jefa/jefe
+            if (e.contains("jefe") || e.contains("jefa")) {
+                return true
+            }
+
+            return false
         }
     }
 
@@ -233,26 +265,25 @@ class LoginActivity : AppCompatActivity() {
                         return@launch
                     }
 
-                    // Identificar el rol y el correo.
-                    val rol = (loginRes.usuario?.rol ?: "")
-                        .trim()
-                        .lowercase()
-
-                    val email = (loginRes.usuario?.correo ?: correo)
+                    val userInfo = loginRes.usuario
+                    val rolTexto = normalizarTexto(userInfo?.rolEfectivo)
+                    val email = (userInfo?.correo?.takeIf { it.isNotBlank() } ?: correo)
                         .trim()
                         .lowercase()
 
                     // El administrador ingresa desde la página web.
-                    if (rol.contains("admin")) {
+                    val esAdmin = rolTexto.contains("admin") ||
+                            userInfo?.isSuperuser == true ||
+                            userInfo?.idRol == 1 ||
+                            userInfo?.idRol == 2
 
+                    if (esAdmin) {
                         mostrarCargando(false)
-
                         Toast.makeText(
                             this@LoginActivity,
                             "Este usuario debe ingresar desde la página web.",
                             Toast.LENGTH_LONG
                         ).show()
-
                         return@launch
                     }
 
@@ -263,39 +294,47 @@ class LoginActivity : AppCompatActivity() {
                     RetrofitClient.authToken = token
                     sessionManager.saveAuthToken(token)
 
-                    // Guardar los datos del usuario y su sede.
-                    loginRes.usuario?.let { usuario ->
+                    // Identificar dinámicamente si es jefa (sin datos quemados)
+                    val esJefa = esUsuarioJefa(
+                        rol = userInfo?.rol,
+                        email = email,
+                        idRol = userInfo?.idRol,
+                        nombreRol = userInfo?.nombreRol
+                    )
 
-                        val nombreCompleto = listOf(
-                            usuario.nombre,
-                            usuario.apellido.orEmpty()
-                        )
-                            .filter { it.isNotBlank() }
-                            .joinToString(" ")
-                            .trim()
+                    // Guardar los datos del usuario y su sede asociada
+                    userInfo?.let { usuario ->
+                        val nombreCompleto = usuario.nombreCompleto.ifBlank {
+                            if (usuario.nombre.isNotBlank()) usuario.nombre else email
+                        }
 
-                        val correoFinal = usuario.correo
-                            .takeIf { it.isNotBlank() }
-                            ?: correo.trim()
+                        val sedeDisplay = usuario.sedeEfectiva
+                            ?: usuario.sedeNombre
+                            ?: usuario.institucionNombre
+
+                        val rolGuardar = when {
+                            !usuario.nombreRol.isNullOrBlank() -> usuario.nombreRol
+                            !usuario.rol.isNullOrBlank() && usuario.rol.toIntOrNull() == null -> usuario.rol
+                            esJefa -> "Jefa de Manipuladoras"
+                            else -> "Manipuladora de alimentos"
+                        }
 
                         sessionManager.saveUserData(
                             name = nombreCompleto,
-                            role = usuario.rol,
-                            email = correoFinal,
+                            role = rolGuardar,
+                            email = email,
                             idUsuario = usuario.idUsuario,
                             idSede = usuario.idSede,
-                            sedeNombre = usuario.sedeNombre
+                            sedeNombre = usuario.sedeNombre ?: sedeDisplay,
+                            idInstitucion = usuario.idInstitucion,
+                            institucionNombre = usuario.institucionNombre
                         )
 
                         Log.d(
-                            "SEDE_DEBUG",
-                            "idSede=${usuario.idSede}, " +
-                                    "sedeNombre=${usuario.sedeNombre}"
+                            "LOGIN_AUTH",
+                            "Usuario: $nombreCompleto | Rol: $rolGuardar | Sede: $sedeDisplay (idSede=${usuario.idSede})"
                         )
                     }
-
-                    // Identificar a la jefa de manipuladoras sin mezclar roles
-                    val esJefa = esUsuarioJefa(rol, email)
 
                     // Determinar la pantalla de destino.
                     val destino = if (esJefa) {

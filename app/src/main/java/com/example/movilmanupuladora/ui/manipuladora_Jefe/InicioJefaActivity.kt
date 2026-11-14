@@ -105,6 +105,10 @@ class InicioJefaActivity : AppCompatActivity() {
         cargarAsistenciaDelBackend()
         lifecycleScope.launch {
             try {
+                val res = RetrofitClient.apiService.obtenerPlatos()
+                if (res.isSuccessful && !res.body().isNullOrEmpty()) {
+                    MenuPaeCatalog.registrarPlatosDesdeBackend(res.body()!!)
+                }
                 PreparacionSyncManager.sincronizarDesdeBackend(this@InicioJefaActivity)
                 actualizarPlatosVisuales()
             } catch (_: Exception) { }
@@ -230,6 +234,16 @@ class InicioJefaActivity : AppCompatActivity() {
         binding.imgMerienda.setImageResource(obtenerImagenPlatoPorNombre(nomMer))
         binding.txtNombreMerienda.text = nomMer
         binding.txtComponenteMerienda.text = compMer
+
+        val sedeTexto = sessionManager.getSedeNombre().orEmpty().lowercase()
+        val esSoloDesayuno = sedeTexto.contains("piagua")
+        if (esSoloDesayuno) {
+            binding.cardAlmuerzo.visibility = View.GONE
+            binding.cardMerienda.visibility = View.GONE
+        } else {
+            binding.cardAlmuerzo.visibility = View.VISIBLE
+            binding.cardMerienda.visibility = View.VISIBLE
+        }
     }
 
     // =========================================================
@@ -257,6 +271,12 @@ class InicioJefaActivity : AppCompatActivity() {
         // Clic en "Registra la asistencia" -> Abre AsistenciaJefaActivity
         binding.bannerRegistraAsistencia.setOnClickListener {
             val intent = Intent(this, AsistenciaJefaActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Clic en "Asistente IA - Sugerir Menú & Descontar" -> Abre SugerenciaIaActivity
+        binding.bannerSugerenciasIA.setOnClickListener {
+            val intent = Intent(this, SugerenciaIaActivity::class.java)
             startActivity(intent)
         }
 
@@ -392,7 +412,7 @@ class InicioJefaActivity : AppCompatActivity() {
     private fun configurarHeaderJefa() {
         val nombreUser = sessionManager.getUserName() ?: "Jefa de Cocina"
         binding.txtSaludoJefa.text = "Hola, $nombreUser"
-        val sedeNombre = sessionManager.getSedeNombre() ?: "I.E. Técnico San José · Sede Principal"
+        val sedeNombre = sessionManager.getUbicacionCompleta()
         binding.txtInstitucionHeaderJefa.text = sedeNombre
 
         val iniciales = nombreUser.split(" ")

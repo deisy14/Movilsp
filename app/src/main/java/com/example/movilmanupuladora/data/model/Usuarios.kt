@@ -32,7 +32,19 @@ data class Usuario(
     val isActive: Boolean? = true,
 
     @SerializedName("is_staff")
-    val isStaff: Boolean? = false
+    val isStaff: Boolean? = false,
+
+    @SerializedName("id_sede", alternate = ["sede_id"])
+    val idSede: Int? = null,
+
+    @SerializedName("sede_nombre", alternate = ["nombre_sede"])
+    val sedeNombre: String? = null,
+
+    @SerializedName("id_institucion", alternate = ["institucion_id"])
+    val idInstitucion: Int? = null,
+
+    @SerializedName("institucion_nombre", alternate = ["nombre_institucion"])
+    val institucionNombre: String? = null
 ) {
     /** Nombre completo del usuario */
     val nombreCompleto: String
@@ -68,22 +80,30 @@ data class UsuarioInfo(
     @SerializedName("id_usuario")
     val idUsuario: Int,
 
-    val nombre: String,
-    val apellido: String,
-    val correo: String,
-    val rol: String?,
+    val nombre: String = "",
+    val apellido: String? = "",
+    val correo: String = "",
+
+    @SerializedName("rol", alternate = ["role", "tipo_usuario"])
+    val rol: String? = null,
+
+    @SerializedName("nombre_rol", alternate = ["rol_nombre", "nombreRol", "role_name"])
+    val nombreRol: String? = null,
+
+    @SerializedName("id_rol", alternate = ["rol_id"])
+    val idRol: Int? = null,
 
     // Sede asignada al usuario autenticado
-    @SerializedName("id_sede")
+    @SerializedName("id_sede", alternate = ["sede_id"])
     val idSede: Int? = null,
 
-    @SerializedName("sede_nombre")
+    @SerializedName("sede_nombre", alternate = ["nombre_sede", "sede_texto"])
     val sedeNombre: String? = null,
 
-    @SerializedName("id_institucion")
+    @SerializedName("id_institucion", alternate = ["institucion_id"])
     val idInstitucion: Int? = null,
 
-    @SerializedName("institucion_nombre")
+    @SerializedName("institucion_nombre", alternate = ["nombre_institucion", "institucion_texto"])
     val institucionNombre: String? = null,
 
     @SerializedName("is_superuser")
@@ -91,7 +111,31 @@ data class UsuarioInfo(
 
     @SerializedName("debe_cambiar_password")
     val debeCambiarPassword: Boolean? = false
-)
+) {
+    /** Nombre completo del usuario */
+    val nombreCompleto: String
+        get() = listOf(nombre, apellido.orEmpty())
+            .filter { it.isNotBlank() }
+            .joinToString(" ")
+            .trim()
+
+    /** Rol unificado y normalizado */
+    val rolEfectivo: String
+        get() = (nombreRol ?: rol ?: "").trim()
+
+    /** Sede o institución formateada para mostrar en cabecera */
+    val sedeEfectiva: String?
+        get() {
+            val s = sedeNombre?.trim()
+            val i = institucionNombre?.trim()
+            return when {
+                !s.isNullOrEmpty() && !i.isNullOrEmpty() && !s.equals(i, ignoreCase = true) -> "$i · $s"
+                !s.isNullOrEmpty() -> s
+                !i.isNullOrEmpty() -> i
+                else -> null
+            }
+        }
+}
 
 // Modelo para la respuesta del Registro
 data class RegistroResponse(

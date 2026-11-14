@@ -52,15 +52,17 @@ class PerfilJefaActivity : AppCompatActivity() {
     }
 
     private fun cargarDatosPerfil() {
-        val nombre = sessionManager.getUserName() ?: "Isa Pérez"
-        val correo = sessionManager.getUserEmail() ?: "Isaperez@gmail.com"
+        val nombre = sessionManager.getUserName() ?: "Jefa de Cocina"
+        val correo = sessionManager.getUserEmail() ?: ""
         val rol = sessionManager.getUserRole() ?: "Jefa de Manipuladoras"
+        val ubicacion = sessionManager.getUbicacionCompleta()
         val telefono = sessionManager.getUserPhone() ?: "No registrado"
 
         binding.txtNombreJefa.text = nombre
         binding.txtNombre.text = nombre
         binding.txtCorreo.text = correo
-        binding.txtCargo.text = rol
+        binding.txtCargo.text = "$rol · $ubicacion"
+        binding.txtInstitucionSede.text = ubicacion
         binding.txtTelefono.text = telefono
     }
 
@@ -115,8 +117,8 @@ class PerfilJefaActivity : AppCompatActivity() {
         try {
             val dialogBinding = DialogEditarPerfilBinding.inflate(layoutInflater)
 
-            val nombreGuardado = sessionManager.getUserName() ?: "Isa Pérez"
-            val correoGuardado = sessionManager.getUserEmail() ?: "Isaperez@gmail.com"
+            val nombreGuardado = sessionManager.getUserName() ?: "Jefa de Cocina"
+            val correoGuardado = sessionManager.getUserEmail() ?: ""
             val telefonoGuardado = sessionManager.getUserPhone() ?: "No registrado"
 
             dialogBinding.edtNombre.setText(nombreGuardado)

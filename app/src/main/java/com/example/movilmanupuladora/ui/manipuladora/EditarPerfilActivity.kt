@@ -37,13 +37,15 @@ class EditarPerfilActivity : AppCompatActivity() {
         // ==========================================
 
         val nombreGuardado = sessionManager.getUserName() ?: "Manipuladora PAE"
-        val correoGuardado = sessionManager.getUserEmail() ?: "manipuladora@sirae.gov.co"
-        val telefonoGuardado = sessionManager.getUserPhone() ?: "310 450 8920"
-        val cargoGuardado = sessionManager.getUserRole() ?: "Manipuladora de alimentos institucional"
+        val correoGuardado = sessionManager.getUserEmail() ?: ""
+        val telefonoGuardado = sessionManager.getUserPhone() ?: ""
+        val cargoGuardado = sessionManager.getUserRole() ?: "Manipuladora de alimentos"
+        val ubicacionGuardada = sessionManager.getUbicacionCompleta()
 
         binding.edtNombre.setText(nombreGuardado)
         binding.edtCorreo.setText(correoGuardado)
         binding.edtTelefono.setText(telefonoGuardado)
+        binding.txtDescripcion.text = "$cargoGuardado · $ubicacionGuardada"
 
         // Iniciales para el avatar
         val iniciales = nombreGuardado.split(" ")

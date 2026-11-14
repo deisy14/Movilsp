@@ -293,13 +293,34 @@
                             android:layout_weight="1"
                             android:orientation="vertical">
 
-                            <TextView
+                            <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Desayuno"
-                                android:textColor="#1E293B"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Desayuno"
+                                    android:textColor="#1E293B"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/badgeEstadoDesayuno"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:background="@drawable/bg_pill_green"
+                                    android:paddingHorizontal="8dp"
+                                    android:paddingVertical="2dp"
+                                    android:text="✓ Programado"
+                                    android:textColor="#2A5226"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+
+                            </LinearLayout>
 
                             <TextView
                                 android:id="@+id/txtDetalleNombreDesayuno"
@@ -311,6 +332,25 @@
                                 android:textSize="12sp" />
 
                         </LinearLayout>
+
+                        <FrameLayout
+                            android:id="@+id/btnProgramarDesayuno"
+                            android:layout_width="38dp"
+                            android:layout_height="38dp"
+                            android:layout_marginEnd="6dp"
+                            android:background="@drawable/bg_date_selected"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?attr/selectableItemBackgroundBorderless">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="Programar o cambiar desayuno"
+                                android:src="@drawable/ic_editar"
+                                app:tint="#854D0E" />
+                        </FrameLayout>
 
                         <FrameLayout
                             android:id="@+id/btnVerDetalleDesayuno"
@@ -370,13 +410,34 @@
                             android:layout_weight="1"
                             android:orientation="vertical">
 
-                            <TextView
+                            <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Almuerzo"
-                                android:textColor="#1E293B"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Almuerzo"
+                                    android:textColor="#1E293B"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/badgeEstadoAlmuerzo"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:background="@drawable/bg_pill_green"
+                                    android:paddingHorizontal="8dp"
+                                    android:paddingVertical="2dp"
+                                    android:text="✓ Programado"
+                                    android:textColor="#2A5226"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+
+                            </LinearLayout>
 
                             <TextView
                                 android:id="@+id/txtDetalleNombreAlmuerzo"
@@ -388,6 +449,25 @@
                                 android:textSize="12sp" />
 
                         </LinearLayout>
+
+                        <FrameLayout
+                            android:id="@+id/btnProgramarAlmuerzo"
+                            android:layout_width="38dp"
+                            android:layout_height="38dp"
+                            android:layout_marginEnd="6dp"
+                            android:background="@drawable/bg_date_selected"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?attr/selectableItemBackgroundBorderless">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="Programar o cambiar almuerzo"
+                                android:src="@drawable/ic_editar"
+                                app:tint="#854D0E" />
+                        </FrameLayout>
 
                         <FrameLayout
                             android:id="@+id/btnVerDetalleAlmuerzo"
@@ -447,13 +527,34 @@
                             android:layout_weight="1"
                             android:orientation="vertical">
 
-                            <TextView
+                            <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Merienda"
-                                android:textColor="#1E293B"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Merienda"
+                                    android:textColor="#1E293B"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/badgeEstadoMerienda"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:background="@drawable/bg_pill_green"
+                                    android:paddingHorizontal="8dp"
+                                    android:paddingVertical="2dp"
+                                    android:text="✓ Programado"
+                                    android:textColor="#2A5226"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+
+                            </LinearLayout>
 
                             <TextView
                                 android:id="@+id/txtDetalleNombreMerienda"
@@ -465,6 +566,25 @@
                                 android:textSize="12sp" />
 
                         </LinearLayout>
+
+                        <FrameLayout
+                            android:id="@+id/btnProgramarMerienda"
+                            android:layout_width="38dp"
+                            android:layout_height="38dp"
+                            android:layout_marginEnd="6dp"
+                            android:background="@drawable/bg_date_selected"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?attr/selectableItemBackgroundBorderless">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="Programar o cambiar merienda"
+                                android:src="@drawable/ic_editar"
+                                app:tint="#854D0E" />
+                        </FrameLayout>
 
                         <FrameLayout
                             android:id="@+id/btnVerDetalleMerienda"
@@ -488,6 +608,25 @@
                 </com.google.android.material.card.MaterialCardView>
 
             </LinearLayout>
+
+            <!-- BOTÓN PLANIFICACIÓN SEMANAL COMPLETA -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPlanificarSemanaSiguiente"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="24dp"
+                android:text="🗓️ Planificar toda la semana siguiente"
+                android:textColor="#1E293B"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                app:backgroundTint="#FAC94B"
+                app:cornerRadius="16dp"
+                app:icon="@drawable/ic_calendar"
+                app:iconGravity="textStart"
+                app:iconTint="#1E293B"
+                app:strokeColor="#F59E0B"
+                app:strokeWidth="1dp" />
 
         </LinearLayout>
 

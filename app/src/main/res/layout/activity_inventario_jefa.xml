@@ -71,6 +71,72 @@
 
             </LinearLayout>
 
+            <!-- BANNER ENTREGA DESPACHADA POR SUPERVISOR (RECEPCIÓN Y FIRMA) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardBannerEntregaSupervisor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="#FEF3C7"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#F4B41F"
+                app:strokeWidth="1.5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="12dp">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:background="@drawable/bg_icono_circular"
+                        android:backgroundTint="#FFFFFF"
+                        android:padding="6dp"
+                        android:src="@drawable/ic_food"
+                        app:tint="#D97706" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🚚 Entrega pendiente por verificar"
+                            android:textColor="#92400E"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Remisión #REM-2026-104 • Toca para revisar y firmar"
+                            android:textColor="#B45309"
+                            android:textSize="11sp" />
+
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="#92400E" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- 3 BOTONES DE CATEGORÍAS HORIZONTALMENTE (GRANOS, LÁCTEOS, VERDURAS) -->
             <LinearLayout
                 android:layout_width="match_parent"

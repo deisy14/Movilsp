@@ -6,8 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FAF9F5"
-    android:orientation="vertical"
-    tools:context=".ui.manipuladora_Jefe.AiRecetaActivity">
+    android:orientation="vertical">
 
     <!-- BARRA SUPERIOR -->
     <LinearLayout
@@ -49,9 +48,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_weight="1"
-            android:text="Asistente IA - Recetas PAE"
+            android:text="Asistente IA - Recetas PAE &amp; Bodega"
             android:textColor="#1E293B"
-            android:textSize="18sp"
+            android:textSize="17sp"
             android:textStyle="bold" />
 
     </LinearLayout>
@@ -63,7 +62,7 @@
         android:layout_weight="1"
         android:clipToPadding="false"
         android:overScrollMode="never"
-        android:padding="20dp">
+        android:padding="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -74,10 +73,10 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="14dp"
                 app:cardBackgroundColor="#FEF3C7"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="2dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
                 app:strokeColor="#FCD34D"
                 app:strokeWidth="1dp">
 
@@ -85,198 +84,332 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="14dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="🤖 Sugerencias Inteligentes de Menú"
+                        android:text="🤖 Sugerencias Inteligentes con Inventario"
                         android:textColor="#92400E"
-                        android:textSize="16sp"
+                        android:textSize="15sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Genera recetas coherentes con el ciclo PAE y la jornada (Desayuno, Almuerzo o Merienda), calcula las cantidades para los niños y proyecta la disminución del stock en bodega."
+                        android:textColor="#78350F"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- PANEL DE PARÁMETROS -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- SELECCIÓN DE MOMENTO -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Momento de Entrega"
+                        android:textColor="#334155"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="El sistema analiza los inventarios disponibles en bodega y los requerimientos nutricionales del programa PAE para recomendarte los mejores platos y proporciones diarias."
-                        android:textColor="#78350F"
-                        android:textSize="13sp" />
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnMomentoDesayuno"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_marginEnd="4dp"
+                            android:layout_weight="1"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:text="Desayuno"
+                            android:textAllCaps="false"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            app:cornerRadius="10dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnMomentoAlmuerzo"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_marginHorizontal="4dp"
+                            android:layout_weight="1"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:text="Almuerzo"
+                            android:textAllCaps="false"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            app:cornerRadius="10dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnMomentoMerienda"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_marginStart="4dp"
+                            android:layout_weight="1"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:text="Merienda"
+                            android:textAllCaps="false"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            app:cornerRadius="10dp" />
+
+                    </LinearLayout>
+
+                    <!-- CANTIDAD DE NIÑOS / RACIONES -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Número de Niños / Raciones"
+                        android:textColor="#334155"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/etNinosPresentes"
+                        android:layout_width="match_parent"
+                        android:layout_height="42dp"
+                        android:layout_marginTop="4dp"
+                        android:background="@drawable/bg_banner_amarillo_borde"
+                        android:digits="0123456789"
+                        android:hint="Ej: 200"
+                        android:inputType="number"
+                        android:paddingHorizontal="12dp"
+                        android:text="200"
+                        android:textColor="#1E293B"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <!-- BOTÓN GENERAR -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnGenerarIA"
+                        android:layout_width="match_parent"
+                        android:layout_height="46dp"
+                        android:layout_marginTop="14dp"
+                        android:backgroundTint="#F4B41F"
+                        android:text="⚡ Generar Sugerencia con IA"
+                        android:textAllCaps="false"
+                        android:textColor="#1B3317"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        app:cornerRadius="12dp" />
 
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- TÍTULO DE SECCIÓN -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:text="Platos Sugeridos por la IA para Hoy"
-                android:textColor="#1E293B"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <!-- TARJETA SUGERENCIA 1 -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardSugerencia1"
+            <!-- LOADING INDICATOR -->
+            <LinearLayout
+                android:id="@+id/layoutCargandoIA"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#E2E8F0"
-                app:strokeWidth="1dp">
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="20dp"
+                android:visibility="gone">
 
-                <LinearLayout
+                <ProgressBar
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:indeterminateTint="#F4B41F" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Consultando IA y calculando gramajes de bodega..."
+                    android:textColor="#64748B"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <!-- RESULTADO SUGERENCIA IA -->
+            <LinearLayout
+                android:id="@+id/layoutResultadoIA"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- TARJETA DEL PLATO -->
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:layout_marginBottom="14dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="#CBD5E1"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/tvChipMomento"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/bg_chip_desayuno"
+                                android:paddingHorizontal="10dp"
+                                android:paddingVertical="4dp"
+                                android:text="Desayuno • Coherencia PAE"
+                                android:textColor="#B45309"
+                                android:textSize="11sp"
+                                android:textStyle="bold" />
+
+                            <View
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="1" />
+
+                            <TextView
+                                android:id="@+id/tvBadgeStock"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="✓ Stock Disponible"
+                                android:textColor="#15803D"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
 
                         <TextView
+                            android:id="@+id/tvNombrePlatoIA"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/bg_chip_almuerzo"
-                            android:paddingHorizontal="8dp"
-                            android:paddingVertical="3dp"
-                            android:text="Almuerzo • Alta disponibilidad"
-                            android:textColor="#15803D"
-                            android:textSize="11sp"
+                            android:layout_marginTop="10dp"
+                            android:text="Huevos Pericos con Arepa, Queso y Chocolate"
+                            android:textColor="#1E293B"
+                            android:textSize="16sp"
                             android:textStyle="bold" />
-
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:layout_weight="1" />
 
                         <TextView
+                            android:id="@+id/tvComponentesIA"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="98% Match"
-                            android:textColor="#D97706"
-                            android:textSize="12sp"
-                            android:textStyle="bold" />
+                            android:layout_marginTop="4dp"
+                            android:text="Bebida con leche, Alimento proteico, Cereal acompañante, Fruta"
+                            android:textColor="#64748B"
+                            android:textSize="12sp" />
 
                     </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Pollo Guisado Criollo con Arroz y Papa"
-                        android:textColor="#1E293B"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                </com.google.android.material.card.MaterialCardView>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Insumos requeridos: Pollo, papa criolla, cebolla, tomate, arroz."
-                        android:textColor="#64748B"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- TARJETA SUGERENCIA 2 -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardSugerencia2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#E2E8F0"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
+                <!-- TARJETA INGREDIENTES PARA 200 NIÑOS Y DESCUENTO -->
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:layout_marginBottom="14dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="#CBD5E1"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:id="@+id/tvTituloIngredientes"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ingredientes &amp; Disminución de Inventario (200 Niños)"
+                            android:textColor="#1E293B"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/bg_chip_desayuno"
-                            android:paddingHorizontal="8dp"
-                            android:paddingVertical="3dp"
-                            android:text="Desayuno • Balanceado"
-                            android:textColor="#B45309"
-                            android:textSize="11sp"
-                            android:textStyle="bold" />
+                            android:layout_marginTop="2dp"
+                            android:text="Gramajes oficiales por porción escolar y total a preparar"
+                            android:textColor="#64748B"
+                            android:textSize="11sp" />
 
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:layout_weight="1" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <!-- CONTENEDOR DINÁMICO DE FILAS DE INGREDIENTES -->
+                        <LinearLayout
+                            android:id="@+id/layoutListaIngredientes"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="95% Match"
-                            android:textColor="#D97706"
-                            android:textSize="12sp"
-                            android:textStyle="bold" />
+                            android:layout_marginTop="10dp"
+                            android:orientation="vertical" />
 
                     </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Huevos Pericos con Arepa y Chocolate"
-                        android:textColor="#1E293B"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                </com.google.android.material.card.MaterialCardView>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Insumos requeridos: Huevos, tomate, cebolla, arepas de maíz, cacao."
-                        android:textColor="#64748B"
-                        android:textSize="12sp" />
+                <!-- BOTÓN CONFIRMAR Y DESCONTAR -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnConfirmarDescuento"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginBottom="14dp"
+                    android:backgroundTint="#15803D"
+                    android:text="✓ Confirmar Menú y Descontar de Bodega"
+                    android:textAllCaps="false"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="14dp" />
 
-                </LinearLayout>
+            </LinearLayout>
 
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- BOTÓN REDACTAR RECETA MANUALMENTE -->
+            <!-- BOTÓN REDACTAR RECETA MANUAL -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnIrARedactar"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:backgroundTint="#F4B41F"
-                android:text="Redactar Nueva Receta Manual"
+                android:layout_height="46dp"
+                android:layout_marginTop="4dp"
+                android:text="Redactar Otra Receta Manualmente"
                 android:textAllCaps="false"
-                android:textColor="#1B3317"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:cornerRadius="16dp" />
+                android:textColor="#64748B"
+                android:textSize="13sp"
+                app:cornerRadius="12dp"
+                app:strokeColor="#CBD5E1" />
 
         </LinearLayout>
 
