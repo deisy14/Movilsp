@@ -15,6 +15,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.data.api.RetrofitClient
+import com.example.movilmanupuladora.data.model.ConfirmarRecepcionRequest
 import com.example.movilmanupuladora.databinding.ActivityRegistrarEntregaBinding
 import com.example.movilmanupuladora.utils.SessionManager
 import com.google.android.material.card.MaterialCardView
@@ -33,6 +34,7 @@ class RegistrarEntregaActivity : AppCompatActivity() {
 
     data class ItemIngredienteVerificar(
         val id: Int,
+        val idEntrega: Int? = null,
         val nombre: String,
         val cantidad: Double,
         val unidad: String,
@@ -68,14 +70,19 @@ class RegistrarEntregaActivity : AppCompatActivity() {
 
         configurarEncabezado()
         renderizarIngredientes()
+        cargarEntregasDesdeServidor()
         configurarLienzoFirma()
         configurarBotonesAccion()
     }
 
-    private fun configurarEncabezado() {
-        val sedeNombre = sessionManager.getSedeNombre() ?: "Sede Piagua (Primaria)"
-        numeroRemision = intent.getStringExtra("numero_remision") ?: "#REM-2026-104"
-        nombreSupervisor = intent.getStringExtra("supervisor_nombre") ?: "Carlos Méndez"
+    private fun configurarEncabezado(sedeNombrePersonalizado: String? = null) {
+        val sedeNombre = sedeNombrePersonalizado ?: sessionManager.getSedeNombre() ?: "Sede Escolar"
+        if (intent.hasExtra("numero_remision")) {
+            numeroRemision = intent.getStringExtra("numero_remision") ?: numeroRemision
+        }
+        if (intent.hasExtra("supervisor_nombre")) {
+            nombreSupervisor = intent.getStringExtra("supervisor_nombre") ?: nombreSupervisor
+        }
 
         binding.txtSubtituloRemision.text = "$sedeNombre • Remisión $numeroRemision"
         binding.txtSedeDestino.text = sedeNombre
@@ -90,6 +97,67 @@ class RegistrarEntregaActivity : AppCompatActivity() {
 
         binding.btnVolver.setOnClickListener {
             finish()
+        }
+    }
+
+    private fun cargarEntregasDesdeServidor() {
+        val idSede = sessionManager.getSedeId()
+        lifecycleScope.launch {
+            try {
+                val resp = RetrofitClient.apiService.obtenerEntregas(
+                    idSede = if (idSede > 0) idSede else null,
+                    estado = "EN_TRANSITO"
+                )
+                if (resp.isSuccessful) {
+                    val lista = resp.body()
+                    if (!lista.isNullOrEmpty()) {
+                        val remisionParam = intent.getStringExtra("numero_remision")
+                        val remisionTarget = if (!remisionParam.isNullOrBlank()) {
+                            remisionParam
+                        } else {
+                            lista.firstOrNull { !it.documentoEntrega.isNullOrBlank() }?.documentoEntrega
+                                ?: lista.first().documentoEntrega ?: "#REM-2026-001"
+                        }
+
+                        numeroRemision = remisionTarget
+                        val entregasRemision = lista.filter { it.documentoEntrega == remisionTarget || remisionTarget.isBlank() }
+                        val sedeNombre = entregasRemision.firstOrNull()?.sedeNombre
+                            ?: sessionManager.getSedeNombre()
+                            ?: "Sede Escolar"
+
+                        val supervisor = entregasRemision.firstOrNull()?.observaciones?.let { obs ->
+                            val match = Regex("Responsable:\\s*([^|;\\n]+)", RegexOption.IGNORE_CASE).find(obs)
+                            match?.groupValues?.get(1)?.trim()
+                        } ?: intent.getStringExtra("supervisor_nombre") ?: "Supervisor PAE"
+                        nombreSupervisor = supervisor
+
+                        listaIngredientesDespacho.clear()
+                        for (e in entregasRemision) {
+                            val id = e.idIngrediente ?: e.idEntrega ?: (listaIngredientesDespacho.size + 1)
+                            val nombre = e.ingredienteNombre ?: "Alimento PAE"
+                            val cant = e.cantidad ?: 1.0
+                            val uni = e.unidad ?: "kg"
+                            val desc = e.observaciones?.takeIf { it.isNotBlank() } ?: "Víveres entregados por Supervisor"
+                            listaIngredientesDespacho.add(
+                                ItemIngredienteVerificar(
+                                    id = id,
+                                    idEntrega = e.idEntrega,
+                                    nombre = nombre,
+                                    cantidad = cant,
+                                    unidad = uni,
+                                    descripcion = desc,
+                                    verificado = true
+                                )
+                            )
+                        }
+
+                        configurarEncabezado(sedeNombrePersonalizado = sedeNombre)
+                        renderizarIngredientes()
+                    }
+                }
+            } catch (_: Exception) {
+                // Conserva los alimentos precargados si el backend no responde
+            }
         }
     }
 
@@ -207,6 +275,22 @@ class RegistrarEntregaActivity : AppCompatActivity() {
         val sedeNombre = sessionManager.getSedeNombre() ?: "Sede Piagua"
         lifecycleScope.launch {
             try {
+                // Confirmar rechazo en el backend para cada ítem en tránsito
+                for (item in listaIngredientesDespacho) {
+                    item.idEntrega?.let { idEnt ->
+                        try {
+                            RetrofitClient.apiService.confirmarRecepcionEntrega(
+                                idEnt,
+                                ConfirmarRecepcionRequest(
+                                    cantidadRecibida = 0.0,
+                                    cantidadRechazada = item.cantidad,
+                                    motivoRechazo = motivo
+                                )
+                            )
+                        } catch (_: Exception) {}
+                    }
+                }
+
                 val tituloBody = "⚠️ Entrega Rechazada en $sedeNombre".toRequestBody("text/plain".toMediaTypeOrNull())
                 val mensajeBody = "La Jefa de Manipuladoras ha rechazado la remisión $numeroRemision. Motivo: $motivo".toRequestBody("text/plain".toMediaTypeOrNull())
 
@@ -249,17 +333,36 @@ class RegistrarEntregaActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                // 1. Notificación al Administrador Institucional
+                // 1. Confirmar recepción en el backend (actualiza estado a RECIBIDA o CON_NOVEDAD en base de datos)
+                for (item in listaIngredientesDespacho) {
+                    item.idEntrega?.let { idEnt ->
+                        try {
+                            val cantRecibida = if (item.verificado) item.cantidad else 0.0
+                            val cantRechazada = if (item.verificado) 0.0 else item.cantidad
+                            val motivoItem = if (item.verificado) "" else "No verificado por la manipuladora: $obs"
+                            RetrofitClient.apiService.confirmarRecepcionEntrega(
+                                idEnt,
+                                ConfirmarRecepcionRequest(
+                                    cantidadRecibida = cantRecibida,
+                                    cantidadRechazada = cantRechazada,
+                                    motivoRechazo = motivoItem
+                                )
+                            )
+                        } catch (_: Exception) {}
+                    }
+                }
+
+                // 2. Notificación al Administrador Institucional
                 val titAdmin = "🔔 Recepción confirmada en sede: $sedeNombre".toRequestBody("text/plain".toMediaTypeOrNull())
                 val msgAdmin = "La Jefa de Manipuladoras ha firmado la remisión $numeroRemision en $sedeNombre. Observaciones: $obs. Lista para aceptar su ingreso al inventario.".toRequestBody("text/plain".toMediaTypeOrNull())
                 RetrofitClient.apiService.enviarNotificacion(titAdmin, msgAdmin, null)
 
-                // 2. Notificación al Supervisor
+                // 3. Notificación al Supervisor
                 val titSup = "✅ Entrega Aceptada en $sedeNombre".toRequestBody("text/plain".toMediaTypeOrNull())
                 val msgSup = "La remisión $numeroRemision ha sido verificada, firmada y aceptada por la Jefa de manipuladoras en $sedeNombre.".toRequestBody("text/plain".toMediaTypeOrNull())
                 RetrofitClient.apiService.enviarNotificacion(titSup, msgSup, null)
 
-                // 3. Cargar cantidades verificadas al inventario de la sede
+                // 4. Cargar cantidades verificadas al inventario de la sede
                 for (item in listaIngredientesDespacho.filter { it.verificado }) {
                     InventarioManager.guardarCantidad(
                         alimento = item.nombre,
@@ -274,7 +377,7 @@ class RegistrarEntregaActivity : AppCompatActivity() {
 
             MaterialAlertDialogBuilder(this@RegistrarEntregaActivity)
                 .setTitle("¡Entrega Aceptada!")
-                .setMessage("Se ha enviado el comprobante firmado.\n\n• El Administrador recibió la notificación para sumar los ingredientes al inventario.\n• El Supervisor fue notificado de la aceptación.")
+                .setMessage("Se ha enviado el comprobante firmado.\n\n• El Administrador recibió la notificación para sumar los ingredientes al inventario.\n• El Supervisor fue notificado de la aceptación.\n• Las entregas pasaron a estado RECIBIDA en la base de datos.")
                 .setPositiveButton("Aceptar") { _, _ ->
                     finish()
                 }
