@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
+import android.view.View
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -29,6 +30,8 @@ import com.example.movilmanupuladora.utils.PreparacionSyncManager
 import com.example.movilmanupuladora.utils.SessionManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -44,6 +47,7 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
 
     private var comidaSeleccionada = TipoComida.DESAYUNO
     private var posicionPlatoCarousel = 0
+    private var esSemanaAprobadaFijada = false
 
     private var platoSeleccionadoDesayuno: InicioJefaActivity.Plato? = null
     private var platoSeleccionadoAlmuerzo: InicioJefaActivity.Plato? = null
@@ -94,6 +98,7 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
             configurarViewPagerCarousel()
             configurarMenuDisponiblePAE()
             cargarPlatosDesdeBackend()
+            consultarEstadoAprobacionYDevolucion()
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(this, "Error al abrir planificación: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
@@ -110,10 +115,12 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        configurarTabsComida()
         cargarPlatosDesdeBackend()
         cargarPlatosSeleccionados()
         configurarViewPagerCarousel()
         configurarMenuDisponiblePAE()
+        consultarEstadoAprobacionYDevolucion()
     }
 
     private var semanaOffset = 0
@@ -171,7 +178,14 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
             val tieneDes = !sessionManager.getPlatoDiaServicio(this, fechaDia, "Desayuno").isNullOrBlank()
             val tieneAlm = !sessionManager.getPlatoDiaServicio(this, fechaDia, "Almuerzo").isNullOrBlank()
             val tieneMer = !sessionManager.getPlatoDiaServicio(this, fechaDia, "Merienda").isNullOrBlank()
-            val diaCompleto = tieneDes && tieneAlm && tieneMer
+            val permitidas = obtenerJornadasPermitidas()
+            val diaCompleto = permitidas.all { tipo ->
+                when (tipo) {
+                    TipoComida.DESAYUNO -> tieneDes
+                    TipoComida.ALMUERZO -> tieneAlm
+                    TipoComida.MERIENDA -> tieneMer
+                }
+            }
 
             val txtNum = TextView(this).apply {
                 val p = FrameLayout.LayoutParams(
@@ -347,18 +361,70 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
     // TABS DE COMIDA (DESAYUNO, ALMUERZO, MERIENDA)
     // =========================================================
 
+    /**
+     * Determina las jornadas y momentos habilitados según la sede asignada a la Jefa.
+     * Sedes como Sede Piagua (primaria / jornada mañana) solo manejan Desayuno.
+     * Sedes con jornada mañana y tarde manejan Desayuno, Almuerzo y Merienda.
+     */
+    private fun obtenerJornadasPermitidas(): List<TipoComida> {
+        val sede = sessionManager.getSedeNombre().orEmpty().lowercase()
+        val ubicacion = sessionManager.getUbicacionCompleta().lowercase()
+        val texto = "$sede $ubicacion"
+        return when {
+            // Sede Piagua o sedes rurales de primaria exclusivamente mañana
+            texto.contains("piagua") || (texto.contains("mañana") && !texto.contains("tarde") && !texto.contains("unica") && !texto.contains("completa")) -> {
+                listOf(TipoComida.DESAYUNO)
+            }
+            // Sedes con solo tarde
+            texto.contains("tarde") && !texto.contains("mañana") -> {
+                listOf(TipoComida.ALMUERZO, TipoComida.MERIENDA)
+            }
+            // Sedes con mañana y tarde (o jornada completa institucional)
+            else -> {
+                listOf(TipoComida.DESAYUNO, TipoComida.ALMUERZO, TipoComida.MERIENDA)
+            }
+        }
+    }
+
     private fun configurarTabsComida() {
+        val permitidas = obtenerJornadasPermitidas()
+        val sedeNombre = sessionManager.getSedeNombre() ?: "Sede Piagua"
+        val esSoloManana = permitidas == listOf(TipoComida.DESAYUNO)
+        val esSoloTarde = !permitidas.contains(TipoComida.DESAYUNO)
+
+        val infoJornada = when {
+            esSoloManana -> "Solo Jornada Mañana (Desayuno)"
+            esSoloTarde -> "Solo Jornada Tarde (Almuerzo y Merienda)"
+            else -> "Jornadas Mañana y Tarde (Desayuno, Almuerzo y Merienda)"
+        }
+        binding.txtSedeJornadaInfo.text = "$sedeNombre · $infoJornada"
+
+        binding.tabDesayuno.visibility = if (permitidas.contains(TipoComida.DESAYUNO)) View.VISIBLE else View.GONE
+        binding.tabAlmuerzo.visibility = if (permitidas.contains(TipoComida.ALMUERZO)) View.VISIBLE else View.GONE
+        binding.tabMerienda.visibility = if (permitidas.contains(TipoComida.MERIENDA)) View.VISIBLE else View.GONE
+
         binding.tabDesayuno.setOnClickListener {
-            seleccionarTipoComida(TipoComida.DESAYUNO)
+            if (permitidas.contains(TipoComida.DESAYUNO)) {
+                seleccionarTipoComida(TipoComida.DESAYUNO)
+            }
         }
         binding.tabAlmuerzo.setOnClickListener {
-            seleccionarTipoComida(TipoComida.ALMUERZO)
+            if (permitidas.contains(TipoComida.ALMUERZO)) {
+                seleccionarTipoComida(TipoComida.ALMUERZO)
+            } else {
+                Toast.makeText(this, "Esta sede opera exclusivamente en Jornada Mañana (Desayuno).", Toast.LENGTH_SHORT).show()
+            }
         }
         binding.tabMerienda.setOnClickListener {
-            seleccionarTipoComida(TipoComida.MERIENDA)
+            if (permitidas.contains(TipoComida.MERIENDA)) {
+                seleccionarTipoComida(TipoComida.MERIENDA)
+            } else {
+                Toast.makeText(this, "Esta sede opera exclusivamente en Jornada Mañana (Desayuno).", Toast.LENGTH_SHORT).show()
+            }
         }
 
-        seleccionarTipoComida(TipoComida.DESAYUNO)
+        val inicial = if (permitidas.contains(comidaSeleccionada)) comidaSeleccionada else (permitidas.firstOrNull() ?: TipoComida.DESAYUNO)
+        seleccionarTipoComida(inicial)
     }
 
     private fun seleccionarTipoComida(tipo: TipoComida) {
@@ -622,9 +688,22 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
             renderizarNumerosSemanaSiguiente()
             verificarAvanzarSiguienteDia()
         }
+
+        binding.btnEnviarProgramacionSupervisor.setOnClickListener {
+            enviarProgramacionAlSupervisor()
+        }
     }
 
     private fun seleccionarPlatoParaSiguienteSemana(plato: InicioJefaActivity.Plato) {
+        if (esSemanaAprobadaFijada) {
+            MaterialAlertDialogBuilder(this)
+                .setTitle("Semana Aprobada por el Supervisor")
+                .setMessage("La programación de esta semana ya ha sido formalmente aprobada por el supervisor PAE. No se pueden modificar los menús programados.")
+                .setPositiveButton("Entendido", null)
+                .show()
+            return
+        }
+
         val comidaNombre = obtenerNombreComidaActual()
         val platosAyer = obtenerPlatosDiaAnterior()
 
@@ -689,6 +768,10 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
     }
 
     private fun desmarcarPlatoActual(servicio: String) {
+        if (esSemanaAprobadaFijada) {
+            Toast.makeText(this, "Esta semana está formalmente aprobada y no se pueden quitar platos.", Toast.LENGTH_SHORT).show()
+            return
+        }
         val fechaStr = obtenerClaveFecha(diaSeleccionadoSemanaSiguiente)
         when (servicio.lowercase()) {
             "desayuno" -> platoSeleccionadoDesayuno = null
@@ -812,37 +895,49 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
     }
 
     private fun avanzarSiguienteServicioODia(servicioGuardado: String) {
+        val permitidas = obtenerJornadasPermitidas()
         val des = platoSeleccionadoDesayuno
         val alm = platoSeleccionadoAlmuerzo
         val mer = platoSeleccionadoMerienda
 
-        when {
-            // Si acabamos de seleccionar desayuno y falta almuerzo, pasar a almuerzo en este mismo día
-            comidaSeleccionada == TipoComida.DESAYUNO && alm == null -> {
-                seleccionarTipoComida(TipoComida.ALMUERZO)
-                Toast.makeText(this, "✓ Desayuno guardado. Selecciona ahora el Almuerzo", Toast.LENGTH_SHORT).show()
+        // Buscar el siguiente servicio permitido que aún no tenga plato asignado en este día
+        val siguientePendiente = permitidas.firstOrNull { tipo ->
+            when (tipo) {
+                TipoComida.DESAYUNO -> des == null
+                TipoComida.ALMUERZO -> alm == null
+                TipoComida.MERIENDA -> mer == null
             }
-            // Si falta merienda, pasar a merienda en este mismo día
-            (comidaSeleccionada == TipoComida.DESAYUNO || comidaSeleccionada == TipoComida.ALMUERZO) && mer == null -> {
-                seleccionarTipoComida(TipoComida.MERIENDA)
-                Toast.makeText(this, "✓ Guardado. Selecciona ahora la Merienda", Toast.LENGTH_SHORT).show()
+        }
+
+        if (siguientePendiente != null && siguientePendiente != comidaSeleccionada) {
+            seleccionarTipoComida(siguientePendiente)
+            val nom = when (siguientePendiente) {
+                TipoComida.DESAYUNO -> "Desayuno"
+                TipoComida.ALMUERZO -> "Almuerzo"
+                TipoComida.MERIENDA -> "Merienda"
             }
-            // Si los 3 servicios ya están completos en este día, avanzar al siguiente día
-            des != null && alm != null && mer != null -> {
-                verificarAvanzarSiguienteDia()
-            }
-            else -> {
-                Toast.makeText(this, "✓ Plato guardado para $servicioGuardado", Toast.LENGTH_SHORT).show()
-            }
+            Toast.makeText(this, "✓ Guardado. Selecciona ahora el $nom", Toast.LENGTH_SHORT).show()
+        } else {
+            // Todos los servicios requeridos para este día están completos
+            verificarAvanzarSiguienteDia()
         }
     }
 
     private fun verificarAvanzarSiguienteDia() {
+        val permitidas = obtenerJornadasPermitidas()
         val des = platoSeleccionadoDesayuno
         val alm = platoSeleccionadoAlmuerzo
         val mer = platoSeleccionadoMerienda
 
-        if (des != null && alm != null && mer != null) {
+        val diaCompleto = permitidas.all { tipo ->
+            when (tipo) {
+                TipoComida.DESAYUNO -> des != null
+                TipoComida.ALMUERZO -> alm != null
+                TipoComida.MERIENDA -> mer != null
+            }
+        }
+
+        if (diaCompleto) {
             val currentIndex = diasSemanaSiguiente.indexOfFirst { esMismoDia(it, diaSeleccionadoSemanaSiguiente) }
             if (currentIndex in 0 until diasSemanaSiguiente.size - 1) {
                 val siguienteDia = diasSemanaSiguiente[currentIndex + 1]
@@ -857,6 +952,186 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
                 Toast.makeText(this, "✓ Día completado. Pasando a: $fechaStr", Toast.LENGTH_LONG).show()
             } else {
                 Toast.makeText(this, "✓ ¡Semana completa planificada con éxito!", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    /**
+     * Consulta si la semana ha sido aprobada por el Supervisor PAE o si devolvió algún plato.
+     */
+    private fun consultarEstadoAprobacionYDevolucion() {
+        lifecycleScope.launch {
+            try {
+                val semanaClave = SimpleDateFormat("yyyy_MM_W", Locale.getDefault()).format(diaSeleccionadoSemanaSiguiente.time)
+                val prefs = getSharedPreferences("MINUTA_APROBACION", MODE_PRIVATE)
+                val semanaAprobada = prefs.getBoolean("aprobada_supervisor_$semanaClave", false)
+
+                val notifRes = RetrofitClient.apiService.obtenerNotificaciones()
+                var platoDevueltoNotif: com.example.movilmanupuladora.data.model.Notificacion? = null
+                var semanaAprobadaNotif = false
+
+                if (notifRes.isSuccessful && !notifRes.body().isNullOrEmpty()) {
+                    val lista = notifRes.body()!!
+                    val devuelta = lista.firstOrNull {
+                        val t = (it.titulo ?: "").lowercase()
+                        val m = (it.mensaje ?: "").lowercase()
+                        t.contains("devuelto") || t.contains("rechaz") || m.contains("devuelto") || m.contains("rechaz")
+                    }
+                    if (devuelta != null) {
+                        platoDevueltoNotif = devuelta
+                    }
+
+                    val aprob = lista.firstOrNull {
+                        val t = (it.titulo ?: "").lowercase()
+                        val m = (it.mensaje ?: "").lowercase()
+                        (t.contains("aprobada") || m.contains("aprobada")) && (t.contains("minuta") || t.contains("semana") || m.contains("minuta"))
+                    }
+                    if (aprob != null) {
+                        semanaAprobadaNotif = true
+                    }
+                }
+
+                if (semanaAprobada || semanaAprobadaNotif) {
+                    esSemanaAprobadaFijada = true
+                    binding.cardAlertaSupervisor.visibility = View.VISIBLE
+                    binding.cardAlertaSupervisor.setCardBackgroundColor(Color.parseColor("#ECFDF5"))
+                    binding.cardAlertaSupervisor.strokeColor = Color.parseColor("#A7F3D0")
+                    binding.txtIconoAlertaSupervisor.text = "✓"
+                    binding.txtTituloAlertaSupervisor.text = "Semana Aprobada por el Supervisor PAE"
+                    binding.txtTituloAlertaSupervisor.setTextColor(Color.parseColor("#065F46"))
+                    binding.txtMensajeAlertaSupervisor.text = "La programación de esta semana ha sido aprobada formalmente. Es oficial, fija y no se puede modificar."
+                    binding.txtMensajeAlertaSupervisor.setTextColor(Color.parseColor("#047857"))
+                    binding.btnEnviarProgramacionSupervisor.text = "✓ Programación Aprobada y Fijada"
+                    binding.btnEnviarProgramacionSupervisor.isEnabled = false
+                    binding.btnEnviarProgramacionSupervisor.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#64748B"))
+                    binding.btnGuardarSeleccion.isEnabled = false
+                    binding.btnGuardarSeleccion.alpha = 0.5f
+                    binding.btnSeleccionarPlato.isEnabled = false
+                    binding.btnSeleccionarPlato.alpha = 0.5f
+                } else if (platoDevueltoNotif != null) {
+                    esSemanaAprobadaFijada = false
+                    binding.cardAlertaSupervisor.visibility = View.VISIBLE
+                    binding.cardAlertaSupervisor.setCardBackgroundColor(Color.parseColor("#FFF1F2"))
+                    binding.cardAlertaSupervisor.strokeColor = Color.parseColor("#FECDD3")
+                    binding.txtIconoAlertaSupervisor.text = "⚠️"
+                    binding.txtTituloAlertaSupervisor.text = platoDevueltoNotif.titulo ?: "Plato devuelto por el Supervisor"
+                    binding.txtTituloAlertaSupervisor.setTextColor(Color.parseColor("#9F1239"))
+                    binding.txtMensajeAlertaSupervisor.text = platoDevueltoNotif.mensaje ?: "El supervisor devolvió un plato. Por favor cámbialo antes de reenviar la programación."
+                    binding.txtMensajeAlertaSupervisor.setTextColor(Color.parseColor("#881337"))
+                    binding.btnEnviarProgramacionSupervisor.isEnabled = true
+                    binding.btnGuardarSeleccion.isEnabled = true
+                    binding.btnGuardarSeleccion.alpha = 1.0f
+                    binding.btnSeleccionarPlato.isEnabled = true
+                    binding.btnSeleccionarPlato.alpha = 1.0f
+                } else {
+                    esSemanaAprobadaFijada = false
+                    binding.cardAlertaSupervisor.visibility = View.GONE
+                    binding.btnEnviarProgramacionSupervisor.isEnabled = true
+                    binding.btnGuardarSeleccion.isEnabled = true
+                    binding.btnGuardarSeleccion.alpha = 1.0f
+                    binding.btnSeleccionarPlato.isEnabled = true
+                    binding.btnSeleccionarPlato.alpha = 1.0f
+                }
+            } catch (_: Exception) { }
+        }
+    }
+
+    /**
+     * Valida y remite la programación semanal completa al Supervisor PAE.
+     */
+    private fun enviarProgramacionAlSupervisor() {
+        if (esSemanaAprobadaFijada) {
+            Toast.makeText(this, "Esta semana ya fue formalmente aprobada y está fijada.", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        val permitidas = obtenerJornadasPermitidas()
+        val diasIncompletos = mutableListOf<String>()
+
+        for (dia in diasSemanaSiguiente.take(5)) { // Lunes a Viernes
+            val fechaStr = obtenerClaveFecha(dia)
+            val diaNombre = SimpleDateFormat("EEEE d", Locale.forLanguageTag("es-CO")).format(dia.time)
+            val completo = permitidas.all { tipo ->
+                val serv = when (tipo) {
+                    TipoComida.DESAYUNO -> "Desayuno"
+                    TipoComida.ALMUERZO -> "Almuerzo"
+                    TipoComida.MERIENDA -> "Merienda"
+                }
+                !sessionManager.getPlatoDiaServicio(this, fechaStr, serv).isNullOrBlank()
+            }
+            if (!completo) {
+                diasIncompletos.add(diaNombre)
+            }
+        }
+
+        if (diasIncompletos.isNotEmpty()) {
+            MaterialAlertDialogBuilder(this)
+                .setTitle("Programación Incompleta")
+                .setMessage("Aún faltan menús por definir en los siguientes días:\n\n• ${diasIncompletos.joinToString("\n• ")}\n\nPor favor asigna los menús de toda la semana antes de enviarla al supervisor.")
+                .setPositiveButton("Entendido", null)
+                .show()
+            return
+        }
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Enviar programación al supervisor")
+            .setMessage("¿Deseas enviar la programación de la semana al Supervisor PAE?\n\nAl enviarla, se actualizará la minuta semanal para su correspondiente revisión y visto bueno.")
+            .setPositiveButton("Sí, enviar") { _, _ ->
+                ejecutarEnvioSupervisor()
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun ejecutarEnvioSupervisor() {
+        lifecycleScope.launch {
+            try {
+                val sedeNombre = sessionManager.getSedeNombre() ?: "Sede Piagua"
+                val jefaNombre = sessionManager.getUserName() ?: "Jefa de Cocina"
+                val primerDia = diasSemanaSiguiente.first()
+                val ultimoDia = diasSemanaSiguiente[4] // Viernes
+                val rango = "${SimpleDateFormat("d MMM", Locale.forLanguageTag("es-CO")).format(primerDia.time)} – ${SimpleDateFormat("d MMM", Locale.forLanguageTag("es-CO")).format(ultimoDia.time)}"
+
+                // 1. Guardar todos los platos de la semana en el backend
+                for (dia in diasSemanaSiguiente.take(5)) {
+                    val fechaStr = obtenerClaveFecha(dia)
+                    for (tipo in obtenerJornadasPermitidas()) {
+                        val serv = when (tipo) {
+                            TipoComida.DESAYUNO -> "Desayuno"
+                            TipoComida.ALMUERZO -> "Almuerzo"
+                            TipoComida.MERIENDA -> "Merienda"
+                        }
+                        val plato = sessionManager.getPlatoDiaServicio(this@PlanificacionSemanalJefaActivity, fechaStr, serv)
+                        if (!plato.isNullOrBlank()) {
+                            val id = sessionManager.getPlatoDiaServicioId(this@PlanificacionSemanalJefaActivity, fechaStr, serv)
+                            PreparacionSyncManager.guardarPlatoServicio(this@PlanificacionSemanalJefaActivity, serv, plato, id, fechaStr)
+                        }
+                    }
+                }
+
+                // 2. Enviar notificación al Supervisor
+                val tituloBody = "Programación Semanal Enviada - $sedeNombre".toRequestBody("text/plain".toMediaTypeOrNull())
+                val mensajeBody = "La Jefa de Cocina ($jefaNombre) ha enviado la programación de menús de la semana ($rango). La minuta se encuentra actualizada y lista para su visto bueno.".toRequestBody("text/plain".toMediaTypeOrNull())
+
+                try {
+                    RetrofitClient.apiService.enviarNotificacion(tituloBody, mensajeBody, null)
+                } catch (_: Exception) { }
+
+                val semanaClave = SimpleDateFormat("yyyy_MM_W", Locale.getDefault()).format(diasSemanaSiguiente.first().time)
+                getSharedPreferences("MINUTA_APROBACION", MODE_PRIVATE)
+                    .edit()
+                    .putBoolean("enviada_supervisor_$semanaClave", true)
+                    .apply()
+
+                MaterialAlertDialogBuilder(this@PlanificacionSemanalJefaActivity)
+                    .setTitle("✓ Programación Enviada al Supervisor")
+                    .setMessage("La programación de la semana ($rango) fue remitida exitosamente al supervisor PAE.\n\nSe ha actualizado la minuta para su revisión y aprobación.")
+                    .setPositiveButton("Aceptar") { _, _ ->
+                        finish()
+                    }
+                    .show()
+            } catch (e: Exception) {
+                Toast.makeText(this@PlanificacionSemanalJefaActivity, "Error al enviar: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
     }

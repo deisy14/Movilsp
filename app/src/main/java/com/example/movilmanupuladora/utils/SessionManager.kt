@@ -24,6 +24,8 @@ class SessionManager(context: Context) {
         private const val KEY_USER_ID = "user_id"
         private const val KEY_SEDE_ID = "sede_id"
         private const val KEY_SEDE_NOMBRE = "sede_nombre"
+        private const val KEY_INSTITUCION_ID = "institucion_id"
+        private const val KEY_INSTITUCION_NOMBRE = "institucion_nombre"
 
         var currentToken: String?
             get() = RetrofitClient.authToken
@@ -76,14 +78,16 @@ class SessionManager(context: Context) {
         return (hora in 7..18) || (hora == 19 && minuto == 0)
     }
 
-    // Guarda los datos del usuario autenticado y su sede.
+    // Guarda los datos del usuario autenticado, su sede e institución.
     fun saveUserData(
         name: String,
         role: String?,
         email: String? = null,
         idUsuario: Int? = null,
         idSede: Int? = null,
-        sedeNombre: String? = null
+        sedeNombre: String? = null,
+        idInstitucion: Int? = null,
+        institucionNombre: String? = null
     ) {
         val editor = prefs.edit()
 
@@ -110,6 +114,18 @@ class SessionManager(context: Context) {
             editor.remove(KEY_SEDE_NOMBRE)
         }
 
+        if (idInstitucion != null && idInstitucion > 0) {
+            editor.putInt(KEY_INSTITUCION_ID, idInstitucion)
+        } else {
+            editor.remove(KEY_INSTITUCION_ID)
+        }
+
+        if (!institucionNombre.isNullOrBlank()) {
+            editor.putString(KEY_INSTITUCION_NOMBRE, institucionNombre)
+        } else {
+            editor.remove(KEY_INSTITUCION_NOMBRE)
+        }
+
         editor.apply()
     }
 
@@ -122,6 +138,27 @@ class SessionManager(context: Context) {
 
     fun getSedeNombre(): String? =
         prefs.getString(KEY_SEDE_NOMBRE, null)
+
+    fun getInstitucionId(): Int =
+        prefs.getInt(KEY_INSTITUCION_ID, -1)
+
+    fun getInstitucionNombre(): String? =
+        prefs.getString(KEY_INSTITUCION_NOMBRE, null)
+
+    /**
+     * Retorna la institución y sede formateadas (ej: "I.E. Técnico San José · Sede Principal")
+     */
+    fun getUbicacionCompleta(): String {
+        val inst = getInstitucionNombre()?.trim().orEmpty()
+        val sede = getSedeNombre()?.trim().orEmpty()
+        return when {
+            inst.isNotBlank() && sede.isNotBlank() && !inst.equals(sede, ignoreCase = true) ->
+                "$inst · $sede"
+            sede.isNotBlank() -> sede
+            inst.isNotBlank() -> inst
+            else -> "Sede Principal"
+        }
+    }
 
     fun saveUserPhone(phone: String) {
         prefs.edit().putString(KEY_USER_PHONE, phone).apply()

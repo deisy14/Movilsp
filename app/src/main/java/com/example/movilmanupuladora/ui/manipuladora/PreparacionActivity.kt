@@ -81,12 +81,8 @@ class PreparacionActivity : AppCompatActivity() {
         val imgRes = if (imgIntent > 0) imgIntent else com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity.obtenerImagenPlatoPorNombre(nombrePlatoActual)
         binding.imgPlatoPreparacion.setImageResource(imgRes)
 
-        // Cargar pasos de preparación específicos para el componente
-        if (!componenteAsignado.isNullOrBlank()) {
-            mostrarPasos(obtenerPasosComponente(componenteAsignado!!))
-        } else {
-            cargarPasos()
-        }
+        // Cargar pasos de preparación reales configurados por el supervisor desde el backend
+        cargarPasosDesdeBackend()
     }
 
     private fun actualizarVistaEstado(estado: String) {
@@ -294,6 +290,15 @@ class PreparacionActivity : AppCompatActivity() {
                 preferencias.edit().putString("estado_plato", "FINALIZADO").apply()
                 actualizarVistaEstado(nuevoEstado)
                 Toast.makeText(this, "Estado actualizado: Finalizada", Toast.LENGTH_SHORT).show()
+
+                // Descontar automáticamente del inventario al finalizar la preparación
+                lifecycleScope.launch {
+                    com.example.movilmanupuladora.utils.PreparacionSyncManager.descontarInventarioPorFinalizacion(
+                        this@PreparacionActivity,
+                        nombrePlatoActual,
+                        componenteAsignado
+                    )
+                }
             }
         }
     }
@@ -305,19 +310,55 @@ class PreparacionActivity : AppCompatActivity() {
         pasos_preparacion(idPlato = 1, numeroPaso = "4", descripcionPaso = "Porcionar y servir según las tablas de gramaje institucional del programa de alimentación escolar.")
     )
 
-    private fun cargarPasos() {
+    private fun cargarPasosDesdeBackend() {
         lifecycleScope.launch {
             try {
-                val response = RetrofitClient.apiService.obtenerPasosPreparacion()
+                // 1. Consultar platos del backend para mapear el ID del plato actual
+                val platosRes = RetrofitClient.apiService.obtenerPlatos()
+                val platosBackend = platosRes.body() ?: emptyList()
+                val platoActual = platosBackend.firstOrNull {
+                    it.nombrePlato?.equals(nombrePlatoActual, ignoreCase = true) == true ||
+                    (nombrePlatoActual.isNotBlank() && it.nombrePlato?.contains(nombrePlatoActual, ignoreCase = true) == true) ||
+                    (it.componente?.contains(nombrePlatoActual, ignoreCase = true) == true)
+                }
 
-                if (response.isSuccessful && !response.body().isNullOrEmpty()) {
-                    val listaPasos: List<pasos_preparacion> = response.body()!!
-                    mostrarPasos(listaPasos)
+                val idPlato = platoActual?.idPlato ?: intent.getIntExtra("id_plato", -1)
+
+                // 2. Consultar pasos de preparación en el backend configurados por el supervisor
+                val response = RetrofitClient.apiService.obtenerPasosPreparacion()
+                val todosPasos: List<pasos_preparacion> = if (response.isSuccessful && !response.body().isNullOrEmpty()) {
+                    response.body()!!
+                } else {
+                    emptyList()
+                }
+
+                val compLimpio = componenteAsignado?.trim()?.lowercase().orEmpty()
+                val pasosFiltrados = todosPasos.filter { paso ->
+                    val coincidePlato = idPlato > 0 && paso.idPlato == idPlato
+                    val desc = paso.descripcionPaso.lowercase()
+                    val coincideComp = compLimpio.isNotBlank() && (
+                        desc.contains("[$compLimpio]") || desc.contains(compLimpio)
+                    )
+                    coincideComp || coincidePlato
+                }.sortedBy { it.numeroPaso.toIntOrNull() ?: 99 }
+
+                val pasosFinales = if (pasosFiltrados.isNotEmpty()) {
+                    pasosFiltrados
+                } else if (compLimpio.isNotBlank()) {
+                    obtenerPasosComponente(componenteAsignado!!)
+                } else if (todosPasos.isNotEmpty()) {
+                    todosPasos.take(5)
+                } else {
+                    pasosFallback
+                }
+
+                mostrarPasos(pasosFinales)
+            } catch (e: Exception) {
+                if (!componenteAsignado.isNullOrBlank()) {
+                    mostrarPasos(obtenerPasosComponente(componenteAsignado!!))
                 } else {
                     mostrarPasos(pasosFallback)
                 }
-            } catch (e: Exception) {
-                mostrarPasos(pasosFallback)
             }
         }
     }
@@ -354,8 +395,9 @@ class PreparacionActivity : AppCompatActivity() {
                 layoutParams = LinearLayout.LayoutParams(54, 54)
             }
 
+            val descLimpia = paso.descripcionPaso.replaceFirst(Regex("^\\[[^\\]]+\\]\\s*"), "")
             val tvDescripcion = TextView(this).apply {
-                text = paso.descripcionPaso
+                text = descLimpia
                 setTextColor(0xFF1B3317.toInt())
                 textSize = 13f
                 layoutParams = LinearLayout.LayoutParams(

@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
         val sessionMgr = SessionManager(this)
         val nombreUser = sessionMgr.getUserName() ?: "María López"
         binding.tvSaludo.text = nombreUser
-        val sedeNombre = sessionMgr.getSedeNombre() ?: "I.E. Técnico San José · Sede Principal"
+        val sedeNombre = sessionMgr.getUbicacionCompleta()
         binding.tvInstitucion.text = sedeNombre
 
         val fechaFormatted = SimpleDateFormat(
@@ -448,6 +448,7 @@ class MainActivity : AppCompatActivity() {
                 val resPlatos = menuRepository.obtenerPlatos()
                 if (resPlatos.isSuccessful && !resPlatos.body().isNullOrEmpty()) {
                     listaPlatos = resPlatos.body()!!
+                    com.example.movilmanupuladora.data.model.MenuPaeCatalog.registrarPlatosDesdeBackend(listaPlatos)
                 }
 
                 val resSecciones = menuRepository.obtenerSeccionesMenu()

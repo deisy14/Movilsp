@@ -5,6 +5,7 @@ import android.util.Log
 import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.model.MenuPaeCatalog
 import com.example.movilmanupuladora.data.model.Turno
+import com.example.movilmanupuladora.ui.auth.LoginActivity
 import com.example.movilmanupuladora.ui.manipuladora_Jefe.AsistenciaManager
 import com.example.movilmanupuladora.ui.manipuladora_Jefe.ManipuladorasManager
 import com.example.movilmanupuladora.ui.manipuladora_Jefe.PreparacionEstadoManager
@@ -210,22 +211,34 @@ object PreparacionSyncManager {
                 }
 
                 if (uid > 0 && comp.isNotBlank()) {
-                    if (uid == 19) {
+                    val obs = t.observaciones ?: ""
+                    val obsParts = obs.split("#")
+                    val obsCorreo = if (obsParts.isNotEmpty() && obsParts[0].contains("@")) obsParts[0].trim() else ""
+                    val obsNombre = if (obsParts.size > 1 && obsParts[1].isNotBlank()) obsParts[1].trim() else ""
+
+                    val rolSession = sessionMgr.getUserRole()?.lowercase() ?: ""
+                    val emailSession = sessionMgr.getUserEmail()?.lowercase() ?: ""
+                    val uidSession = sessionMgr.getUserId()
+
+                    val esJefaTurno = LoginActivity.esUsuarioJefa(null, obsCorreo) ||
+                            obsNombre.contains("jefa", true) ||
+                            obsNombre.contains("jefe", true) ||
+                            (rolSession.contains("jef") && (uid == uidSession || (obsCorreo.isNotBlank() && obsCorreo.equals(emailSession, true))))
+
+                    if (esJefaTurno) {
+                        val nombreJ = if (obsNombre.isNotBlank()) obsNombre else (sessionMgr.getUserName() ?: "Jefa de Cocina")
+                        val correoJ = if (obsCorreo.isNotBlank()) obsCorreo else emailSession
                         jefaEditor.putString("comp_jefa", comp)
-                        jefaEditor.putString("comp_uid_19", comp)
+                        jefaEditor.putString("comp_uid_$uid", comp)
                         PreparacionEstadoManager.guardarEstado(
                             context = context,
-                            persona = "Isa Pérez",
+                            persona = nombreJ,
                             componente = comp,
                             estado = estado,
-                            correo = "isaperez@gmail.com"
+                            correo = correoJ
                         )
-                        Log.d(TAG, "Componente Jefa sincronizado: $comp ($estado)")
+                        Log.d(TAG, "Componente Jefa sincronizado: $comp ($estado) para $nombreJ")
                     } else {
-                        val obs = t.observaciones ?: ""
-                        val obsParts = obs.split("#")
-                        val obsCorreo = if (obsParts.isNotEmpty() && obsParts[0].contains("@")) obsParts[0].trim() else ""
-                        val obsNombre = if (obsParts.size > 1 && obsParts[1].isNotBlank()) obsParts[1].trim() else ""
                         val obsJornada = if (obsParts.size > 5 && obsParts[5].isNotBlank()) obsParts[5].trim() else ""
                         val obsFecha = if (obsParts.size > 6 && obsParts[6].isNotBlank()) obsParts[6].trim() else ""
 
@@ -412,7 +425,15 @@ object PreparacionSyncManager {
                     jefaEditor.putString("manip_nombre_uid_${a.idUsuario}", a.nombre)
                     jefaEditor.putString("manip_correo_uid_${a.idUsuario}", a.correo)
                 }
-                if (a.idUsuario == 19 || a.nombre.contains("isa", true)) {
+                val rolSession = sessionMgr.getUserRole()?.lowercase() ?: ""
+                val emailSession = sessionMgr.getUserEmail()?.lowercase() ?: ""
+                val uidSession = sessionMgr.getUserId()
+                val esJefaAsignada = LoginActivity.esUsuarioJefa(null, a.correo) ||
+                        a.nombre.contains("jefa", true) ||
+                        a.nombre.contains("jefe", true) ||
+                        (rolSession.contains("jef") && (a.idUsuario == uidSession || (a.correo.isNotBlank() && a.correo.equals(emailSession, true))))
+
+                if (esJefaAsignada) {
                     jefaEditor.putString("comp_jefa", comp)
                 }
                 PreparacionEstadoManager.guardarEstado(
@@ -849,6 +870,105 @@ object PreparacionSyncManager {
         } catch (e: Exception) {
             Log.e(TAG, "Error actualizando estado en backend: ${e.message}")
             return@withContext false
+        }
+    }
+
+    /**
+     * Descuenta del inventario los ingredientes requeridos cuando un componente
+     * o plato es marcado como FINALIZADO.
+     * Si no se finaliza (ej. no hubo clases ese día), no se descuenta nada del inventario.
+     */
+    suspend fun descontarInventarioPorFinalizacion(
+        context: Context,
+        nombrePlato: String,
+        componente: String? = null
+    ): Boolean = withContext(Dispatchers.IO) {
+        try {
+            val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+            val deduccionKey = "deduccion_inv_${fechaHoy}_${normalizar(componente ?: nombrePlato)}"
+            val prefs = context.getSharedPreferences("INVENTARIO_DEDUCCIONES", Context.MODE_PRIVATE)
+
+            // Evitar doble descuento para el mismo componente/plato en el mismo día
+            if (prefs.getBoolean(deduccionKey, false)) {
+                Log.d(TAG, "Inventario ya descontado previamente hoy para: $componente ($nombrePlato)")
+                return@withContext true
+            }
+
+            // 1. Obtener número de niños presentes
+            val p = AsistenciaManager.obtenerPrimaria(context)
+            val s = AsistenciaManager.obtenerSecundaria(context)
+            val m = AsistenciaManager.obtenerManana(context)
+            val ninos = (p + s).takeIf { it > 0 } ?: (if (m > 0) m else 50)
+
+            // 2. Determinar ingredientes a descontar según el componente o receta
+            val compLimpio = (componente ?: nombrePlato).lowercase().trim()
+            val ingredientesConsumo = mutableMapOf<String, Double>()
+
+            when {
+                compLimpio.contains("arroz") -> {
+                    ingredientesConsumo["arroz"] = (ninos * 0.08).coerceAtLeast(3.0)
+                    ingredientesConsumo["aceite"] = (ninos * 0.015).coerceAtLeast(0.5)
+                }
+                compLimpio.contains("pollo") -> {
+                    ingredientesConsumo["pollo"] = (ninos * 0.12).coerceAtLeast(5.0)
+                    ingredientesConsumo["aceite"] = (ninos * 0.015).coerceAtLeast(0.5)
+                }
+                compLimpio.contains("carne") -> {
+                    ingredientesConsumo["carne"] = (ninos * 0.12).coerceAtLeast(5.0)
+                }
+                compLimpio.contains("huevo") -> {
+                    ingredientesConsumo["huevos"] = ninos.toDouble().coerceAtLeast(10.0)
+                    ingredientesConsumo["aceite"] = (ninos * 0.01).coerceAtLeast(0.3)
+                }
+                compLimpio.contains("frijol") || compLimpio.contains("lenteja") -> {
+                    ingredientesConsumo["frijol"] = (ninos * 0.07).coerceAtLeast(3.0)
+                }
+                compLimpio.contains("leche") || compLimpio.contains("avena") || compLimpio.contains("chocolate") -> {
+                    ingredientesConsumo["leche"] = (ninos * 0.20).coerceAtLeast(8.0)
+                }
+                compLimpio.contains("fruta") || compLimpio.contains("papaya") || compLimpio.contains("mango") || compLimpio.contains("banano") -> {
+                    ingredientesConsumo["fruta"] = ninos.toDouble().coerceAtLeast(15.0)
+                }
+                else -> {
+                    // Descuento estándar proporcional según el componente
+                    ingredientesConsumo[compLimpio] = (ninos * 0.06).coerceAtLeast(2.0)
+                }
+            }
+
+            // 3. Consultar inventario del backend y actualizar stock
+            SessionManager.getToken(context)
+            val invRes = RetrofitClient.apiService.obtenerInventario()
+            if (invRes.isSuccessful && !invRes.body().isNullOrEmpty()) {
+                val inventarios = invRes.body()!!
+
+                for ((ingNom, cantConsumida) in ingredientesConsumo) {
+                    val itemInv = inventarios.firstOrNull { inv ->
+                        val n = inv.idIngrediente?.toString()?.lowercase() ?: ""
+                        n.contains(ingNom) || ingNom.contains(n)
+                    } ?: inventarios.firstOrNull()
+
+                    if (itemInv != null && itemInv.idInventario != null) {
+                        val cantActual = itemInv.cantidadActual?.toDoubleOrNull() ?: 15.0
+                        val nuevaCant = (cantActual - cantConsumida).coerceAtLeast(0.0)
+                        val payload = itemInv.copy(
+                            cantidadActual = String.format(Locale.US, "%.2f", nuevaCant)
+                        )
+                        try {
+                            RetrofitClient.apiService.actualizarInventario(itemInv.idInventario, payload)
+                            Log.d(TAG, "Deducción de inventario exitosa: $ingNom -$cantConsumida -> Quedan $nuevaCant")
+                        } catch (e: Exception) {
+                            Log.w(TAG, "No se pudo actualizar inventario en backend para $ingNom: ${e.message}")
+                        }
+                    }
+                }
+            }
+
+            prefs.edit().putBoolean(deduccionKey, true).apply()
+            Log.d(TAG, "Inventario descontado exitosamente para $componente ($nombrePlato)")
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Error al descontar inventario: ${e.message}")
+            false
         }
     }
 }

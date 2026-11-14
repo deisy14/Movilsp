@@ -34,7 +34,7 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
     private var idPlato = -1
 
     private var componenteJefa: String? = null
-    private var nombreJefa: String = "Isa Pérez"
+    private var nombreJefa: String = "Jefa de Cocina"
     private var correoJefa: String = ""
 
     data class ManipuladoraLocal(
@@ -83,7 +83,7 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
         idPlato = intent.getIntExtra("id_plato", -1)
 
         val sessionMgr = SessionManager(this)
-        nombreJefa = sessionMgr.getUserName() ?: "Isa Pérez"
+        nombreJefa = sessionMgr.getUserName() ?: "Jefa de Cocina"
         correoJefa = sessionMgr.getUserEmail() ?: ""
 
         binding.txtJornada.text = "Jornada: $jornada"
@@ -777,6 +777,8 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
         editor.putInt("cantidad_manipuladoras", manipuladoras.size)
 
         // Guardar componente de la Jefa de Cocina
+        editor.putString("jefa_nombre", nombreJefa)
+        editor.putString("jefa_correo", correoJefa)
         editor.putString("comp_jefa", componenteJefa ?: "")
         val jefaSinTilde = Normalizer.normalize(nombreJefa, Normalizer.Form.NFD)
             .replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")

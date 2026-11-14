@@ -42,7 +42,7 @@ object ManipuladorasManager {
             }
             if (response.isSuccessful && !response.body().isNullOrEmpty()) {
                 val todosUsuarios = response.body()!!
-                // Filtrar ESTRICTAMENTE usuarios con rol Manipuladora (excluyendo cualquier otro rol)
+                // Filtrar ESTRICTAMENTE usuarios con rol Manipuladora (excluyendo administradores y jefas)
                 val manipuladorasBackend = todosUsuarios.filter { usuario ->
                     val rolNombre = usuario.nombreRol?.lowercase()?.trim() ?: ""
                     val rolId = usuario.rol
@@ -53,25 +53,20 @@ object ManipuladorasManager {
                     val esExcluido = rolNombre.contains("admin") ||
                             rolNombre.contains("jef") ||
                             rolNombre.contains("super") ||
+                            rolNombre.contains("coordinad") ||
+                            rolId == 1 || rolId == 2 || rolId == 4 ||
                             rolId == 10 || rolId == 26 || rolId == 27 || rolId == 28 || rolId == 29 ||
-                            rolId == 1 || rolId == 2 ||
                             correo.contains("admin") || correo.contains("jefe") || correo.contains("jefa") ||
-                            correo.contains("supervisor") || correo.contains("superadmin") ||
-                            correo.contains("carlos") || correo.contains("jader") || correo.contains("sara") ||
-                            correo.contains("jorgeruiz") || correo.contains("jf@") ||
+                            correo.contains("supervisor") ||
                             nombre.contains("admin") || nombre.contains("jefe") || nombre.contains("jefa") ||
                             nombre.contains("supervisor")
 
-                    // Solo manipuladoras válidas
+                    // Solo manipuladoras válidas por rol o función (sin correos quemados)
                     val esManipuladora = !esExcluido && (
-                            rolId == 24 || rolId == 3 ||
-                            rolNombre == "manipuladora" ||
-                            rolNombre.contains("manipuladora") ||
-                            correo == "andreasanchez@gmail.com" ||
-                            correo == "poolgomez27@gmail.com" ||
-                            correo == "deis@gmail.com" ||
-                            correo == "andres@gmail.com" ||
-                            correo == "manipuladora@sirae.com"
+                            rolId == 5 || rolId == 24 || rolId == 3 ||
+                            rolNombre.contains("manipula") ||
+                            rolNombre.contains("cocina") ||
+                            rolNombre.contains("operaria")
                     )
 
                     esManipuladora
