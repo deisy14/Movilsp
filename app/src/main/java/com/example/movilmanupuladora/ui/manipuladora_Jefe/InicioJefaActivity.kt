@@ -105,6 +105,10 @@ class InicioJefaActivity : AppCompatActivity() {
         cargarAsistenciaDelBackend()
         lifecycleScope.launch {
             try {
+                val res = RetrofitClient.apiService.obtenerPlatos()
+                if (res.isSuccessful && !res.body().isNullOrEmpty()) {
+                    MenuPaeCatalog.registrarPlatosDesdeBackend(res.body()!!)
+                }
                 PreparacionSyncManager.sincronizarDesdeBackend(this@InicioJefaActivity)
                 actualizarPlatosVisuales()
             } catch (_: Exception) { }
@@ -392,7 +396,7 @@ class InicioJefaActivity : AppCompatActivity() {
     private fun configurarHeaderJefa() {
         val nombreUser = sessionManager.getUserName() ?: "Jefa de Cocina"
         binding.txtSaludoJefa.text = "Hola, $nombreUser"
-        val sedeNombre = sessionManager.getSedeNombre() ?: "I.E. Técnico San José · Sede Principal"
+        val sedeNombre = sessionManager.getUbicacionCompleta()
         binding.txtInstitucionHeaderJefa.text = sedeNombre
 
         val iniciales = nombreUser.split(" ")
