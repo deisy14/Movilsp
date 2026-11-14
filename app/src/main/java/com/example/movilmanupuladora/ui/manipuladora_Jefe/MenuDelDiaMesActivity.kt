@@ -5,18 +5,28 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.movilmanupuladora.R
+import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.model.MenuPaeCatalog
+import com.example.movilmanupuladora.data.model.PlatoResponse
+import com.example.movilmanupuladora.data.repository.MenuRepository
 import com.example.movilmanupuladora.databinding.ActivityMenuDelDiaMesBinding
 import com.example.movilmanupuladora.databinding.DialogDetallePlatoBinding
+import com.example.movilmanupuladora.databinding.ItemPlatoCatalogoBinding
+import com.example.movilmanupuladora.utils.PreparacionSyncManager
+import com.example.movilmanupuladora.utils.SessionManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -36,10 +46,19 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
         val imagen: Int
     )
 
+    data class PlatoOpcion(
+        val id: Int,
+        val nombre: String,
+        val componente: String,
+        val imagenRes: Int
+    )
+
     private var platoActualDesayuno: DetallePlatoDia? = null
     private var platoActualAlmuerzo: DetallePlatoDia? = null
     private var platoActualMerienda: DetallePlatoDia? = null
-    private val sessionManager by lazy { com.example.movilmanupuladora.utils.SessionManager(this) }
+    private val sessionManager by lazy { SessionManager(this) }
+    private val menuRepository = MenuRepository(RetrofitClient.apiService)
+    private val platosCatalogoPae = mutableListOf<PlatoResponse>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +81,66 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
         configurarEventos()
         generarGridMes()
         actualizarDetallePlatos()
+        cargarPlatosBackend()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        actualizarDetallePlatos()
+        generarGridMes()
+    }
+
+    private fun cargarPlatosBackend() {
+        lifecycleScope.launch {
+            try {
+                val res = menuRepository.obtenerPlatos()
+                if (res.isSuccessful && !res.body().isNullOrEmpty()) {
+                    platosCatalogoPae.clear()
+                    platosCatalogoPae.addAll(res.body()!!)
+                }
+            } catch (_: Exception) { }
+        }
+    }
+
+    private fun obtenerPlatosPaeDisponibles(): List<PlatoOpcion> {
+        val lista = mutableListOf<PlatoOpcion>()
+        val mapa = mutableSetOf<String>()
+
+        // 1. Platos oficiales registrados y supervisados en el backend PAE
+        for (p in platosCatalogoPae) {
+            val nom = p.nombrePlato?.trim()
+            if (!nom.isNullOrBlank() && mapa.add(nom.lowercase())) {
+                val img = if (p.idPlato in 1..20) {
+                    MenuPaeCatalog.obtenerMenuPorId(p.idPlato).imagenRes
+                } else {
+                    MenuPaeCatalog.obtenerImagenPorNombre(nom)
+                }
+                lista.add(
+                    PlatoOpcion(
+                        id = p.idPlato,
+                        nombre = nom,
+                        componente = p.componente ?: "Sopas, Sazón y Proteína estipulada PAE",
+                        imagenRes = img
+                    )
+                )
+            }
+        }
+
+        // 2. Platos oficiales de los 20 menús del ciclo PAE
+        for (m in MenuPaeCatalog.menus) {
+            if (mapa.add(m.nombre.lowercase())) {
+                lista.add(
+                    PlatoOpcion(
+                        id = m.id,
+                        nombre = m.nombre,
+                        componente = m.componente,
+                        imagenRes = m.imagenRes
+                    )
+                )
+            }
+        }
+
+        return lista
     }
 
     private fun configurarEventos() {
@@ -79,15 +158,26 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
             generarGridMes()
         }
 
-        // Clics en el icono de ojo o en la tarjeta para ver detalle del plato
+        // Programar o cambiar plato para la jornada seleccionada
+        binding.btnProgramarDesayuno.setOnClickListener { mostrarDialogoSeleccionarPlato("Desayuno") }
+        binding.cardDetalleDesayuno.setOnClickListener { mostrarDialogoSeleccionarPlato("Desayuno") }
         binding.btnVerDetalleDesayuno.setOnClickListener { platoActualDesayuno?.let { mostrarModalDetalle(it) } }
-        binding.cardDetalleDesayuno.setOnClickListener { platoActualDesayuno?.let { mostrarModalDetalle(it) } }
 
+        binding.btnProgramarAlmuerzo.setOnClickListener { mostrarDialogoSeleccionarPlato("Almuerzo") }
+        binding.cardDetalleAlmuerzo.setOnClickListener { mostrarDialogoSeleccionarPlato("Almuerzo") }
         binding.btnVerDetalleAlmuerzo.setOnClickListener { platoActualAlmuerzo?.let { mostrarModalDetalle(it) } }
-        binding.cardDetalleAlmuerzo.setOnClickListener { platoActualAlmuerzo?.let { mostrarModalDetalle(it) } }
 
+        binding.btnProgramarMerienda.setOnClickListener { mostrarDialogoSeleccionarPlato("Merienda") }
+        binding.cardDetalleMerienda.setOnClickListener { mostrarDialogoSeleccionarPlato("Merienda") }
         binding.btnVerDetalleMerienda.setOnClickListener { platoActualMerienda?.let { mostrarModalDetalle(it) } }
-        binding.cardDetalleMerienda.setOnClickListener { platoActualMerienda?.let { mostrarModalDetalle(it) } }
+
+        // Botón para acceder directamente a la planificación semanal completa
+        binding.btnPlanificarSemanaSiguiente.setOnClickListener {
+            val intent = Intent(this, PlanificacionSemanalJefaActivity::class.java).apply {
+                putExtra("semana_offset", 1) // Siguiente semana
+            }
+            startActivity(intent)
+        }
     }
 
     // =========================================================
@@ -108,7 +198,7 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
         calGrid.set(Calendar.DAY_OF_MONTH, 1)
 
         // Encontrar el día de inicio respecto al Lunes (1 = Lun, 2 = Mar, ..., 7 = Dom)
-        var primerDiaSemana = calGrid.get(Calendar.DAY_OF_WEEK) // Domingo es 1, Lunes es 2 en Java Calendar
+        val primerDiaSemana = calGrid.get(Calendar.DAY_OF_WEEK)
         val offsetLunes = when (primerDiaSemana) {
             Calendar.MONDAY -> 0
             Calendar.TUESDAY -> 1
@@ -129,7 +219,6 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
 
         var diaMesActual = 1
         var diaMesSiguiente = 1
-        val totalCeldas = 35 // 5 semanas x 7 días (o 42 si requiere 6 semanas)
         val totalSemanas = if (offsetLunes + diasEnMes > 35) 6 else 5
 
         for (semana in 0 until totalSemanas) {
@@ -189,21 +278,33 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
                         val isPast = calDiaActual.before(hoyCero)
                         val isSelected = esMismoDia(calDiaActual, diaSeleccionado)
 
+                        val fechaStrLoop = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calDiaActual.time)
+                        val tieneProgramado = !sessionManager.getPlatoDiaServicio(this, fechaStrLoop, "Desayuno").isNullOrBlank() ||
+                                              !sessionManager.getPlatoDiaServicio(this, fechaStrLoop, "Almuerzo").isNullOrBlank() ||
+                                              !sessionManager.getPlatoDiaServicio(this, fechaStrLoop, "Merienda").isNullOrBlank()
+
                         when {
                             isToday -> {
-                                // EL DÍA DE HOY EN AMARILLO RELLENO
                                 txtDia.setBackgroundResource(R.drawable.circulo_amarillo_badge)
                                 txtDia.setTextColor(Color.parseColor("#1E293B"))
                                 txtDia.typeface = android.graphics.Typeface.DEFAULT_BOLD
                             }
-                            isPast || isSelected -> {
-                                // LOS DÍAS ANTERIORES EN PUNTICOS / ANILLO AMARILLO
+                            isSelected -> {
+                                txtDia.setBackgroundResource(R.drawable.bg_date_selected)
+                                txtDia.setTextColor(Color.parseColor("#7A5500"))
+                                txtDia.typeface = android.graphics.Typeface.DEFAULT_BOLD
+                            }
+                            tieneProgramado -> {
+                                txtDia.setBackgroundResource(R.drawable.bg_pill_green)
+                                txtDia.setTextColor(Color.parseColor("#2A5226"))
+                                txtDia.typeface = android.graphics.Typeface.DEFAULT_BOLD
+                            }
+                            isPast -> {
                                 txtDia.setBackgroundResource(R.drawable.bg_date_selected)
                                 txtDia.setTextColor(Color.parseColor("#7A5500"))
                                 txtDia.typeface = android.graphics.Typeface.DEFAULT_BOLD
                             }
                             else -> {
-                                // MAÑANA Y LOS OTROS QUE FALTAN EN BLANCO
                                 txtDia.setBackgroundColor(Color.TRANSPARENT)
                                 txtDia.setTextColor(Color.parseColor("#1E293B"))
                                 txtDia.typeface = android.graphics.Typeface.DEFAULT
@@ -246,38 +347,78 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
     // =========================================================
 
     private fun actualizarDetallePlatos() {
+        val fechaClave = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(diaSeleccionado.time)
+        val customDes = sessionManager.getPlatoDiaServicio(this, fechaClave, "Desayuno")
+        val customAlm = sessionManager.getPlatoDiaServicio(this, fechaClave, "Almuerzo")
+        val customMer = sessionManager.getPlatoDiaServicio(this, fechaClave, "Merienda")
+
         val menuDia = MenuPaeCatalog.obtenerMenuDiaCompleto(diaSeleccionado)
 
+        // 1. DESAYUNO
+        val nomDes = customDes ?: menuDia.desayuno.nombre
+        val imgDes = MenuPaeCatalog.obtenerImagenPorNombre(nomDes)
         platoActualDesayuno = DetallePlatoDia(
-            nombre = menuDia.desayuno.nombre,
+            nombre = nomDes,
             seccion = "Desayuno",
             componente = menuDia.desayuno.componente,
             porciones = "42",
-            imagen = menuDia.desayuno.imagenRes
+            imagen = imgDes
         )
+        binding.imgDetalleDesayuno.setImageResource(imgDes)
+        binding.txtDetalleNombreDesayuno.text = nomDes
+        if (!customDes.isNullOrBlank()) {
+            binding.badgeEstadoDesayuno.text = "✓ Programado"
+            binding.badgeEstadoDesayuno.setBackgroundResource(R.drawable.bg_pill_green)
+            binding.badgeEstadoDesayuno.setTextColor(Color.parseColor("#2A5226"))
+        } else {
+            binding.badgeEstadoDesayuno.text = "Sugerido PAE"
+            binding.badgeEstadoDesayuno.setBackgroundResource(R.drawable.bg_date_selected)
+            binding.badgeEstadoDesayuno.setTextColor(Color.parseColor("#854D0E"))
+        }
+
+        // 2. ALMUERZO
+        val nomAlm = customAlm ?: menuDia.almuerzo.nombre
+        val imgAlm = MenuPaeCatalog.obtenerImagenPorNombre(nomAlm)
         platoActualAlmuerzo = DetallePlatoDia(
-            nombre = menuDia.almuerzo.nombre,
+            nombre = nomAlm,
             seccion = "Almuerzo",
             componente = menuDia.almuerzo.componente,
             porciones = "60",
-            imagen = menuDia.almuerzo.imagenRes
+            imagen = imgAlm
         )
+        binding.imgDetalleAlmuerzo.setImageResource(imgAlm)
+        binding.txtDetalleNombreAlmuerzo.text = nomAlm
+        if (!customAlm.isNullOrBlank()) {
+            binding.badgeEstadoAlmuerzo.text = "✓ Programado"
+            binding.badgeEstadoAlmuerzo.setBackgroundResource(R.drawable.bg_pill_green)
+            binding.badgeEstadoAlmuerzo.setTextColor(Color.parseColor("#2A5226"))
+        } else {
+            binding.badgeEstadoAlmuerzo.text = "Sugerido PAE"
+            binding.badgeEstadoAlmuerzo.setBackgroundResource(R.drawable.bg_date_selected)
+            binding.badgeEstadoAlmuerzo.setTextColor(Color.parseColor("#854D0E"))
+        }
+
+        // 3. MERIENDA
+        val nomMer = customMer ?: menuDia.merienda.nombre
+        val imgMer = MenuPaeCatalog.obtenerImagenPorNombre(nomMer)
         platoActualMerienda = DetallePlatoDia(
-            nombre = menuDia.merienda.nombre,
+            nombre = nomMer,
             seccion = "Merienda",
             componente = menuDia.merienda.componente,
             porciones = "30",
-            imagen = menuDia.merienda.imagenRes
+            imagen = imgMer
         )
-
-        binding.imgDetalleDesayuno.setImageResource(menuDia.desayuno.imagenRes)
-        binding.txtDetalleNombreDesayuno.text = menuDia.desayuno.nombre
-
-        binding.imgDetalleAlmuerzo.setImageResource(menuDia.almuerzo.imagenRes)
-        binding.txtDetalleNombreAlmuerzo.text = menuDia.almuerzo.nombre
-
-        binding.imgDetalleMerienda.setImageResource(menuDia.merienda.imagenRes)
-        binding.txtDetalleNombreMerienda.text = menuDia.merienda.nombre
+        binding.imgDetalleMerienda.setImageResource(imgMer)
+        binding.txtDetalleNombreMerienda.text = nomMer
+        if (!customMer.isNullOrBlank()) {
+            binding.badgeEstadoMerienda.text = "✓ Programado"
+            binding.badgeEstadoMerienda.setBackgroundResource(R.drawable.bg_pill_green)
+            binding.badgeEstadoMerienda.setTextColor(Color.parseColor("#2A5226"))
+        } else {
+            binding.badgeEstadoMerienda.text = "Sugerido PAE"
+            binding.badgeEstadoMerienda.setBackgroundResource(R.drawable.bg_date_selected)
+            binding.badgeEstadoMerienda.setTextColor(Color.parseColor("#854D0E"))
+        }
 
         val sedeTexto = sessionManager.getSedeNombre().orEmpty().lowercase()
         val esSoloDesayuno = sedeTexto.contains("piagua")
@@ -288,6 +429,132 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
             binding.cardDetalleAlmuerzo.visibility = View.VISIBLE
             binding.cardDetalleMerienda.visibility = View.VISIBLE
         }
+    }
+
+    // =========================================================
+    // MODAL DE SELECCIÓN DE PLATOS DEL PAE PARA LA JORNADA
+    // =========================================================
+
+    private fun mostrarDialogoSeleccionarPlato(servicio: String) {
+        val sedeTexto = sessionManager.getSedeNombre().orEmpty().lowercase()
+        val esSoloDesayuno = sedeTexto.contains("piagua")
+        if (esSoloDesayuno && !servicio.equals("Desayuno", ignoreCase = true)) {
+            MaterialAlertDialogBuilder(this)
+                .setTitle("Servicio no autorizado")
+                .setMessage("La Sede Piagua opera exclusivamente para el servicio de Desayuno.")
+                .setPositiveButton("Entendido", null)
+                .show()
+            return
+        }
+
+        val fechaClave = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(diaSeleccionado.time)
+        val fechaFormato = SimpleDateFormat("EEEE, d 'de' MMMM", Locale.forLanguageTag("es-CO")).format(diaSeleccionado.time)
+            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+
+        // Calcular platos servidos el día inmediatamente anterior (Regla de Rotación PAE)
+        val calAyer = (diaSeleccionado.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, -1) }
+        val fechaAyer = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calAyer.time)
+        val platosAyer = listOfNotNull(
+            sessionManager.getPlatoDiaServicio(this, fechaAyer, "Desayuno"),
+            sessionManager.getPlatoDiaServicio(this, fechaAyer, "Almuerzo"),
+            sessionManager.getPlatoDiaServicio(this, fechaAyer, "Merienda")
+        ).toSet()
+
+        val platoAsignadoActual = sessionManager.getPlatoDiaServicio(this, fechaClave, servicio)
+        val listaPlatosOpciones = obtenerPlatosPaeDisponibles()
+
+        // Contenedor principal con ScrollView
+        val scroll = androidx.core.widget.NestedScrollView(this).apply {
+            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        }
+        val layout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(
+                (20 * resources.displayMetrics.density).toInt(),
+                (14 * resources.displayMetrics.density).toInt(),
+                (20 * resources.displayMetrics.density).toInt(),
+                (20 * resources.displayMetrics.density).toInt()
+            )
+        }
+        scroll.addView(layout)
+
+        // Subtítulo explicativo
+        val tvSub = TextView(this).apply {
+            text = "📅 $fechaFormato\nSelecciona el plato estipulado del PAE para la jornada:"
+            textSize = 13f
+            setTextColor(Color.parseColor("#475569"))
+            setPadding(0, 0, 0, (14 * resources.displayMetrics.density).toInt())
+        }
+        layout.addView(tvSub)
+
+        var dialogRef: androidx.appcompat.app.AlertDialog? = null
+
+        for (plato in listaPlatosOpciones) {
+            val esDeAyer = platosAyer.contains(plato.nombre)
+            val esActual = platoAsignadoActual != null && platoAsignadoActual.equals(plato.nombre, ignoreCase = true)
+
+            val itemBinding = ItemPlatoCatalogoBinding.inflate(layoutInflater, layout, false)
+            itemBinding.tvNombrePlatoCatalogo.text = plato.nombre
+            itemBinding.tvComponenteCatalogo.text = plato.componente
+            itemBinding.imgPlatoCatalogo.setImageResource(plato.imagenRes)
+
+            when {
+                esActual -> {
+                    itemBinding.root.strokeColor = Color.parseColor("#15803D")
+                    itemBinding.root.strokeWidth = (2 * resources.displayMetrics.density).toInt()
+                    itemBinding.tvComponenteCatalogo.text = "✓ Actualmente seleccionado para $servicio"
+                    itemBinding.tvComponenteCatalogo.setTextColor(Color.parseColor("#15803D"))
+                }
+                esDeAyer -> {
+                    itemBinding.root.alpha = 0.5f
+                    itemBinding.tvComponenteCatalogo.text = "⛔ No disponible: servido el día anterior (rotación PAE)"
+                    itemBinding.tvComponenteCatalogo.setTextColor(Color.parseColor("#BE123C"))
+                }
+                else -> {
+                    itemBinding.root.strokeColor = Color.parseColor("#E2E8F0")
+                    itemBinding.root.strokeWidth = (1 * resources.displayMetrics.density).toInt()
+                }
+            }
+
+            itemBinding.root.setOnClickListener {
+                if (esDeAyer) {
+                    val diaAyerTexto = SimpleDateFormat("EEEE d", Locale.forLanguageTag("es-CO")).format(calAyer.time)
+                    MaterialAlertDialogBuilder(this)
+                        .setTitle("Plato no disponible por rotación")
+                        .setMessage("El plato \"${plato.nombre}\" ya fue seleccionado para el día anterior ($diaAyerTexto).\n\nPor lineamiento PAE de variedad nutricional, no se puede repetir en días consecutivos.")
+                        .setPositiveButton("Entendido", null)
+                        .show()
+                    return@setOnClickListener
+                }
+
+                // Guardar plato en sesión local y sincronizar con backend
+                sessionManager.savePlatoDiaServicio(this@MenuDelDiaMesActivity, fechaClave, servicio, plato.nombre, plato.id)
+                lifecycleScope.launch {
+                    PreparacionSyncManager.guardarPlatoServicio(
+                        this@MenuDelDiaMesActivity,
+                        servicio,
+                        plato.nombre,
+                        plato.id,
+                        fechaClave
+                    )
+                }
+
+                Toast.makeText(this@MenuDelDiaMesActivity, "✓ $servicio programado: ${plato.nombre}", Toast.LENGTH_SHORT).show()
+                actualizarDetallePlatos()
+                generarGridMes()
+                dialogRef?.dismiss()
+            }
+
+            layout.addView(itemBinding.root)
+        }
+
+        dialogRef = MaterialAlertDialogBuilder(this)
+            .setTitle("Programar $servicio")
+            .setView(scroll)
+            .setNegativeButton("Cerrar", null)
+            .create()
+
+        dialogRef.show()
     }
 
     private fun mostrarModalDetalle(detalle: DetallePlatoDia) {
@@ -319,9 +586,10 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        dialogBinding.btnOtroAleatorioModal.text = "Cerrar"
+        dialogBinding.btnOtroAleatorioModal.text = "Cambiar plato"
         dialogBinding.btnOtroAleatorioModal.setOnClickListener {
             dialog.dismiss()
+            mostrarDialogoSeleccionarPlato(detalle.seccion)
         }
 
         dialog.show()
