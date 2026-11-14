@@ -1,480 +1,471 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<ScrollView
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutPrincipalEntrega"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/blanco"
-    android:fillViewport="true"
-    android:fitsSystemWindows="true">
+    android:background="#FAF9F5"
+    android:fitsSystemWindows="true"
+    tools:context=".ui.manipuladora_Jefe.RegistrarEntregaActivity">
 
+    <!-- Scroll con todo el contenido del formulario -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:paddingBottom="96dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="20dp">
+
+            <!-- BARRA SUPERIOR CON BOTÓN VOLVER Y TÍTULO -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingBottom="12dp">
+
+                <ImageButton
+                    android:id="@+id/btnVolver"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_icono_circular"
+                    android:contentDescription="Volver"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_arrow_back"
+                    app:tint="#1B3317" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="RECEPCIÓN DE ENTREGA"
+                        android:textColor="#1B3317"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtSubtituloRemision"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Sede Piagua • Remisión #REM-2026-104"
+                        android:textColor="#3D5C37"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <!-- Badge de Estado -->
+                <TextView
+                    android:id="@+id/badgeEstadoEntrega"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_pill_yellow"
+                    android:backgroundTint="#FEF3C7"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="5dp"
+                    android:text="Por Verificar"
+                    android:textColor="#B45309"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- 1. TARJETA RESUMEN DE LA REMISIÓN / DESPACHO -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_icono_circular"
+                            android:backgroundTint="#FEF3C7"
+                            android:contentDescription="Camión"
+                            android:padding="6dp"
+                            android:src="@drawable/ic_food"
+                            app:tint="#F4B41F" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/txtTituloDespacho"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Entrega Despachada por Supervisor"
+                                android:textColor="#0F172A"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/txtDetalleSupervisor"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="Supervisor PAE: Carlos Méndez • Mercados del Mes"
+                                android:textColor="#64748B"
+                                android:textSize="12sp" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="12dp"
+                        android:background="#F1F5F9" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Fecha de Entrega"
+                                android:textColor="#64748B"
+                                android:textSize="11sp" />
+
+                            <TextView
+                                android:id="@+id/txtFechaDespacho"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="Hoy, 14 Nov 2026"
+                                android:textColor="#0F172A"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Sede Destino"
+                                android:textColor="#64748B"
+                                android:textSize="11sp" />
+
+                            <TextView
+                                android:id="@+id/txtSedeDestino"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="Sede Piagua (Primaria)"
+                                android:textColor="#0F172A"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 2. SECCIÓN: VERIFICACIÓN DE INGREDIENTES (CHECKLIST) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Verificación de Ingredientes"
+                        android:textColor="#0F172A"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtConteoCheck"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Chulea cada alimento que baja conforme del camión"
+                        android:textColor="#64748B"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btnMarcarTodos"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Marcar todos"
+                    android:textColor="#5F7625"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- Contenedor dinámico de ingredientes -->
+            <LinearLayout
+                android:id="@+id/contenedorIngredientesCheck"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical" />
+
+            <!-- 3. SECCIÓN: OBSERVACIONES / NOVEDADES -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Observaciones y Novedades"
+                        android:textColor="#0F172A"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Escribe aquí si algún alimento llegó golpeado, dañado o con faltante."
+                        android:textColor="#64748B"
+                        android:textSize="11sp" />
+
+                    <EditText
+                        android:id="@+id/edtObservacionesEntrega"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/bg_edittext"
+                        android:gravity="top|start"
+                        android:hint="Ej: Los sacos de arroz llegaron en buen estado. En el tomate llegaron 2 kg dañados por humedad..."
+                        android:inputType="textMultiLine"
+                        android:lines="3"
+                        android:minLines="3"
+                        android:padding="12dp"
+                        android:textColor="#0F172A"
+                        android:textColorHint="#94A3B8"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 4. SECCIÓN: FIRMA DIGITAL -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Firma Digital de Recibido"
+                                android:textColor="#0F172A"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="Manipuladora Jefe: Firma en el recuadro con el dedo"
+                                android:textColor="#64748B"
+                                android:textSize="11sp" />
+
+                        </LinearLayout>
+
+                        <Button
+                            android:id="@+id/btnBorrarFirma"
+                            style="@style/Widget.Material3.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Borrar firma"
+                            android:textColor="#DC2626"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <!-- Lienzo de Firma Digital -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="140dp"
+                        android:layout_marginTop="10dp"
+                        app:cardBackgroundColor="#FAF9F5"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="#CBD5E1"
+                        app:strokeWidth="1.5dp">
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <TextView
+                                android:id="@+id/txtPistaFirma"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="✍️ Toca y firma aquí con el dedo"
+                                android:textColor="#94A3B8"
+                                android:textSize="13sp"
+                                android:textStyle="italic" />
+
+                            <com.example.movilmanupuladora.utils.SignatureView
+                                android:id="@+id/signatureView"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent" />
+
+                        </FrameLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- BARRA INFERIOR FIJA CON ACCIONES: RECHAZAR / ACEPTAR -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingHorizontal="20dp"
-        android:paddingTop="48dp"
-        android:paddingBottom="32dp">
-
-        <!-- ================================================= -->
-        <!-- TITULO                                            -->
-        <!-- ================================================= -->
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:gravity="center_vertical">
-
-            <ImageButton
-                android:id="@+id/btnCerrar"
-
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-
-                android:background="@drawable/bg_icono_circular"
-
-                android:padding="10dp"
-
-                android:src="@drawable/ic_arrow_back"
-
-                android:tint="@color/negro_principal"
-
-                android:contentDescription="Volver"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-
-                android:layout_weight="1"
-
-                android:layout_marginStart="12dp"
-
-                android:text="Registrar entrega"
-
-                android:textColor="@color/negro_principal"
-
-                android:textSize="22sp"
-
-                android:textStyle="bold"/>
-
-        </LinearLayout>
-
-        <!-- ================================================= -->
-        <!-- JORNADA                                           -->
-        <!-- ================================================= -->
-
-        <TextView
-            android:id="@+id/txtJornada"
-
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-
-            android:layout_marginTop="8dp"
-
-            android:text="Jornada: Mañana"
-
-            android:textColor="@color/gris_texto"
-
-            android:textSize="13sp"/>
-
-        <!-- ================================================= -->
-        <!-- INFORMACIÓN                                       -->
-        <!-- ================================================= -->
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:layout_marginTop="24dp"
-
-            android:text="Registra los alimentos entregados por el supervisor y la cantidad recibida."
-
-            android:textColor="@color/gris_texto"
-
-            android:textSize="13sp"/>
-
-        <!-- ================================================= -->
-        <!-- ARROZ                                             -->
-        <!-- ================================================= -->
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-
-            android:layout_marginTop="20dp"
-
-            android:gravity="center_vertical"
-
-            android:padding="12dp"
-
-            android:background="@drawable/bg_card_resumen">
-
-            <ImageView
-                android:layout_width="38dp"
-                android:layout_height="38dp"
-
-                android:padding="8dp"
-
-                android:background="@drawable/bg_icono_verde"
-
-                android:src="@drawable/ic_food"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-
-                android:layout_weight="1"
-
-                android:layout_marginStart="12dp"
-
-                android:text="Arroz"
-
-                android:textColor="@color/negro_principal"
-
-                android:textSize="15sp"
-
-                android:textStyle="bold"/>
-
-            <EditText
-                android:id="@+id/edtArroz"
-
-                android:layout_width="90dp"
-                android:layout_height="48dp"
-
-                android:hint="0"
-
-                android:inputType="numberDecimal"
-
-                android:gravity="center"
-
-                android:textSize="14sp"
-
-                android:background="@drawable/bg_campo"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-
-                android:layout_marginStart="5dp"
-
-                android:text="kg"
-
-                android:textColor="@color/gris_texto"
-
-                android:textSize="12sp"/>
-
-        </LinearLayout>
-
-        <!-- ================================================= -->
-        <!-- POLLO                                             -->
-        <!-- ================================================= -->
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-
-            android:layout_marginTop="10dp"
-
-            android:gravity="center_vertical"
-
-            android:padding="12dp"
-
-            android:background="@drawable/bg_card_resumen">
-
-            <ImageView
-                android:layout_width="38dp"
-                android:layout_height="38dp"
-
-                android:padding="8dp"
-
-                android:background="@drawable/bg_icono_amarillo"
-
-                android:src="@drawable/ic_food"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-
-                android:layout_weight="1"
-
-                android:layout_marginStart="12dp"
-
-                android:text="Pollo"
-
-                android:textColor="@color/negro_principal"
-
-                android:textSize="15sp"
-
-                android:textStyle="bold"/>
-
-            <EditText
-                android:id="@+id/edtPollo"
-
-                android:layout_width="90dp"
-                android:layout_height="48dp"
-
-                android:hint="0"
-
-                android:inputType="numberDecimal"
-
-                android:gravity="center"
-
-                android:background="@drawable/bg_campo"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-
-                android:layout_marginStart="5dp"
-
-                android:text="kg"
-
-                android:textColor="@color/gris_texto"
-
-                android:textSize="12sp"/>
-
-        </LinearLayout>
-
-        <!-- ================================================= -->
-        <!-- LENTEJAS                                          -->
-        <!-- ================================================= -->
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-
-            android:layout_marginTop="10dp"
-
-            android:gravity="center_vertical"
-
-            android:padding="12dp"
-
-            android:background="@drawable/bg_card_resumen">
-
-            <ImageView
-                android:layout_width="38dp"
-                android:layout_height="38dp"
-
-                android:padding="8dp"
-
-                android:background="@drawable/bg_icono_verde"
-
-                android:src="@drawable/ic_food"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-
-                android:layout_weight="1"
-
-                android:layout_marginStart="12dp"
-
-                android:text="Lentejas"
-
-                android:textColor="@color/negro_principal"
-
-                android:textSize="15sp"
-
-                android:textStyle="bold"/>
-
-            <EditText
-                android:id="@+id/edtLentejas"
-
-                android:layout_width="90dp"
-                android:layout_height="48dp"
-
-                android:hint="0"
-
-                android:inputType="numberDecimal"
-
-                android:gravity="center"
-
-                android:background="@drawable/bg_campo"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-
-                android:layout_marginStart="5dp"
-
-                android:text="kg"
-
-                android:textColor="@color/gris_texto"
-
-                android:textSize="12sp"/>
-
-        </LinearLayout>
-
-        <!-- ================================================= -->
-        <!-- PASTA                                             -->
-        <!-- ================================================= -->
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-
-            android:layout_marginTop="10dp"
-
-            android:gravity="center_vertical"
-
-            android:padding="12dp"
-
-            android:background="@drawable/bg_card_resumen">
-
-            <ImageView
-                android:layout_width="38dp"
-                android:layout_height="38dp"
-
-                android:padding="8dp"
-
-                android:background="@drawable/bg_icono_amarillo"
-
-                android:src="@drawable/ic_food"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-
-                android:layout_weight="1"
-
-                android:layout_marginStart="12dp"
-
-                android:text="Pasta"
-
-                android:textColor="@color/negro_principal"
-
-                android:textSize="15sp"
-
-                android:textStyle="bold"/>
-
-            <EditText
-                android:id="@+id/edtPasta"
-
-                android:layout_width="90dp"
-                android:layout_height="48dp"
-
-                android:hint="0"
-
-                android:inputType="numberDecimal"
-
-                android:gravity="center"
-
-                android:background="@drawable/bg_campo"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-
-                android:layout_marginStart="5dp"
-
-                android:text="kg"
-
-                android:textColor="@color/gris_texto"
-
-                android:textSize="12sp"/>
-
-        </LinearLayout>
-
-        <!-- ================================================= -->
-        <!-- VERDURAS                                          -->
-        <!-- ================================================= -->
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-
-            android:layout_marginTop="10dp"
-
-            android:gravity="center_vertical"
-
-            android:padding="12dp"
-
-            android:background="@drawable/bg_card_resumen">
-
-            <ImageView
-                android:layout_width="38dp"
-                android:layout_height="38dp"
-
-                android:padding="8dp"
-
-                android:background="@drawable/bg_icono_verde"
-
-                android:src="@drawable/ic_food"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-
-                android:layout_weight="1"
-
-                android:layout_marginStart="12dp"
-
-                android:text="Verduras"
-
-                android:textColor="@color/negro_principal"
-
-                android:textSize="15sp"
-
-                android:textStyle="bold"/>
-
-            <EditText
-                android:id="@+id/edtVerduras"
-
-                android:layout_width="90dp"
-                android:layout_height="48dp"
-
-                android:hint="0"
-
-                android:inputType="numberDecimal"
-
-                android:gravity="center"
-
-                android:background="@drawable/bg_campo"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-
-                android:layout_marginStart="5dp"
-
-                android:text="kg"
-
-                android:textColor="@color/gris_texto"
-
-                android:textSize="12sp"/>
-
-        </LinearLayout>
-
-        <!-- ================================================= -->
-        <!-- GUARDAR                                            -->
-        <!-- ================================================= -->
-
-        <Button
-            android:id="@+id/btnGuardar"
-            android:layout_width="match_parent"
+        android:layout_gravity="bottom"
+        android:background="#FFFFFF"
+        android:elevation="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="16dp">
+
+        <!-- Botón Rechazar -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRechazarEntrega"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
             android:layout_height="52dp"
-            android:layout_marginTop="24dp"
-            android:text="Guardar entrega"
-            android:textColor="@color/blanco"
-            android:textSize="15sp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:text="Rechazar"
+            android:textColor="#DC2626"
+            android:textSize="14sp"
             android:textStyle="bold"
-            android:backgroundTint="@color/amarillo_principal"/>
+            app:cornerRadius="14dp"
+            app:strokeColor="#FCA5A5"
+            app:strokeWidth="1.5dp" />
 
-        <Button
-            android:id="@+id/btnCancelar"
-
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-
-            android:layout_marginTop="8dp"
-
-            android:text="Cancelar"
-
-            android:textColor="@color/negro_principal"
-
-            android:backgroundTint="@color/gris_claro"/>
+        <!-- Botón Aceptar y Notificar -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAceptarEntrega"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1.6"
+            android:backgroundTint="#5F7625"
+            android:text="Aceptar y Notificar"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:cornerRadius="14dp"
+            app:icon="@drawable/ic_check"
+            app:iconGravity="textStart"
+            app:iconTint="#FFFFFF" />
 
     </LinearLayout>
 
-</ScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

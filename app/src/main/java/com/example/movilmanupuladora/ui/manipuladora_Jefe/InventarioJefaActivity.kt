@@ -59,6 +59,11 @@ class InventarioJefaActivity : AppCompatActivity() {
         binding.btnVolver.setOnClickListener {
             finish()
         }
+
+        binding.cardBannerEntregaSupervisor.setOnClickListener {
+            val intent = Intent(this, RegistrarEntregaActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     override fun onResume() {

@@ -31,6 +31,11 @@ class HistorialNotificacionesJefaActivity : AppCompatActivity() {
             finish()
         }
 
+        binding.cardNotif1.setOnClickListener {
+            val intent = android.content.Intent(this, RegistrarEntregaActivity::class.java)
+            startActivity(intent)
+        }
+
         configurarFiltros()
     }
 
