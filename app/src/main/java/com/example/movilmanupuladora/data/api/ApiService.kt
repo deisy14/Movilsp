@@ -191,4 +191,23 @@ interface ApiService {
     suspend fun sugerirRecetas(
         @Body request: com.example.movilmanupuladora.data.model.SugerenciasRecetasRequest
     ): Response<com.example.movilmanupuladora.data.model.SugerenciasRecetasResponse>
+
+    // Descontar inventario al confirmar preparación con IA
+    @POST("ia/descontar-inventario/")
+    suspend fun descontarInventario(
+        @Body request: com.example.movilmanupuladora.data.model.DescontarInventarioRequest
+    ): Response<com.example.movilmanupuladora.data.model.DescontarInventarioResponse>
+
+    // Entregas de alimentos desde supervisor
+    @GET("entregas/")
+    suspend fun obtenerEntregas(
+        @retrofit2.http.Query("id_sede") idSede: Int? = null,
+        @retrofit2.http.Query("estado") estado: String? = null
+    ): Response<List<com.example.movilmanupuladora.data.model.EntregaItem>>
+
+    @POST("entregas/{id}/confirmar-recepcion/")
+    suspend fun confirmarRecepcionEntrega(
+        @Path("id") idEntrega: Int,
+        @Body request: com.example.movilmanupuladora.data.model.ConfirmarRecepcionRequest
+    ): Response<JsonObject>
 }
