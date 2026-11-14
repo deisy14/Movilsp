@@ -34,12 +34,12 @@ class RegistrarEntregaActivity : AppCompatActivity() {
 
     data class ItemIngredienteVerificar(
         val id: Int,
-        val idEntrega: Int? = null,
         val nombre: String,
         val cantidad: Double,
         val unidad: String,
         val descripcion: String,
-        var verificado: Boolean = true
+        var verificado: Boolean = true,
+        val idEntrega: Int? = null
     )
 
     private val listaIngredientesDespacho = mutableListOf(
