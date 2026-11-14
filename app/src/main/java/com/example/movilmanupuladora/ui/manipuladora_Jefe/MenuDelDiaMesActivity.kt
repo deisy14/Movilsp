@@ -386,6 +386,41 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
         val esPasado = calDiaSelCero.before(hoyCero)
         val menuDia = MenuPaeCatalog.obtenerMenuDiaCompleto(diaSeleccionado)
 
+        // 0. ASISTENCIA DEL DÍA POR GRADO
+        val detalleAsist = AsistenciaManager.obtenerDetalleGradosFecha(this, fechaClave)
+        val totalAsist = AsistenciaManager.obtenerTotalFecha(this, fechaClave)
+
+        if (totalAsist > 0) {
+            binding.cardAsistenciaDia.visibility = View.VISIBLE
+            binding.txtTotalAsistenciaDia.text = "$totalAsist / 227 niños"
+            binding.txtTotalAsistenciaDia.setBackgroundResource(R.drawable.bg_pill_green)
+            binding.txtTotalAsistenciaDia.setTextColor(Color.parseColor("#2A5226"))
+
+            val partes = mutableListOf<String>()
+            detalleAsist["p1"]?.takeIf { it.isNotBlank() }?.let { partes.add("1°: $it") }
+            detalleAsist["p2"]?.takeIf { it.isNotBlank() }?.let { partes.add("2°: $it") }
+            detalleAsist["p4"]?.takeIf { it.isNotBlank() }?.let { partes.add("4°: $it") }
+            detalleAsist["p5"]?.takeIf { it.isNotBlank() }?.let { partes.add("5°: $it") }
+            detalleAsist["s6"]?.takeIf { it.isNotBlank() }?.let { partes.add("6°: $it") }
+            val textoGrados = if (partes.isNotEmpty()) partes.joinToString(" | ") else "Asistencia registrada por manipuladora"
+            binding.txtDetalleGradosAsistenciaDia.text = textoGrados
+            binding.txtDetalleGradosAsistenciaDia.setTextColor(Color.parseColor("#334155"))
+        } else if (esPasado) {
+            binding.cardAsistenciaDia.visibility = View.VISIBLE
+            binding.txtTotalAsistenciaDia.text = "Sin registro"
+            binding.txtTotalAsistenciaDia.setBackgroundResource(R.drawable.bg_date_selected)
+            binding.txtTotalAsistenciaDia.setTextColor(Color.parseColor("#854D0E"))
+            binding.txtDetalleGradosAsistenciaDia.text = "No se reportó asistencia de estudiantes en esta fecha"
+            binding.txtDetalleGradosAsistenciaDia.setTextColor(Color.parseColor("#64748B"))
+        } else {
+            binding.cardAsistenciaDia.visibility = View.VISIBLE
+            binding.txtTotalAsistenciaDia.text = "Pendiente registro"
+            binding.txtTotalAsistenciaDia.setBackgroundResource(R.drawable.bg_date_selected)
+            binding.txtTotalAsistenciaDia.setTextColor(Color.parseColor("#854D0E"))
+            binding.txtDetalleGradosAsistenciaDia.text = "La manipuladora reportará la asistencia durante la jornada"
+            binding.txtDetalleGradosAsistenciaDia.setTextColor(Color.parseColor("#64748B"))
+        }
+
         // 1. DESAYUNO
         if (!customDes.isNullOrBlank()) {
             val imgDes = MenuPaeCatalog.obtenerImagenPorNombre(customDes)
