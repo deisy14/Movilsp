@@ -11,7 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
 
-    private const val BASE_URL = "https://backend-sirae-t9zi.onrender.com/api/"
+    private const val BASE_URL = "https://backend-sirae-pyim.onrender.com/api/"
 
     // Variable en memoria para autorización con Bearer JWT
     var authToken: String? = null
