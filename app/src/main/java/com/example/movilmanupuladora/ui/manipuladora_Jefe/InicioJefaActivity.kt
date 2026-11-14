@@ -264,6 +264,12 @@ class InicioJefaActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        // Clic en "Asistente IA - Sugerir Menú & Descontar" -> Abre SugerenciaIaActivity
+        binding.bannerSugerenciasIA.setOnClickListener {
+            val intent = Intent(this, SugerenciaIaActivity::class.java)
+            startActivity(intent)
+        }
+
         // Clic en "Resumen del día" -> Abre AsistenciaJefaActivity
         binding.cardResumenDia.setOnClickListener {
             val intent = Intent(this, AsistenciaJefaActivity::class.java)

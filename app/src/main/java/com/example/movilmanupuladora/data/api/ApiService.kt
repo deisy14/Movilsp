@@ -192,6 +192,12 @@ interface ApiService {
         @Body request: com.example.movilmanupuladora.data.model.SugerenciasRecetasRequest
     ): Response<com.example.movilmanupuladora.data.model.SugerenciasRecetasResponse>
 
+    // Descontar inventario al confirmar preparación con IA
+    @POST("ia/descontar-inventario/")
+    suspend fun descontarInventario(
+        @Body request: com.example.movilmanupuladora.data.model.DescontarInventarioRequest
+    ): Response<com.example.movilmanupuladora.data.model.DescontarInventarioResponse>
+
     // Entregas de alimentos desde supervisor
     @GET("entregas/")
     suspend fun obtenerEntregas(
