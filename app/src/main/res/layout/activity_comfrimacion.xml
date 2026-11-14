@@ -28,7 +28,7 @@
                 android:layout_height="55dp"
                 android:contentDescription="Logo SIRAE"
                 android:scaleType="centerInside"
-                android:src="@drawable/logo_sirae" />
+                android:src="@drawable/logosira" />
 
             <!-- ICONO CHECK VERDE EN TARJETA ELEVADA -->
             <com.google.android.material.card.MaterialCardView
