@@ -182,6 +182,11 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
             }
             startActivity(intent)
         }
+
+        // Botón para enviar programación de menús directamente al supervisor
+        binding.btnEnviarProgramacionSupervisor.setOnClickListener {
+            confirmarYEnviarAlSupervisor()
+        }
     }
 
     // =========================================================
@@ -539,18 +544,19 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
         val diaActualCompleto = esDiaCompletoProgramado(diaSeleccionado)
         val dayOfWeek = diaSeleccionado.get(Calendar.DAY_OF_WEEK)
 
+        // Quitar completamente cualquier icono del botón de planificar
+        binding.btnPlanificarSemanaSiguiente.icon = null
+
         if (todosCompletos) {
-            // ¡Toda la semana completa de Lunes a Viernes lista para enviar al Supervisor!
-            binding.btnPlanificarSemanaSiguiente.text = "🚀 Enviar Minuta de la Semana al Supervisor"
-            binding.btnPlanificarSemanaSiguiente.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#15803D"))
-            binding.btnPlanificarSemanaSiguiente.setTextColor(Color.WHITE)
-            binding.btnPlanificarSemanaSiguiente.iconTint = ColorStateList.valueOf(Color.WHITE)
-            binding.btnPlanificarSemanaSiguiente.setIconResource(R.drawable.ic_check)
+            // Toda la semana completa de Lunes a Viernes planificada
+            binding.btnPlanificarSemanaSiguiente.text = "Semana planificada (Lunes a Viernes)"
+            binding.btnPlanificarSemanaSiguiente.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#E2E8F0"))
+            binding.btnPlanificarSemanaSiguiente.setTextColor(Color.parseColor("#334155"))
             binding.btnPlanificarSemanaSiguiente.setOnClickListener {
-                enviarMinutaSemanaAlSupervisor(diasSemanaHabiles)
+                Toast.makeText(this, "Esta semana ya tiene todos sus días planificados. Presiona 'Enviar programación al supervisor' abajo para oficializarla.", Toast.LENGTH_LONG).show()
             }
         } else if (diaActualCompleto && dayOfWeek in Calendar.MONDAY..Calendar.THURSDAY) {
-            // El día actual ya tiene desayuno, almuerzo y merienda: avanzar al siguiente día hábil
+            // El día actual ya tiene todos sus platos requeridos: avanzar al siguiente día hábil
             val calSiguiente = (diaSeleccionado.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, 1) }
             val numDiaSig = calSiguiente.get(Calendar.DAY_OF_MONTH)
             val nombreDiaSig = when (calSiguiente.get(Calendar.DAY_OF_WEEK)) {
@@ -564,8 +570,6 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
             binding.btnPlanificarSemanaSiguiente.text = "Planificar día $numDiaSig ($nombreDiaSig) ➡️"
             binding.btnPlanificarSemanaSiguiente.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FAC94B"))
             binding.btnPlanificarSemanaSiguiente.setTextColor(Color.parseColor("#1E293B"))
-            binding.btnPlanificarSemanaSiguiente.iconTint = ColorStateList.valueOf(Color.parseColor("#1E293B"))
-            binding.btnPlanificarSemanaSiguiente.setIconResource(R.drawable.ic_calendar)
             binding.btnPlanificarSemanaSiguiente.setOnClickListener {
                 diaSeleccionado = calSiguiente
                 generarGridMes()
@@ -587,15 +591,13 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
             if (!diaActualCompleto && dayOfWeek in Calendar.MONDAY..Calendar.FRIDAY) {
                 val sedeTexto = sessionManager.getSedeNombre().orEmpty().lowercase()
                 val faltantes = if (sedeTexto.contains("piagua")) "el Desayuno" else "Desayuno, Almuerzo y Merienda"
-                binding.btnPlanificarSemanaSiguiente.text = "👉 Programa $faltantes de $nombreDia $numDia"
+                binding.btnPlanificarSemanaSiguiente.text = "Programar $faltantes de $nombreDia $numDia"
             } else {
-                binding.btnPlanificarSemanaSiguiente.text = "🗓️ Planificar toda la semana siguiente"
+                binding.btnPlanificarSemanaSiguiente.text = "Planificar toda la semana siguiente"
             }
 
             binding.btnPlanificarSemanaSiguiente.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FAC94B"))
             binding.btnPlanificarSemanaSiguiente.setTextColor(Color.parseColor("#1E293B"))
-            binding.btnPlanificarSemanaSiguiente.iconTint = ColorStateList.valueOf(Color.parseColor("#1E293B"))
-            binding.btnPlanificarSemanaSiguiente.setIconResource(R.drawable.ic_calendar)
             binding.btnPlanificarSemanaSiguiente.setOnClickListener {
                 if (dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY) {
                     val proxLunes = (calLunes.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, 7) }
@@ -603,72 +605,179 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
                     generarGridMes()
                     actualizarDetallePlatos()
                 } else {
-                    Toast.makeText(this, "Completa los platos requeridos de $nombreDia $numDia para avanzar al siguiente día", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Completa los platos requeridos de $nombreDia $numDia para avanzar", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
 
-    private fun enviarMinutaSemanaAlSupervisor(dias: List<Calendar>) {
-        val fInicio = SimpleDateFormat("d 'de' MMMM", Locale.forLanguageTag("es-CO")).format(dias.first().time)
-        val fFin = SimpleDateFormat("d 'de' MMMM", Locale.forLanguageTag("es-CO")).format(dias.last().time)
+    private fun confirmarYEnviarAlSupervisor() {
+        val sdfClave = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val calLunes = (diaSeleccionado.clone() as Calendar).apply {
+            firstDayOfWeek = Calendar.MONDAY
+            set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+            set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
+        }
+        val diasSemanaHabiles = (0..4).map { offset ->
+            (calLunes.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, offset) }
+        }
+
+        // Buscar qué días tienen al menos un plato registrado
+        val diasConMenu = diasSemanaHabiles.filter { calDia ->
+            val f = sdfClave.format(calDia.time)
+            !sessionManager.getPlatoDiaServicio(this, f, "Desayuno").isNullOrBlank() ||
+            !sessionManager.getPlatoDiaServicio(this, f, "Almuerzo").isNullOrBlank() ||
+            !sessionManager.getPlatoDiaServicio(this, f, "Merienda").isNullOrBlank()
+        }.toMutableList()
+
+        val fSel = sdfClave.format(diaSeleccionado.time)
+        val selTiene = !sessionManager.getPlatoDiaServicio(this, fSel, "Desayuno").isNullOrBlank() ||
+                       !sessionManager.getPlatoDiaServicio(this, fSel, "Almuerzo").isNullOrBlank() ||
+                       !sessionManager.getPlatoDiaServicio(this, fSel, "Merienda").isNullOrBlank()
+
+        if (selTiene && diasConMenu.none { esMismoDia(it, diaSeleccionado) }) {
+            diasConMenu.add(diaSeleccionado)
+        }
+
+        if (diasConMenu.isEmpty()) {
+            Toast.makeText(this, "Primero programa al menos un menú antes de enviar al supervisor", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val sedeNombre = sessionManager.getSedeNombre() ?: "asignada"
-        val jefaNombre = sessionManager.getUserName() ?: "Jefa de Cocina"
+        val cantDias = diasConMenu.size
+        val resumenDias = diasConMenu.joinToString(", ") { SimpleDateFormat("d 'de' MMMM", Locale.forLanguageTag("es-CO")).format(it.time) }
 
         MaterialAlertDialogBuilder(this)
-            .setTitle("¿Enviar Minuta de la Semana?")
-            .setMessage("Has completado la programación de toda la semana ($fInicio al $fFin) para la $sedeNombre.\n\nAl enviar, el Supervisor PAE recibirá la minuta oficial con los platos seleccionados para su aprobación.")
-            .setPositiveButton("Sí, Enviar Minuta") { _, _ ->
-                lifecycleScope.launch {
-                    try {
-                        val sdfClave = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                        for (d in dias) {
-                            val fClave = sdfClave.format(d.time)
-                            val des = sessionManager.getPlatoDiaServicio(this@MenuDelDiaMesActivity, fClave, "Desayuno")
-                            val idDes = sessionManager.getPlatoDiaServicioId(this@MenuDelDiaMesActivity, fClave, "Desayuno")
-                            if (!des.isNullOrBlank()) {
-                                PreparacionSyncManager.guardarPlatoServicio(this@MenuDelDiaMesActivity, "Desayuno", des, idDes, fClave)
-                            }
-
-                            val alm = sessionManager.getPlatoDiaServicio(this@MenuDelDiaMesActivity, fClave, "Almuerzo")
-                            val idAlm = sessionManager.getPlatoDiaServicioId(this@MenuDelDiaMesActivity, fClave, "Almuerzo")
-                            if (!alm.isNullOrBlank()) {
-                                PreparacionSyncManager.guardarPlatoServicio(this@MenuDelDiaMesActivity, "Almuerzo", alm, idAlm, fClave)
-                            }
-
-                            val mer = sessionManager.getPlatoDiaServicio(this@MenuDelDiaMesActivity, fClave, "Merienda")
-                            val idMer = sessionManager.getPlatoDiaServicioId(this@MenuDelDiaMesActivity, fClave, "Merienda")
-                            if (!mer.isNullOrBlank()) {
-                                PreparacionSyncManager.guardarPlatoServicio(this@MenuDelDiaMesActivity, "Merienda", mer, idMer, fClave)
-                            }
-                        }
-
-                        // Notificación al Supervisor
-                        try {
-                            val titBody = "Minuta Semanal Programada por Jefa".toRequestBody("text/plain".toMediaTypeOrNull())
-                            val msgBody = "La Jefa de Cocina ($jefaNombre) ha programado la minuta completa de la semana ($fInicio al $fFin) en la sede $sedeNombre. Los menús están listos para tu revisión y aprobación en la plataforma."
-                                .toRequestBody("text/plain".toMediaTypeOrNull())
-                            RetrofitClient.apiService.enviarNotificacion(titBody, msgBody, null)
-                        } catch (eNotif: Exception) {
-                            Log.w("MenuDelDia", "Aviso push al supervisor: ${eNotif.message}")
-                        }
-
-                        MaterialAlertDialogBuilder(this@MenuDelDiaMesActivity)
-                            .setTitle("¡Minuta Enviada con Éxito!")
-                            .setMessage("La programación de toda la semana ha sido enviada al Supervisor PAE. Ahora le aparecerá en su minuta para dar el visto bueno.")
-                            .setPositiveButton("Aceptar") { _, _ ->
-                                generarGridMes()
-                                actualizarDetallePlatos()
-                            }
-                            .show()
-
-                    } catch (e: Exception) {
-                        Toast.makeText(this@MenuDelDiaMesActivity, "Error al enviar minuta: ${e.message}", Toast.LENGTH_LONG).show()
-                    }
-                }
+            .setTitle("¿Enviar Programación al Supervisor?")
+            .setMessage("Has seleccionado menús para $cantDias día(s) ($resumenDias) de la sede $sedeNombre.\n\nAl enviar, estos menús se registrarán en la plataforma para que le aparezcan al Supervisor PAE en su minuta oficial y pueda dar el visto bueno.\n\n¿Deseas enviar la programación ahora?")
+            .setPositiveButton("Sí, Enviar") { _, _ ->
+                enviarProgramacionAlSupervisor(diasConMenu)
             }
             .setNegativeButton("Cancelar", null)
             .show()
+    }
+
+    private fun enviarProgramacionAlSupervisor(dias: List<Calendar>) {
+        val sdfClave = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val sedeNombre = sessionManager.getSedeNombre() ?: "asignada"
+        val jefaNombre = sessionManager.getUserName() ?: "Jefa de Cocina"
+        val idSede = sessionManager.getSedeId().takeIf { it > 0 } ?: 1
+
+        lifecycleScope.launch {
+            try {
+                var totalPlatosEnviados = 0
+                for (d in dias) {
+                    val fClave = sdfClave.format(d.time)
+                    val semanaDelAnio = d.get(Calendar.WEEK_OF_YEAR)
+                    val indiceSemana = Math.abs(semanaDelAnio - 1) % 4
+                    val diaSemana = d.get(Calendar.DAY_OF_WEEK)
+                    val diaIndice = when (diaSemana) {
+                        Calendar.MONDAY -> 0
+                        Calendar.TUESDAY -> 1
+                        Calendar.WEDNESDAY -> 2
+                        Calendar.THURSDAY -> 3
+                        Calendar.FRIDAY -> 4
+                        else -> 0
+                    }
+                    val numMenu = (indiceSemana * 5) + diaIndice + 1
+
+                    // 1. Desayuno (id_seccion = 1)
+                    val des = sessionManager.getPlatoDiaServicio(this@MenuDelDiaMesActivity, fClave, "Desayuno")
+                    val idDes = sessionManager.getPlatoDiaServicioId(this@MenuDelDiaMesActivity, fClave, "Desayuno")
+                    if (!des.isNullOrBlank()) {
+                        PreparacionSyncManager.guardarPlatoServicio(this@MenuDelDiaMesActivity, "Desayuno", des, idDes, fClave)
+                        try {
+                            val body = mapOf(
+                                "id_jornada" to 1,
+                                "fecha" to fClave,
+                                "ninos_presentes" to 120,
+                                "id_contrato" to 1,
+                                "id_seccion" to 1,
+                                "id_sede" to idSede,
+                                "id_plato" to (idDes.takeIf { it > 0 }),
+                                "estado" to "Programado",
+                                "informacion_nutricional" to "[SEDE:$idSede] [MENU_CICLO:$numMenu] [Elegido Jefa] $des"
+                            )
+                            RetrofitClient.apiService.registrarMenu(body)
+                            totalPlatosEnviados++
+                        } catch (ePost: Exception) {
+                            Log.w("MenuDelDia", "Error post menu Desayuno: ${ePost.message}")
+                        }
+                    }
+
+                    // 2. Almuerzo (id_seccion = 2)
+                    val alm = sessionManager.getPlatoDiaServicio(this@MenuDelDiaMesActivity, fClave, "Almuerzo")
+                    val idAlm = sessionManager.getPlatoDiaServicioId(this@MenuDelDiaMesActivity, fClave, "Almuerzo")
+                    if (!alm.isNullOrBlank()) {
+                        PreparacionSyncManager.guardarPlatoServicio(this@MenuDelDiaMesActivity, "Almuerzo", alm, idAlm, fClave)
+                        try {
+                            val body = mapOf(
+                                "id_jornada" to 1,
+                                "fecha" to fClave,
+                                "ninos_presentes" to 120,
+                                "id_contrato" to 1,
+                                "id_seccion" to 2,
+                                "id_sede" to idSede,
+                                "id_plato" to (idAlm.takeIf { it > 0 }),
+                                "estado" to "Programado",
+                                "informacion_nutricional" to "[SEDE:$idSede] [MENU_CICLO:$numMenu] [Elegido Jefa] $alm"
+                            )
+                            RetrofitClient.apiService.registrarMenu(body)
+                            totalPlatosEnviados++
+                        } catch (ePost: Exception) {
+                            Log.w("MenuDelDia", "Error post menu Almuerzo: ${ePost.message}")
+                        }
+                    }
+
+                    // 3. Merienda (id_seccion = 3)
+                    val mer = sessionManager.getPlatoDiaServicio(this@MenuDelDiaMesActivity, fClave, "Merienda")
+                    val idMer = sessionManager.getPlatoDiaServicioId(this@MenuDelDiaMesActivity, fClave, "Merienda")
+                    if (!mer.isNullOrBlank()) {
+                        PreparacionSyncManager.guardarPlatoServicio(this@MenuDelDiaMesActivity, "Merienda", mer, idMer, fClave)
+                        try {
+                            val body = mapOf(
+                                "id_jornada" to 1,
+                                "fecha" to fClave,
+                                "ninos_presentes" to 120,
+                                "id_contrato" to 1,
+                                "id_seccion" to 3,
+                                "id_sede" to idSede,
+                                "id_plato" to (idMer.takeIf { it > 0 }),
+                                "estado" to "Programado",
+                                "informacion_nutricional" to "[SEDE:$idSede] [MENU_CICLO:$numMenu] [Elegido Jefa] $mer"
+                            )
+                            RetrofitClient.apiService.registrarMenu(body)
+                            totalPlatosEnviados++
+                        } catch (ePost: Exception) {
+                            Log.w("MenuDelDia", "Error post menu Merienda: ${ePost.message}")
+                        }
+                    }
+                }
+
+                // Notificación al Supervisor
+                try {
+                    val titBody = "Programación de Menús Enviada por Jefa".toRequestBody("text/plain".toMediaTypeOrNull())
+                    val msgBody = "La Jefa de Cocina ($jefaNombre) ha enviado la programación de menús para la sede $sedeNombre. Ya están registrados en el sistema y disponibles en la minuta oficial para su aprobación."
+                        .toRequestBody("text/plain".toMediaTypeOrNull())
+                    RetrofitClient.apiService.enviarNotificacion(titBody, msgBody, null)
+                } catch (eNotif: Exception) {
+                    Log.w("MenuDelDia", "Aviso push al supervisor: ${eNotif.message}")
+                }
+
+                MaterialAlertDialogBuilder(this@MenuDelDiaMesActivity)
+                    .setTitle("¡Programación Enviada con Éxito!")
+                    .setMessage("Los menús programados ($totalPlatosEnviados platos) han sido enviados al Supervisor PAE. Ya se reflejan en la minuta oficial de la sede para dar el visto bueno.")
+                    .setPositiveButton("Aceptar") { _, _ ->
+                        generarGridMes()
+                        actualizarDetallePlatos()
+                    }
+                    .show()
+
+            } catch (e: Exception) {
+                Toast.makeText(this@MenuDelDiaMesActivity, "Error al enviar programación: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     // =========================================================

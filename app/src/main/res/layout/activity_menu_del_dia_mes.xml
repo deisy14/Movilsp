@@ -338,10 +338,9 @@
                             android:layout_width="38dp"
                             android:layout_height="38dp"
                             android:layout_marginEnd="6dp"
-                            android:background="@drawable/bg_date_selected"
+                            android:background="?attr/selectableItemBackgroundBorderless"
                             android:clickable="true"
-                            android:focusable="true"
-                            android:foreground="?attr/selectableItemBackgroundBorderless">
+                            android:focusable="true">
 
                             <ImageView
                                 android:layout_width="20dp"
@@ -455,10 +454,9 @@
                             android:layout_width="38dp"
                             android:layout_height="38dp"
                             android:layout_marginEnd="6dp"
-                            android:background="@drawable/bg_date_selected"
+                            android:background="?attr/selectableItemBackgroundBorderless"
                             android:clickable="true"
-                            android:focusable="true"
-                            android:foreground="?attr/selectableItemBackgroundBorderless">
+                            android:focusable="true">
 
                             <ImageView
                                 android:layout_width="20dp"
@@ -572,10 +570,9 @@
                             android:layout_width="38dp"
                             android:layout_height="38dp"
                             android:layout_marginEnd="6dp"
-                            android:background="@drawable/bg_date_selected"
+                            android:background="?attr/selectableItemBackgroundBorderless"
                             android:clickable="true"
-                            android:focusable="true"
-                            android:foreground="?attr/selectableItemBackgroundBorderless">
+                            android:focusable="true">
 
                             <ImageView
                                 android:layout_width="20dp"
@@ -609,24 +606,34 @@
 
             </LinearLayout>
 
-            <!-- BOTÓN PLANIFICACIÓN SEMANAL COMPLETA -->
+            <!-- BOTÓN PLANIFICAR DÍA / SEMANA -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnPlanificarSemanaSiguiente"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="24dp"
-                android:text="🗓️ Planificar toda la semana siguiente"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="10dp"
+                android:text="Planificar siguiente día"
                 android:textColor="#1E293B"
-                android:textSize="13sp"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 app:backgroundTint="#FAC94B"
                 app:cornerRadius="16dp"
-                app:icon="@drawable/ic_calendar"
-                app:iconGravity="textStart"
-                app:iconTint="#1E293B"
                 app:strokeColor="#F59E0B"
                 app:strokeWidth="1dp" />
+
+            <!-- BOTÓN ENVIAR PROGRAMACIÓN AL SUPERVISOR -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEnviarProgramacionSupervisor"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginBottom="28dp"
+                android:text="Enviar programación al supervisor"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:backgroundTint="#16A34A"
+                app:cornerRadius="16dp" />
 
         </LinearLayout>
 
