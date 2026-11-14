@@ -234,6 +234,16 @@ class InicioJefaActivity : AppCompatActivity() {
         binding.imgMerienda.setImageResource(obtenerImagenPlatoPorNombre(nomMer))
         binding.txtNombreMerienda.text = nomMer
         binding.txtComponenteMerienda.text = compMer
+
+        val sedeTexto = sessionManager.getSedeNombre().orEmpty().lowercase()
+        val esSoloDesayuno = sedeTexto.contains("piagua")
+        if (esSoloDesayuno) {
+            binding.cardAlmuerzo.visibility = View.GONE
+            binding.cardMerienda.visibility = View.GONE
+        } else {
+            binding.cardAlmuerzo.visibility = View.VISIBLE
+            binding.cardMerienda.visibility = View.VISIBLE
+        }
     }
 
     // =========================================================

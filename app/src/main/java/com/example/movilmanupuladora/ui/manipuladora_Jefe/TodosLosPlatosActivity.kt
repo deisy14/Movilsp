@@ -31,6 +31,7 @@ import java.util.Locale
 class TodosLosPlatosActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityTodosLosPlatosBinding
+    private val sessionManager by lazy { SessionManager(this) }
     private val menuRepository = MenuRepository(RetrofitClient.apiService)
     private var fechaSeleccionada: String = ""
 
@@ -193,6 +194,16 @@ class TodosLosPlatosActivity : AppCompatActivity() {
             pintarBoton(dialogBinding.btnAsignarDesayunoModal, "Desayuno", esDesayuno, platoDesayuno)
             pintarBoton(dialogBinding.btnAsignarAlmuerzoModal, "Almuerzo", esAlmuerzo, platoAlmuerzo)
             pintarBoton(dialogBinding.btnAsignarMeriendaModal, "Merienda", esMerienda, platoMerienda)
+
+            val sedeTexto = sessionManager.getSedeNombre().orEmpty().lowercase()
+            val esSoloDesayuno = sedeTexto.contains("piagua")
+            if (esSoloDesayuno) {
+                dialogBinding.btnAsignarAlmuerzoModal.visibility = View.GONE
+                dialogBinding.btnAsignarMeriendaModal.visibility = View.GONE
+            } else {
+                dialogBinding.btnAsignarAlmuerzoModal.visibility = View.VISIBLE
+                dialogBinding.btnAsignarMeriendaModal.visibility = View.VISIBLE
+            }
 
             // Texto informativo del estado
             when {

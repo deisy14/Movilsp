@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -38,6 +39,7 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
     private var platoActualDesayuno: DetallePlatoDia? = null
     private var platoActualAlmuerzo: DetallePlatoDia? = null
     private var platoActualMerienda: DetallePlatoDia? = null
+    private val sessionManager by lazy { com.example.movilmanupuladora.utils.SessionManager(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -276,6 +278,16 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
 
         binding.imgDetalleMerienda.setImageResource(menuDia.merienda.imagenRes)
         binding.txtDetalleNombreMerienda.text = menuDia.merienda.nombre
+
+        val sedeTexto = sessionManager.getSedeNombre().orEmpty().lowercase()
+        val esSoloDesayuno = sedeTexto.contains("piagua")
+        if (esSoloDesayuno) {
+            binding.cardDetalleAlmuerzo.visibility = View.GONE
+            binding.cardDetalleMerienda.visibility = View.GONE
+        } else {
+            binding.cardDetalleAlmuerzo.visibility = View.VISIBLE
+            binding.cardDetalleMerienda.visibility = View.VISIBLE
+        }
     }
 
     private fun mostrarModalDetalle(detalle: DetallePlatoDia) {
