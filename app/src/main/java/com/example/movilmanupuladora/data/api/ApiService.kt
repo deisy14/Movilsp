@@ -165,6 +165,11 @@ interface ApiService {
     @GET("menus/")
     suspend fun obtenerMenus(): Response<List<menus>>
 
+    @POST("menus/")
+    suspend fun registrarMenu(
+        @Body menuData: Map<String, @JvmSuppressWildcards Any?>
+    ): Response<Map<String, Any?>>
+
     // Asistencia diaria
     @GET("asistencia-diaria/")
     suspend fun obtenerAsistenciaDiaria():

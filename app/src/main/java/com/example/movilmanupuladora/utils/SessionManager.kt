@@ -375,6 +375,82 @@ class SessionManager(context: Context) {
         desasignarPlatoServicio(context, servicio)
     }
 
+    private val FECHAS_20_DIAS = listOf(
+        "2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22", "2026-10-23",
+        "2026-10-26", "2026-10-27", "2026-10-28", "2026-10-29", "2026-10-30",
+        "2026-11-02", "2026-11-03", "2026-11-04", "2026-11-05", "2026-11-06",
+        "2026-11-09", "2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13"
+    )
+
+    private val PLATOS_DESAYUNO_20 = listOf(
+        "Huevos pericos con arroz blanco",
+        "Chocolate con arepa de maíz y queso",
+        "Huevos revueltos con tajadas de maduro",
+        "Colada de avena con galletas de soda",
+        "Huevos cocidos con arepa de choclo",
+        "Sorbete de guayaba con tostadas",
+        "Huevos pericos con chocolate en leche",
+        "Colada de quinua con panela y arepa",
+        "Huevos revueltos con tomate y cebolla",
+        "Avena caliente con galleta cuca",
+        "Huevos tibios con arepa redonda",
+        "Chocolate tradicional con queso campesino",
+        "Tortilla de huevo con verduras",
+        "Bebida láctea con arepa y huevo",
+        "Colada de maicena con galletas",
+        "Huevos revueltos con arroz y fruta",
+        "Chocolate en leche con pan integral",
+        "Huevos con hogao y arepa blanca",
+        "Avena con leche y fruta picada",
+        "Huevos pericos con colada casera"
+    )
+
+    private val PLATOS_ALMUERZO_20 = listOf(
+        "Pollo en salsa blanca con arroz y ensalada",
+        "Lentejas guisadas con colada de quinua",
+        "Carne de res guisada con arroz y maduro",
+        "Frijoles guisados con papa y arroz con fideos",
+        "Torta de huevo con arroz y verduras al vapor",
+        "Sancocho de pollo escolar con arroz blanco",
+        "Carne molida con lentejas y arroz",
+        "Guiso de carne de cerdo con papa y arroz",
+        "Pollo a la plancha con arroz y puré de papa",
+        "Frijol rojo con plátano y arroz blanco",
+        "Albóndigas de carne en salsa con arroz",
+        "Pechuga de pollo desmechada con arroz y ensalada",
+        "Lentejas con huevo cocido y arroz",
+        "Carne en bistec con arroz y papa cocida",
+        "Estofado de pollo campesino con arroz",
+        "Arroz con pollo y verduras acompañado de ensalada",
+        "Carne de res salteada con verduras y arroz",
+        "Sopa de lentejas con carne y arroz",
+        "Pollo guisado con zanahoria y habichuela",
+        "Cazuela escolar de frijoles con arroz y ensalada"
+    )
+
+    private val PLATOS_MERIENDA_20 = listOf(
+        "Leche con galleta cuca y mango",
+        "Yogurt con galleta de soda y mandarina",
+        "Refresco de avena con arequipe y galleta",
+        "Bocadillo con queso y bebida láctea",
+        "Leche con galletas dulces kraker y banano",
+        "Jugo de naranja con galleta de soda",
+        "Colada de maicena con fruta fresca",
+        "Leche con galleta cuca y papaya picada",
+        "Yogurt con galletas dulces y manzana",
+        "Refresco de guayaba con tostada y fruta",
+        "Bebida láctea con galleta y mandarina",
+        "Leche con panela y galletas kraker",
+        "Yogurt con fruta de temporada y galleta",
+        "Refresco de fruta natural con galleta de soda",
+        "Leche chocolatada con galleta dulce",
+        "Colada con fruta picada y galleta",
+        "Leche con galleta y porción de banano",
+        "Yogurt con queso y galleta de agua",
+        "Bebida de avena con fruta y galleta dulce",
+        "Leche con galleta cuca y fruta fresca"
+    )
+
     /**
      * Obtiene el plato de un día y servicio específico.
      */
@@ -393,6 +469,17 @@ class SessionManager(context: Context) {
             .getString("plan_${fecha}_${servKey}", null)
         if (!jVal.isNullOrBlank()) return jVal
 
+        // Ver si corresponde a uno de los 20 días escolares oficiales registrados
+        val idx = FECHAS_20_DIAS.indexOf(fecha)
+        if (idx != -1) {
+            return when (servKey) {
+                "desayuno" -> PLATOS_DESAYUNO_20.getOrNull(idx)
+                "almuerzo" -> PLATOS_ALMUERZO_20.getOrNull(idx)
+                "merienda" -> PLATOS_MERIENDA_20.getOrNull(idx)
+                else -> null
+            }
+        }
+
         return null
     }
 
@@ -410,8 +497,16 @@ class SessionManager(context: Context) {
             .getInt("plan_${fecha}_${servKey}_id", -1)
         if (tId != -1) return tId
 
-        return context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE)
+        val jId = context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE)
             .getInt("plan_${fecha}_${servKey}_id", -1)
+        if (jId != -1) return jId
+
+        val idx = FECHAS_20_DIAS.indexOf(fecha)
+        if (idx != -1) {
+            return idx + 1
+        }
+
+        return -1
     }
 
     /**
