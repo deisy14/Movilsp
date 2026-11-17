@@ -1,6 +1,64 @@
 package com.example.movilmanupuladora.data.model
 
+import com.google.gson.JsonArray
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
+import com.google.gson.JsonSerializationContext
+import com.google.gson.JsonSerializer
+import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
+import java.lang.reflect.Type
+
+/**
+ * Deserializador tolerante para el campo "ingredientes":
+ * - En "sugerencias_ia_estructuradas" el backend envia objetos IngredienteCalculadoIA.
+ * - En "platos_estipulados_pae" el backend envia nombres simples (String).
+ * Convierte ambos formatos sin lanzar JsonSyntaxException.
+ */
+class IngredienteCalculadoListAdapter :
+    JsonDeserializer<List<IngredienteCalculadoIA>>,
+    JsonSerializer<List<IngredienteCalculadoIA>> {
+
+    override fun deserialize(
+        json: JsonElement?,
+        typeOfT: Type?,
+        context: JsonDeserializationContext
+    ): List<IngredienteCalculadoIA> {
+        if (json == null || !json.isJsonArray) return emptyList()
+        val result = mutableListOf<IngredienteCalculadoIA>()
+        for (element in json.asJsonArray) {
+            when {
+                element.isJsonObject -> {
+                    val item = context.deserialize<IngredienteCalculadoIA>(
+                        element,
+                        IngredienteCalculadoIA::class.java
+                    )
+                    if (item != null) result.add(item)
+                }
+                element.isJsonPrimitive && element.asJsonPrimitive.isString -> {
+                    val nombre = element.asString.trim()
+                    if (nombre.isNotEmpty()) {
+                        result.add(IngredienteCalculadoIA(nombreIngrediente = nombre))
+                    }
+                }
+            }
+        }
+        return result
+    }
+
+    override fun serialize(
+        src: List<IngredienteCalculadoIA>?,
+        typeOfSrc: Type?,
+        context: JsonSerializationContext
+    ): JsonElement {
+        val array = JsonArray()
+        src?.forEach { item ->
+            array.add(context.serialize(item, IngredienteCalculadoIA::class.java))
+        }
+        return array
+    }
+}
 
 data class SugerenciasRecetasRequest(
     @SerializedName("id_sede")
@@ -74,6 +132,7 @@ data class SugerenciaIAItem(
     val ninosPresentes: Int = 200,
 
     @SerializedName("ingredientes")
+    @JsonAdapter(IngredienteCalculadoListAdapter::class)
     val ingredientes: List<IngredienteCalculadoIA> = emptyList(),
 
     @SerializedName("pasos")

@@ -15,10 +15,12 @@ import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.model.MenuPaeCatalog
 import com.example.movilmanupuladora.data.model.PlatoResponse
-import com.example.movilmanupuladora.data.model.SugerenciaRequest
-import com.example.movilmanupuladora.data.model.SugerenciaRecetaResponse
+import com.example.movilmanupuladora.data.model.SugerenciaIAItem
+import com.example.movilmanupuladora.data.model.SugerenciasRecetasRequest
 import com.example.movilmanupuladora.databinding.ActivityMenuDiaBinding
+import com.example.movilmanupuladora.ui.manipuladora_Jefe.AsistenciaManager
 import com.example.movilmanupuladora.utils.SessionManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 
 class MenuDiaActivity : AppCompatActivity() {
@@ -163,9 +165,10 @@ class MenuDiaActivity : AppCompatActivity() {
 
         // Evento de clic en el plato principal para invocar la IA adaptada
         cardPrincipal.setOnClickListener {
-            val idMenuActual = 1
-            val idPlatoActual = principal.idPlato ?: 1
-            solicitarSugerenciaIA(idMenuActual, idPlatoActual)
+            solicitarSugerenciaIA(
+                nombrePlato = principal.nombrePlato ?: "Plato del día",
+                componente = principal.componente
+            )
         }
 
         contenedorPrincipal?.addView(cardPrincipal)
@@ -216,9 +219,10 @@ class MenuDiaActivity : AppCompatActivity() {
 
                 // Evento de clic en los otros platos para abrir ingredientes o solicitar IA
                 fila.setOnClickListener {
-                    val idMenuActual = 1
-                    val idPlatoActual = plato.idPlato ?: 1
-                    solicitarSugerenciaIA(idMenuActual, idPlatoActual)
+                    solicitarSugerenciaIA(
+                        nombrePlato = plato.nombrePlato ?: "Plato del día",
+                        componente = plato.componente
+                    )
                 }
 
                 contenedorOtros?.addView(fila)
@@ -241,17 +245,52 @@ class MenuDiaActivity : AppCompatActivity() {
     }
 
     // --- Integración de Sugerencia de Receta con IA adaptada al Inventario (Corrutina) ---
-    private fun solicitarSugerenciaIA(idMenu: Int, idPlato: Int) {
-        val request = SugerenciaRequest(id_menu = idMenu, id_plato = idPlato)
+    private fun inferirSeccion(nombrePlato: String, componente: String?): Int {
+        val texto = "$nombrePlato ${componente.orEmpty()}".lowercase()
+        return when {
+            texto.contains("merienda") || texto.contains("refrigerio") || texto.contains("yogurt") || texto.contains("colada") -> 3
+            texto.contains("desayuno") || texto.contains("huevo") || texto.contains("arepa") || texto.contains("chocolate") || texto.contains("avena") -> 1
+            else -> 2
+        }
+    }
+
+    private fun solicitarSugerenciaIA(nombrePlato: String, componente: String?) {
+        val idSede = sessionManager.getSedeId().takeIf { it > 0 } ?: 1
+        val ninos = AsistenciaManager.obtenerTotal(this).takeIf { it > 0 } ?: 100
+        val idSeccion = inferirSeccion(nombrePlato, componente)
+
+        Toast.makeText(this, "Consultando sugerencia IA...", Toast.LENGTH_SHORT).show()
 
         lifecycleScope.launch {
             try {
-                val response = RetrofitClient.apiService.obtenerSugerenciaReceta(request)
+                val request = SugerenciasRecetasRequest(
+                    idSede = idSede,
+                    ninosPresentes = ninos,
+                    idSeccion = idSeccion,
+                    preferencia = nombrePlato
+                )
+                val response = RetrofitClient.apiService.sugerirRecetas(request)
                 if (response.isSuccessful && response.body() != null) {
-                    val data = response.body()!!
-                    mostrarIngredientesAdaptados(data)
+                    val body = response.body()!!
+                    val lista = body.sugerenciasIaEstructuradas.orEmpty().ifEmpty {
+                        body.platosEstipuladosPae.orEmpty()
+                    }
+                    val sugerencia = lista.firstOrNull()
+                    if (sugerencia != null) {
+                        mostrarIngredientesAdaptados(sugerencia, body.ninosPresentes ?: ninos)
+                    } else {
+                        Toast.makeText(
+                            this@MenuDiaActivity,
+                            "No se recibieron sugerencias IA para este plato.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 } else {
-                    Toast.makeText(this@MenuDiaActivity, "Error al calcular sugerencia", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@MenuDiaActivity,
+                        "Error al consultar IA (${response.code()})",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             } catch (t: Throwable) {
                 Toast.makeText(this@MenuDiaActivity, "Fallo de red: ${t.localizedMessage}", Toast.LENGTH_SHORT).show()
@@ -259,15 +298,35 @@ class MenuDiaActivity : AppCompatActivity() {
         }
     }
 
-    private fun mostrarIngredientesAdaptados(sugerencia: SugerenciaRecetaResponse) {
-        // Recorre los ingredientes calculados por el backend en función de los niños presentes y stock
-        for (ingrediente in sugerencia.ingredientes) {
-            val nombre = ingrediente.nombre
-            val cantidadTotal = ingrediente.cantidad_total
-            val unidad = ingrediente.unidad
-            val alcanza = ingrediente.alcanza // Indica si hay suficiente stock en la sede
+    private fun mostrarIngredientesAdaptados(sugerencia: SugerenciaIAItem, ninos: Int) {
+        val sb = StringBuilder()
+        sb.append("Calculado para $ninos niños\n")
+        if (sugerencia.componente.isNotBlank()) {
+            sb.append("${sugerencia.componente}\n")
+        }
+        sb.append("\nIngredientes y bodega:\n")
+
+        for (ing in sugerencia.ingredientes.orEmpty()) {
+            val icono = if (ing.alcanza) "✓" else "⚠️"
+            if (ing.cantidadTotal.isNotBlank()) {
+                sb.append("$icono ${ing.nombreIngrediente}: ${ing.cantidadTotal} (Stock: ${ing.stockActual} ${ing.unidad})\n")
+            } else {
+                sb.append("• ${ing.nombreIngrediente}\n")
+            }
         }
 
-        Toast.makeText(this, "Sugerencia cargada para: ${sugerencia.nombre_plato}", Toast.LENGTH_SHORT).show()
+        val pasos = sugerencia.pasos.orEmpty()
+        if (pasos.isNotEmpty()) {
+            sb.append("\nPreparación sugerida:\n")
+            pasos.forEachIndexed { idx, paso ->
+                sb.append("${idx + 1}. $paso\n")
+            }
+        }
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle("🤖 ${sugerencia.nombrePlato}")
+            .setMessage(sb.toString().trim())
+            .setPositiveButton("Entendido", null)
+            .show()
     }
 }
