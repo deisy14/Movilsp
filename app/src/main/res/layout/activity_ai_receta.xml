@@ -381,6 +381,52 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
+                <!-- TARJETA RECETA / PREPARACIÓN PASO A PASO -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardPasosRecetaIA"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="14dp"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="#CBD5E1"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="👨‍🍳 Receta y Preparación Paso a Paso"
+                            android:textColor="#1E293B"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Guía de preparación sugerida por la IA"
+                            android:textColor="#64748B"
+                            android:textSize="11sp" />
+
+                        <LinearLayout
+                            android:id="@+id/layoutListaPasosIA"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:orientation="vertical" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
                 <!-- BOTÓN CONFIRMAR Y DESCONTAR -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnConfirmarDescuento"

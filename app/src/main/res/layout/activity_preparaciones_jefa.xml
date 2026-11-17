@@ -382,6 +382,17 @@
                 android:backgroundTint="@color/amarillo_principal"/>
 
             <Button
+                android:id="@+id/btnVerSugerenciasIa"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:text="Ver sugerencias IA"
+                android:textColor="@color/negro_principal"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:backgroundTint="@color/gris_claro"/>
+
+            <Button
                 android:id="@+id/btnVerManipuladoras"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"

@@ -1,6 +1,7 @@
 package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
@@ -11,7 +12,12 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.databinding.ActivityPreparacionesJefaBinding
+import com.example.movilmanupuladora.utils.NavigationHelperJefa
 import com.example.movilmanupuladora.utils.SessionManager
+import com.example.movilmanupuladora.ui.manipuladora.PreparacionActivity
+import com.example.movilmanupuladora.ui.manipuladora_Jefe.PlanificacionSemanalJefaActivity
+import com.example.movilmanupuladora.ui.manipuladora_Jefe.ManipuladorasAsignadasActivity
+import com.example.movilmanupuladora.ui.manipuladora_Jefe.IniciarPreparacionActivity
 
 class PreparacionesJefaActivity : AppCompatActivity() {
 
@@ -24,6 +30,9 @@ class PreparacionesJefaActivity : AppCompatActivity() {
         MANANA,
         TARDE
     }
+
+    private val nombreJornada: String
+        get() = if (jornadaActual == Jornada.MANANA) "Mañana" else "Tarde"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,25 +57,44 @@ class PreparacionesJefaActivity : AppCompatActivity() {
     private fun configurarEventos() {
         binding.btnManana.setOnClickListener {
             jornadaActual = Jornada.MANANA
-            actualizarBotonesJornada()
             actualizarDatosJornada()
         }
 
         binding.btnTarde.setOnClickListener {
             jornadaActual = Jornada.TARDE
-            actualizarBotonesJornada()
             actualizarDatosJornada()
+        }
+
+        // Abre la Planificación Semanal con IA
+        binding.btnVerSugerenciasIa.setOnClickListener {
+            val intent = Intent(this, PlanificacionSemanalJefaActivity::class.java).apply {
+            putExtra("jornada", nombreJornada)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        startActivity(intent)
         }
 
         binding.btnIniciarPreparacion.setOnClickListener {
             val plato = binding.txtPlatoPreparacion.text.toString()
-            val jornadaNombre = if (jornadaActual == Jornada.MANANA) "Mañana" else "Tarde"
 
-            val intent = Intent(this, IniciarPreparacionActivity::class.java).apply {
-                putExtra("nombre_menu", plato)
-                putExtra("jornada", jornadaNombre)
+            val jefaPrefs = getSharedPreferences("ManipuladoraJefe", MODE_PRIVATE)
+            val compJefa = jefaPrefs.getString("comp_jefa", null)
+
+            if (!compJefa.isNullOrBlank()) {
+                val intent = Intent(this, PreparacionActivity::class.java).apply {
+                    putExtra("nombre_plato", plato)
+                    putExtra("componente_seleccionado", compJefa)
+                    putExtra("id_imagen", InicioJefaActivity.obtenerImagenPlatoPorNombre(plato))
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                }
+                startActivity(intent)
+            } else {
+                val intent = Intent(this, IniciarPreparacionActivity::class.java).apply {
+                    putExtra("nombre_menu", plato)
+                    putExtra("jornada", nombreJornada)
+                }
+                startActivity(intent)
             }
-            startActivity(intent)
         }
 
         binding.btnVerManipuladoras.setOnClickListener {
@@ -85,14 +113,14 @@ class PreparacionesJefaActivity : AppCompatActivity() {
         val negro = ContextCompat.getColor(this, R.color.negro_principal)
 
         if (jornadaActual == Jornada.MANANA) {
-            binding.btnManana.backgroundTintList = android.content.res.ColorStateList.valueOf(amarillo)
+            binding.btnManana.backgroundTintList = ColorStateList.valueOf(amarillo)
             binding.btnManana.setTextColor(blanco)
-            binding.btnTarde.backgroundTintList = android.content.res.ColorStateList.valueOf(gris)
+            binding.btnTarde.backgroundTintList = ColorStateList.valueOf(gris)
             binding.btnTarde.setTextColor(negro)
         } else {
-            binding.btnTarde.backgroundTintList = android.content.res.ColorStateList.valueOf(amarillo)
+            binding.btnTarde.backgroundTintList = ColorStateList.valueOf(amarillo)
             binding.btnTarde.setTextColor(blanco)
-            binding.btnManana.backgroundTintList = android.content.res.ColorStateList.valueOf(gris)
+            binding.btnManana.backgroundTintList = ColorStateList.valueOf(gris)
             binding.btnManana.setTextColor(negro)
         }
     }
@@ -100,22 +128,21 @@ class PreparacionesJefaActivity : AppCompatActivity() {
     private fun actualizarDatosJornada() {
         actualizarBotonesJornada()
 
-        val guardados = if (jornadaActual == Jornada.MANANA) {
+        val esManana = jornadaActual == Jornada.MANANA
+
+        val guardados: Int = if (esManana) {
             AsistenciaManager.obtenerManana(this)
         } else {
             AsistenciaManager.obtenerTarde(this)
         }
-        val ninos = if (guardados > 0) guardados else if (jornadaActual == Jornada.MANANA) 120 else 110
+        val ninos: Int = if (guardados > 0) guardados else if (esManana) 120 else 110
 
-        if (jornadaActual == Jornada.MANANA) {
-            binding.txtTituloJornada.text = "Preparación de la mañana"
-            binding.txtNinosPreparacion.text = "$ninos niños"
-        } else {
-            binding.txtTituloJornada.text = "Preparación de la tarde"
-            binding.txtNinosPreparacion.text = "$ninos niños"
-        }
+        binding.txtTituloJornada.text =
+            if (esManana) "Preparación de la mañana" else "Preparación de la tarde"
+        binding.txtNinosPreparacion.text = "$ninos niños"
 
-        val platoSeleccionado = getSharedPreferences("SIRAE", MODE_PRIVATE).getString("plato_seleccionado", "Pollo Guisado Criollo") ?: "Pollo Guisado Criollo"
+        val platoSeleccionado = getSharedPreferences("SIRAE", MODE_PRIVATE)
+            .getString("plato_seleccionado", "Pollo Guisado Criollo") ?: "Pollo Guisado Criollo"
         binding.txtPlatoPreparacion.text = platoSeleccionado
 
         val jefaPrefs = getSharedPreferences("ManipuladoraJefe", MODE_PRIVATE)
@@ -129,10 +156,11 @@ class PreparacionesJefaActivity : AppCompatActivity() {
             null
         }
 
-        if (!compJefa.isNullOrBlank()) {
-            binding.txtDescripcionPlato.text = "Plato de ${if (jornadaActual == Jornada.MANANA) "la mañana" else "la tarde"}.\n👨‍🍳 Tu componente asignado: $compJefa ($estadoJefa)"
+        val textoJornada = if (esManana) "la mañana" else "la tarde"
+        binding.txtDescripcionPlato.text = if (!compJefa.isNullOrBlank()) {
+            "Plato de $textoJornada.\n👨‍🍳 Tu componente asignado: $compJefa ($estadoJefa)"
         } else {
-            binding.txtDescripcionPlato.text = "Plato programado para la jornada de ${if (jornadaActual == Jornada.MANANA) "la mañana" else "la tarde"}."
+            "Plato programado para la jornada de $textoJornada."
         }
 
         val arrozKg = (ninos * 0.1).toInt().coerceAtLeast(10)
@@ -145,7 +173,9 @@ class PreparacionesJefaActivity : AppCompatActivity() {
         binding.txtCantidadLentejas.text = "$lentejasKg kg"
         binding.txtCantidadPasta.text = "$pastaKg kg"
 
-        val estado = getSharedPreferences("SIRAE_JEFA", MODE_PRIVATE).getString("estado_plato", "PENDIENTE")
+        val estado = getSharedPreferences("SIRAE_JEFA", MODE_PRIVATE)
+            .getString("estado_plato", "PENDIENTE")
+
         if (estado == "EN_PREPARACION" || estadoJefa == PreparacionEstadoManager.ESTADO_EN_PROCESO) {
             binding.txtEstadoPreparacion.text = "En proceso"
             binding.txtEstadoPreparacion.setTextColor(Color.parseColor("#7A5500"))
@@ -153,7 +183,8 @@ class PreparacionesJefaActivity : AppCompatActivity() {
         } else if (estado == "FINALIZADO" || estadoJefa == PreparacionEstadoManager.ESTADO_FINALIZADA) {
             binding.txtEstadoPreparacion.text = "Completado"
             binding.txtEstadoPreparacion.setTextColor(Color.parseColor("#2A5226"))
-            binding.btnIniciarPreparacion.text = if (!compJefa.isNullOrBlank()) "Preparación completada ($compJefa)" else "Preparación completada"
+            binding.btnIniciarPreparacion.text =
+                if (!compJefa.isNullOrBlank()) "Preparación completada ($compJefa)" else "Preparación completada"
         } else {
             binding.txtEstadoPreparacion.text = "Pendiente"
             binding.txtEstadoPreparacion.setTextColor(Color.parseColor("#D92D20"))
@@ -162,10 +193,10 @@ class PreparacionesJefaActivity : AppCompatActivity() {
     }
 
     private fun configurarNavegacionInferior() {
-        com.example.movilmanupuladora.utils.NavigationHelperJefa.setupBarraNavegacionJefa(
+        NavigationHelperJefa.setupBarraNavegacionJefa(
             this,
             binding.barraNavegacionJefa,
-            com.example.movilmanupuladora.utils.NavigationHelperJefa.TabJefa.PREPARACIONES
+            NavigationHelperJefa.TabJefa.PREPARACIONES
         )
     }
 }

@@ -32,6 +32,10 @@ class SugerenciaIaActivity : AppCompatActivity() {
 
     private var seccionSeleccionadaId: Int = 1 // 1: Desayuno, 2: Almuerzo, 3: Merienda
     private var sugerenciaActual: SugerenciaIAItem? = null
+    private var sugerenciasDisponibles: List<SugerenciaIAItem> = emptyList()
+    private var indiceSugerenciaActual: Int = 0
+    private var ultimaSeccionConsultada: Int = -1
+    private var ultimosNinosConsultados: Int = -1
     private var idSedeUsuario: Int = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,6 +47,11 @@ class SugerenciaIaActivity : AppCompatActivity() {
 
         sessionManager = SessionManager(this)
         idSedeUsuario = sessionManager.getSedeId().takeIf { it > 0 } ?: 1
+
+        val asistenciaHoy = AsistenciaManager.obtenerTotal(this)
+        if (asistenciaHoy > 0) {
+            binding.etNinosPresentes.setText(asistenciaHoy.toString())
+        }
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -106,7 +115,21 @@ class SugerenciaIaActivity : AppCompatActivity() {
         }
 
         binding.btnGenerarIA.setOnClickListener {
-            consultarSugerenciasConIA()
+            val ninosActual = binding.etNinosPresentes.text.toString().trim().toIntOrNull() ?: 200
+            if (sugerenciasDisponibles.size > 1 &&
+                ultimaSeccionConsultada == seccionSeleccionadaId &&
+                ultimosNinosConsultados == ninosActual
+            ) {
+                indiceSugerenciaActual = (indiceSugerenciaActual + 1) % sugerenciasDisponibles.size
+                mostrarSugerenciaEnPantalla(
+                    sugerenciasDisponibles[indiceSugerenciaActual],
+                    ninosActual,
+                    indiceSugerenciaActual + 1,
+                    sugerenciasDisponibles.size
+                )
+            } else {
+                consultarSugerenciasConIA()
+            }
         }
 
         binding.btnConfirmarDescuento.setOnClickListener {
@@ -147,11 +170,21 @@ class SugerenciaIaActivity : AppCompatActivity() {
 
                 if (response.isSuccessful && response.body() != null) {
                     val body = response.body()!!
-                    val sugerencias = body.sugerenciasIaEstructuradas
-                    if (sugerencias.isNotEmpty()) {
-                        mostrarSugerenciaEnPantalla(sugerencias[0], ninos)
-                    } else if (body.platosEstipuladosPae.isNotEmpty()) {
-                        mostrarSugerenciaEnPantalla(body.platosEstipuladosPae[0], ninos)
+                    val sugerencias = body.sugerenciasIaEstructuradas.orEmpty()
+                    val pae = body.platosEstipuladosPae.orEmpty()
+                    val listaFinal = if (sugerencias.isNotEmpty()) sugerencias else pae
+
+                    if (listaFinal.isNotEmpty()) {
+                        sugerenciasDisponibles = listaFinal
+                        indiceSugerenciaActual = 0
+                        ultimaSeccionConsultada = seccionSeleccionadaId
+                        ultimosNinosConsultados = ninos
+                        mostrarSugerenciaEnPantalla(
+                            listaFinal[0],
+                            ninos,
+                            1,
+                            listaFinal.size
+                        )
                     } else {
                         Toast.makeText(
                             this@SugerenciaIaActivity,
@@ -178,19 +211,28 @@ class SugerenciaIaActivity : AppCompatActivity() {
         }
     }
 
-    private fun mostrarSugerenciaEnPantalla(sug: SugerenciaIAItem, ninos: Int) {
+    private fun mostrarSugerenciaEnPantalla(
+        sug: SugerenciaIAItem,
+        ninos: Int,
+        posicion: Int = 1,
+        totalPropuestas: Int = 1
+    ) {
         sugerenciaActual = sug
         binding.layoutResultadoIA.visibility = View.VISIBLE
 
         binding.tvNombrePlatoIA.text = sug.nombrePlato
         binding.tvComponentesIA.text = sug.componente
 
-        val momentoNombre = when (seccionSeleccionadaId) {
-            1 -> "Desayuno • Coherencia PAE"
-            3 -> "Merienda • Coherencia PAE"
-            else -> "Almuerzo • Coherencia PAE"
+        val momentoBase = when (seccionSeleccionadaId) {
+            1 -> "Desayuno"
+            3 -> "Merienda"
+            else -> "Almuerzo"
         }
-        binding.tvChipMomento.text = momentoNombre
+        binding.tvChipMomento.text = if (totalPropuestas > 1) {
+            "$momentoBase • Propuesta IA $posicion/$totalPropuestas"
+        } else {
+            "$momentoBase • Coherencia PAE"
+        }
 
         if (sug.viableConInventario) {
             binding.tvBadgeStock.text = "✓ Stock Disponible"
@@ -205,7 +247,7 @@ class SugerenciaIaActivity : AppCompatActivity() {
         // Llenar lista dinámica de ingredientes
         binding.layoutListaIngredientes.removeAllViews()
 
-        for (ing in sug.ingredientes) {
+        for (ing in sug.ingredientes.orEmpty()) {
             val itemLayout = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
                 setPadding(0, 10, 0, 10)
@@ -236,21 +278,23 @@ class SugerenciaIaActivity : AppCompatActivity() {
             itemLayout.addView(fila1)
 
             // Fila 2: Porción por niño y Total para N niños
-            val tvPorcion = TextView(this).apply {
-                text = "Porción niño: ${ing.cantidadPorNino} | Total para $ninos niños: ${ing.cantidadTotal}"
-                setTextColor(Color.parseColor("#475569"))
-                textSize = 11f
-            }
-            itemLayout.addView(tvPorcion)
+            if (ing.cantidadPorNino.isNotBlank() || ing.cantidadTotal.isNotBlank()) {
+                val tvPorcion = TextView(this).apply {
+                    text = "Porción niño: ${ing.cantidadPorNino} | Total para $ninos niños: ${ing.cantidadTotal}"
+                    setTextColor(Color.parseColor("#475569"))
+                    textSize = 11f
+                }
+                itemLayout.addView(tvPorcion)
 
-            // Fila 3: Disminución de inventario (Stock actual vs restante proyectado)
-            val tvStock = TextView(this).apply {
-                text = "Stock bodega: ${ing.stockActual} ${ing.unidad}  ➔  Quedarán: ${ing.stockRestanteProyectado} ${ing.unidad} (-${ing.cantidadTotalValor} ${ing.unidad})"
-                setTextColor(Color.parseColor("#0369A1"))
-                textSize = 11f
-                typeface = android.graphics.Typeface.DEFAULT_BOLD
+                // Fila 3: Disminución de inventario (Stock actual vs restante proyectado)
+                val tvStock = TextView(this).apply {
+                    text = "Stock bodega: ${ing.stockActual} ${ing.unidad}  ➔  Quedarán: ${ing.stockRestanteProyectado} ${ing.unidad} (-${ing.cantidadTotalValor} ${ing.unidad})"
+                    setTextColor(Color.parseColor("#0369A1"))
+                    textSize = 11f
+                    typeface = android.graphics.Typeface.DEFAULT_BOLD
+                }
+                itemLayout.addView(tvStock)
             }
-            itemLayout.addView(tvStock)
 
             // Separador tenue
             val separador = View(this).apply {
@@ -263,6 +307,47 @@ class SugerenciaIaActivity : AppCompatActivity() {
             itemLayout.addView(separador)
 
             binding.layoutListaIngredientes.addView(itemLayout)
+        }
+
+        // Llenar pasos de preparación / receta sugerida por la IA
+        val pasos = sug.pasos.orEmpty().filter { it.isNotBlank() }
+        binding.layoutListaPasosIA.removeAllViews()
+        if (pasos.isNotEmpty()) {
+            binding.cardPasosRecetaIA.visibility = View.VISIBLE
+            pasos.forEachIndexed { index, paso ->
+                val pasoRow = LinearLayout(this).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    setPadding(0, 8, 0, 8)
+                }
+
+                val tvNumero = TextView(this).apply {
+                    text = "${index + 1}."
+                    setTextColor(Color.parseColor("#B45309"))
+                    textSize = 13f
+                    typeface = android.graphics.Typeface.DEFAULT_BOLD
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply { marginEnd = 12 }
+                }
+
+                val tvPaso = TextView(this).apply {
+                    text = paso
+                    setTextColor(Color.parseColor("#334155"))
+                    textSize = 13f
+                    layoutParams = LinearLayout.LayoutParams(
+                        0,
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        1f
+                    )
+                }
+
+                pasoRow.addView(tvNumero)
+                pasoRow.addView(tvPaso)
+                binding.layoutListaPasosIA.addView(pasoRow)
+            }
+        } else {
+            binding.cardPasosRecetaIA.visibility = View.GONE
         }
     }
 

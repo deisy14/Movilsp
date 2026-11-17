@@ -1,4 +1,3 @@
-
 package com.example.movilmanupuladora.data.api
 
 import com.example.movilmanupuladora.data.model.DetallePlato
@@ -15,7 +14,10 @@ import com.example.movilmanupuladora.data.model.gramaje
 import com.example.movilmanupuladora.data.model.inventario
 import com.example.movilmanupuladora.data.model.menus
 import com.example.movilmanupuladora.data.model.pasos_preparacion
+import com.example.movilmanupuladora.data.model.SugerenciaRequest
+import com.example.movilmanupuladora.data.model.SugerenciaRecetaResponse
 
+import com.google.gson.JsonObject
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -23,18 +25,19 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 
-import com.google.gson.JsonObject
-
 interface ApiService {
 
-    // Roles
-    @GET("roles/")
-    suspend fun obtenerRoles(): Response<List<Rol>>
+    // Sugerencia de receta con IA adaptada al inventario
+    @POST("ia-sugerencias/sugerir/")
+    suspend fun obtenerSugerenciaReceta(
+        @Body request: SugerenciaRequest
+    ): Response<SugerenciaRecetaResponse>
 
     // Autenticación
     @POST("auth/login/")
@@ -42,7 +45,7 @@ interface ApiService {
         @Body request: LoginRequest
     ): Response<LoginResponse>
 
-    // Recuperación de contraseña por código
+    // Recuperación de contraseña
     @POST("auth/recuperar-password/")
     suspend fun solicitarCodigoRecuperacion(
         @Body request: com.example.movilmanupuladora.data.model.SolicitarRecuperacionRequest
@@ -52,6 +55,10 @@ interface ApiService {
     suspend fun confirmarCodigoRecuperacion(
         @Body request: com.example.movilmanupuladora.data.model.ConfirmarRecuperacionRequest
     ): Response<com.example.movilmanupuladora.data.model.MensajeResponse>
+
+    // Roles
+    @GET("roles/")
+    suspend fun obtenerRoles(): Response<List<Rol>>
 
     // Usuarios
     @GET("usuarios/")
@@ -109,14 +116,11 @@ interface ApiService {
     suspend fun obtenerUnidadesMedida():
             Response<List<com.example.movilmanupuladora.data.model.UnidadMedida>>
 
-    // Notificaciones: consultar avisos recibidos
+    // Notificaciones
     @GET("notificaciones/")
     suspend fun obtenerNotificaciones():
             Response<List<com.example.movilmanupuladora.data.model.Notificacion>>
 
-    // Notificaciones: enviar aviso al administrador o supervisor.
-    // El backend recibe multipart/form-data.
-    // La imagen es opcional: enviar null cuando no se adjunte una.
     @Multipart
     @POST("notificaciones/enviar/")
     suspend fun enviarNotificacion(
@@ -125,19 +129,34 @@ interface ApiService {
         @Part imagen: MultipartBody.Part?
     ): Response<JsonObject>
 
+    @POST("notificaciones/{id}/marcar-leida/")
+    suspend fun marcarNotificacionLeida(
+        @Path("id") id: Int
+    ): Response<JsonObject>
+
+    @POST("notificaciones/marcar-todas-leidas/")
+    suspend fun marcarTodasLeidas(): Response<JsonObject>
+
     // Turnos
     @GET("turnos/")
     suspend fun obtenerTurnos():
             Response<List<com.example.movilmanupuladora.data.model.Turno>>
 
     @POST("turnos/")
-    suspend fun crearTurno(@Body turno: com.example.movilmanupuladora.data.model.Turno): Response<com.example.movilmanupuladora.data.model.Turno>
+    suspend fun crearTurno(
+        @Body turno: com.example.movilmanupuladora.data.model.Turno
+    ): Response<com.example.movilmanupuladora.data.model.Turno>
 
-    @retrofit2.http.PATCH("turnos/{id}/")
-    suspend fun patchTurno(@Path("id") id: Int, @Body body: Map<String, String>): Response<com.example.movilmanupuladora.data.model.Turno>
+    @PATCH("turnos/{id}/")
+    suspend fun patchTurno(
+        @Path("id") id: Int,
+        @Body body: Map<String, String>
+    ): Response<com.example.movilmanupuladora.data.model.Turno>
 
-    @retrofit2.http.DELETE("turnos/{id}/")
-    suspend fun eliminarTurno(@Path("id") id: Int): Response<Unit>
+    @DELETE("turnos/{id}/")
+    suspend fun eliminarTurno(
+        @Path("id") id: Int
+    ): Response<Unit>
 
     // Ingredientes
     @GET("ingredientes/")
@@ -191,7 +210,6 @@ interface ApiService {
         @Path("id") id: Int
     ): Response<Unit>
 
-    // Sugerencias de recetas según el inventario de la sede
     @POST("ia/sugerencias-recetas/")
     suspend fun sugerirRecetas(
         @Body request: com.example.movilmanupuladora.data.model.SugerenciasRecetasRequest

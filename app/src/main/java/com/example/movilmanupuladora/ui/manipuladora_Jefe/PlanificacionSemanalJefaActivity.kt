@@ -24,6 +24,8 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.model.MenuPaeCatalog
+import com.example.movilmanupuladora.data.model.SugerenciaIAItem
+import com.example.movilmanupuladora.data.model.SugerenciasRecetasRequest
 import com.example.movilmanupuladora.data.repository.MenuRepository
 import com.example.movilmanupuladora.databinding.ActivityPlanificacionSemanalJefaBinding
 import com.example.movilmanupuladora.utils.PreparacionSyncManager
@@ -48,6 +50,8 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
     private var comidaSeleccionada = TipoComida.DESAYUNO
     private var posicionPlatoCarousel = 0
     private var esSemanaAprobadaFijada = false
+    private var carouselPageCallback: ViewPager2.OnPageChangeCallback? = null
+    private val cacheSugerenciasIA = mutableMapOf<Int, List<SugerenciaIAItem>>()
 
     private var platoSeleccionadoDesayuno: InicioJefaActivity.Plato? = null
     private var platoSeleccionadoAlmuerzo: InicioJefaActivity.Plato? = null
@@ -512,21 +516,31 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
 
         binding.viewPagerSugerenciasIA.setPageTransformer(pageTransformer)
 
-        binding.viewPagerSugerenciasIA.registerOnPageChangeCallback(object :
-            ViewPager2.OnPageChangeCallback() {
+        carouselPageCallback?.let {
+            binding.viewPagerSugerenciasIA.unregisterOnPageChangeCallback(it)
+        }
+        val callback = object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 posicionPlatoCarousel = position
                 actualizarIndicadorPuntos(position, platosActuales.size)
                 actualizarBotonSeleccionarPlato(position, platosActuales)
+                platosActuales.getOrNull(position)?.let {
+                    solicitarSugerenciaIA(it.nombre, position)
+                }
             }
-        })
+        }
+        carouselPageCallback = callback
+        binding.viewPagerSugerenciasIA.registerOnPageChangeCallback(callback)
 
         val initialPos = if (platosActuales.size >= 2) 1 else 0
         binding.viewPagerSugerenciasIA.setCurrentItem(initialPos, false)
         posicionPlatoCarousel = initialPos
         actualizarIndicadorPuntos(initialPos, platosActuales.size)
         actualizarBotonSeleccionarPlato(initialPos, platosActuales)
+        platosActuales.getOrNull(initialPos)?.let {
+            solicitarSugerenciaIA(it.nombre, initialPos)
+        }
     }
 
     private fun actualizarBotonSeleccionarPlato(position: Int, lista: List<InicioJefaActivity.Plato>) {
@@ -1133,6 +1147,142 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
                     .show()
             } catch (e: Exception) {
                 Toast.makeText(this@PlanificacionSemanalJefaActivity, "Error al enviar: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun obtenerIdSeccionActual(): Int = when (comidaSeleccionada) {
+        TipoComida.DESAYUNO -> 1
+        TipoComida.ALMUERZO -> 2
+        TipoComida.MERIENDA -> 3
+    }
+
+    private fun solicitarSugerenciaIA(nombrePlato: String, posicionCarrusel: Int) {
+        val idSeccion = obtenerIdSeccionActual()
+        val idSede = sessionManager.getSedeId().takeIf { it > 0 } ?: 1
+        val ninos = AsistenciaManager.obtenerTotal(this).takeIf { it > 0 } ?: 100
+
+        val cacheadas = cacheSugerenciasIA[idSeccion]
+        if (!cacheadas.isNullOrEmpty()) {
+            val sugerencia = cacheadas[posicionCarrusel % cacheadas.size]
+            pintarIngredientesEnPantalla(sugerencia, ninos)
+            return
+        }
+
+        binding.txtNinosPresentesInfo.text = "Calculando ingredientes con IA..."
+        binding.layoutContenedorIngredientes.removeAllViews()
+
+        lifecycleScope.launch {
+            try {
+                val request = SugerenciasRecetasRequest(
+                    idSede = idSede,
+                    ninosPresentes = ninos,
+                    idSeccion = idSeccion,
+                    preferencia = nombrePlato
+                )
+                val response = RetrofitClient.apiService.sugerirRecetas(request)
+                if (response.isSuccessful && response.body() != null) {
+                    val body = response.body()!!
+                    val lista = body.sugerenciasIaEstructuradas.orEmpty().ifEmpty {
+                        body.platosEstipuladosPae.orEmpty()
+                    }
+                    if (lista.isNotEmpty()) {
+                        cacheSugerenciasIA[idSeccion] = lista
+                        val sugerencia = lista[posicionCarrusel % lista.size]
+                        val ninosResp = body.ninosPresentes ?: ninos
+                        pintarIngredientesEnPantalla(sugerencia, ninosResp)
+                    } else {
+                        binding.txtNinosPresentesInfo.text = "Sin sugerencias IA disponibles para esta jornada."
+                    }
+                } else {
+                    binding.txtNinosPresentesInfo.text = "No se pudo consultar la IA (${response.code()})."
+                }
+            } catch (t: Throwable) {
+                binding.txtNinosPresentesInfo.text = "Error de conexión con IA: ${t.localizedMessage}"
+            }
+        }
+    }
+
+    private fun pintarIngredientesEnPantalla(sugerencia: SugerenciaIAItem, ninos: Int) {
+        binding.layoutContenedorIngredientes.removeAllViews()
+        val estadoStock = if (sugerencia.viableConInventario) "✓ Stock disponible" else "⚠️ Revisar stock"
+        binding.txtNinosPresentesInfo.text =
+            "🤖 ${sugerencia.nombrePlato}\n👥 Calculado para $ninos niños · $estadoStock"
+
+        for (ingrediente in sugerencia.ingredientes.orEmpty()) {
+            val itemLayout = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                setPadding(0, 8, 0, 8)
+                gravity = Gravity.CENTER_VERTICAL
+            }
+
+            val textLayout = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            }
+
+            val tvNombre = TextView(this).apply {
+                text = ingrediente.nombreIngrediente
+                setTextColor(Color.parseColor("#1E293B"))
+                textSize = 14f
+                setTypeface(null, android.graphics.Typeface.BOLD)
+            }
+
+            val detalleTexto = if (ingrediente.cantidadTotal.isNotBlank()) {
+                "Requerido: ${ingrediente.cantidadTotal} · Stock: ${ingrediente.stockActual} ${ingrediente.unidad}"
+            } else {
+                "Ingrediente requerido del menú PAE"
+            }
+
+            val tvDetalle = TextView(this).apply {
+                text = detalleTexto
+                setTextColor(Color.parseColor("#92400E"))
+                textSize = 12f
+            }
+
+            textLayout.addView(tvNombre)
+            textLayout.addView(tvDetalle)
+            itemLayout.addView(textLayout)
+
+            val tvEstado = TextView(this).apply {
+                text = if (ingrediente.alcanza) "✓ Disponible" else "✕ Insuficiente"
+                setTextColor(Color.parseColor(if (ingrediente.alcanza) "#16A34A" else "#DC2626"))
+                textSize = 12f
+                setTypeface(null, android.graphics.Typeface.BOLD)
+            }
+            itemLayout.addView(tvEstado)
+
+            binding.layoutContenedorIngredientes.addView(itemLayout)
+
+            val divider = View(this).apply {
+                setBackgroundColor(Color.parseColor("#E2E8F0"))
+                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1).also {
+                    it.topMargin = 4
+                    it.bottomMargin = 4
+                }
+            }
+            binding.layoutContenedorIngredientes.addView(divider)
+        }
+
+        val pasos = sugerencia.pasos.orEmpty().filter { it.isNotBlank() }
+        if (pasos.isNotEmpty()) {
+            val tvTituloPasos = TextView(this).apply {
+                text = "👨‍🍳 Receta / Preparación paso a paso"
+                setTextColor(Color.parseColor("#1E293B"))
+                textSize = 13f
+                setTypeface(null, android.graphics.Typeface.BOLD)
+                setPadding(0, 14, 0, 6)
+            }
+            binding.layoutContenedorIngredientes.addView(tvTituloPasos)
+
+            pasos.forEachIndexed { idx, paso ->
+                val tvPaso = TextView(this).apply {
+                    text = "${idx + 1}. $paso"
+                    setTextColor(Color.parseColor("#475569"))
+                    textSize = 12f
+                    setPadding(0, 4, 0, 4)
+                }
+                binding.layoutContenedorIngredientes.addView(tvPaso)
             }
         }
     }
