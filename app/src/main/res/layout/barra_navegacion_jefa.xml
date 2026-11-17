@@ -3,10 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/barraNavegacionJefaContainer"
     android:layout_width="match_parent"
-    android:layout_height="96dp"
+    android:layout_height="116dp"
     android:clipChildren="false"
     android:clipToPadding="false"
     android:paddingHorizontal="12dp"
+    android:paddingBottom="24dp"
     android:background="@android:color/transparent">
 
     <!-- Background with Notch -->
@@ -164,7 +165,7 @@
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="12dp"
+        android:layout_marginBottom="36dp"
         android:clickable="true"
         android:focusable="true"
         android:stateListAnimator="@null"

@@ -10,8 +10,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.movilmanupuladora.databinding.ActivityManipuladorasJefaBinding
 import com.example.movilmanupuladora.utils.NavigationHelperJefa
+import kotlinx.coroutines.launch
 
 class ManipuladorasJefaActivity : AppCompatActivity() {
 
@@ -32,7 +34,18 @@ class ManipuladorasJefaActivity : AppCompatActivity() {
 
         configurarEventos()
         configurarNavegacionInferior()
-        cargarDatos()
+        sincronizarManipuladoras()
+    }
+
+    private fun sincronizarManipuladoras() {
+        lifecycleScope.launch {
+            try {
+                ManipuladorasManager.cargarDesdeBackend()
+                cargarDatos()
+            } catch (_: Exception) {
+                cargarDatos()
+            }
+        }
     }
 
     private fun configurarEventos() {
@@ -147,7 +160,7 @@ class ManipuladorasJefaActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         if (::binding.isInitialized) {
-            cargarDatos()
+            sincronizarManipuladoras()
         }
     }
 }

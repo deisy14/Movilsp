@@ -22,6 +22,47 @@ import org.json.JSONObject
 
 class LoginActivity : AppCompatActivity() {
 
+    companion object {
+        fun normalizarTexto(texto: String?): String {
+            if (texto.isNullOrBlank()) return ""
+            val nfd = java.text.Normalizer.normalize(texto, java.text.Normalizer.Form.NFD)
+            return nfd.replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
+                .lowercase()
+                .trim()
+        }
+
+        fun esUsuarioJefa(
+            rol: String?,
+            email: String?,
+            idRol: Int? = null,
+            nombreRol: String? = null
+        ): Boolean {
+            val r = normalizarTexto(rol)
+            val nr = normalizarTexto(nombreRol)
+            val e = normalizarTexto(email)
+
+            // 1. Chequeo por ID numérico asignado a Jefa de Manipuladoras en backend
+            if (idRol == 4 || idRol == 26 || idRol == 27 || idRol == 28) return true
+
+            // 2. Si el rol llegó como string numérico ("4")
+            val idParsed = r.toIntOrNull() ?: nr.toIntOrNull()
+            if (idParsed == 4 || idParsed == 26 || idParsed == 27 || idParsed == 28) return true
+
+            // 3. Chequeo dinámico por nombre o descripción de rol (sin datos quemados)
+            val rolTexto = "$r $nr".trim()
+            if (rolTexto.contains("jefa") || rolTexto.contains("jefe") || rolTexto.contains("coordinad")) {
+                return true
+            }
+
+            // 4. Si el correo institucional indica explícitamente jefa/jefe
+            if (e.contains("jefe") || e.contains("jefa")) {
+                return true
+            }
+
+            return false
+        }
+    }
+
     private lateinit var binding: ActivityLoginBinding
 
     private val usuarioRepository =
@@ -62,6 +103,23 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         sessionManager = SessionManager(this)
+
+        // Hacer scroll automático al enfocar campos de texto cuando sale el teclado
+        binding.txtCorreo.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                binding.scrollLogin.postDelayed({
+                    binding.scrollLogin.smoothScrollTo(0, binding.txtCorreo.top)
+                }, 150)
+            }
+        }
+
+        binding.txtPassword.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                binding.scrollLogin.postDelayed({
+                    binding.scrollLogin.smoothScrollTo(0, binding.txtPassword.top)
+                }, 150)
+            }
+        }
 
         // Recuperar el token guardado.
         sessionManager.fetchAuthToken()?.let { savedToken ->
@@ -207,78 +265,82 @@ class LoginActivity : AppCompatActivity() {
                         return@launch
                     }
 
-                    // Identificar el rol y el correo.
-                    val rol = (loginRes.usuario?.rol ?: "")
-                        .trim()
-                        .lowercase()
-
-                    val email = (loginRes.usuario?.correo ?: correo)
+                    val userInfo = loginRes.usuario
+                    val rolTexto = normalizarTexto(userInfo?.rolEfectivo)
+                    val email = (userInfo?.correo?.takeIf { it.isNotBlank() } ?: correo)
                         .trim()
                         .lowercase()
 
                     // El administrador ingresa desde la página web.
-                    if (rol.contains("admin")) {
+                    val esAdmin = rolTexto.contains("admin") ||
+                            userInfo?.isSuperuser == true ||
+                            userInfo?.idRol == 1 ||
+                            userInfo?.idRol == 2
 
+                    if (esAdmin) {
                         mostrarCargando(false)
-
                         Toast.makeText(
                             this@LoginActivity,
                             "Este usuario debe ingresar desde la página web.",
                             Toast.LENGTH_LONG
                         ).show()
-
                         return@launch
                     }
+
+                    // Limpiar datos de la sesión anterior para evitar mezclar usuarios
+                    sessionManager.clearSession()
 
                     // Guardar el token de autenticación.
                     RetrofitClient.authToken = token
                     sessionManager.saveAuthToken(token)
 
-                    // Guardar los datos del usuario y su sede.
-                    loginRes.usuario?.let { usuario ->
+                    // Identificar dinámicamente si es jefa (sin datos quemados)
+                    val esJefa = esUsuarioJefa(
+                        rol = userInfo?.rol,
+                        email = email,
+                        idRol = userInfo?.idRol,
+                        nombreRol = userInfo?.nombreRol
+                    )
 
-                        val nombreCompleto = listOf(
-                            usuario.nombre,
-                            usuario.apellido.orEmpty()
-                        )
-                            .filter { it.isNotBlank() }
-                            .joinToString(" ")
-                            .trim()
+                    // Guardar los datos del usuario y su sede asociada
+                    userInfo?.let { usuario ->
+                        val nombreCompleto = usuario.nombreCompleto.ifBlank {
+                            if (usuario.nombre.isNotBlank()) usuario.nombre else email
+                        }
 
-                        val correoFinal = usuario.correo
-                            .takeIf { it.isNotBlank() }
-                            ?: correo.trim()
+                        val sedeDisplay = usuario.sedeEfectiva
+                            ?: usuario.sedeNombre
+                            ?: usuario.institucionNombre
+
+                        val rolGuardar = when {
+                            !usuario.nombreRol.isNullOrBlank() -> usuario.nombreRol
+                            !usuario.rol.isNullOrBlank() && usuario.rol.toIntOrNull() == null -> usuario.rol
+                            esJefa -> "Jefa de Manipuladoras"
+                            else -> "Manipuladora de alimentos"
+                        }
 
                         sessionManager.saveUserData(
                             name = nombreCompleto,
-                            role = usuario.rol,
-                            email = correoFinal,
+                            role = rolGuardar,
+                            email = email,
                             idUsuario = usuario.idUsuario,
                             idSede = usuario.idSede,
-                            sedeNombre = usuario.sedeNombre
+                            sedeNombre = usuario.sedeNombre ?: sedeDisplay,
+                            idInstitucion = usuario.idInstitucion,
+                            institucionNombre = usuario.institucionNombre
                         )
 
                         Log.d(
-                            "SEDE_DEBUG",
-                            "idSede=${usuario.idSede}, " +
-                                    "sedeNombre=${usuario.sedeNombre}"
+                            "LOGIN_AUTH",
+                            "Usuario: $nombreCompleto | Rol: $rolGuardar | Sede: $sedeDisplay (idSede=${usuario.idSede})"
                         )
                     }
 
-                    // Identificar a la jefa de manipuladoras.
-                    val esJefa =
-                        rol.contains("jefa") ||
-                                rol.contains("jefe") ||
-                                email.contains("jefe") ||
-                                email.contains("jefa") ||
-                                email.contains("isaperez") ||
-                                email.contains("carlos")
-
                     // Determinar la pantalla de destino.
-                    val destino = when {
-                        esJefa -> InicioJefaActivity::class.java
-                        rol.contains("manipuladora") -> TurnoActivity::class.java
-                        else -> TurnoActivity::class.java
+                    val destino = if (esJefa) {
+                        InicioJefaActivity::class.java
+                    } else {
+                        TurnoActivity::class.java
                     }
 
                     Toast.makeText(
@@ -294,17 +356,6 @@ class LoginActivity : AppCompatActivity() {
                     finish()
 
                 } else {
-
-                    // Intentar el acceso local configurado en el proyecto.
-                    // Importante: este acceso debe validarse con credenciales
-                    // legítimas, no únicamente con un correo conocido.
-                    if (
-                        verificarLoginLocal(correo, pass) ||
-                        esManipuladoraOValida(correo, pass)
-                    ) {
-                        accederConLoginLocal(correo)
-                        return@launch
-                    }
 
                     mostrarCargando(false)
 
@@ -375,15 +426,6 @@ class LoginActivity : AppCompatActivity() {
 
             } catch (e: Exception) {
 
-                // Acceso local cuando el servidor no responde.
-                if (
-                    verificarLoginLocal(correo, pass) ||
-                    esManipuladoraOValida(correo, pass)
-                ) {
-                    accederConLoginLocal(correo)
-                    return@launch
-                }
-
                 mostrarCargando(false)
 
                 Log.e(
@@ -415,102 +457,6 @@ class LoginActivity : AppCompatActivity() {
                 ).show()
             }
         }
-    }
-
-    // =========================================================
-    // VALIDACIÓN LOCAL
-    // =========================================================
-
-    private fun esManipuladoraOValida(
-        correo: String,
-        pass: String
-    ): Boolean {
-
-        val email = correo.lowercase().trim()
-        val passTrim = pass.trim()
-
-        val esManipuladora =
-            email == "andreasanchez@gmail.com" ||
-                    email == "poolgomez27@gmail.com" ||
-                    email == "andres@gmail.com" ||
-                    email == "deis@gmail.com" ||
-                    email.contains("andrea") ||
-                    email.contains("pool") ||
-                    email.contains("deis") ||
-                    email.contains("manipuladora")
-
-        return esManipuladora && passTrim.isNotEmpty()
-    }
-
-    private fun verificarLoginLocal(
-        correo: String,
-        pass: String
-    ): Boolean {
-
-        val localAuth = getSharedPreferences(
-            "SIRAE_LOCAL_AUTH",
-            MODE_PRIVATE
-        )
-
-        val savedPwd = localAuth.getString(
-            "pwd_${correo.lowercase().trim()}",
-            null
-        )
-
-        return savedPwd != null &&
-                (savedPwd == pass.trim() || savedPwd == pass)
-    }
-
-    private fun accederConLoginLocal(correo: String) {
-
-        mostrarCargando(false)
-
-        val email = correo.lowercase().trim()
-
-        val esJefa =
-            email.contains("jefe") ||
-                    email.contains("jefa") ||
-                    email.contains("isaperez") ||
-                    email.contains("carlos") ||
-                    email.contains("jader") ||
-                    email.contains("sara")
-
-        val nombre = when {
-            email.contains("andrea") -> "Andrea Sánchez"
-            email.contains("pool") -> "Pool Gómez"
-            email.contains("deis") -> "Deisy"
-            email.contains("andres") -> "Andreas Muñoz"
-            email.contains("carlos") -> "Carlos Ruiz"
-            email.contains("isaperez") -> "Isa Pérez"
-            email.contains("jader") -> "Jader Gómez"
-            email.contains("sara") -> "Sara Rodríguez"
-            else -> sessionManager.getUserName() ?: "Manipuladora PAE"
-        }
-
-        sessionManager.saveUserData(
-            name = nombre,
-            role = if (esJefa) {
-                "Jefa de Manipuladoras"
-            } else {
-                "Manipuladora"
-            },
-            email = correo
-        )
-
-        Toast.makeText(
-            this@LoginActivity,
-            "¡Bienvenido $nombre!",
-            Toast.LENGTH_SHORT
-        ).show()
-
-        val destino = if (esJefa) {
-            InicioJefaActivity::class.java
-        } else {
-            TurnoActivity::class.java
-        }
-
-        startActivity(Intent(this@LoginActivity, destino))
-        finish()
     }
 
     // =========================================================

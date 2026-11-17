@@ -1,0 +1,796 @@
+﻿Tipo de Incidencia,ID / Código,Código de Épica / Padre,Nombre de la Épica,Sprint,Módulo en Aplicación Web / Móvil,Rol Principal,Resumen (Título de Historia / Épica),Historia de Usuario (Como / Quiero / Para),Criterios de Aceptación (Reglas de Negocio),Descripción Completa (Formato Jira / Confluence)
+"Épica","HE-01","HE-01","HE-01: Autenticación, Seguridad Perimetral y Centro de Notificaciones","","Transversal","Todos los Roles (Transversal)","HE-01: Autenticación, Seguridad Perimetral y Centro de Notificaciones","Gestión integral del flujo de inicio de sesión, recuperación de contraseña por correo, guards de navegación basados en roles de usuario y centro de notificaciones en tiempo real para todos los perfiles de la plataforma web SIRAE/PAE.","* Formulario de autenticación con redirección reactiva al dashboard del rol correspondiente (/inicio, /dashboard-supervisor o /asistencia-diaria).
+* Protección de rutas frontend mediante CanActivate (guards) y validación de tokens JWT.
+* Flujo de recuperación de contraseña con token temporal sin vulnerar cuentas existentes.
+* Campana de notificaciones con conteo de no leídas y panel flotante de avisos.","*Descripción de la Épica:*
+Gestión integral del flujo de inicio de sesión, recuperación de contraseña por correo, guards de navegación basados en roles de usuario y centro de notificaciones en tiempo real para todos los perfiles de la plataforma web SIRAE/PAE.
+
+*Alcance y Criterios Generales:*
+* Formulario de autenticación con redirección reactiva al dashboard del rol correspondiente (/inicio, /dashboard-supervisor o /asistencia-diaria).
+* Protección de rutas frontend mediante CanActivate (guards) y validación de tokens JWT.
+* Flujo de recuperación de contraseña con token temporal sin vulnerar cuentas existentes.
+* Campana de notificaciones con conteo de no leídas y panel flotante de avisos."
+"Épica","HE-02","HE-02","HE-02: Super Admin - Gestión Contractual, Zonas y Jornadas PAE","","Web - Super Administrador","Super Administrador","HE-02: Super Admin - Gestión Contractual, Zonas y Jornadas PAE","Flujo del Super Administrador para la administración integral de contratos (módulos /contratos y /contratos/:id/detalle): parametrización de número de contrato (código COR-2026), asignación de zonas geográficas (Norte, Sur, Oriente, Occidente, Urbana, Rural), configuración de jornadas y vinculación de instituciones/sedes educativas.","* Registro, edición y cambio de estado (Activo/Inactivo) de contratos PAE.
+* Parametrización de zonas geográficas (Norte, Sur, Este, Oeste, Centro, Oriente, Occidente, Urbana, Rural).
+* Configuración de jornadas escolares vinculadas (Mañana, Tarde, Única con horarios de inicio y fin).
+* Asignación y visualización de sedes educativas vinculadas al contrato.","*Descripción de la Épica:*
+Flujo del Super Administrador para la administración integral de contratos (módulos /contratos y /contratos/:id/detalle): parametrización de número de contrato (código COR-2026), asignación de zonas geográficas (Norte, Sur, Oriente, Occidente, Urbana, Rural), configuración de jornadas y vinculación de instituciones/sedes educativas.
+
+*Alcance y Criterios Generales:*
+* Registro, edición y cambio de estado (Activo/Inactivo) de contratos PAE.
+* Parametrización de zonas geográficas (Norte, Sur, Este, Oeste, Centro, Oriente, Occidente, Urbana, Rural).
+* Configuración de jornadas escolares vinculadas (Mañana, Tarde, Única con horarios de inicio y fin).
+* Asignación y visualización de sedes educativas vinculadas al contrato."
+"Épica","HE-03","HE-03","HE-03: Super Admin - Banco de Datos, Unidades de Medida y Parámetros Nutricionales","","Web - Super Administrador","Super Administrador","HE-03: Super Admin - Banco de Datos, Unidades de Medida y Parámetros Nutricionales","Flujo de parametrización base del sistema en los módulos /banco-datos, /unidades-medida y /entregas-tipo-mercado: catálogo unificado de ingredientes e insumos, factores de conversión de unidades de medida, clasificación de tipos de mercado (quincenal, mensual, perecedero y no perecedero) y definición de grados escolares y gramajes por ciclo.","* Catálogo normalizado de ingredientes con códigos oficiales, categorías y unidades de medida.
+* Gestión de unidades de medida (/unidades-medida) con factores de conversión de gramos a kilogramos y mililitros a litros.
+* Definición de periodicidad de mercados (/entregas-tipo-mercado): Quincenal, Mensual, Perecederos y No Perecederos.
+* Parametrización de gramajes oficiales por ingrediente y ciclo escolar.","*Descripción de la Épica:*
+Flujo de parametrización base del sistema en los módulos /banco-datos, /unidades-medida y /entregas-tipo-mercado: catálogo unificado de ingredientes e insumos, factores de conversión de unidades de medida, clasificación de tipos de mercado (quincenal, mensual, perecedero y no perecedero) y definición de grados escolares y gramajes por ciclo.
+
+*Alcance y Criterios Generales:*
+* Catálogo normalizado de ingredientes con códigos oficiales, categorías y unidades de medida.
+* Gestión de unidades de medida (/unidades-medida) con factores de conversión de gramos a kilogramos y mililitros a litros.
+* Definición de periodicidad de mercados (/entregas-tipo-mercado): Quincenal, Mensual, Perecederos y No Perecederos.
+* Parametrización de gramajes oficiales por ingrediente y ciclo escolar."
+"Épica","HE-04","HE-04","HE-04: Super Admin - Facturas de Compra y Control de Bodega Central","","Web - Super Administrador","Super Administrador / Bodeguero Central","HE-04: Super Admin - Facturas de Compra y Control de Bodega Central","Flujo completo del módulo unificado de compras y almacén central (/facturas-compra y /bodega-central): registro de facturas de compra con proveedores, insumos, lotes y fechas de vencimiento, reversión justificada por anulación, y monitoreo de existencias de Bodega Central con semáforo de stock (ÓPTIMO, BAJO) y configuración de umbrales de alerta.","* Registro de facturas con validación de al menos un producto, fecha de compra y soporte digital.
+* Control de lotes y fechas de expiración con impacto directo en el inventario central.
+* Módulo de anulación de factura con motivo obligatorio y actualización de inventario.
+* Tablero de Bodega Central con semaforización (ÓPTIMO/BAJO) y modal para configurar el umbral de alerta (stock mínimo).","*Descripción de la Épica:*
+Flujo completo del módulo unificado de compras y almacén central (/facturas-compra y /bodega-central): registro de facturas de compra con proveedores, insumos, lotes y fechas de vencimiento, reversión justificada por anulación, y monitoreo de existencias de Bodega Central con semáforo de stock (ÓPTIMO, BAJO) y configuración de umbrales de alerta.
+
+*Alcance y Criterios Generales:*
+* Registro de facturas con validación de al menos un producto, fecha de compra y soporte digital.
+* Control de lotes y fechas de expiración con impacto directo en el inventario central.
+* Módulo de anulación de factura con motivo obligatorio y actualización de inventario.
+* Tablero de Bodega Central con semaforización (ÓPTIMO/BAJO) y modal para configurar el umbral de alerta (stock mínimo)."
+"Épica","HE-05","HE-05","HE-05: Administración Centralizada de Usuarios, Roles y Asignaciones","","Web - Super Admin / Admin","Super Administrador / Administrador","HE-05: Administración Centralizada de Usuarios, Roles y Asignaciones","Flujo de gestión de usuarios en /usuarios, /crear-usuario y /rol: alta de nuevos colaboradores con documento, correo y sede, asignación de roles (Super Administrador, Administrador, Supervisor, Manipuladora Jefe, Manipuladora), filtros reactivos de búsqueda, edición de perfiles, activación/suspensión y asignación de instituciones a supervisores.","* Formulario de registro /crear-usuario con validación de documento, correo y obligatoriedad de sede para roles operativos.
+* Tabla de usuarios con buscador en tiempo real (nombre, apellido, documento, correo) y filtros por rol e institución.
+* Control de estados (Activo / Inactivo / Suspendido) con revocación inmediata de acceso.
+* Asignación de supervisores a múltiples instituciones y sedes educativas.","*Descripción de la Épica:*
+Flujo de gestión de usuarios en /usuarios, /crear-usuario y /rol: alta de nuevos colaboradores con documento, correo y sede, asignación de roles (Super Administrador, Administrador, Supervisor, Manipuladora Jefe, Manipuladora), filtros reactivos de búsqueda, edición de perfiles, activación/suspensión y asignación de instituciones a supervisores.
+
+*Alcance y Criterios Generales:*
+* Formulario de registro /crear-usuario con validación de documento, correo y obligatoriedad de sede para roles operativos.
+* Tabla de usuarios con buscador en tiempo real (nombre, apellido, documento, correo) y filtros por rol e institución.
+* Control de estados (Activo / Inactivo / Suspendido) con revocación inmediata de acceso.
+* Asignación de supervisores a múltiples instituciones y sedes educativas."
+"Épica","HE-06","HE-06","HE-06: Supervisor - Panel de Monitoreo y Gestión de Sedes Asignadas","","Web - Supervisor","Supervisor (Coordinador PAE)","HE-06: Supervisor - Panel de Monitoreo y Gestión de Sedes Asignadas","Flujo del Supervisor en /dashboard-supervisor e /instituciones: monitoreo en tiempo real de indicadores operativos de sedes a cargo (sedes activas, estudiantes matriculados, asistencia promedio), directorio detallado de ""Mis Sedes"", consulta de datos de rector y manipuladora jefe, e inspección del inventario y entregas de cada sede.","* Dashboard con tarjetas de métricas globales sincronizadas de sedes a cargo.
+* Directorio de sedes con filtros por institución, municipio y estado operativo (ACTIVO/INACTIVO).
+* Pestaña de detalle por sede: visualización de ""Inventario de la Sede"" (con alerta de bajo, agotado o por vencer) e ""Historial de Entregas"".
+* Acceso rápido para registrar nuevos despachos hacia la sede seleccionada.","*Descripción de la Épica:*
+Flujo del Supervisor en /dashboard-supervisor e /instituciones: monitoreo en tiempo real de indicadores operativos de sedes a cargo (sedes activas, estudiantes matriculados, asistencia promedio), directorio detallado de ""Mis Sedes"", consulta de datos de rector y manipuladora jefe, e inspección del inventario y entregas de cada sede.
+
+*Alcance y Criterios Generales:*
+* Dashboard con tarjetas de métricas globales sincronizadas de sedes a cargo.
+* Directorio de sedes con filtros por institución, municipio y estado operativo (ACTIVO/INACTIVO).
+* Pestaña de detalle por sede: visualización de ""Inventario de la Sede"" (con alerta de bajo, agotado o por vencer) e ""Historial de Entregas"".
+* Acceso rápido para registrar nuevos despachos hacia la sede seleccionada."
+"Épica","HE-07","HE-07","HE-07: Supervisor - Despacho de Remesas y Trazabilidad de Entregas","","Web - Supervisor","Supervisor (Coordinador PAE)","HE-07: Supervisor - Despacho de Remesas y Trazabilidad de Entregas","Flujo de registro y seguimiento de despachos de alimentos en /registrar-entrega-alimentos e /historial-entregas: selección de sede, periodicidad y tipo de mercado, armado de la remesa de insumos (granos, lácteos, carnes, abarrotes), validación contra existencias de bodega central, y auditoría en historial con estados EN_TRANSITO, RECIBIDA, CON_NOVEDAD y RECHAZADA.","* Formulario /registrar-entrega-alimentos con selección de sede, tipo de mercado (perecedero/no perecedero) y productos.
+* Validación de cantidades frente al stock disponible en bodega central antes de generar la orden de despacho.
+* Tabla de historial de entregas con estados: EN_TRANSITO, RECIBIDA (Recibida OK), CON_NOVEDAD y RECHAZADA.
+* Modal de detalle de entrega con desglose de cantidades enviadas vs recibidas, fechas de vencimiento y observaciones.
+* Exportación del historial de entregas a archivo Excel.","*Descripción de la Épica:*
+Flujo de registro y seguimiento de despachos de alimentos en /registrar-entrega-alimentos e /historial-entregas: selección de sede, periodicidad y tipo de mercado, armado de la remesa de insumos (granos, lácteos, carnes, abarrotes), validación contra existencias de bodega central, y auditoría en historial con estados EN_TRANSITO, RECIBIDA, CON_NOVEDAD y RECHAZADA.
+
+*Alcance y Criterios Generales:*
+* Formulario /registrar-entrega-alimentos con selección de sede, tipo de mercado (perecedero/no perecedero) y productos.
+* Validación de cantidades frente al stock disponible en bodega central antes de generar la orden de despacho.
+* Tabla de historial de entregas con estados: EN_TRANSITO, RECIBIDA (Recibida OK), CON_NOVEDAD y RECHAZADA.
+* Modal de detalle de entrega con desglose de cantidades enviadas vs recibidas, fechas de vencimiento y observaciones.
+* Exportación del historial de entregas a archivo Excel."
+"Épica","HE-08","HE-08","HE-08: Supervisor - Control de Saldos de Almacén y Ajustes en Sedes","","Web - Supervisor","Supervisor (Coordinador PAE)","HE-08: Supervisor - Control de Saldos de Almacén y Ajustes en Sedes","Flujo de fiscalización de inventarios locales en /saldos-almacen y /entradas-ajustes-inventario: consulta de existencias en tiempo real en los almacenes escolares, semáforo de existencias (Adecuado, Bajo stock), registro y exportación de entradas y ajustes extraordinarios de inventario.","* Consulta de saldos de insumos por sede seleccionada con semaforización (Adecuado / Crítico).
+* Bandeja de entradas y ajustes de inventario con motivo (corrección, merma, donación).
+* Descarga de reportes de saldos y entradas de almacén en formato Excel.","*Descripción de la Épica:*
+Flujo de fiscalización de inventarios locales en /saldos-almacen y /entradas-ajustes-inventario: consulta de existencias en tiempo real en los almacenes escolares, semáforo de existencias (Adecuado, Bajo stock), registro y exportación de entradas y ajustes extraordinarios de inventario.
+
+*Alcance y Criterios Generales:*
+* Consulta de saldos de insumos por sede seleccionada con semaforización (Adecuado / Crítico).
+* Bandeja de entradas y ajustes de inventario con motivo (corrección, merma, donación).
+* Descarga de reportes de saldos y entradas de almacén en formato Excel."
+"Épica","HE-09","HE-09","HE-09: Administrador - Control Operativo General, Auditoría y Liquidación","","Web - Administrador (Operador PAE)","Administrador (Operador PAE)","HE-09: Administrador - Control Operativo General, Auditoría y Liquidación","Flujo del Administrador del operador PAE en /inicio, /reportes-consumo, /reporte-inventario y /saldos-almacen: panel general de control de la operación territorial, auditoría transversal de despachos emitidos por supervisores, aprobación de ajustes de inventario y consolidación de reportes de ejecución contractual.","* Panel general de inicio con indicadores macro de operación, sedes atendidas y raciones servidas.
+* Auditoría y trazabilidad global de despachos y recepciones en sedes escolares.
+* Aprobación de ajustes extraordinarios de inventario reportados desde campo.
+* Generación y exportación de informes consolidados de consumo y balance de inventario para interventoría.","*Descripción de la Épica:*
+Flujo del Administrador del operador PAE en /inicio, /reportes-consumo, /reporte-inventario y /saldos-almacen: panel general de control de la operación territorial, auditoría transversal de despachos emitidos por supervisores, aprobación de ajustes de inventario y consolidación de reportes de ejecución contractual.
+
+*Alcance y Criterios Generales:*
+* Panel general de inicio con indicadores macro de operación, sedes atendidas y raciones servidas.
+* Auditoría y trazabilidad global de despachos y recepciones en sedes escolares.
+* Aprobación de ajustes extraordinarios de inventario reportados desde campo.
+* Generación y exportación de informes consolidados de consumo y balance de inventario para interventoría."
+"Épica","HE-10","HE-10","HE-10: Operación en Cocina, Registro Diario y Elaboración de Alimentos (App Móvil)","","App Móvil - Cocina","Manipuladora Jefe / Manipuladora","HE-10: Operación en Cocina, Registro Diario y Elaboración de Alimentos (App Móvil)","Flujo validado de la aplicación móvil para manipuladoras de alimentos y manipuladora jefe: registro de asistencia escolar con ventanas de tiempo (7-8 am y 1-2 pm), sugerencias de menú con Inteligencia Artificial basadas en inventario, calendario interactivo, semáforo de cocción (Rojo, Amarillo, Verde), reporte oportuno de novedades y conciliación de remesas recibidas.","* Registro y consulta de asistencia escolar con cálculo automático de gramajes por ciclo educativo.
+* Selección de menús y generación de alternativas nutricionales con Inteligencia Artificial.
+* Control visual de estados de preparación y alertas de novedades a supervisión.
+* Conciliación de existencias en bodega escolar por tipo de mercado.","*Descripción de la Épica:*
+Flujo validado de la aplicación móvil para manipuladoras de alimentos y manipuladora jefe: registro de asistencia escolar con ventanas de tiempo (7-8 am y 1-2 pm), sugerencias de menú con Inteligencia Artificial basadas en inventario, calendario interactivo, semáforo de cocción (Rojo, Amarillo, Verde), reporte oportuno de novedades y conciliación de remesas recibidas.
+
+*Alcance y Criterios Generales:*
+* Registro y consulta de asistencia escolar con cálculo automático de gramajes por ciclo educativo.
+* Selección de menús y generación de alternativas nutricionales con Inteligencia Artificial.
+* Control visual de estados de preparación y alertas de novedades a supervisión.
+* Conciliación de existencias en bodega escolar por tipo de mercado."
+"Historia","HU-01","HE-01","HE-01: Autenticación, Seguridad Perimetral y Centro de Notificaciones","161","Web - Login","Usuario Registrado","HU-01: Iniciar sesión en la plataforma SIRAE","*Como usuario registrado de la plataforma (Super Admin, Administrador, Supervisor o Manipuladora)*,
+*Quiero ingresar con mi correo institucional y contraseña en la pantalla /login*,
+*Para autenticarme de forma segura y acceder al panel correspondiente a mi perfil*.","* Muestra formulario centrado con campos de correo electrónico y contraseña, y botón de inicio de sesión.
+* Incluye botón interactivo con ícono de ojo para alternar la visibilidad de la contraseña.
+* Si las credenciales son válidas, almacena el token JWT de sesión y redirige según el rol:
+* Super Administrador / Administrador -> /inicio
+* Supervisor / Coordinador PAE -> /dashboard-supervisor
+* Jefa de manipuladoras -> /asistencia-diaria
+* Si las credenciales son inválidas o la cuenta está inactiva, despliega notificación de error de SweetAlert2 (""Credenciales inválidas"" o ""Cuenta no autorizada"").
+* Incluye enlace directo hacia la pantalla de recuperación de contraseña (/recuperar-password).","*Como usuario registrado de la plataforma (Super Admin, Administrador, Supervisor o Manipuladora)*,
+*Quiero ingresar con mi correo institucional y contraseña en la pantalla /login*,
+*Para autenticarme de forma segura y acceder al panel correspondiente a mi perfil*.
+
+*Criterios de Aceptación:*
+
+* Muestra formulario centrado con campos de correo electrónico y contraseña, y botón de inicio de sesión.
+* Incluye botón interactivo con ícono de ojo para alternar la visibilidad de la contraseña.
+* Si las credenciales son válidas, almacena el token JWT de sesión y redirige según el rol:
+* Super Administrador / Administrador -> /inicio
+* Supervisor / Coordinador PAE -> /dashboard-supervisor
+* Jefa de manipuladoras -> /asistencia-diaria
+* Si las credenciales son inválidas o la cuenta está inactiva, despliega notificación de error de SweetAlert2 (""Credenciales inválidas"" o ""Cuenta no autorizada"").
+* Incluye enlace directo hacia la pantalla de recuperación de contraseña (/recuperar-password)."
+"Historia","HU-02","HE-01","HE-01: Autenticación, Seguridad Perimetral y Centro de Notificaciones","161","Web - Seguridad y Rutas","Usuario del Sistema","HU-02: Control y protección de rutas privadas mediante guards de rol","*Como responsable de seguridad de la plataforma*,
+*Quiero que el router de Angular aplique los guards de autenticación (canActivate) y validación de roles en cada ruta privada*,
+*Para impedir que usuarios no autorizados o anónimos accedan a módulos restringidos mediante manipulación de la URL*.","* El guard de sesión (YM) intercepta cualquier intento de navegación sin token y redirige a /login.
+* El guard de rol (Dt) valida el array data.roles de la ruta configurada (ej. contratos solo para superadmin; dashboard-supervisor para supervisores).
+* Si el usuario autenticado intenta entrar a una ruta fuera de su perfil, el sistema bloquea la carga y lo redirige a su página de inicio autorizada con notificación de permiso denegado.
+* El menú lateral del layout (vm) oculta automáticamente los enlaces y secciones que no correspondan al rol del usuario conectado.","*Como responsable de seguridad de la plataforma*,
+*Quiero que el router de Angular aplique los guards de autenticación (canActivate) y validación de roles en cada ruta privada*,
+*Para impedir que usuarios no autorizados o anónimos accedan a módulos restringidos mediante manipulación de la URL*.
+
+*Criterios de Aceptación:*
+
+* El guard de sesión (YM) intercepta cualquier intento de navegación sin token y redirige a /login.
+* El guard de rol (Dt) valida el array data.roles de la ruta configurada (ej. contratos solo para superadmin; dashboard-supervisor para supervisores).
+* Si el usuario autenticado intenta entrar a una ruta fuera de su perfil, el sistema bloquea la carga y lo redirige a su página de inicio autorizada con notificación de permiso denegado.
+* El menú lateral del layout (vm) oculta automáticamente los enlaces y secciones que no correspondan al rol del usuario conectado."
+"Historia","HU-03","HE-01","HE-01: Autenticación, Seguridad Perimetral y Centro de Notificaciones","161","Web - Recuperación","Usuario Registrado","HU-03: Solicitar recuperación de contraseña en /recuperar-password","*Como usuario que ha olvidado su clave de acceso*,
+*Quiero ingresar mi correo en la vista /recuperar-password y solicitar el restablecimiento*,
+*Para recibir las instrucciones de recuperación en mi bandeja de correo sin depender de soporte presencial*.","* Formulario en /recuperar-password con campo para correo electrónico y botón de envío.
+* Valida que el campo no esté vacío y cumpla el formato de correo electrónico.
+* Muestra estado de carga durante la petición a la API.
+* Despliega mensaje de confirmación claro informando que si el correo está registrado, se enviaron las instrucciones.
+* Botón ""Volver al inicio de sesión"" que redirige de retorno a /login.","*Como usuario que ha olvidado su clave de acceso*,
+*Quiero ingresar mi correo en la vista /recuperar-password y solicitar el restablecimiento*,
+*Para recibir las instrucciones de recuperación en mi bandeja de correo sin depender de soporte presencial*.
+
+*Criterios de Aceptación:*
+
+* Formulario en /recuperar-password con campo para correo electrónico y botón de envío.
+* Valida que el campo no esté vacío y cumpla el formato de correo electrónico.
+* Muestra estado de carga durante la petición a la API.
+* Despliega mensaje de confirmación claro informando que si el correo está registrado, se enviaron las instrucciones.
+* Botón ""Volver al inicio de sesión"" que redirige de retorno a /login."
+"Historia","HU-04","HE-01","HE-01: Autenticación, Seguridad Perimetral y Centro de Notificaciones","161","Web - Notificaciones","Usuario Autenticado","HU-04: Centro de notificaciones en tiempo real en /notificaciones","*Como usuario operativo o directivo del sistema*,
+*Quiero consultar la campana de notificaciones en el encabezado y acceder al panel /notificaciones*,
+*Para enterarme de despachos entrantes, alertas de inventario bajo y novedades operativas de las sedes*.","* El encabezado muestra la campana de notificaciones con un indicador numérico (badge) de avisos no leídos.
+* Al pulsar la campana o navegar a /notificaciones, muestra la lista cronológica de alertas con título, mensaje, fecha y tipo de evento.
+* Permite marcar notificaciones como leídas, actualizando en tiempo real el contador del encabezado.
+* Permite eliminar notificaciones obsoletas previa confirmación.
+* Filtra los eventos mostrando solo las alertas relevantes para la institución y rol del usuario.","*Como usuario operativo o directivo del sistema*,
+*Quiero consultar la campana de notificaciones en el encabezado y acceder al panel /notificaciones*,
+*Para enterarme de despachos entrantes, alertas de inventario bajo y novedades operativas de las sedes*.
+
+*Criterios de Aceptación:*
+
+* El encabezado muestra la campana de notificaciones con un indicador numérico (badge) de avisos no leídos.
+* Al pulsar la campana o navegar a /notificaciones, muestra la lista cronológica de alertas con título, mensaje, fecha y tipo de evento.
+* Permite marcar notificaciones como leídas, actualizando en tiempo real el contador del encabezado.
+* Permite eliminar notificaciones obsoletas previa confirmación.
+* Filtra los eventos mostrando solo las alertas relevantes para la institución y rol del usuario."
+"Historia","HU-05","HE-01","HE-01: Autenticación, Seguridad Perimetral y Centro de Notificaciones","161","Web - Layout","Usuario Autenticado","HU-05: Cierre de sesión seguro y limpieza de estado","*Como usuario conectado a la plataforma*,
+*Quiero hacer clic en el botón de cerrar sesión en el menú de usuario*,
+*Para destruir mis credenciales locales y asegurar mi cuenta al retirarme del equipo*.","* Opción ""Cerrar sesión"" claramente identificable en el layout principal del sistema.
+* Al ejecutarse, borra el token de autenticación y los datos de usuario de localStorage y cookies.
+* Redirige de inmediato a /login.
+* Impide la navegación hacia atrás mediante el historial del navegador hacia rutas protegidas.","*Como usuario conectado a la plataforma*,
+*Quiero hacer clic en el botón de cerrar sesión en el menú de usuario*,
+*Para destruir mis credenciales locales y asegurar mi cuenta al retirarme del equipo*.
+
+*Criterios de Aceptación:*
+
+* Opción ""Cerrar sesión"" claramente identificable en el layout principal del sistema.
+* Al ejecutarse, borra el token de autenticación y los datos de usuario de localStorage y cookies.
+* Redirige de inmediato a /login.
+* Impide la navegación hacia atrás mediante el historial del navegador hacia rutas protegidas."
+"Historia","HU-06","HE-02","HE-02: Super Admin - Gestión Contractual, Zonas y Jornadas PAE","159","Web - Contratos","Super Administrador","HU-06: Consultar y listar contratos PAE en /contratos","*Como Super Administrador*,
+*Quiero visualizar la tabla de contratos con su código (ej. COR-2026), operador, vigencia, zona y estado*,
+*Para supervisar los convenios de alimentación escolar vigentes en el territorio*.","* Muestra la tabla en /contratos con columnas: Código Contrato, Operador/Institución, Fechas (Inicio y Fin), Zona Asignada, Estado (Activo / Inactivo) y Acciones.
+* Buscador por código de contrato o nombre de institución/operador.
+* Filtro por Estado (Todos, Activo, Inactivo).
+* Permite alternar el estado del contrato con confirmación modal.
+* Botón de acceso directo para ""Ver Detalle"" de cada contrato (/contratos/:id/detalle).","*Como Super Administrador*,
+*Quiero visualizar la tabla de contratos con su código (ej. COR-2026), operador, vigencia, zona y estado*,
+*Para supervisar los convenios de alimentación escolar vigentes en el territorio*.
+
+*Criterios de Aceptación:*
+
+* Muestra la tabla en /contratos con columnas: Código Contrato, Operador/Institución, Fechas (Inicio y Fin), Zona Asignada, Estado (Activo / Inactivo) y Acciones.
+* Buscador por código de contrato o nombre de institución/operador.
+* Filtro por Estado (Todos, Activo, Inactivo).
+* Permite alternar el estado del contrato con confirmación modal.
+* Botón de acceso directo para ""Ver Detalle"" de cada contrato (/contratos/:id/detalle)."
+"Historia","HU-07","HE-02","HE-02: Super Admin - Gestión Contractual, Zonas y Jornadas PAE","159","Web - Contratos","Super Administrador","HU-07: Registrar y editar contratos con asignación de zonas geográficas","*Como Super Administrador*,
+*Quiero crear o editar un contrato seleccionando su código, institución, fechas y zona geográfica oficial*,
+*Para delimitar el marco legal y territorial del suministro alimentario*.","* Formulario modal en /contratos con campos: Código de Contrato, Institución principal, Fecha de Inicio, Fecha de Fin, Estado y Zona.
+* Selector desplegable de Zonas con las opciones estándar del sistema: Norte, Sur, Este, Oeste, Centro, Oriente, Occidente, Nororiente, Noroccidente, Suroriente, Suroccidente, Urbana, Rural.
+* Valida que la fecha de fin sea estrictamente mayor a la fecha de inicio.
+* Al guardar exitosamente, actualiza la tabla de contratos con notificación SweetAlert2.
+* Si la API arroja error, muestra mensaje descriptivo sin perder los datos ingresados.","*Como Super Administrador*,
+*Quiero crear o editar un contrato seleccionando su código, institución, fechas y zona geográfica oficial*,
+*Para delimitar el marco legal y territorial del suministro alimentario*.
+
+*Criterios de Aceptación:*
+
+* Formulario modal en /contratos con campos: Código de Contrato, Institución principal, Fecha de Inicio, Fecha de Fin, Estado y Zona.
+* Selector desplegable de Zonas con las opciones estándar del sistema: Norte, Sur, Este, Oeste, Centro, Oriente, Occidente, Nororiente, Noroccidente, Suroriente, Suroccidente, Urbana, Rural.
+* Valida que la fecha de fin sea estrictamente mayor a la fecha de inicio.
+* Al guardar exitosamente, actualiza la tabla de contratos con notificación SweetAlert2.
+* Si la API arroja error, muestra mensaje descriptivo sin perder los datos ingresados."
+"Historia","HU-08","HE-02","HE-02: Super Admin - Gestión Contractual, Zonas y Jornadas PAE","159","Web - Contratos Detalle","Super Administrador","HU-08: Administrar jornadas escolares y sedes en /contratos/:id/detalle","*Como Super Administrador*,
+*Quiero ingresar al detalle del contrato para configurar las jornadas (nombre, hora de inicio y fin) y vincular sedes y supervisores*,
+*Para establecer las reglas horarias del servicio y asignar la cobertura de campo*.","* Vista detallada en /contratos/:id/detalle con cabecera informativa del contrato y zona.
+* Sección ""Jornadas Escolares"": permite agregar jornadas (ej. Mañana, Tarde, Única) especificando horaInicio y horaFin.
+* Sección ""Sedes Educativas Vinculadas"": lista las sedes adscritas al contrato con su código DANE y rector.
+* Sección ""Supervisores Asignados"": permite asignar o desvincular coordinadores y supervisores responsables del contrato.
+* Permite guardar y actualizar los parámetros con validación de horarios coherentes (horaFin > horaInicio).","*Como Super Administrador*,
+*Quiero ingresar al detalle del contrato para configurar las jornadas (nombre, hora de inicio y fin) y vincular sedes y supervisores*,
+*Para establecer las reglas horarias del servicio y asignar la cobertura de campo*.
+
+*Criterios de Aceptación:*
+
+* Vista detallada en /contratos/:id/detalle con cabecera informativa del contrato y zona.
+* Sección ""Jornadas Escolares"": permite agregar jornadas (ej. Mañana, Tarde, Única) especificando horaInicio y horaFin.
+* Sección ""Sedes Educativas Vinculadas"": lista las sedes adscritas al contrato con su código DANE y rector.
+* Sección ""Supervisores Asignados"": permite asignar o desvincular coordinadores y supervisores responsables del contrato.
+* Permite guardar y actualizar los parámetros con validación de horarios coherentes (horaFin > horaInicio)."
+"Historia","HU-09","HE-03","HE-03: Super Admin - Banco de Datos, Unidades de Medida y Parámetros Nutricionales","159","Web - Banco de Datos","Super Administrador","HU-09: Administrar catálogo de ingredientes e insumos en /banco-datos y /ingredientes","*Como Super Administrador*,
+*Quiero registrar y catalogar los ingredientes oficiales del programa con su nombre, categoría y tipo de producto*,
+*Para estandarizar los insumos que pueden ser adquiridos, despachados y preparados en todas las sedes*.","* Módulo /banco-datos con tabla de insumos: Nombre, Código, Categoría (Granos y Cereales, Lácteos, Carnes, Frutas y Verduras, Abarrotes), Unidad de Medida base y Estado.
+* Formulario de creación (/nuevo-producto): Nombre del producto, Categoría, Unidad de medida y Tipo (Perecedero / No Perecedero).
+* Valida que el nombre del ingrediente no esté duplicado en el catálogo.
+* Permite activar o desactivar ingredientes del catálogo según disponibilidad contractual.","*Como Super Administrador*,
+*Quiero registrar y catalogar los ingredientes oficiales del programa con su nombre, categoría y tipo de producto*,
+*Para estandarizar los insumos que pueden ser adquiridos, despachados y preparados en todas las sedes*.
+
+*Criterios de Aceptación:*
+
+* Módulo /banco-datos con tabla de insumos: Nombre, Código, Categoría (Granos y Cereales, Lácteos, Carnes, Frutas y Verduras, Abarrotes), Unidad de Medida base y Estado.
+* Formulario de creación (/nuevo-producto): Nombre del producto, Categoría, Unidad de medida y Tipo (Perecedero / No Perecedero).
+* Valida que el nombre del ingrediente no esté duplicado en el catálogo.
+* Permite activar o desactivar ingredientes del catálogo según disponibilidad contractual."
+"Historia","HU-10","HE-03","HE-03: Super Admin - Banco de Datos, Unidades de Medida y Parámetros Nutricionales","159","Web - Unidades de Medida","Super Administrador","HU-10: Configurar unidades de medida y factores de conversión en /unidades-medida","*Como Super Administrador*,
+*Quiero registrar y gestionar las unidades de medida oficiales (kg, g, lt, ml, unidad, bulto)*,
+*Para garantizar la precisión en el cálculo de compras mayoristas y recetas por gramaje individual*.","* Vista en /unidades-medida con listado de unidades configuradas en el sistema.
+* Formulario rápido para agregar nueva unidad: Nombre de la unidad (ej. Kilogramo, Litro, Gramo) y Abreviatura oficial.
+* Valida campo obligatorio antes de enviar la petición.
+* Permite editar el nombre o eliminar unidades que no tengan insumos vinculados.
+* Muestra notificaciones claras (""Unidad actualizada"", ""Los cambios se guardaron correctamente"").","*Como Super Administrador*,
+*Quiero registrar y gestionar las unidades de medida oficiales (kg, g, lt, ml, unidad, bulto)*,
+*Para garantizar la precisión en el cálculo de compras mayoristas y recetas por gramaje individual*.
+
+*Criterios de Aceptación:*
+
+* Vista en /unidades-medida con listado de unidades configuradas en el sistema.
+* Formulario rápido para agregar nueva unidad: Nombre de la unidad (ej. Kilogramo, Litro, Gramo) y Abreviatura oficial.
+* Valida campo obligatorio antes de enviar la petición.
+* Permite editar el nombre o eliminar unidades que no tengan insumos vinculados.
+* Muestra notificaciones claras (""Unidad actualizada"", ""Los cambios se guardaron correctamente"")."
+"Historia","HU-11","HE-03","HE-03: Super Admin - Banco de Datos, Unidades de Medida y Parámetros Nutricionales","159","Web - Entregas Tipo Mercado","Super Administrador","HU-11: Parametrizar tipos de mercado y periodicidad de entrega en /entregas-tipo-mercado","*Como Super Administrador*,
+*Quiero definir las modalidades y frecuencias de entrega tipo mercado (Quincenal y Mensual, Perecederos y No Perecederos)*,
+*Para que los supervisores organicen las rutas y despachos conforme a los cronogramas contractuales*.","* Vista en /entregas-tipo-mercado con clasificación por periodicidad: Mensual (no perecederos / abarrotes) y Quincenal/Semanal (perecederos / cárnicos y verduras).
+* Permite asociar qué categorías de insumos pertenecen a cada ciclo de entrega.
+* Guarda los parámetros para filtrar automáticamente las listas de despacho de los supervisores.","*Como Super Administrador*,
+*Quiero definir las modalidades y frecuencias de entrega tipo mercado (Quincenal y Mensual, Perecederos y No Perecederos)*,
+*Para que los supervisores organicen las rutas y despachos conforme a los cronogramas contractuales*.
+
+*Criterios de Aceptación:*
+
+* Vista en /entregas-tipo-mercado con clasificación por periodicidad: Mensual (no perecederos / abarrotes) y Quincenal/Semanal (perecederos / cárnicos y verduras).
+* Permite asociar qué categorías de insumos pertenecen a cada ciclo de entrega.
+* Guarda los parámetros para filtrar automáticamente las listas de despacho de los supervisores."
+"Historia","HU-12","HE-03","HE-03: Super Admin - Banco de Datos, Unidades de Medida y Parámetros Nutricionales","159","Web - Menús","Super Administrador","HU-12: Configurar catálogo de menús escolares y platos en /menus","*Como Super Administrador o Nutricionista*,
+*Quiero crear platos y minutas nutricionales indicando sus componentes e ingredientes requeridos*,
+*Para que las manipuladoras de cocina puedan seleccionar y programar los menús aprobados*.","* Vista en /menus con listado de platos registrados y estados: ACTIVO, PENDIENTE.
+* Formulario de plato con nombre, servicio (Desayuno, Almuerzo, Merienda), fotografía y componentes de la receta.
+* Permite asignar los ingredientes que integran cada componente con sus cantidades base.
+* Los platos activos quedan disponibles de inmediato para el calendario de las manipuladoras en la app móvil.","*Como Super Administrador o Nutricionista*,
+*Quiero crear platos y minutas nutricionales indicando sus componentes e ingredientes requeridos*,
+*Para que las manipuladoras de cocina puedan seleccionar y programar los menús aprobados*.
+
+*Criterios de Aceptación:*
+
+* Vista en /menus con listado de platos registrados y estados: ACTIVO, PENDIENTE.
+* Formulario de plato con nombre, servicio (Desayuno, Almuerzo, Merienda), fotografía y componentes de la receta.
+* Permite asignar los ingredientes que integran cada componente con sus cantidades base.
+* Los platos activos quedan disponibles de inmediato para el calendario de las manipuladoras en la app móvil."
+"Historia","HU-13","HE-04","HE-04: Super Admin - Facturas de Compra y Control de Bodega Central","159","Web - Facturas de Compra","Super Administrador / Bodeguero","HU-13: Registrar factura de compra con lotes y vencimientos en /facturas-compra","*Como Super Administrador o Encargado de Bodega Central*,
+*Quiero registrar una factura de compra en /facturas-compra agregando proveedor, insumos, lotes y fechas de vencimiento*,
+*Para ingresar los alimentos al inventario central garantizando inocuidad y trazabilidad*.","* Formulario en /facturas-compra con: Número de Factura, Proveedor, Fecha de Compra (por defecto hoy) y Soporte Digital (archivo/documento adjunto).
+* Tabla dinámica para agregar productos: Selector de Ingrediente, Cantidad, Unidad de Medida, Número de Lote y Fecha de Vencimiento.
+* Valida que la factura tenga al menos un producto (""La factura debe tener al menos un producto"").
+* Valida fecha de compra requerida y campos de insumos completos.
+* Al guardar con éxito, muestra alerta (""Factura Registrada"") y suma de forma inmediata las cantidades al inventario de Bodega Central con estado REGISTRADA.","*Como Super Administrador o Encargado de Bodega Central*,
+*Quiero registrar una factura de compra en /facturas-compra agregando proveedor, insumos, lotes y fechas de vencimiento*,
+*Para ingresar los alimentos al inventario central garantizando inocuidad y trazabilidad*.
+
+*Criterios de Aceptación:*
+
+* Formulario en /facturas-compra con: Número de Factura, Proveedor, Fecha de Compra (por defecto hoy) y Soporte Digital (archivo/documento adjunto).
+* Tabla dinámica para agregar productos: Selector de Ingrediente, Cantidad, Unidad de Medida, Número de Lote y Fecha de Vencimiento.
+* Valida que la factura tenga al menos un producto (""La factura debe tener al menos un producto"").
+* Valida fecha de compra requerida y campos de insumos completos.
+* Al guardar con éxito, muestra alerta (""Factura Registrada"") y suma de forma inmediata las cantidades al inventario de Bodega Central con estado REGISTRADA."
+"Historia","HU-14","HE-04","HE-04: Super Admin - Facturas de Compra y Control de Bodega Central","159","Web - Facturas de Compra","Super Administrador","HU-14: Anular factura de compra con motivo obligatorio en /facturas-compra","*Como Super Administrador*,
+*Quiero anular facturas registradas erróneamente indicando el motivo de la anulación*,
+*Para descontar las cantidades ingresadas indebidamente de la Bodega Central sin alterar la bitácora contable*.","* Listado de facturas con filtros de estado: TODAS, REGISTRADA, ANULADA.
+* Botón de anulación con ventana modal que exige ingresar obligatoriamente el ""Motivo de la Anulación"".
+* Al confirmar, cambia el estado a ANULADA y descuenta las existencias del inventario central.
+* Si los insumos del lote ya fueron despachados a sedes y no hay saldo suficiente, notifica el conflicto impidiendo saldos negativos.
+* Muestra feedback exitoso (""Factura Anulada"") y registra usuario y fecha de la anulación.","*Como Super Administrador*,
+*Quiero anular facturas registradas erróneamente indicando el motivo de la anulación*,
+*Para descontar las cantidades ingresadas indebidamente de la Bodega Central sin alterar la bitácora contable*.
+
+*Criterios de Aceptación:*
+
+* Listado de facturas con filtros de estado: TODAS, REGISTRADA, ANULADA.
+* Botón de anulación con ventana modal que exige ingresar obligatoriamente el ""Motivo de la Anulación"".
+* Al confirmar, cambia el estado a ANULADA y descuenta las existencias del inventario central.
+* Si los insumos del lote ya fueron despachados a sedes y no hay saldo suficiente, notifica el conflicto impidiendo saldos negativos.
+* Muestra feedback exitoso (""Factura Anulada"") y registra usuario y fecha de la anulación."
+"Historia","HU-15","HE-04","HE-04: Super Admin - Facturas de Compra y Control de Bodega Central","159","Web - Bodega Central","Super Administrador","HU-15: Monitorear stock de Bodega Central y fijar umbral de alerta en /bodega-central","*Como Super Administrador*,
+*Quiero consultar las existencias de Bodega Central en /bodega-central y configurar el umbral de alerta (stock mínimo)*,
+*Para identificar insumos con stock bajo y programar compras con suficiente antelación*.","* Tabla en /bodega-central con: Insumo, Categoría, Saldo Actual, Unidad de Medida y Estado de Stock (ÓPTIMO / BAJO).
+* Filtros por categoría y buscador rápido por nombre de producto.
+* Modal de configuración de ""Umbral de Alerta"" para establecer el stock mínimo requerido por ingrediente.
+* Al guardar el umbral, muestra confirmación (""El umbral de alerta ha sido guardado exitosamente"").
+* Resalta en color amarillo/rojo los productos que se encuentren en estado BAJO respecto a su umbral.","*Como Super Administrador*,
+*Quiero consultar las existencias de Bodega Central en /bodega-central y configurar el umbral de alerta (stock mínimo)*,
+*Para identificar insumos con stock bajo y programar compras con suficiente antelación*.
+
+*Criterios de Aceptación:*
+
+* Tabla en /bodega-central con: Insumo, Categoría, Saldo Actual, Unidad de Medida y Estado de Stock (ÓPTIMO / BAJO).
+* Filtros por categoría y buscador rápido por nombre de producto.
+* Modal de configuración de ""Umbral de Alerta"" para establecer el stock mínimo requerido por ingrediente.
+* Al guardar el umbral, muestra confirmación (""El umbral de alerta ha sido guardado exitosamente"").
+* Resalta en color amarillo/rojo los productos que se encuentren en estado BAJO respecto a su umbral."
+"Historia","HU-16","HE-05","HE-05: Administración Centralizada de Usuarios, Roles y Asignaciones","160","Web - Usuarios","Super Administrador / Administrador","HU-16: Consultar y buscar usuarios en tiempo real en /usuarios","*Como Super Administrador o Administrador*,
+*Quiero consultar la tabla general de usuarios en /usuarios con filtros dinámicos*,
+*Para auditar rápidamente las cuentas registradas y verificar sus sedes asignadas*.","* Tabla de usuarios con: Nombre y Apellido, Tipo y Número de Documento, Correo Electrónico, Rol Asignado, Institución / Sede, Estado (Activo/Inactivo) y Acciones.
+* Buscador superior reactivo que filtra simultáneamente por coincidencia de nombre, apellido, cédula o correo.
+* Selector de filtro por Rol (""Todos los Roles"", Super Administrador, Administrador, Supervisor, Manipuladora Jefe, Manipuladora).
+* Filtro por Institución / Sede educativa.
+* Muestra indicador de carga mientras sincroniza con el servidor.","*Como Super Administrador o Administrador*,
+*Quiero consultar la tabla general de usuarios en /usuarios con filtros dinámicos*,
+*Para auditar rápidamente las cuentas registradas y verificar sus sedes asignadas*.
+
+*Criterios de Aceptación:*
+
+* Tabla de usuarios con: Nombre y Apellido, Tipo y Número de Documento, Correo Electrónico, Rol Asignado, Institución / Sede, Estado (Activo/Inactivo) y Acciones.
+* Buscador superior reactivo que filtra simultáneamente por coincidencia de nombre, apellido, cédula o correo.
+* Selector de filtro por Rol (""Todos los Roles"", Super Administrador, Administrador, Supervisor, Manipuladora Jefe, Manipuladora).
+* Filtro por Institución / Sede educativa.
+* Muestra indicador de carga mientras sincroniza con el servidor."
+"Historia","HU-17","HE-05","HE-05: Administración Centralizada de Usuarios, Roles y Asignaciones","160","Web - Crear Usuario","Super Administrador / Administrador","HU-17: Registrar nuevo usuario con validaciones de sede en /crear-usuario","*Como Administrador o Super Administrador*,
+*Quiero diligenciar el formulario de alta en /crear-usuario especificando datos de identidad, rol y sede obligatoria*,
+*Para habilitar las credenciales operativas del nuevo personal*.","* Formulario en tarjeta (/crear-usuario) con: Tipo de Documento (Cédula de Ciudadanía, Tarjeta de Identidad, Cédula de Extranjería), Número de Documento, Nombres, Apellidos, Correo Electrónico, Rol, Institución y Sede.
+* Si se selecciona un rol operativo (Supervisor, Manipuladora Jefe, Manipuladora), la selección de Institución y Sede es estrictamente obligatoria (""Sede requerida"").
+* Valida campos obligatorios incompletos mostrando aviso (""Por favor completa todos los campos obligatorios (*)"").
+* Valida que el correo y el documento no se encuentren previamente registrados.
+* Al guardar exitosamente, muestra confirmación (""Usuario registrado: El usuario ha sido dado de alta exitosamente"") y redirige al listado /usuarios.","*Como Administrador o Super Administrador*,
+*Quiero diligenciar el formulario de alta en /crear-usuario especificando datos de identidad, rol y sede obligatoria*,
+*Para habilitar las credenciales operativas del nuevo personal*.
+
+*Criterios de Aceptación:*
+
+* Formulario en tarjeta (/crear-usuario) con: Tipo de Documento (Cédula de Ciudadanía, Tarjeta de Identidad, Cédula de Extranjería), Número de Documento, Nombres, Apellidos, Correo Electrónico, Rol, Institución y Sede.
+* Si se selecciona un rol operativo (Supervisor, Manipuladora Jefe, Manipuladora), la selección de Institución y Sede es estrictamente obligatoria (""Sede requerida"").
+* Valida campos obligatorios incompletos mostrando aviso (""Por favor completa todos los campos obligatorios (*)"").
+* Valida que el correo y el documento no se encuentren previamente registrados.
+* Al guardar exitosamente, muestra confirmación (""Usuario registrado: El usuario ha sido dado de alta exitosamente"") y redirige al listado /usuarios."
+"Historia","HU-18","HE-05","HE-05: Administración Centralizada de Usuarios, Roles y Asignaciones","160","Web - Usuarios","Super Administrador / Administrador","HU-18: Editar información de usuario y cambiar estado en /usuarios","*Como Administrador o Super Administrador*,
+*Quiero editar los datos de contacto y rol de un usuario o cambiar su estado (Activar / Suspender)*,
+*Para reasignar sedes de trabajo o retirar el acceso a personal inactivo sin borrar su historial*.","* Botón de edición en la columna ""Acciones"" de cada fila de usuario.
+* Modal con los datos precargados que permite actualizar correo, rol y sede vinculada.
+* Control de activación / suspensión con confirmación previa.
+* Si el usuario es suspendido, el sistema revoca inmediatamente su sesión y no le permite ingresar.
+* El número de documento de identidad permanece protegido contra alteraciones accidentales.","*Como Administrador o Super Administrador*,
+*Quiero editar los datos de contacto y rol de un usuario o cambiar su estado (Activar / Suspender)*,
+*Para reasignar sedes de trabajo o retirar el acceso a personal inactivo sin borrar su historial*.
+
+*Criterios de Aceptación:*
+
+* Botón de edición en la columna ""Acciones"" de cada fila de usuario.
+* Modal con los datos precargados que permite actualizar correo, rol y sede vinculada.
+* Control de activación / suspensión con confirmación previa.
+* Si el usuario es suspendido, el sistema revoca inmediatamente su sesión y no le permite ingresar.
+* El número de documento de identidad permanece protegido contra alteraciones accidentales."
+"Historia","HU-19","HE-05","HE-05: Administración Centralizada de Usuarios, Roles y Asignaciones","160","Web - Roles","Super Administrador","HU-19: Administrar roles y permisos del sistema en /rol","*Como Super Administrador*,
+*Quiero consultar, crear y actualizar los roles de usuario en el módulo /rol*,
+*Para gobernar los niveles de privilegio y accesos de seguridad de toda la plataforma*.","* Vista en /rol con listado de roles del sistema (Super Administrador, Administrador, Supervisor, Manipuladora Jefe, Manipuladora).
+* Formulario para crear o actualizar roles con validación de campos obligatorios.
+* Muestra confirmación SweetAlert2 al crear o modificar (""Rol actualizado"", ""Rol creado"").
+* Protege los roles base del sistema contra eliminación accidental si cuentan con usuarios activos asignados.","*Como Super Administrador*,
+*Quiero consultar, crear y actualizar los roles de usuario en el módulo /rol*,
+*Para gobernar los niveles de privilegio y accesos de seguridad de toda la plataforma*.
+
+*Criterios de Aceptación:*
+
+* Vista en /rol con listado de roles del sistema (Super Administrador, Administrador, Supervisor, Manipuladora Jefe, Manipuladora).
+* Formulario para crear o actualizar roles con validación de campos obligatorios.
+* Muestra confirmación SweetAlert2 al crear o modificar (""Rol actualizado"", ""Rol creado"").
+* Protege los roles base del sistema contra eliminación accidental si cuentan con usuarios activos asignados."
+"Historia","HU-20","HE-06","HE-06: Supervisor - Panel de Monitoreo y Gestión de Sedes Asignadas","157","Web - Dashboard Supervisor","Supervisor (Coordinador PAE)","HU-20: Visualizar panel de métricas y resumen de sedes en /dashboard-supervisor","*Como Supervisor o Coordinador PAE*,
+*Quiero consultar el panel /dashboard-supervisor con el resumen de mis instituciones y sedes activas*,
+*Para conocer en tiempo real el estado general de las entregas y el funcionamiento de mis sedes asignadas*.","* Vista responsiva en /dashboard-supervisor que consulta exclusivamente las sedes asignadas al supervisor autenticado.
+* Tarjetas métricas con total de sedes activas, entregas en tránsito y reportes pendientes.
+* Si el supervisor no tiene sedes vinculadas, muestra mensaje amigable (""Sin sedes registradas"").
+* Manejo de estados de carga con spinner animado y captura de errores de conexión.
+* Enlaces directos hacia el registro de entregas y reporte de saldos de almacén.","*Como Supervisor o Coordinador PAE*,
+*Quiero consultar el panel /dashboard-supervisor con el resumen de mis instituciones y sedes activas*,
+*Para conocer en tiempo real el estado general de las entregas y el funcionamiento de mis sedes asignadas*.
+
+*Criterios de Aceptación:*
+
+* Vista responsiva en /dashboard-supervisor que consulta exclusivamente las sedes asignadas al supervisor autenticado.
+* Tarjetas métricas con total de sedes activas, entregas en tránsito y reportes pendientes.
+* Si el supervisor no tiene sedes vinculadas, muestra mensaje amigable (""Sin sedes registradas"").
+* Manejo de estados de carga con spinner animado y captura de errores de conexión.
+* Enlaces directos hacia el registro de entregas y reporte de saldos de almacén."
+"Historia","HU-21","HE-06","HE-06: Supervisor - Panel de Monitoreo y Gestión de Sedes Asignadas","157","Web - Instituciones","Supervisor / Administrador","HU-21: Consultar directorio de instituciones y sedes en /instituciones","*Como Supervisor o Administrador*,
+*Quiero consultar la vista /instituciones con la lista de colegios y sedes a mi cargo*,
+*Para verificar su código DANE, dirección, teléfono y estado operativo*.","* Listado de instituciones y sedes con nombre oficial, código DANE, teléfono, dirección y badge de estado (ACTIVO / INACTIVO).
+* Buscador por nombre de sede o institución.
+* Filtro por estado (Todos, Activos, Inactivos).
+* Permite seleccionar una sede para desplegar sus submódulos de Inventario e Historial de Entregas.","*Como Supervisor o Administrador*,
+*Quiero consultar la vista /instituciones con la lista de colegios y sedes a mi cargo*,
+*Para verificar su código DANE, dirección, teléfono y estado operativo*.
+
+*Criterios de Aceptación:*
+
+* Listado de instituciones y sedes con nombre oficial, código DANE, teléfono, dirección y badge de estado (ACTIVO / INACTIVO).
+* Buscador por nombre de sede o institución.
+* Filtro por estado (Todos, Activos, Inactivos).
+* Permite seleccionar una sede para desplegar sus submódulos de Inventario e Historial de Entregas."
+"Historia","HU-22","HE-06","HE-06: Supervisor - Panel de Monitoreo y Gestión de Sedes Asignadas","157","Web - Instituciones (Sede Detalle)","Supervisor","HU-22: Inspeccionar inventario y entregas de una sede en /instituciones","*Como Supervisor*,
+*Quiero abrir las pestañas ""Inventario de la Sede"" e ""Historial de Entregas"" dentro de la sede seleccionada*,
+*Para auditar sus existencias actuales y comprobar las remesas recibidas recientemente*.","* Pestaña ""Inventario de la Sede"": lista los productos en bodega con semáforo de estado (Óptimo, Bajo, Por vencer, Agotado).
+* Pestaña ""Historial de Entregas"": muestra las remisiones dirigidas a esa sede con fecha, insumos y estado de entrega.
+* Botón de acción rápida para iniciar un nuevo despacho hacia la sede desde esta misma pantalla.","*Como Supervisor*,
+*Quiero abrir las pestañas ""Inventario de la Sede"" e ""Historial de Entregas"" dentro de la sede seleccionada*,
+*Para auditar sus existencias actuales y comprobar las remesas recibidas recientemente*.
+
+*Criterios de Aceptación:*
+
+* Pestaña ""Inventario de la Sede"": lista los productos en bodega con semáforo de estado (Óptimo, Bajo, Por vencer, Agotado).
+* Pestaña ""Historial de Entregas"": muestra las remisiones dirigidas a esa sede con fecha, insumos y estado de entrega.
+* Botón de acción rápida para iniciar un nuevo despacho hacia la sede desde esta misma pantalla."
+"Historia","HU-23","HE-07","HE-07: Supervisor - Despacho de Remesas y Trazabilidad de Entregas","157","Web - Registrar Entrega","Supervisor (Coordinador PAE)","HU-23: Registrar nuevo despacho de alimentos a sede en /registrar-entrega-alimentos","*Como Supervisor*,
+*Quiero armar y registrar una remesa de insumos en /registrar-entrega-alimentos seleccionando la sede y tipo de mercado*,
+*Para autorizar el envío de productos desde la bodega central hacia la cocina escolar*.","* Formulario en /registrar-entrega-alimentos con selector de Sede y periodicidad (Semanal, Quincenal, Mensual).
+* Lista de insumos organizados por categorías con cantidades y unidades de medida (Arroz, Frijol, Lentejas, Pasta, Aceite, Panela, Avena, Leche, Huevos, Pollo, etc.).
+* Filtros rápidos de selección: ""Todos"", ""Perecederos"" y ""No perecederos"".
+* Valida que las cantidades a despachar no superen el saldo disponible en la bodega central.
+* Al guardar exitosamente, genera el número de remesa con estado EN_TRANSITO y muestra confirmación (""Inventario guardado"").","*Como Supervisor*,
+*Quiero armar y registrar una remesa de insumos en /registrar-entrega-alimentos seleccionando la sede y tipo de mercado*,
+*Para autorizar el envío de productos desde la bodega central hacia la cocina escolar*.
+
+*Criterios de Aceptación:*
+
+* Formulario en /registrar-entrega-alimentos con selector de Sede y periodicidad (Semanal, Quincenal, Mensual).
+* Lista de insumos organizados por categorías con cantidades y unidades de medida (Arroz, Frijol, Lentejas, Pasta, Aceite, Panela, Avena, Leche, Huevos, Pollo, etc.).
+* Filtros rápidos de selección: ""Todos"", ""Perecederos"" y ""No perecederos"".
+* Valida que las cantidades a despachar no superen el saldo disponible en la bodega central.
+* Al guardar exitosamente, genera el número de remesa con estado EN_TRANSITO y muestra confirmación (""Inventario guardado"")."
+"Historia","HU-24","HE-07","HE-07: Supervisor - Despacho de Remesas y Trazabilidad de Entregas","157","Web - Historial Entregas","Supervisor / Administrador","HU-24: Consultar historial de entregas con estados de recepción en /historial-entregas","*Como Supervisor o Administrador*,
+*Quiero consultar la tabla /historial-entregas filtrando por sede y fechas para revisar el estado de cada remesa*,
+*Para auditar si los alimentos llegaron conforme o si hubo novedades o rechazos en cocina*.","* Tabla en /historial-entregas con columnas: Sede Destino, Fecha de Envío, Tipo de Mercado, Estado de Entrega y Acciones.
+* Visualización de estados con etiquetas de color:
+* EN_TRANSITO (En Tránsito)
+* RECIBIDA (Recibida OK)
+* CON_NOVEDAD (Con Novedad)
+* RECHAZADA (Rechazada)
+* Filtro desplegable por Sede y selector de rango de fechas.
+* Muestra feedback en caso de error de red o permisos insuficientes.","*Como Supervisor o Administrador*,
+*Quiero consultar la tabla /historial-entregas filtrando por sede y fechas para revisar el estado de cada remesa*,
+*Para auditar si los alimentos llegaron conforme o si hubo novedades o rechazos en cocina*.
+
+*Criterios de Aceptación:*
+
+* Tabla en /historial-entregas con columnas: Sede Destino, Fecha de Envío, Tipo de Mercado, Estado de Entrega y Acciones.
+* Visualización de estados con etiquetas de color:
+* EN_TRANSITO (En Tránsito)
+* RECIBIDA (Recibida OK)
+* CON_NOVEDAD (Con Novedad)
+* RECHAZADA (Rechazada)
+* Filtro desplegable por Sede y selector de rango de fechas.
+* Muestra feedback en caso de error de red o permisos insuficientes."
+"Historia","HU-25","HE-07","HE-07: Supervisor - Despacho de Remesas y Trazabilidad de Entregas","157","Web - Historial Entregas Detalle","Supervisor","HU-25: Auditar detalle de entrega y exportar historial a Excel en /historial-entregas","*Como Supervisor*,
+*Quiero abrir el modal de detalle de una entrega y utilizar el botón ""Exportar a Excel""*,
+*Para inspeccionar las cantidades recibidas frente a las despachadas y generar reportes impresos de auditoría*.","* Al pulsar sobre una entrega, abre un modal con la lista de productos: Insumo, Cantidad enviada, Cantidad recibida confirmada, Lote, Fecha de vencimiento y Observaciones.
+* Si la entrega tuvo novedad, muestra la justificación ingresada por la manipuladora jefe.
+* Botón ""Exportar a Excel"" que genera y descarga el archivo .xlsx con los datos filtrados en pantalla.
+* Si no hay registros para exportar, notifica con alerta informativa.","*Como Supervisor*,
+*Quiero abrir el modal de detalle de una entrega y utilizar el botón ""Exportar a Excel""*,
+*Para inspeccionar las cantidades recibidas frente a las despachadas y generar reportes impresos de auditoría*.
+
+*Criterios de Aceptación:*
+
+* Al pulsar sobre una entrega, abre un modal con la lista de productos: Insumo, Cantidad enviada, Cantidad recibida confirmada, Lote, Fecha de vencimiento y Observaciones.
+* Si la entrega tuvo novedad, muestra la justificación ingresada por la manipuladora jefe.
+* Botón ""Exportar a Excel"" que genera y descarga el archivo .xlsx con los datos filtrados en pantalla.
+* Si no hay registros para exportar, notifica con alerta informativa."
+"Historia","HU-26","HE-08","HE-08: Supervisor - Control de Saldos de Almacén y Ajustes en Sedes","157","Web - Saldos Almacén","Supervisor (Coordinador PAE)","HU-26: Consultar saldos de almacén de sedes en /saldos-almacen","*Como Supervisor*,
+*Quiero consultar la tabla de inventario en /saldos-almacen seleccionando una sede específica*,
+*Para verificar el stock físico actual y prevenir desabastecimientos en cocina*.","* Selector de sede educativa para cargar su inventario en tiempo real.
+* Tabla con columnas: Ingrediente, Saldo Actual, Unidad de Medida y Estado de Stock (Adecuado / Bajo stock).
+* Compara el saldo actual contra el stock mínimo definido para esa sede.
+* Botón interactivo de exportación a Excel que genera el reporte oficial de existencias.
+* Manejo de errores si la sede seleccionada no tiene inventario cargado.","*Como Supervisor*,
+*Quiero consultar la tabla de inventario en /saldos-almacen seleccionando una sede específica*,
+*Para verificar el stock físico actual y prevenir desabastecimientos en cocina*.
+
+*Criterios de Aceptación:*
+
+* Selector de sede educativa para cargar su inventario en tiempo real.
+* Tabla con columnas: Ingrediente, Saldo Actual, Unidad de Medida y Estado de Stock (Adecuado / Bajo stock).
+* Compara el saldo actual contra el stock mínimo definido para esa sede.
+* Botón interactivo de exportación a Excel que genera el reporte oficial de existencias.
+* Manejo de errores si la sede seleccionada no tiene inventario cargado."
+"Historia","HU-27","HE-08","HE-08: Supervisor - Control de Saldos de Almacén y Ajustes en Sedes","157","Web - Entradas y Ajustes","Supervisor / Administrador","HU-27: Registrar y conciliar entradas o ajustes de inventario en /entradas-ajustes-inventario","*Como Supervisor o Administrador*,
+*Quiero registrar entradas por ajuste de inventario o recepción física en /entradas-ajustes-inventario*,
+*Para corregir diferencias de conteo físico o registrar devoluciones justificadas en el sistema*.","* Formulario en /entradas-ajustes-inventario con: Sede, Producto/Ingrediente, Cantidad recibida, Unidad y Observaciones.
+* Valida que la cantidad sea numérica positiva y los campos requeridos estén completos.
+* Al registrar la entrada exitosamente, impacta el saldo del almacén de la sede (""Entrada registrada"").
+* Historial de ajustes con fecha, responsable y botón para exportar el registro de entradas a Excel.","*Como Supervisor o Administrador*,
+*Quiero registrar entradas por ajuste de inventario o recepción física en /entradas-ajustes-inventario*,
+*Para corregir diferencias de conteo físico o registrar devoluciones justificadas en el sistema*.
+
+*Criterios de Aceptación:*
+
+* Formulario en /entradas-ajustes-inventario con: Sede, Producto/Ingrediente, Cantidad recibida, Unidad y Observaciones.
+* Valida que la cantidad sea numérica positiva y los campos requeridos estén completos.
+* Al registrar la entrada exitosamente, impacta el saldo del almacén de la sede (""Entrada registrada"").
+* Historial de ajustes con fecha, responsable y botón para exportar el registro de entradas a Excel."
+"Historia","HU-28","HE-09","HE-09: Administrador - Control Operativo General, Auditoría y Liquidación","156","Web - Inicio Administrador","Administrador (Operador PAE)","HU-28: Visualizar panel de inicio y control general en /inicio","*Como Administrador del operador PAE*,
+*Quiero acceder a la vista /inicio con los indicadores consolidados de la operación*,
+*Para tener un panorama integral del abastecimiento y cumplimiento del servicio en todas las sedes*.","* Panel general en /inicio con métricas consolidadas de instituciones activas y alertas de inventario.
+* Acceso directo hacia la administración de usuarios, auditoría de entregas y reportes.
+* Visualización de estado del sistema y avisos institucionales del operador PAE.","*Como Administrador del operador PAE*,
+*Quiero acceder a la vista /inicio con los indicadores consolidados de la operación*,
+*Para tener un panorama integral del abastecimiento y cumplimiento del servicio en todas las sedes*.
+
+*Criterios de Aceptación:*
+
+* Panel general en /inicio con métricas consolidadas de instituciones activas y alertas de inventario.
+* Acceso directo hacia la administración de usuarios, auditoría de entregas y reportes.
+* Visualización de estado del sistema y avisos institucionales del operador PAE."
+"Historia","HU-29","HE-09","HE-09: Administrador - Control Operativo General, Auditoría y Liquidación","156","Web - Reportes Consumo","Administrador / Super Administrador","HU-29: Generar reportes de consumo de alimentos y raciones en /reportes-consumo","*Como Administrador o Super Administrador*,
+*Quiero consultar la tabla consolidada en /reportes-consumo con filtros de fecha y sede*,
+*Para auditar los kilogramos consumidos, raciones entregadas y asistencia escolar certificada*.","* Tabla en /reportes-consumo con: Sede Escolar, Matrícula, Raciones Servidas, Kilogramos Consumidos y Días Operados.
+* Filtros por rango de fechas (Desde / Hasta) y selector de institución.
+* Cálculo automático de la fila de totales generales al pie de la tabla.
+* Botón de exportación a Excel que descarga el reporte consolidado listo para auditoría de interventoría.","*Como Administrador o Super Administrador*,
+*Quiero consultar la tabla consolidada en /reportes-consumo con filtros de fecha y sede*,
+*Para auditar los kilogramos consumidos, raciones entregadas y asistencia escolar certificada*.
+
+*Criterios de Aceptación:*
+
+* Tabla en /reportes-consumo con: Sede Escolar, Matrícula, Raciones Servidas, Kilogramos Consumidos y Días Operados.
+* Filtros por rango de fechas (Desde / Hasta) y selector de institución.
+* Cálculo automático de la fila de totales generales al pie de la tabla.
+* Botón de exportación a Excel que descarga el reporte consolidado listo para auditoría de interventoría."
+"Historia","HU-30","HE-09","HE-09: Administrador - Control Operativo General, Auditoría y Liquidación","156","Web - Reporte Inventario","Administrador / Supervisor","HU-30: Consultar reporte consolidado de inventario en /reporte-inventario","*Como Administrador*,
+*Quiero consultar el consolidado de existencias en /reporte-inventario con clasificación de disponibilidad*,
+*Para vigilar la rotación de alimentos y detectar sedes con poco stock o excedentes*.","* Tabla en /reporte-inventario con: Insumo, Saldo Actual, Unidad de Medida y Estado de Disponibilidad (Suficiente, Disponible, Poco stock).
+* Buscador superior reactivo por nombre de ingrediente.
+* Botón ""Exportar a Excel"" que genera la sábana completa de inventario territorial.
+* Si no hay saldos cargados, muestra mensaje preventivo (""No hay datos para exportar"").","*Como Administrador*,
+*Quiero consultar el consolidado de existencias en /reporte-inventario con clasificación de disponibilidad*,
+*Para vigilar la rotación de alimentos y detectar sedes con poco stock o excedentes*.
+
+*Criterios de Aceptación:*
+
+* Tabla en /reporte-inventario con: Insumo, Saldo Actual, Unidad de Medida y Estado de Disponibilidad (Suficiente, Disponible, Poco stock).
+* Buscador superior reactivo por nombre de ingrediente.
+* Botón ""Exportar a Excel"" que genera la sábana completa de inventario territorial.
+* Si no hay saldos cargados, muestra mensaje preventivo (""No hay datos para exportar"")."
+"Historia","HU-M01","HE-10","HE-10: Operación en Cocina y Elaboración de Alimentos (App Móvil)","158","","Manipuladora jefe","HU-M01: Registrar asistencia diaria escolar","*Como manipuladora jefe*,
+*Quiero registrar la cantidad de estudiantes presentes por grado*,
+*Para que el sistema calcule las cantidades necesarias y el gramaje correspondiente*.","* Muestra jornada (mañana y tarde) y en cada jornada se debe visualizar los grados de Transición a Once.
+* El sistema suma por separado la cantidad de estudiantes de cada grado para aplicar el gramaje correspondiente según el ciclo escolar.
+* Clasificación de servicios: Primaria -> Desayuno, Secundaria -> Almuerzo, Tarde -> Merienda.
+* Guarda el historial de asistencia asociado a cada fecha.
+* Notifica a la manipuladora jefe con una alerta o cuenta regresiva cuánto tiempo le falta para registrar la asistencia.
+* Ventanas horarias habilitadas de registro: de 7:00 am a 8:00 am para la jornada de la mañana, y de 1:00 pm a 2:00 pm para la jornada de la tarde.
+* Según la hora y jornada en la que se registre la asistencia, el sistema indica el servicio a usar.","*Como manipuladora jefe*,
+*Quiero registrar la cantidad de estudiantes presentes por grado*,
+*Para que el sistema calcule las cantidades necesarias y el gramaje correspondiente*.
+
+*Criterios de Aceptación:*
+
+* Muestra jornada (mañana y tarde) y en cada jornada se debe visualizar los grados de Transición a Once.
+* El sistema suma por separado la cantidad de estudiantes de cada grado para aplicar el gramaje correspondiente según el ciclo escolar.
+* Clasificación de servicios: Primaria -> Desayuno, Secundaria -> Almuerzo, Tarde -> Merienda.
+* Guarda el historial de asistencia asociado a cada fecha.
+* Notifica a la manipuladora jefe con una alerta o cuenta regresiva cuánto tiempo le falta para registrar la asistencia.
+* Ventanas horarias habilitadas de registro: de 7:00 am a 8:00 am para la jornada de la mañana, y de 1:00 pm a 2:00 pm para la jornada de la tarde.
+* Según la hora y jornada en la que se registre la asistencia, el sistema indica el servicio a usar."
+"Historia","HU-M02","HE-10","HE-10: Operación en Cocina y Elaboración de Alimentos (App Móvil)","158","","Manipuladora","HU-M02: Consultar asistencia","*Como manipuladora*,
+*Quiero consultar la asistencia registrada*,
+*Para verificar cuántos estudiantes recibirán el servicio sin alterar la información*.","* Muestra totales confirmados en un apartado dedicado de la aplicación.
+* Vista bloqueada (solo lectura), sin campos ni opciones de edición.","*Como manipuladora*,
+*Quiero consultar la asistencia registrada*,
+*Para verificar cuántos estudiantes recibirán el servicio sin alterar la información*.
+
+*Criterios de Aceptación:*
+
+* Muestra totales confirmados en un apartado dedicado de la aplicación.
+* Vista bloqueada (solo lectura), sin campos ni opciones de edición."
+"Historia","HU-M03","HE-10","HE-10: Operación en Cocina y Elaboración de Alimentos (App Móvil)","158","","Manipuladora jefe","HU-M03: Elegir menú","*Como manipuladora jefe*,
+*Quiero visualizar el menú establecido por el PAE y la sugerencia de la IA*,
+*Para elegir los alimentos para preparar cada día*.","* Muestra foto, nombre del plato y componentes; al dar clic en componentes aparece la preparación de cada uno.
+* Al contar con la asistencia registrada, muestra en cada componente el gramaje a gastar de cada producto según el plato seleccionado.
+* Se visualiza primero la sugerencia de la IA y debajo de este el menú establecido por el PAE.
+* Se debe elegir con al menos un día de anterioridad el desayuno, almuerzo y merienda a preparar.","*Como manipuladora jefe*,
+*Quiero visualizar el menú establecido por el PAE y la sugerencia de la IA*,
+*Para elegir los alimentos para preparar cada día*.
+
+*Criterios de Aceptación:*
+
+* Muestra foto, nombre del plato y componentes; al dar clic en componentes aparece la preparación de cada uno.
+* Al contar con la asistencia registrada, muestra en cada componente el gramaje a gastar de cada producto según el plato seleccionado.
+* Se visualiza primero la sugerencia de la IA y debajo de este el menú establecido por el PAE.
+* Se debe elegir con al menos un día de anterioridad el desayuno, almuerzo y merienda a preparar."
+"Historia","HU-M04","HE-10","HE-10: Operación en Cocina y Elaboración de Alimentos (App Móvil)","158","","Manipuladora jefe","HU-M04: Generar opciones de platos mediante IA","*Como manipuladora jefe*,
+*Quiero ver diferentes opciones de platos generado por la IA*,
+*Para elegir alternativas adecuadas y nutricionales según el inventario de la sede*.","* Envía el inventario actual de la sede como contexto a la IA.
+* Recibe 3 opciones viables y balanceadas.
+* Valida que las opciones sugeridas no superen los insumos disponibles en bodega.","*Como manipuladora jefe*,
+*Quiero ver diferentes opciones de platos generado por la IA*,
+*Para elegir alternativas adecuadas y nutricionales según el inventario de la sede*.
+
+*Criterios de Aceptación:*
+
+* Envía el inventario actual de la sede como contexto a la IA.
+* Recibe 3 opciones viables y balanceadas.
+* Valida que las opciones sugeridas no superen los insumos disponibles en bodega."
+"Historia","HU-M05","HE-10","HE-10: Operación en Cocina y Elaboración de Alimentos (App Móvil)","158","","Manipuladora jefe","HU-M05: Calendario de menús","*Como manipuladora jefe*,
+*Quiero visualizar un calendario de días hábiles*,
+*Para consultar qué menús fueron asignados días antes y programar los menús de días posteriores*.","* Calendario interactivo con días hábiles escolares marcados.
+* Permite seleccionar un plato correspondiente a una fecha específica y programar platos para los siguientes días.
+* Permite reemplazar un plato si la fecha es futura.
+* Permite visualizar el histórico de menús de días anteriores en modo consulta.
+* Al tocar una fecha, despliega el plato programado o la opción para programar uno nuevo.","*Como manipuladora jefe*,
+*Quiero visualizar un calendario de días hábiles*,
+*Para consultar qué menús fueron asignados días antes y programar los menús de días posteriores*.
+
+*Criterios de Aceptación:*
+
+* Calendario interactivo con días hábiles escolares marcados.
+* Permite seleccionar un plato correspondiente a una fecha específica y programar platos para los siguientes días.
+* Permite reemplazar un plato si la fecha es futura.
+* Permite visualizar el histórico de menús de días anteriores en modo consulta.
+* Al tocar una fecha, despliega el plato programado o la opción para programar uno nuevo."
+"Historia","HU-M06","HE-10","HE-10: Operación en Cocina y Elaboración de Alimentos (App Móvil)","158","","Manipuladora jefe","HU-M06: Asignar preparaciones y consultar horarios","*Como manipuladora jefe*,
+*Quiero consultar los horarios y asignar los componentes del plato a las manipuladoras*,
+*Para distribuir de forma equitativa el trabajo diario de la cocina*.","* Muestra las manipuladoras activas, para asignarle componentes a preparar.
+* Permite asignar a cada manipuladora activa el componente que le corresponde preparar en el día.
+* Permite a la manipuladora jefe autoasignarse componentes para su propia preparación.
+* Permite reasignar una responsable de preparación a otra compañera ante cualquier imprevisto.
+* Guarda el registro de la asignación con fecha, turno, manipuladora y componente.","*Como manipuladora jefe*,
+*Quiero consultar los horarios y asignar los componentes del plato a las manipuladoras*,
+*Para distribuir de forma equitativa el trabajo diario de la cocina*.
+
+*Criterios de Aceptación:*
+
+* Muestra las manipuladoras activas, para asignarle componentes a preparar.
+* Permite asignar a cada manipuladora activa el componente que le corresponde preparar en el día.
+* Permite a la manipuladora jefe autoasignarse componentes para su propia preparación.
+* Permite reasignar una responsable de preparación a otra compañera ante cualquier imprevisto.
+* Guarda el registro de la asignación con fecha, turno, manipuladora y componente."
+"Historia","HU-M07","HE-10","HE-10: Operación en Cocina y Elaboración de Alimentos (App Móvil)","158","","Manipuladora","HU-M07: Visualizar menú por servicio","*Como manipuladora*,
+*Quiero ver el menú separado por Desayuno, Almuerzo y Merienda*,
+*Para identificar los platos a preparar según el momento del día*.","* Pestañas o secciones divisorias por servicio (Desayuno, Almuerzo y Merienda).
+* Inhabilita la visualización o edición de cada menú después de su hora límite programada.","*Como manipuladora*,
+*Quiero ver el menú separado por Desayuno, Almuerzo y Merienda*,
+*Para identificar los platos a preparar según el momento del día*.
+
+*Criterios de Aceptación:*
+
+* Pestañas o secciones divisorias por servicio (Desayuno, Almuerzo y Merienda).
+* Inhabilita la visualización o edición de cada menú después de su hora límite programada."
+"Historia","HU-M08","HE-10","HE-10: Operación en Cocina y Elaboración de Alimentos (App Móvil)","158","","Manipuladora","HU-M08: Visualizar asignación y gramaje por ciclo","*Como manipuladora*,
+*Quiero consultar mi componente a preparar, su instructivo y los ingredientes requeridos*,
+*Para cumplir con mi trabajo y medir las porciones exactas según cada grado escolar*.","* Al ingresar con mis credenciales, enfoca en la sección ""Tu preparación"" el componente que me corresponde.
+* Muestra el plato completo (foto y nombre), encargada asignada, pasos de preparación e ingredientes con su cantidad y unidad de medida.
+* Calcula las cantidades teniendo en cuenta que el gramaje es diferente según cada ciclo escolar (ej. Transición y Primero un gramaje base; Segundo a Quinto un gramaje mayor).
+* Filtra la visualización del componente asignado según la hora de ingreso al aplicativo:
+* 7:00 am – 9:30 am: se visualiza el componente asignado del desayuno.
+* 9:30 am – 2:00 pm: se visualiza el componente asignado del almuerzo.
+* 2:00 pm – 6:00 pm: se visualiza el componente asignado de la merienda.","*Como manipuladora*,
+*Quiero consultar mi componente a preparar, su instructivo y los ingredientes requeridos*,
+*Para cumplir con mi trabajo y medir las porciones exactas según cada grado escolar*.
+
+*Criterios de Aceptación:*
+
+* Al ingresar con mis credenciales, enfoca en la sección ""Tu preparación"" el componente que me corresponde.
+* Muestra el plato completo (foto y nombre), encargada asignada, pasos de preparación e ingredientes con su cantidad y unidad de medida.
+* Calcula las cantidades teniendo en cuenta que el gramaje es diferente según cada ciclo escolar (ej. Transición y Primero un gramaje base; Segundo a Quinto un gramaje mayor).
+* Filtra la visualización del componente asignado según la hora de ingreso al aplicativo:
+* 7:00 am – 9:30 am: se visualiza el componente asignado del desayuno.
+* 9:30 am – 2:00 pm: se visualiza el componente asignado del almuerzo.
+* 2:00 pm – 6:00 pm: se visualiza el componente asignado de la merienda."
+"Historia","HU-M09","HE-10","HE-10: Operación en Cocina y Elaboración de Alimentos (App Móvil)","158","","Manipuladora / Manipuladora jefe","HU-M09: Registrar y consultar estado de preparación","*Como manipuladora (y supervisado por la manipuladora jefe)*,
+*Quiero registrar y visualizar el estado de preparación por componente*,
+*Para informar y conocer en tiempo real qué comida ya está cocinada y qué falta*.","* Permite seleccionar el avance del componente mediante semáforo de colores: Rojo (Por hacer), Amarillo (En proceso) y Verde (Completado).
+* Muestra en el detalle del plato los componentes con sus respectivos estados de preparación actualizados.
+* La manipuladora jefe visualiza el estado consolidado de todos los componentes de la jornada en tiempo real.","*Como manipuladora (y supervisado por la manipuladora jefe)*,
+*Quiero registrar y visualizar el estado de preparación por componente*,
+*Para informar y conocer en tiempo real qué comida ya está cocinada y qué falta*.
+
+*Criterios de Aceptación:*
+
+* Permite seleccionar el avance del componente mediante semáforo de colores: Rojo (Por hacer), Amarillo (En proceso) y Verde (Completado).
+* Muestra en el detalle del plato los componentes con sus respectivos estados de preparación actualizados.
+* La manipuladora jefe visualiza el estado consolidado de todos los componentes de la jornada en tiempo real."
+"Historia","HU-M10","HE-10","HE-10: Operación en Cocina y Elaboración de Alimentos (App Móvil)","158","","Manipuladora jefe","HU-M10: Registrar novedad en preparación","*Como manipuladora jefe*,
+*Quiero registrar una novedad en un componente ('Con novedad')*,
+*Para avisar oportunamente al supervisor sobre cualquier eventualidad en cocina*.","* Despliega un modal obligatorio para escribir la justificación de la eventualidad.
+* Notifica de forma inmediata la novedad a la coordinación y supervisión.","*Como manipuladora jefe*,
+*Quiero registrar una novedad en un componente ('Con novedad')*,
+*Para avisar oportunamente al supervisor sobre cualquier eventualidad en cocina*.
+
+*Criterios de Aceptación:*
+
+* Despliega un modal obligatorio para escribir la justificación de la eventualidad.
+* Notifica de forma inmediata la novedad a la coordinación y supervisión."
+"Historia","HU-M11","HE-10","HE-10: Operación en Cocina y Elaboración de Alimentos (App Móvil)","158","","Manipuladora / Manipuladora jefe","HU-M11: Consultar inventario","*Como manipuladora jefe y manipuladora*,
+*Quiero consultar el inventario disponible*,
+*Para conocer las cantidades existentes en bodega*.","* Muestra el stock actual de cada insumo con su nombre y unidad de medida.
+* La vista se mantiene en modo solo lectura para las manipuladoras de cocina.
+* La manipuladora jefe puede mandar eventualidades con algún producto.","*Como manipuladora jefe y manipuladora*,
+*Quiero consultar el inventario disponible*,
+*Para conocer las cantidades existentes en bodega*.
+
+*Criterios de Aceptación:*
+
+* Muestra el stock actual de cada insumo con su nombre y unidad de medida.
+* La vista se mantiene en modo solo lectura para las manipuladoras de cocina.
+* La manipuladora jefe puede mandar eventualidades con algún producto."
+"Historia","HU-M12","HE-10","HE-10: Operación en Cocina y Elaboración de Alimentos (App Móvil)","158","","Manipuladora jefe","HU-M12: Conciliar stock y reportar faltantes","*Como manipuladora jefe*,
+*Quiero registrar los productos que llegaron físicamente y ajustar la cantidad recibida*,
+*Para actualizar el inventario real y notificar faltantes a la administración*.","* Permite registrar por separado los insumos perecederos (entregas cada 20 días) y los no perecederos (entregas cada 8 días).
+* Permite editar la cantidad registrada en remesa por la cantidad verdaderamente recibida y contada.
+* La cantidad recibida confirmada es la que se suma al inventario actual que ya existía en bodega.
+* Incluye un campo obligatorio de reporte (justificación / observaciones) para notificar al supervisor si la cantidad recibida fue menor a la registrada en el despacho.","*Como manipuladora jefe*,
+*Quiero registrar los productos que llegaron físicamente y ajustar la cantidad recibida*,
+*Para actualizar el inventario real y notificar faltantes a la administración*.
+
+*Criterios de Aceptación:*
+
+* Permite registrar por separado los insumos perecederos (entregas cada 20 días) y los no perecederos (entregas cada 8 días).
+* Permite editar la cantidad registrada en remesa por la cantidad verdaderamente recibida y contada.
+* La cantidad recibida confirmada es la que se suma al inventario actual que ya existía en bodega.
+* Incluye un campo obligatorio de reporte (justificación / observaciones) para notificar al supervisor si la cantidad recibida fue menor a la registrada en el despacho."
+"Historia","HU-M13","HE-10","HE-10: Operación en Cocina y Elaboración de Alimentos (App Móvil)","158","","Manipuladora / Manipuladora jefe","HU-M13: Consultar y gestionar perfil","*Como manipuladora de alimentos o manipuladora jefe*,
+*Quiero visualizar y actualizar mis datos personales*,
+*Para verificar mi información y mantener mi cuenta protegida*.","* Muestra la pantalla ""Mi Perfil"" con los datos registrados.
+* Permite cambiar la imagen de perfil.
+* Permite editar y actualizar el número de teléfono.
+* Permite restablecer la contraseña mediante formulario con validación de nueva clave.
+* Los campos de correo institucional y nombre completo permanecen bloqueados en modo solo lectura.","*Como manipuladora de alimentos o manipuladora jefe*,
+*Quiero visualizar y actualizar mis datos personales*,
+*Para verificar mi información y mantener mi cuenta protegida*.
+
+*Criterios de Aceptación:*
+
+* Muestra la pantalla ""Mi Perfil"" con los datos registrados.
+* Permite cambiar la imagen de perfil.
+* Permite editar y actualizar el número de teléfono.
+* Permite restablecer la contraseña mediante formulario con validación de nueva clave.
+* Los campos de correo institucional y nombre completo permanecen bloqueados en modo solo lectura."

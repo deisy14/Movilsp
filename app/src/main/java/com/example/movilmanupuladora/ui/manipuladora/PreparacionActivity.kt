@@ -1,6 +1,7 @@
 package com.example.movilmanupuladora.ui.manipuladora
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
@@ -71,7 +72,7 @@ class PreparacionActivity : AppCompatActivity() {
         // Mostrar el componente asignado si existe
         if (!componenteAsignado.isNullOrBlank()) {
             binding.tvComponentePreparacion.visibility = View.VISIBLE
-            binding.tvComponentePreparacion.text = "🥣 Componente a preparar: $componenteAsignado"
+            binding.tvComponentePreparacion.text = "Componente a preparar: $componenteAsignado"
         } else {
             binding.tvComponentePreparacion.visibility = View.GONE
         }
@@ -80,35 +81,31 @@ class PreparacionActivity : AppCompatActivity() {
         val imgRes = if (imgIntent > 0) imgIntent else com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity.obtenerImagenPlatoPorNombre(nombrePlatoActual)
         binding.imgPlatoPreparacion.setImageResource(imgRes)
 
-        // Cargar pasos de preparación específicos para el componente
-        if (!componenteAsignado.isNullOrBlank()) {
-            mostrarPasos(obtenerPasosComponente(componenteAsignado!!))
-        } else {
-            cargarPasos()
-        }
+        // Cargar pasos de preparación reales configurados por el supervisor desde el backend
+        cargarPasosDesdeBackend()
     }
 
     private fun actualizarVistaEstado(estado: String) {
         when (estado) {
             PreparacionEstadoManager.ESTADO_POR_HACER -> {
-                binding.badgeTurnoPreparacion.text = "Estado: Por hacer ⏳"
+                binding.badgeTurnoPreparacion.text = "Estado: Por hacer"
                 binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_tag_plato)
                 binding.badgeTurnoPreparacion.setTextColor(0xFF1B3317.toInt())
                 binding.btnMarcarPreparado.text = "Cambiar Estado (Por hacer)"
                 binding.btnMarcarPreparado.alpha = 1.0f
             }
             PreparacionEstadoManager.ESTADO_EN_PROCESO -> {
-                binding.badgeTurnoPreparacion.text = "Estado: En proceso 🔥"
+                binding.badgeTurnoPreparacion.text = "Estado: En proceso"
                 binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_pill_yellow)
                 binding.badgeTurnoPreparacion.setTextColor(0xFF855B00.toInt())
                 binding.btnMarcarPreparado.text = "En proceso (Cambiar Estado)"
                 binding.btnMarcarPreparado.alpha = 1.0f
             }
             PreparacionEstadoManager.ESTADO_FINALIZADA -> {
-                binding.badgeTurnoPreparacion.text = "Estado: Finalizada ✅"
+                binding.badgeTurnoPreparacion.text = "Estado: Finalizada"
                 binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_pill_green)
                 binding.badgeTurnoPreparacion.setTextColor(0xFF176B35.toInt())
-                binding.btnMarcarPreparado.text = "Preparación Finalizada ✅ (Cambiar)"
+                binding.btnMarcarPreparado.text = "Preparación Finalizada (Cambiar)"
                 binding.btnMarcarPreparado.alpha = 1.0f
             }
             else -> {
@@ -199,70 +196,111 @@ class PreparacionActivity : AppCompatActivity() {
     }
 
     private fun mostrarDialogoEstadoPreparacion() {
-        val opciones = arrayOf(
-            "⏳ Por hacer / Pendiente",
-            "🔥 En proceso / En preparación",
-            "✅ Finalizada / Completada"
+        val opciones = listOf(
+            "Por hacer / Pendiente",
+            "En proceso / En preparación",
+            "Finalizada / Completada"
         )
 
-        MaterialAlertDialogBuilder(this)
-            .setTitle("Actualizar Estado de Preparación")
-            .setItems(opciones) { _, which ->
-                val session = SessionManager(this)
-                val miNombre = session.getUserName() ?: "Manipuladora"
-                val miCorreo = session.getUserEmail() ?: ""
-                val preferencias = getSharedPreferences("SIRAE", MODE_PRIVATE)
+        val dialogBinding = com.example.movilmanupuladora.databinding.DialogOpcionesJefaBinding.inflate(layoutInflater)
+        dialogBinding.txtTituloOpciones.text = "Actualizar Estado de Preparación"
+        dialogBinding.contenedorBotonesOpciones.removeAllViews()
 
-                val nuevoEstado = when (which) {
-                    1 -> PreparacionEstadoManager.ESTADO_EN_PROCESO
-                    2 -> PreparacionEstadoManager.ESTADO_FINALIZADA
-                    else -> PreparacionEstadoManager.ESTADO_POR_HACER
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(dialogBinding.root)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        for ((index, opcion) in opciones.withIndex()) {
+            val btn = com.google.android.material.button.MaterialButton(this).apply {
+                text = opcion
+                isAllCaps = false
+                setTextColor(Color.parseColor("#1E293B"))
+                textSize = 14f
+                backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFFFFF"))
+                strokeColor = android.content.res.ColorStateList.valueOf(Color.parseColor("#CBD5E1"))
+                strokeWidth = (1 * resources.displayMetrics.density).toInt()
+                cornerRadius = (12 * resources.displayMetrics.density).toInt()
+                gravity = android.view.Gravity.START or android.view.Gravity.CENTER_VERTICAL
+                setPadding((14 * resources.displayMetrics.density).toInt(), (12 * resources.displayMetrics.density).toInt(), (14 * resources.displayMetrics.density).toInt(), (12 * resources.displayMetrics.density).toInt())
+
+                layoutParams = android.widget.LinearLayout.LayoutParams(
+                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    bottomMargin = (8 * resources.displayMetrics.density).toInt()
                 }
 
-                PreparacionEstadoManager.guardarEstado(this, miNombre, componenteAsignado, nuevoEstado, miCorreo)
+                setOnClickListener {
+                    dialog.dismiss()
+                    ejecutarCambioEstadoPreparacion(index)
+                }
+            }
+            dialogBinding.contenedorBotonesOpciones.addView(btn)
+        }
 
-                // Sincronizar en tiempo real al backend para que la Jefa y el equipo lo vean de inmediato
+        dialogBinding.btnCancelarOpciones.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.90).toInt(),
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+    }
+
+    private fun ejecutarCambioEstadoPreparacion(which: Int) {
+        val session = SessionManager(this)
+        val miNombre = session.getUserName() ?: "Manipuladora"
+        val miCorreo = session.getUserEmail() ?: ""
+        val preferencias = getSharedPreferences("SIRAE", MODE_PRIVATE)
+
+        val nuevoEstado = when (which) {
+            1 -> PreparacionEstadoManager.ESTADO_EN_PROCESO
+            2 -> PreparacionEstadoManager.ESTADO_FINALIZADA
+            else -> PreparacionEstadoManager.ESTADO_POR_HACER
+        }
+
+        PreparacionEstadoManager.guardarEstado(this, miNombre, componenteAsignado, nuevoEstado, miCorreo)
+
+        // Sincronizar en tiempo real al backend para que la Jefa y el equipo lo vean de inmediato
+        lifecycleScope.launch {
+            com.example.movilmanupuladora.utils.PreparacionSyncManager.actualizarEstadoEnBackend(
+                this@PreparacionActivity,
+                nuevoEstado,
+                componenteAsignado
+            )
+        }
+
+        when (which) {
+            0 -> { // Por hacer
+                preferencias.edit().putString("estado_plato", "PENDIENTE").apply()
+                actualizarVistaEstado(nuevoEstado)
+                Toast.makeText(this, "Estado actualizado: Por hacer", Toast.LENGTH_SHORT).show()
+            }
+            1 -> { // En proceso
+                preferencias.edit().putString("estado_plato", "EN_PREPARACION").apply()
+                actualizarVistaEstado(nuevoEstado)
+                Toast.makeText(this, "Estado actualizado: En proceso", Toast.LENGTH_SHORT).show()
+            }
+            2 -> { // Finalizada
+                preferencias.edit().putBoolean("plato_preparado", true).apply()
+                preferencias.edit().putString("estado_plato", "FINALIZADO").apply()
+                actualizarVistaEstado(nuevoEstado)
+                Toast.makeText(this, "Estado actualizado: Finalizada", Toast.LENGTH_SHORT).show()
+
+                // Descontar automáticamente del inventario al finalizar la preparación
                 lifecycleScope.launch {
-                    com.example.movilmanupuladora.utils.PreparacionSyncManager.actualizarEstadoEnBackend(
+                    com.example.movilmanupuladora.utils.PreparacionSyncManager.descontarInventarioPorFinalizacion(
                         this@PreparacionActivity,
-                        nuevoEstado,
+                        nombrePlatoActual,
                         componenteAsignado
                     )
                 }
-
-                when (which) {
-                    0 -> { // Por hacer
-                        preferencias.edit().putString("estado_plato", "PENDIENTE").apply()
-                        actualizarVistaEstado(nuevoEstado)
-                        Toast.makeText(this, "Estado actualizado: Por hacer ⏳", Toast.LENGTH_SHORT).show()
-                    }
-                    1 -> { // En proceso
-                        preferencias.edit().putString("estado_plato", "EN_PREPARACION").apply()
-                        actualizarVistaEstado(nuevoEstado)
-                        Toast.makeText(this, "Estado actualizado: En proceso 🔥", Toast.LENGTH_SHORT).show()
-                    }
-                    2 -> { // Finalizada
-                        preferencias.edit().putBoolean("plato_preparado", true).apply()
-                        preferencias.edit().putString("estado_plato", "FINALIZADO").apply()
-                        actualizarVistaEstado(nuevoEstado)
-
-                        MaterialAlertDialogBuilder(this)
-                            .setTitle("¡Preparación Finalizada!")
-                            .setMessage("El componente '${componenteAsignado ?: nombrePlatoActual}' ha sido marcado como Finalizado con éxito.\n\n¿Deseas ver la pantalla de confirmación?")
-                            .setPositiveButton("Ver Confirmación") { _, _ ->
-                                val intentConf = Intent(this, ConfirmacionActivity::class.java).apply {
-                                    putExtra("nombre_plato", nombrePlatoActual)
-                                }
-                                startActivity(intentConf)
-                                finish()
-                            }
-                            .setNegativeButton("Permanecer aquí", null)
-                            .show()
-                    }
-                }
             }
-            .setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
-            .show()
+        }
     }
 
     private val pasosFallback = listOf(
@@ -272,19 +310,55 @@ class PreparacionActivity : AppCompatActivity() {
         pasos_preparacion(idPlato = 1, numeroPaso = "4", descripcionPaso = "Porcionar y servir según las tablas de gramaje institucional del programa de alimentación escolar.")
     )
 
-    private fun cargarPasos() {
+    private fun cargarPasosDesdeBackend() {
         lifecycleScope.launch {
             try {
-                val response = RetrofitClient.apiService.obtenerPasosPreparacion()
+                // 1. Consultar platos del backend para mapear el ID del plato actual
+                val platosRes = RetrofitClient.apiService.obtenerPlatos()
+                val platosBackend = platosRes.body() ?: emptyList()
+                val platoActual = platosBackend.firstOrNull {
+                    it.nombrePlato?.equals(nombrePlatoActual, ignoreCase = true) == true ||
+                    (nombrePlatoActual.isNotBlank() && it.nombrePlato?.contains(nombrePlatoActual, ignoreCase = true) == true) ||
+                    (it.componente?.contains(nombrePlatoActual, ignoreCase = true) == true)
+                }
 
-                if (response.isSuccessful && !response.body().isNullOrEmpty()) {
-                    val listaPasos: List<pasos_preparacion> = response.body()!!
-                    mostrarPasos(listaPasos)
+                val idPlato = platoActual?.idPlato ?: intent.getIntExtra("id_plato", -1)
+
+                // 2. Consultar pasos de preparación en el backend configurados por el supervisor
+                val response = RetrofitClient.apiService.obtenerPasosPreparacion()
+                val todosPasos: List<pasos_preparacion> = if (response.isSuccessful && !response.body().isNullOrEmpty()) {
+                    response.body()!!
+                } else {
+                    emptyList()
+                }
+
+                val compLimpio = componenteAsignado?.trim()?.lowercase().orEmpty()
+                val pasosFiltrados = todosPasos.filter { paso ->
+                    val coincidePlato = idPlato > 0 && paso.idPlato == idPlato
+                    val desc = paso.descripcionPaso.lowercase()
+                    val coincideComp = compLimpio.isNotBlank() && (
+                        desc.contains("[$compLimpio]") || desc.contains(compLimpio)
+                    )
+                    coincideComp || coincidePlato
+                }.sortedBy { it.numeroPaso.toIntOrNull() ?: 99 }
+
+                val pasosFinales = if (pasosFiltrados.isNotEmpty()) {
+                    pasosFiltrados
+                } else if (compLimpio.isNotBlank()) {
+                    obtenerPasosComponente(componenteAsignado!!)
+                } else if (todosPasos.isNotEmpty()) {
+                    todosPasos.take(5)
+                } else {
+                    pasosFallback
+                }
+
+                mostrarPasos(pasosFinales)
+            } catch (e: Exception) {
+                if (!componenteAsignado.isNullOrBlank()) {
+                    mostrarPasos(obtenerPasosComponente(componenteAsignado!!))
                 } else {
                     mostrarPasos(pasosFallback)
                 }
-            } catch (e: Exception) {
-                mostrarPasos(pasosFallback)
             }
         }
     }
@@ -321,8 +395,9 @@ class PreparacionActivity : AppCompatActivity() {
                 layoutParams = LinearLayout.LayoutParams(54, 54)
             }
 
+            val descLimpia = paso.descripcionPaso.replaceFirst(Regex("^\\[[^\\]]+\\]\\s*"), "")
             val tvDescripcion = TextView(this).apply {
-                text = paso.descripcionPaso
+                text = descLimpia
                 setTextColor(0xFF1B3317.toInt())
                 textSize = 13f
                 layoutParams = LinearLayout.LayoutParams(

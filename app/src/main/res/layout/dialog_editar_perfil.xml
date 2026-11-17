@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="22dp"
+    app:cardElevation="8dp"
+    app:strokeColor="#F4B41F"
+    app:strokeWidth="1.5dp">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:overScrollMode="never"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- TÍTULO DE LA VENTANA EMERGENTE -->
+            <TextView
+                android:id="@+id/txtTituloModal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Editar Perfil"
+                android:textColor="#1B3317"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtSubtituloModal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:gravity="center"
+                android:text="Actualiza tu contraseña de acceso y teléfono de contacto."
+                android:textColor="#64748B"
+                android:textSize="12sp" />
+
+            <!-- NOTA INSTITUCIONAL -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_banner_aprobado"
+                android:padding="10dp"
+                android:text="El nombre y correo son gestionados por el Administrador PAE. Puedes actualizar tu contraseña y teléfono."
+                android:textColor="#176B35"
+                android:textSize="11.5sp" />
+
+            <!-- NOMBRE (SOLO LECTURA) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="Nombre (Solo lectura)"
+                android:textColor="#1E293B"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edtNombre"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/bg_input"
+                android:enabled="false"
+                android:focusable="false"
+                android:hint="Nombre completo"
+                android:paddingHorizontal="14dp"
+                android:singleLine="true"
+                android:textColor="#64748B"
+                android:textSize="14sp" />
+
+            <!-- CORREO (SOLO LECTURA) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Correo (Solo lectura)"
+                android:textColor="#1E293B"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edtCorreo"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/bg_input"
+                android:enabled="false"
+                android:focusable="false"
+                android:hint="Correo electrónico"
+                android:paddingHorizontal="14dp"
+                android:singleLine="true"
+                android:textColor="#64748B"
+                android:textSize="14sp" />
+
+            <!-- TELÉFONO -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Teléfono de contacto"
+                android:textColor="#1E293B"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edtTelefono"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/bg_input"
+                android:hint="Número de teléfono"
+                android:inputType="phone"
+                android:paddingHorizontal="14dp"
+                android:singleLine="true"
+                android:textColor="#1E293B"
+                android:textSize="14sp" />
+
+            <!-- NUEVA CONTRASEÑA -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="Nueva contraseña"
+                android:textColor="#1E293B"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edtPasswordNueva"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/bg_input"
+                android:hint="Ingresa la nueva contraseña"
+                android:inputType="textPassword"
+                android:paddingHorizontal="14dp"
+                android:singleLine="true"
+                android:textColor="#1E293B"
+                android:textSize="14sp" />
+
+            <!-- CONFIRMAR CONTRASEÑA -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Confirmar nueva contraseña"
+                android:textColor="#1E293B"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edtPasswordConfirmar"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/bg_input"
+                android:hint="Repite la nueva contraseña"
+                android:inputType="textPassword"
+                android:paddingHorizontal="14dp"
+                android:singleLine="true"
+                android:textColor="#1E293B"
+                android:textSize="14sp" />
+
+            <!-- BOTONES BORDES Y AMARILLO -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnGuardarCambios"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="20dp"
+                android:backgroundTint="#F4B41F"
+                android:text="Guardar Cambios"
+                android:textAllCaps="false"
+                android:textColor="#1B3317"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:cornerRadius="12dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCancelar"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:text="Cancelar"
+                android:textAllCaps="false"
+                android:textColor="#64748B"
+                android:textSize="14sp"
+                app:cornerRadius="12dp"
+                app:strokeColor="#CBD5E1"
+                app:strokeWidth="1dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</com.google.android.material.card.MaterialCardView>

@@ -1,28 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/blanco">
+    android:background="#FAF9F5"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
 
     <!-- ===================================================== -->
     <!-- CONTENIDO PRINCIPAL                                   -->
     <!-- ===================================================== -->
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        android:scrollbars="none">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:paddingHorizontal="20dp"
+            android:paddingTop="28dp"
+            android:paddingBottom="36dp">
 
             <!-- ================================================= -->
             <!-- ENCABEZADO                                        -->
@@ -31,7 +35,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -42,19 +47,19 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Manipuladoras"
-                        android:textColor="@color/negro_principal"
-                        android:textSize="26sp"
-                        android:textStyle="bold"/>
+                        android:text="Equipo de Manipuladoras"
+                        android:textColor="#1E293B"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/txtSubtituloManipuladoras"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="Personal encargado de las preparaciones"
-                        android:textColor="@color/gris_texto"
-                        android:textSize="13sp"/>
+                        android:text="Personal encargado de las preparaciones PAE"
+                        android:textColor="#64748B"
+                        android:textSize="13sp" />
 
                 </LinearLayout>
 
@@ -62,7 +67,7 @@
 
 
             <!-- ================================================= -->
-            <!-- RESUMEN                                           -->
+            <!-- TARJETAS DE RESUMEN (TOTAL / ACTIVAS)             -->
             <!-- ================================================= -->
 
             <LinearLayout
@@ -72,67 +77,80 @@
                 android:orientation="horizontal">
 
                 <!-- TOTAL -->
-
-                <LinearLayout
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="0dp"
                     android:layout_height="100dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="6dp"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="12dp"
-                    android:background="@drawable/bg_card_resumen">
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="#F1F5F9"
+                    app:strokeWidth="1dp">
 
-                    <TextView
-                        android:id="@+id/txtTotalManipuladoras"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textColor="@color/negro_principal"
-                        android:textSize="25sp"
-                        android:textStyle="bold"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Total"
-                        android:textColor="@color/gris_texto"
-                        android:textSize="12sp"/>
+                        <TextView
+                            android:id="@+id/txtTotalManipuladoras"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="#1E293B"
+                            android:textSize="26sp"
+                            android:textStyle="bold" />
 
-                </LinearLayout>
-
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Total personal"
+                            android:textColor="#64748B"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
                 <!-- ACTIVAS -->
-
-                <LinearLayout
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="0dp"
                     android:layout_height="100dp"
                     android:layout_weight="1"
                     android:layout_marginStart="6dp"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="12dp"
-                    android:background="@drawable/bg_card_resumen">
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="#E2E8F0"
+                    app:strokeWidth="1dp">
 
-                    <TextView
-                        android:id="@+id/txtManipuladorasActivas"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textColor="@color/negro_principal"
-                        android:textSize="25sp"
-                        android:textStyle="bold"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Activas"
-                        android:textColor="@color/gris_texto"
-                        android:textSize="12sp"/>
+                        <TextView
+                            android:id="@+id/txtManipuladorasActivas"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="#15803D"
+                            android:textSize="26sp"
+                            android:textStyle="bold" />
 
-                </LinearLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Activas hoy"
+                            android:textColor="#64748B"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
             </LinearLayout>
 
@@ -144,290 +162,316 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
+                android:layout_marginTop="26dp"
                 android:text="Personal registrado"
-                android:textColor="@color/negro_principal"
+                android:textColor="#1E293B"
                 android:textSize="18sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
 
             <!-- ================================================= -->
             <!-- MANIPULADORA 1                                   -->
             <!-- ================================================= -->
 
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardManipuladora1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="14dp"
-                android:background="@drawable/bg_card_resumen"
+                android:layout_marginTop="12dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?attr/selectableItemBackground">
-
-                <!-- ICONO PERSONA -->
-
-                <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:padding="12dp"
-                    android:background="@drawable/bg_icono_amarillo"
-                    android:src="@drawable/ic_nav_manipuladoras"
-                    android:tint="@color/negro_principal"
-                    android:contentDescription="Manipuladora"/>
+                android:foreground="?attr/selectableItemBackground"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeColor="#F1F5F9"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="14dp"
-                    android:orientation="vertical">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_icono_amarillo"
+                        android:contentDescription="Manipuladora"
+                        android:padding="11dp"
+                        android:src="@drawable/ic_nav_manipuladoras"
+                        app:tint="#1E293B" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/txtNombreManipuladora1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="María González"
+                            android:textColor="#1E293B"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/txtFuncionManipuladora1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:text="Preparación de alimentos"
+                            android:textColor="#64748B"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/txtJornadaManipuladora1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Jornada: Mañana"
+                            android:textColor="#94A3B8"
+                            android:textSize="11sp" />
+
+                    </LinearLayout>
 
                     <TextView
-                        android:id="@+id/txtNombreManipuladora1"
+                        android:id="@+id/txtEstadoManipuladora1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="María González"
-                        android:textColor="@color/negro_principal"
-                        android:textSize="16sp"
-                        android:textStyle="bold"/>
-
-                    <TextView
-                        android:id="@+id/txtFuncionManipuladora1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Preparación de alimentos"
-                        android:textColor="@color/gris_texto"
-                        android:textSize="12sp"/>
-
-                    <TextView
-                        android:id="@+id/txtJornadaManipuladora1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:text="Mañana"
-                        android:textColor="@color/gris_texto"
-                        android:textSize="11sp"/>
+                        android:background="@drawable/bg_estado_activo"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="5dp"
+                        android:text="Activa"
+                        android:textColor="#15803D"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
-
-                <!-- ESTADO -->
-
-                <TextView
-                    android:id="@+id/txtEstadoManipuladora1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="6dp"
-                    android:text="Activa"
-                    android:textColor="@color/negro_principal"
-                    android:textSize="11sp"
-                    android:textStyle="bold"
-                    android:background="@drawable/bg_estado_activo"/>
-
-            </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
 
             <!-- ================================================= -->
             <!-- MANIPULADORA 2                                   -->
             <!-- ================================================= -->
 
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardManipuladora2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="14dp"
-                android:background="@drawable/bg_card_resumen"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?attr/selectableItemBackground">
-
-                <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:padding="12dp"
-                    android:background="@drawable/bg_icono_verde"
-                    android:src="@drawable/ic_nav_manipuladoras"
-                    android:tint="@color/negro_principal"
-                    android:contentDescription="Manipuladora"/>
+                android:foreground="?attr/selectableItemBackground"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeColor="#F1F5F9"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="14dp"
-                    android:orientation="vertical">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_icono_verde"
+                        android:contentDescription="Manipuladora"
+                        android:padding="11dp"
+                        android:src="@drawable/ic_nav_manipuladoras"
+                        app:tint="#15803D" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/txtNombreManipuladora2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ana Rodríguez"
+                            android:textColor="#1E293B"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/txtFuncionManipuladora2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:text="Preparación y distribución"
+                            android:textColor="#64748B"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/txtJornadaManipuladora2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Jornada: Tarde"
+                            android:textColor="#94A3B8"
+                            android:textSize="11sp" />
+
+                    </LinearLayout>
 
                     <TextView
-                        android:id="@+id/txtNombreManipuladora2"
+                        android:id="@+id/txtEstadoManipuladora2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Ana Rodríguez"
-                        android:textColor="@color/negro_principal"
-                        android:textSize="16sp"
-                        android:textStyle="bold"/>
-
-                    <TextView
-                        android:id="@+id/txtFuncionManipuladora2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Preparación y distribución"
-                        android:textColor="@color/gris_texto"
-                        android:textSize="12sp"/>
-
-                    <TextView
-                        android:id="@+id/txtJornadaManipuladora2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:text="Tarde"
-                        android:textColor="@color/gris_texto"
-                        android:textSize="11sp"/>
+                        android:background="@drawable/bg_estado_activo"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="5dp"
+                        android:text="Activa"
+                        android:textColor="#15803D"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
-
-                <TextView
-                    android:id="@+id/txtEstadoManipuladora2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="6dp"
-                    android:text="Activa"
-                    android:textColor="@color/negro_principal"
-                    android:textSize="11sp"
-                    android:textStyle="bold"
-                    android:background="@drawable/bg_estado_activo"/>
-
-            </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
 
             <!-- ================================================= -->
             <!-- MANIPULADORA 3                                   -->
             <!-- ================================================= -->
 
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardManipuladora3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="14dp"
-                android:background="@drawable/bg_card_resumen"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?attr/selectableItemBackground">
-
-                <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:padding="12dp"
-                    android:background="@drawable/bg_icono_amarillo"
-                    android:src="@drawable/ic_nav_manipuladoras"
-                    android:tint="@color/negro_principal"
-                    android:contentDescription="Manipuladora"/>
+                android:foreground="?attr/selectableItemBackground"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeColor="#F1F5F9"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="14dp"
-                    android:orientation="vertical">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_icono_amarillo"
+                        android:contentDescription="Manipuladora"
+                        android:padding="11dp"
+                        android:src="@drawable/ic_nav_manipuladoras"
+                        app:tint="#1E293B" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/txtNombreManipuladora3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Laura Martínez"
+                            android:textColor="#1E293B"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/txtFuncionManipuladora3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:text="Apoyo en cocina"
+                            android:textColor="#64748B"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/txtJornadaManipuladora3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Jornada: Mañana y tarde"
+                            android:textColor="#94A3B8"
+                            android:textSize="11sp" />
+
+                    </LinearLayout>
 
                     <TextView
-                        android:id="@+id/txtNombreManipuladora3"
+                        android:id="@+id/txtEstadoManipuladora3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Laura Martínez"
-                        android:textColor="@color/negro_principal"
-                        android:textSize="16sp"
-                        android:textStyle="bold"/>
-
-                    <TextView
-                        android:id="@+id/txtFuncionManipuladora3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Apoyo en cocina"
-                        android:textColor="@color/gris_texto"
-                        android:textSize="12sp"/>
-
-                    <TextView
-                        android:id="@+id/txtJornadaManipuladora3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:text="Mañana y tarde"
-                        android:textColor="@color/gris_texto"
-                        android:textSize="11sp"/>
+                        android:background="@drawable/bg_estado_activo"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="5dp"
+                        android:text="Activa"
+                        android:textColor="#15803D"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
-
-                <TextView
-                    android:id="@+id/txtEstadoManipuladora3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="6dp"
-                    android:text="Activa"
-                    android:textColor="@color/negro_principal"
-                    android:textSize="11sp"
-                    android:textStyle="bold"
-                    android:background="@drawable/bg_estado_activo"/>
-
-            </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
 
             <!-- ================================================= -->
-            <!-- MENSAJE INFORMATIVO                              -->
+            <!-- MENSAJE INFORMATIVO / BANNER                      -->
             <!-- ================================================= -->
 
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="14dp"
-                android:background="@drawable/bg_card_resumen">
+                android:layout_marginTop="20dp"
+                app:cardBackgroundColor="#FEF3C7"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#F59E0B"
+                app:strokeWidth="1dp">
 
-                <ImageView
-                    android:layout_width="38dp"
-                    android:layout_height="38dp"
-                    android:padding="9dp"
-                    android:background="@drawable/bg_icono_circular"
-                    android:src="@drawable/ic_info"
-                    android:tint="@color/negro_principal"
-                    android:contentDescription="Información"/>
-
-                <TextView
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="12dp"
-                    android:text="Desde esta sección podrás administrar el personal encargado de las preparaciones."
-                    android:textColor="@color/gris_texto"
-                    android:textSize="12sp"/>
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
 
-            </LinearLayout>
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_icono_circular"
+                        android:contentDescription="Información"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_info"
+                        app:tint="#B45309" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:text="Desde esta sección puedes supervisar al personal encargado de las preparaciones y la distribución de alimentos."
+                        android:textColor="#92400E"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 
     <!-- ===================================================== -->
@@ -437,6 +481,6 @@
         android:id="@+id/barra_navegacion_jefa"
         layout="@layout/view_bottom_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

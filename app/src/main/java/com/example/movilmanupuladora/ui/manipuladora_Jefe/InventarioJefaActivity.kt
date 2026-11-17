@@ -59,6 +59,11 @@ class InventarioJefaActivity : AppCompatActivity() {
         binding.btnVolver.setOnClickListener {
             finish()
         }
+
+        binding.cardBannerEntregaSupervisor.setOnClickListener {
+            val intent = Intent(this, RegistrarEntregaActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     override fun onResume() {
@@ -253,88 +258,88 @@ class InventarioJefaActivity : AppCompatActivity() {
      * Diálogo emergente que se abre al tocar el lápiz para editar el stock
      */
     private fun mostrarDialogoEditarProducto(producto: ProductoAdmin) {
-        val input = EditText(this).apply {
-            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
-            val valorActualStr = if (producto.cantidad % 1.0 == 0.0) {
-                producto.cantidad.toInt().toString()
-            } else {
-                producto.cantidad.toString()
-            }
-            setText(valorActualStr)
-            setSelection(text.length)
-            hint = "Nueva cantidad"
-            textSize = 18f
-            setTextColor(Color.parseColor("#1B3317"))
-            setPadding(dpToPx(16f), dpToPx(12f), dpToPx(16f), dpToPx(12f))
+        val dialogBinding = com.example.movilmanupuladora.databinding.DialogModificarStockBinding.inflate(layoutInflater)
+
+        val valorActualStr = if (producto.cantidad % 1.0 == 0.0) {
+            producto.cantidad.toInt().toString()
+        } else {
+            producto.cantidad.toString()
         }
 
-        val container = FrameLayout(this).apply {
-            setPadding(dpToPx(24f), dpToPx(12f), dpToPx(24f), dpToPx(8f))
-            addView(input)
-        }
+        dialogBinding.txtDetallesStock.text = "Producto: ${producto.nombre}\nCantidad actual: ${producto.cantidadConUnidad}\nUnidad: ${producto.unidadMedida}"
+        dialogBinding.edtNuevaCantidadStock.setText(valorActualStr)
+        dialogBinding.edtNuevaCantidadStock.setSelection(dialogBinding.edtNuevaCantidadStock.text.length)
 
-        MaterialAlertDialogBuilder(this)
-            .setTitle("✏️ Modificar Stock")
-            .setMessage("Producto: ${producto.nombre}\nCantidad actual: ${producto.cantidadConUnidad}\nUnidad: ${producto.unidadMedida}\n\nIngresa la nueva cantidad:")
-            .setView(container)
-            .setPositiveButton("Guardar") { dialog, _ ->
-                val nuevoValorStr = input.text.toString().trim()
-                val nuevoValor = nuevoValorStr.toDoubleOrNull()
-                if (nuevoValor != null && nuevoValor >= 0) {
-                    producto.cantidad = nuevoValor
-                    adapter.notifyDataSetChanged()
-                    actualizarTextoConteo()
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(dialogBinding.root)
+            .create()
 
-                    Toast.makeText(
-                        this,
-                        "¡Stock de ${producto.nombre} actualizado a ${producto.cantidadConUnidad}!",
-                        Toast.LENGTH_SHORT
-                    ).show()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
-                    // Sincronizar con la API del backend para reflejarlo al Administrador
-                    val idInv = producto.idInventario
-                    if (idInv != null && idInv > 0) {
-                        lifecycleScope.launch(Dispatchers.IO) {
-                            try {
-                                SessionManager.getToken(this@InventarioJefaActivity)
-                                val payload = com.example.movilmanupuladora.data.model.inventario(
-                                    idInventario = idInv,
-                                    idIngrediente = producto.idIngrediente,
-                                    cantidadActual = String.format(java.util.Locale.US, "%.2f", nuevoValor),
-                                    stockMinimo = "4.00",
-                                    idUnidadMedida = when (producto.unidadMedida.lowercase().trim()) {
-                                        "l", "litro", "litros" -> 2
-                                        "u", "unidad", "unidades" -> 3
-                                        else -> 1
-                                    }
-                                )
-                                val res = RetrofitClient.apiService.actualizarInventario(idInv, payload)
-                                withContext(Dispatchers.Main) {
-                                    if (!res.isSuccessful) {
-                                        android.util.Log.e("INVENTARIO_SYNC", "Error ${res.code()}: ${res.errorBody()?.string()}")
-                                        if (res.code() == 403) {
-                                            Toast.makeText(
-                                                this@InventarioJefaActivity,
-                                                "⚠️ Guardado en la app. El servidor requiere permiso de Supervisor/Admin para reflejarlo en la web.",
-                                                Toast.LENGTH_LONG
-                                            ).show()
-                                        }
+        dialogBinding.btnGuardarStock.setOnClickListener {
+            val nuevoValorStr = dialogBinding.edtNuevaCantidadStock.text.toString().trim()
+            val nuevoValor = nuevoValorStr.toDoubleOrNull()
+            if (nuevoValor != null && nuevoValor >= 0) {
+                producto.cantidad = nuevoValor
+                adapter.notifyDataSetChanged()
+                actualizarTextoConteo()
+
+                Toast.makeText(
+                    this,
+                    "Stock de ${producto.nombre} actualizado a ${producto.cantidadConUnidad}",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                // Sincronizar con la API del backend para reflejarlo al Administrador
+                val idInv = producto.idInventario
+                if (idInv != null && idInv > 0) {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        try {
+                            SessionManager.getToken(this@InventarioJefaActivity)
+                            val payload = com.example.movilmanupuladora.data.model.inventario(
+                                idInventario = idInv,
+                                idIngrediente = producto.idIngrediente,
+                                cantidadActual = String.format(java.util.Locale.US, "%.2f", nuevoValor),
+                                stockMinimo = "4.00",
+                                idUnidadMedida = when (producto.unidadMedida.lowercase().trim()) {
+                                    "l", "litro", "litros" -> 2
+                                    "u", "unidad", "unidades" -> 3
+                                    else -> 1
+                                }
+                            )
+                            val res = RetrofitClient.apiService.actualizarInventario(idInv, payload)
+                            withContext(Dispatchers.Main) {
+                                if (!res.isSuccessful) {
+                                    android.util.Log.e("INVENTARIO_SYNC", "Error ${res.code()}: ${res.errorBody()?.string()}")
+                                    if (res.code() == 403) {
+                                        Toast.makeText(
+                                            this@InventarioJefaActivity,
+                                            "Guardado en la app. El servidor requiere permiso de Supervisor/Admin para reflejarlo en la web.",
+                                            Toast.LENGTH_LONG
+                                        ).show()
                                     }
                                 }
-                            } catch (e: Exception) {
-                                android.util.Log.e("INVENTARIO_SYNC", "Error al conectar con servidor: ${e.message}")
                             }
+                        } catch (e: Exception) {
+                            android.util.Log.e("INVENTARIO_SYNC", "Error al conectar con servidor: ${e.message}")
                         }
                     }
-                } else {
-                    Toast.makeText(this, "Por favor ingresa una cantidad numérica válida", Toast.LENGTH_SHORT).show()
                 }
-                dialog.dismiss()
+            } else {
+                Toast.makeText(this, "Por favor ingresa una cantidad numérica válida", Toast.LENGTH_SHORT).show()
             }
-            .setNegativeButton("Cancelar") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .show()
+            dialog.dismiss()
+        }
+
+        dialogBinding.btnCancelarStock.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.90).toInt(),
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
     }
 
     /**
@@ -348,8 +353,11 @@ class InventarioJefaActivity : AppCompatActivity() {
                 // 1. Obtener catálogo de ingredientes para nombres, categorías y unidades
                 val ingRes = RetrofitClient.apiService.obtenerIngredientes()
                 val mapIngredientes = if (ingRes.isSuccessful && !ingRes.body().isNullOrEmpty()) {
-                    ingRes.body()!!.associateBy { it.idIngrediente }
-                } else emptyMap()
+                    ingRes.body()!!.associateBy { it.obtenerIdReal() }
+                } else {
+                    android.util.Log.e("INVENTARIO_SYNC", "obtenerIngredientes: HTTP ${ingRes.code()}")
+                    emptyMap()
+                }
 
                 // 2. Consultar el inventario real del Administrador
                 val invRes = RetrofitClient.apiService.obtenerInventario()
@@ -362,15 +370,25 @@ class InventarioJefaActivity : AppCompatActivity() {
                             ?: inv.cantidad
                             ?: 0.0
 
-                        val ing = inv.idIngrediente?.let { mapIngredientes[it] }
-                        val nombre = ing?.nombreIngrediente ?: "Insumo #${inv.idIngrediente ?: inv.idInventario}"
-                        val catNombre = when (ing?.idCategoriaInventario) {
+                        val idReal = inv.obtenerIdReal()
+                        val idIng = inv.obtenerIdIngredienteReal()
+                        val ing = idIng?.let { mapIngredientes[it] }
+
+                        val nombre = ing?.obtenerNombreReal()
+                            ?.takeIf { it.isNotBlank() }
+                            ?: inv.nombreIngrediente
+                            ?: inv.nombre
+                            ?: "Insumo #${idIng ?: idReal}"
+
+                        val catId = ing?.obtenerCategoriaReal()
+                        val catNombre = when (catId) {
                             2, 7 -> "Lácteos"
                             4 -> "Granos"
                             5 -> "Verduras"
                             else -> "Granos"
                         }
-                        val unidadStr = when (inv.idUnidadMedida ?: ing?.idUnidadMedida) {
+                        val unidId = inv.obtenerIdUnidadReal() ?: ing?.obtenerUnidadReal()
+                        val unidadStr = when (unidId) {
                             1 -> "kg"
                             2, 8 -> "L"
                             3 -> "u"
@@ -379,9 +397,9 @@ class InventarioJefaActivity : AppCompatActivity() {
 
                         listaServidor.add(
                             ProductoAdmin(
-                                id = inv.idInventario,
-                                idInventario = inv.idInventario,
-                                idIngrediente = inv.idIngrediente,
+                                id = idReal,
+                                idInventario = idReal,
+                                idIngrediente = idIng,
                                 nombre = nombre,
                                 cantidad = stockServidor,
                                 unidadMedida = unidadStr,
@@ -396,6 +414,8 @@ class InventarioJefaActivity : AppCompatActivity() {
                         listaProductosAdmin.clear()
                         listaProductosAdmin.addAll(listaServidor)
                     }
+                } else {
+                    android.util.Log.e("INVENTARIO_SYNC", "obtenerInventario: HTTP ${invRes.code()}")
                 }
 
                 // 3. Refrescar la interfaz en el hilo principal

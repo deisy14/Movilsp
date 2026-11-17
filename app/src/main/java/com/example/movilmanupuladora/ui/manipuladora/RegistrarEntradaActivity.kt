@@ -186,13 +186,13 @@ class RegistrarEntradaActivity : AppCompatActivity() {
                     if (llegoCompleto) {
                         Toast.makeText(
                             this@RegistrarEntradaActivity,
-                            "✓ Cargamento verificado completo. Stock actualizado.",
+                            "Cargamento verificado completo. Stock actualizado.",
                             Toast.LENGTH_LONG
                         ).show()
                     } else {
                         Toast.makeText(
                             this@RegistrarEntradaActivity,
-                            "✓ Recepción guardada con reporte de faltante enviado al supervisor.",
+                            "Recepción guardada con reporte de faltante enviado al supervisor.",
                             Toast.LENGTH_LONG
                         ).show()
                     }
@@ -200,7 +200,7 @@ class RegistrarEntradaActivity : AppCompatActivity() {
                     // Fallback visual exitoso para el usuario
                     Toast.makeText(
                         this@RegistrarEntradaActivity,
-                        "✓ Recepción registrada exitosamente en el sistema PAE.",
+                        "Recepción registrada exitosamente en el sistema PAE.",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -213,7 +213,7 @@ class RegistrarEntradaActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 Toast.makeText(
                     this@RegistrarEntradaActivity,
-                    "✓ Recepción guardada localmente.",
+                    "Recepción guardada localmente.",
                     Toast.LENGTH_SHORT
                 ).show()
 

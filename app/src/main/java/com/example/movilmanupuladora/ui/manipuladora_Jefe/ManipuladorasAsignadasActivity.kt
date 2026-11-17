@@ -1,11 +1,12 @@
 package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
-import android.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -13,9 +14,13 @@ import androidx.lifecycle.lifecycleScope
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.data.model.MenuPaeCatalog
 import com.example.movilmanupuladora.databinding.ActivityManipuladorasAsignadasBinding
-import com.example.movilmanupuladora.ui.manipuladora.PreparacionActivity
+import com.example.movilmanupuladora.ui.manipuladora_Jefe.IniciarPreparacionActivity
+import com.example.movilmanupuladora.utils.PreparacionSyncManager
 import com.example.movilmanupuladora.utils.SessionManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import java.text.Normalizer
 
 class ManipuladorasAsignadasActivity : AppCompatActivity() {
@@ -29,7 +34,7 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
     private var idPlato = -1
 
     private var componenteJefa: String? = null
-    private var nombreJefa: String = "Isa Pérez"
+    private var nombreJefa: String = "Jefa de Cocina"
     private var correoJefa: String = ""
 
     data class ManipuladoraLocal(
@@ -78,7 +83,7 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
         idPlato = intent.getIntExtra("id_plato", -1)
 
         val sessionMgr = SessionManager(this)
-        nombreJefa = sessionMgr.getUserName() ?: "Isa Pérez"
+        nombreJefa = sessionMgr.getUserName() ?: "Jefa de Cocina"
         correoJefa = sessionMgr.getUserEmail() ?: ""
 
         binding.txtJornada.text = "Jornada: $jornada"
@@ -197,17 +202,17 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
     private fun actualizarTarjetaJefa() {
         binding.cardJefa.visibility = View.VISIBLE
         binding.txtNombreJefa.text = "$nombreJefa (Jefa de Cocina · Tú)"
-        binding.txtRolJefa.text = "👑 Coordinación PAE (Toca para opciones de preparación)"
+        binding.txtRolJefa.text = "Coordinación PAE (Toca para opciones de preparación)"
 
         if (!componenteJefa.isNullOrBlank()) {
-            binding.txtComponenteJefa.text = "🥣 Tu componente: $componenteJefa"
+            binding.txtComponenteJefa.text = "Tu componente: $componenteJefa"
             binding.txtComponenteJefa.setBackgroundResource(R.drawable.bg_pill_green)
             binding.txtComponenteJefa.setTextColor(Color.parseColor("#176B35"))
 
             val estadoJ = PreparacionEstadoManager.obtenerEstado(this, nombreJefa, componenteJefa, correoJefa)
             configurarBadgeEstado(binding.txtEstadoJefa, estadoJ)
         } else {
-            binding.txtComponenteJefa.text = "➕ Toca para asignarte un componente"
+            binding.txtComponenteJefa.text = "Toca para asignarte un componente"
             binding.txtComponenteJefa.setBackgroundResource(R.drawable.bg_pill_yellow)
             binding.txtComponenteJefa.setTextColor(Color.parseColor("#855B00"))
 
@@ -227,14 +232,14 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
                     binding.txtRolManipuladora1.text = persona.rol
 
                     if (!persona.componenteAsignado.isNullOrBlank()) {
-                        binding.txtComponenteManipuladora1.text = "🥣 Componente: ${persona.componenteAsignado}"
+                        binding.txtComponenteManipuladora1.text = "Componente: ${persona.componenteAsignado}"
                         binding.txtComponenteManipuladora1.setBackgroundResource(R.drawable.bg_pill_green)
                         binding.txtComponenteManipuladora1.setTextColor(Color.parseColor("#176B35"))
 
                         val estadoPrep = PreparacionEstadoManager.obtenerEstado(this, persona.nombre, persona.componenteAsignado, persona.correo)
                         configurarBadgeEstado(binding.txtEstadoManipuladora1, estadoPrep)
                     } else {
-                        binding.txtComponenteManipuladora1.text = "➕ Toca para asignar componente"
+                        binding.txtComponenteManipuladora1.text = "Toca para asignar componente"
                         binding.txtComponenteManipuladora1.setBackgroundResource(R.drawable.bg_pill_yellow)
                         binding.txtComponenteManipuladora1.setTextColor(Color.parseColor("#855B00"))
                         binding.txtEstadoManipuladora1.text = "Asignar ›"
@@ -253,14 +258,14 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
                     binding.txtRolManipuladora2.text = persona.rol
 
                     if (!persona.componenteAsignado.isNullOrBlank()) {
-                        binding.txtComponenteManipuladora2.text = "🥣 Componente: ${persona.componenteAsignado}"
+                        binding.txtComponenteManipuladora2.text = "Componente: ${persona.componenteAsignado}"
                         binding.txtComponenteManipuladora2.setBackgroundResource(R.drawable.bg_pill_green)
                         binding.txtComponenteManipuladora2.setTextColor(Color.parseColor("#176B35"))
 
                         val estadoPrep = PreparacionEstadoManager.obtenerEstado(this, persona.nombre, persona.componenteAsignado, persona.correo)
                         configurarBadgeEstado(binding.txtEstadoManipuladora2, estadoPrep)
                     } else {
-                        binding.txtComponenteManipuladora2.text = "➕ Toca para asignar componente"
+                        binding.txtComponenteManipuladora2.text = "Toca para asignar componente"
                         binding.txtComponenteManipuladora2.setBackgroundResource(R.drawable.bg_pill_yellow)
                         binding.txtComponenteManipuladora2.setTextColor(Color.parseColor("#855B00"))
                         binding.txtEstadoManipuladora2.text = "Asignar ›"
@@ -279,14 +284,14 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
                     binding.txtRolManipuladora3.text = persona.rol
 
                     if (!persona.componenteAsignado.isNullOrBlank()) {
-                        binding.txtComponenteManipuladora3.text = "🥣 Componente: ${persona.componenteAsignado}"
+                        binding.txtComponenteManipuladora3.text = "Componente: ${persona.componenteAsignado}"
                         binding.txtComponenteManipuladora3.setBackgroundResource(R.drawable.bg_pill_green)
                         binding.txtComponenteManipuladora3.setTextColor(Color.parseColor("#176B35"))
 
                         val estadoPrep = PreparacionEstadoManager.obtenerEstado(this, persona.nombre, persona.componenteAsignado, persona.correo)
                         configurarBadgeEstado(binding.txtEstadoManipuladora3, estadoPrep)
                     } else {
-                        binding.txtComponenteManipuladora3.text = "➕ Toca para asignar componente"
+                        binding.txtComponenteManipuladora3.text = "Toca para asignar componente"
                         binding.txtComponenteManipuladora3.setBackgroundResource(R.drawable.bg_pill_yellow)
                         binding.txtComponenteManipuladora3.setTextColor(Color.parseColor("#855B00"))
                         binding.txtEstadoManipuladora3.text = "Asignar ›"
@@ -303,17 +308,17 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
     private fun configurarBadgeEstado(textView: TextView, estado: String) {
         when (estado) {
             PreparacionEstadoManager.ESTADO_POR_HACER -> {
-                textView.text = "⏳ Por hacer"
+                textView.text = "Por hacer"
                 textView.setBackgroundResource(R.drawable.bg_tag_plato)
                 textView.setTextColor(Color.parseColor("#1B3317"))
             }
             PreparacionEstadoManager.ESTADO_EN_PROCESO -> {
-                textView.text = "🔥 En proceso"
+                textView.text = "En proceso"
                 textView.setBackgroundResource(R.drawable.bg_pill_yellow)
                 textView.setTextColor(Color.parseColor("#855B00"))
             }
             PreparacionEstadoManager.ESTADO_FINALIZADA -> {
-                textView.text = "✅ Finalizada"
+                textView.text = "Finalizada"
                 textView.setBackgroundResource(R.drawable.bg_pill_green)
                 textView.setTextColor(Color.parseColor("#176B35"))
             }
@@ -332,32 +337,27 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
         }
 
         val estadoActual = PreparacionEstadoManager.obtenerEstado(this, nombreJefa, componenteJefa, correoJefa)
-        val opciones = arrayOf(
-            "👨‍🍳 Ir a preparar mi componente (Ver pasos e insumos)",
-            "⚡ Cambiar estado (Actual: $estadoActual)",
-            "🥣 Cambiar componente asignado",
-            "❌ Quitar mi asignación"
+        val opciones = listOf(
+            "Ir a preparar mi componente (Ver pasos e insumos)",
+            "Cambiar estado (Actual: $estadoActual)",
+            "Cambiar componente asignado",
+            "Quitar mi asignación"
         )
 
-        AlertDialog.Builder(this)
-            .setTitle("Opciones Jefa: $nombreJefa")
-            .setItems(opciones) { _, which ->
-                when (which) {
-                    0 -> {
-                        val intentPrep = Intent(this, PreparacionActivity::class.java).apply {
-                            putExtra("nombre_plato", nombreMenu)
-                            putExtra("componente_seleccionado", componenteJefa)
-                            putExtra("id_imagen", InicioJefaActivity.obtenerImagenPlatoPorNombre(nombreMenu))
-                        }
-                        startActivity(intentPrep)
+        mostrarDialogoOpcionesCustom("Opciones Jefa: $nombreJefa", opciones) { which ->
+            when (which) {
+                0 -> {
+                    val intent = Intent(this, IniciarPreparacionActivity::class.java).apply {
+                        putExtra("nombre_menu", nombreMenu)
+                        putExtra("jornada", jornada)
                     }
-                    1 -> mostrarDialogoCambiarEstado(nombreJefa, componenteJefa, correoJefa)
-                    2 -> mostrarDialogoAsignarComponenteJefa()
-                    3 -> asignarComponenteJefa(null)
+                    startActivity(intent)
                 }
+                1 -> mostrarDialogoCambiarEstado(nombreJefa, componenteJefa, correoJefa)
+                2 -> mostrarDialogoAsignarComponenteJefa()
+                3 -> asignarComponenteJefa(null)
             }
-            .setNegativeButton("Cancelar", null)
-            .show()
+        }
     }
 
     private fun mostrarOpcionesManipuladora(manipuladora: ManipuladoraLocal) {
@@ -367,88 +367,68 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
         }
 
         val estadoActual = PreparacionEstadoManager.obtenerEstado(this, manipuladora.nombre, manipuladora.componenteAsignado, manipuladora.correo)
-        val opciones = arrayOf(
-            "⚡ Cambiar estado de preparación (Actual: $estadoActual)",
-            "🥣 Cambiar componente asignado",
-            "❌ Quitar componente asignado"
+        val opciones = listOf(
+            "Cambiar estado (Actual: $estadoActual)",
+            "Cambiar componente asignado",
+            "Quitar componente asignado"
         )
 
-        AlertDialog.Builder(this)
-            .setTitle("Opciones: ${manipuladora.nombre}")
-            .setItems(opciones) { _, which ->
-                when (which) {
-                    0 -> mostrarDialogoCambiarEstado(manipuladora.nombre, manipuladora.componenteAsignado, manipuladora.correo)
-                    1 -> mostrarDialogoAsignarComponente(manipuladora)
-                    2 -> asignarComponente(manipuladora, null)
-                }
+        mostrarDialogoOpcionesCustom("Opciones: ${manipuladora.nombre}", opciones) { which ->
+            when (which) {
+                0 -> mostrarDialogoCambiarEstado(manipuladora.nombre, manipuladora.componenteAsignado, manipuladora.correo)
+                1 -> mostrarDialogoAsignarComponente(manipuladora)
+                2 -> asignarComponente(manipuladora, null)
             }
-            .setNegativeButton("Cancelar", null)
-            .show()
+        }
     }
 
     private fun mostrarDialogoCambiarEstado(persona: String, componente: String?, correo: String?) {
-        val opciones = arrayOf(
-            "⏳ Por hacer / Pendiente",
-            "🔥 En proceso / En preparación",
-            "✅ Finalizada / Completada"
+        val opciones = listOf(
+            "Por hacer / Pendiente",
+            "En proceso / En preparación",
+            "Finalizada / Completada"
         )
-        val estadoActual = PreparacionEstadoManager.obtenerEstado(this, persona, componente, correo)
 
-        AlertDialog.Builder(this)
-            .setTitle("Actualizar estado de preparación")
-            .setMessage("Responsable: $persona\nComponente: ${componente ?: "General"}\nEstado actual: $estadoActual")
-            .setItems(opciones) { _, which ->
-                val nuevoEstado = when (which) {
-                    0 -> PreparacionEstadoManager.ESTADO_POR_HACER
-                    1 -> PreparacionEstadoManager.ESTADO_EN_PROCESO
-                    2 -> PreparacionEstadoManager.ESTADO_FINALIZADA
-                    else -> PreparacionEstadoManager.ESTADO_POR_HACER
-                }
-                PreparacionEstadoManager.guardarEstado(this, persona, componente, nuevoEstado, correo)
-                actualizarInterfaz()
+        mostrarDialogoOpcionesCustom("Actualizar estado de $persona", opciones) { which ->
+            val nuevoEstado = when (which) {
+                0 -> PreparacionEstadoManager.ESTADO_POR_HACER
+                1 -> PreparacionEstadoManager.ESTADO_EN_PROCESO
+                2 -> PreparacionEstadoManager.ESTADO_FINALIZADA
+                else -> PreparacionEstadoManager.ESTADO_POR_HACER
+            }
+            PreparacionEstadoManager.guardarEstado(this, persona, componente, nuevoEstado, correo)
+            actualizarInterfaz()
 
-                // Sincronizar de inmediato a la nube
-                lifecycleScope.launch {
-                    val sessionMgr = SessionManager(this@ManipuladorasAsignadasActivity)
-                    val uid = when {
-                        persona == nombreJefa -> sessionMgr.getUserId().let { if (it > 0) it else 19 }
-                        else -> {
-                            val manip = manipuladoras.firstOrNull { it.nombre.equals(persona, true) || it.correo.equals(correo, true) }
-                            if (manip != null && manip.idUsuario > 0) manip.idUsuario else {
-                                val real = ManipuladorasManager.obtenerManipuladoras().firstOrNull {
-                                    it.correo.equals(correo, true) || it.nombre.equals(persona, true)
-                                }
-                                real?.idUsuario ?: real?.id ?: -1
+            // Sincronizar de inmediato a la nube
+            lifecycleScope.launch {
+                val sessionMgr = SessionManager(this@ManipuladorasAsignadasActivity)
+                val uid = when {
+                    persona == nombreJefa -> sessionMgr.getUserId().let { if (it > 0) it else 19 }
+                    else -> {
+                        val manip = manipuladoras.firstOrNull { it.nombre.equals(persona, true) || it.correo.equals(correo, true) }
+                        if (manip != null && manip.idUsuario > 0) manip.idUsuario else {
+                            val real = ManipuladorasManager.obtenerManipuladoras().firstOrNull {
+                                it.correo.equals(correo, true) || it.nombre.equals(persona, true)
                             }
+                            real?.idUsuario ?: real?.id ?: -1
                         }
                     }
-                    if (uid > 0 && !componente.isNullOrBlank()) {
-                        com.example.movilmanupuladora.utils.PreparacionSyncManager.guardarAsignacionEnBackend(
-                            idUsuario = uid,
-                            componente = componente,
-                            estado = nuevoEstado
-                        )
-                    }
                 }
-
-                Toast.makeText(this, "Estado de $persona cambiado a: $nuevoEstado", Toast.LENGTH_SHORT).show()
+                if (uid > 0 && !componente.isNullOrBlank()) {
+                    com.example.movilmanupuladora.utils.PreparacionSyncManager.guardarAsignacionEnBackend(
+                        idUsuario = uid,
+                        componente = componente,
+                        estado = nuevoEstado
+                    )
+                }
             }
-            .setNegativeButton("Cancelar", null)
-            .show()
+
+            Toast.makeText(this, "Estado de $persona cambiado a: $nuevoEstado", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun obtenerEmojiComponente(c: String): String {
-        return when {
-            c.contains("avena", true) || c.contains("jugo", true) || c.contains("refresco", true) || c.contains("bebida", true) || c.contains("chocolate", true) -> "🥤"
-            c.contains("leche", true) || c.contains("yogurt", true) -> "🥛"
-            c.contains("galleta", true) || c.contains("cuca", true) || c.contains("hojaldra", true) || c.contains("torta", true) || c.contains("pastel", true) || c.contains("pan", true) -> "🍪"
-            c.contains("maní", true) || c.contains("mani", true) -> "🥜"
-            c.contains("mango", true) || c.contains("papaya", true) || c.contains("manzana", true) || c.contains("fruta", true) -> "🍎"
-            c.contains("carne", true) || c.contains("pollo", true) || c.contains("huevo", true) -> "🥩"
-            c.contains("arroz", true) -> "🍚"
-            c.contains("ensalada", true) || c.contains("verdura", true) -> "🥗"
-            else -> "🥣"
-        }
+        return ""
     }
 
     private fun mostrarDialogoAsignarComponenteJefa() {
@@ -456,85 +436,68 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
         val opciones = mutableListOf<String>()
 
         for (c in componentes) {
-            val emoji = obtenerEmojiComponente(c)
             val otra = manipuladoras.firstOrNull { it.componenteAsignado?.equals(c, ignoreCase = true) == true }
             if (otra != null) {
-                opciones.add("$emoji $c  (⚠️ Ocupado por ${otra.nombre})")
+                opciones.add("$c  (Ocupado por ${otra.nombre})")
             } else if (componenteJefa?.equals(c, ignoreCase = true) == true) {
-                opciones.add("$emoji $c  (✓ Asignado a ti)")
+                opciones.add("$c  (Asignado a ti)")
             } else {
-                opciones.add("$emoji $c")
+                opciones.add(c)
             }
         }
 
-        opciones.add("✏️ Ingresar otro componente personalizado...")
+        opciones.add("Ingresar otro componente personalizado...")
         if (!componenteJefa.isNullOrBlank()) {
-            opciones.add("❌ Quitar componente asignado")
+            opciones.add("Quitar componente asignado")
         }
 
-        AlertDialog.Builder(this)
-            .setTitle("Asignarme componente para preparar")
-            .setItems(opciones.toTypedArray()) { _, posicion ->
-                when {
-                    posicion < componentes.size -> {
-                        val compElegido = componentes[posicion]
-                        val otra = manipuladoras.firstOrNull { it.componenteAsignado?.equals(compElegido, ignoreCase = true) == true }
-                        if (otra != null) {
-                            AlertDialog.Builder(this)
-                                .setTitle("Componente ya asignado")
-                                .setMessage("El componente '$compElegido' ya se encuentra asignado a ${otra.nombre}.\n\nNo se permite duplicar componentes en el equipo.\n\n¿Deseas transferirlo a ti misma?")
-                                .setPositiveButton("Sí, transferir a mí") { _, _ ->
-                                    otra.componenteAsignado = null
-                                    asignarComponenteJefa(compElegido)
-                                }
-                                .setNegativeButton("Cancelar", null)
-                                .show()
-                        } else {
+        mostrarDialogoOpcionesCustom("Asignarme componente para preparar", opciones) { posicion ->
+            when {
+                posicion < componentes.size -> {
+                    val compElegido = componentes[posicion]
+                    val otra = manipuladoras.firstOrNull { it.componenteAsignado?.equals(compElegido, ignoreCase = true) == true }
+                    if (otra != null) {
+                        mostrarDialogoConfirmacionCustom(
+                            "Componente ya asignado",
+                            "El componente '$compElegido' ya se encuentra asignado a ${otra.nombre}.\n\nNo se permite duplicar componentes en el equipo.\n\n¿Deseas transferirlo a ti misma?",
+                            "Sí, transferir a mí"
+                        ) {
+                            otra.componenteAsignado = null
                             asignarComponenteJefa(compElegido)
                         }
-                    }
-                    posicion == componentes.size -> {
-                        mostrarDialogoComponentePersonalizadoJefa()
-                    }
-                    else -> {
-                        asignarComponenteJefa(null)
+                    } else {
+                        asignarComponenteJefa(compElegido)
                     }
                 }
+                posicion == componentes.size -> {
+                    mostrarDialogoComponentePersonalizadoJefa()
+                }
+                else -> {
+                    asignarComponenteJefa(null)
+                }
             }
-            .setNegativeButton("Cancelar", null)
-            .show()
+        }
     }
 
     private fun mostrarDialogoComponentePersonalizadoJefa() {
-        val input = EditText(this)
-        input.hint = "Ej: Porción de fruta, Ensalada dulce..."
-        input.setPadding(48, 32, 48, 32)
-
-        AlertDialog.Builder(this)
-            .setTitle("Componente personalizado (Jefa)")
-            .setMessage("Escribe el componente que prepararás:")
-            .setView(input)
-            .setPositiveButton("Asignar") { _, _ ->
-                val nuevoComp = input.text.toString().trim()
-                if (nuevoComp.isNotEmpty()) {
-                    val otra = manipuladoras.firstOrNull { it.componenteAsignado?.equals(nuevoComp, ignoreCase = true) == true }
-                    if (otra != null) {
-                        AlertDialog.Builder(this)
-                            .setTitle("Componente ya asignado")
-                            .setMessage("El componente '$nuevoComp' ya está asignado a ${otra.nombre}.\n\n¿Deseas transferirlo a ti misma?")
-                            .setPositiveButton("Sí, transferir") { _, _ ->
-                                otra.componenteAsignado = null
-                                asignarComponenteJefa(nuevoComp)
-                            }
-                            .setNegativeButton("Cancelar", null)
-                            .show()
-                    } else {
-                        asignarComponenteJefa(nuevoComp)
-                    }
+        mostrarDialogoInputCustom(
+            "Componente personalizado (Jefa)",
+            "Escribe el componente que prepararás:"
+        ) { nuevoComp ->
+            val otra = manipuladoras.firstOrNull { it.componenteAsignado?.equals(nuevoComp, ignoreCase = true) == true }
+            if (otra != null) {
+                mostrarDialogoConfirmacionCustom(
+                    "Componente ya asignado",
+                    "El componente '$nuevoComp' ya está asignado a ${otra.nombre}.\n\n¿Deseas transferirlo a ti misma?",
+                    "Sí, transferir"
+                ) {
+                    otra.componenteAsignado = null
+                    asignarComponenteJefa(nuevoComp)
                 }
+            } else {
+                asignarComponenteJefa(nuevoComp)
             }
-            .setNegativeButton("Cancelar", null)
-            .show()
+        }
     }
 
     private fun asignarComponenteJefa(componente: String?) {
@@ -556,7 +519,7 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
         if (componente != null) {
             Toast.makeText(
                 this,
-                "✓ '$componente' asignado a la Jefa de Cocina",
+                "'$componente' asignado a la Jefa de Cocina",
                 Toast.LENGTH_SHORT
             ).show()
         } else {
@@ -580,113 +543,95 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
             val ocupadoPorJefa = componenteJefa?.equals(c, ignoreCase = true) == true
 
             when {
-                ocupadoPorJefa -> opciones.add("$emoji $c  (⚠️ Ocupado por la Jefa)")
-                otra != null -> opciones.add("$emoji $c  (⚠️ Ocupado por ${otra.nombre})")
-                manipuladora.componenteAsignado?.equals(c, ignoreCase = true) == true -> opciones.add("$emoji $c  (✓ Asignado)")
-                else -> opciones.add("$emoji $c")
+                ocupadoPorJefa -> opciones.add("$c  (Ocupado por la Jefa)")
+                otra != null -> opciones.add("$c  (Ocupado por ${otra.nombre})")
+                manipuladora.componenteAsignado?.equals(c, ignoreCase = true) == true -> opciones.add("$c  (Asignado)")
+                else -> opciones.add(c)
             }
         }
 
-        opciones.add("✏️ Ingresar otro componente personalizado...")
+        opciones.add("Ingresar otro componente personalizado...")
         if (!manipuladora.componenteAsignado.isNullOrBlank()) {
-            opciones.add("❌ Quitar componente asignado")
+            opciones.add("Quitar componente asignado")
         }
 
-        AlertDialog.Builder(this)
-            .setTitle("Asignar componente a ${manipuladora.nombre}")
-            .setItems(opciones.toTypedArray()) { _, posicion ->
-                when {
-                    posicion < componentes.size -> {
-                        val compElegido = componentes[posicion]
-                        val otra = manipuladoras.firstOrNull { it != manipuladora && it.componenteAsignado?.equals(compElegido, ignoreCase = true) == true }
-                        val ocupadoPorJefa = componenteJefa?.equals(compElegido, ignoreCase = true) == true
-
-                        when {
-                            ocupadoPorJefa -> {
-                                AlertDialog.Builder(this)
-                                    .setTitle("Componente asignado a la Jefa")
-                                    .setMessage("El componente '$compElegido' está asignado a ti (Jefa de Cocina).\n\n¿Deseas transferirlo a ${manipuladora.nombre}?")
-                                    .setPositiveButton("Sí, transferir") { _, _ ->
-                                        componenteJefa = null
-                                        asignarComponente(manipuladora, compElegido)
-                                    }
-                                    .setNegativeButton("Cancelar", null)
-                                    .show()
-                            }
-                            otra != null -> {
-                                AlertDialog.Builder(this)
-                                    .setTitle("Componente ya asignado")
-                                    .setMessage("El componente '$compElegido' ya se encuentra asignado a ${otra.nombre}.\n\nNo se permite que dos personas tengan el mismo componente.\n\n¿Deseas transferirlo a ${manipuladora.nombre}?")
-                                    .setPositiveButton("Sí, transferir") { _, _ ->
-                                        otra.componenteAsignado = null
-                                        asignarComponente(manipuladora, compElegido)
-                                    }
-                                    .setNegativeButton("Cancelar", null)
-                                    .show()
-                            }
-                            else -> {
-                                asignarComponente(manipuladora, compElegido)
-                            }
-                        }
-                    }
-                    posicion == componentes.size -> {
-                        mostrarDialogoComponentePersonalizado(manipuladora)
-                    }
-                    else -> {
-                        asignarComponente(manipuladora, null)
-                    }
-                }
-            }
-            .setNegativeButton("Cancelar", null)
-            .show()
-    }
-
-    private fun mostrarDialogoComponentePersonalizado(manipuladora: ManipuladoraLocal) {
-        val input = EditText(this)
-        input.hint = "Ej: Porción de fruta, Ensalada dulce..."
-        input.setPadding(48, 32, 48, 32)
-
-        AlertDialog.Builder(this)
-            .setTitle("Componente personalizado")
-            .setMessage("Escribe el componente que preparará ${manipuladora.nombre}:")
-            .setView(input)
-            .setPositiveButton("Asignar") { _, _ ->
-                val nuevoComp = input.text.toString().trim()
-                if (nuevoComp.isNotEmpty()) {
-                    val otra = manipuladoras.firstOrNull { it != manipuladora && it.componenteAsignado?.equals(nuevoComp, ignoreCase = true) == true }
-                    val ocupadoPorJefa = componenteJefa?.equals(nuevoComp, ignoreCase = true) == true
+        mostrarDialogoOpcionesCustom("Asignar componente a ${manipuladora.nombre}", opciones) { posicion ->
+            when {
+                posicion < componentes.size -> {
+                    val compElegido = componentes[posicion]
+                    val otra = manipuladoras.firstOrNull { it != manipuladora && it.componenteAsignado?.equals(compElegido, ignoreCase = true) == true }
+                    val ocupadoPorJefa = componenteJefa?.equals(compElegido, ignoreCase = true) == true
 
                     when {
                         ocupadoPorJefa -> {
-                            AlertDialog.Builder(this)
-                                .setTitle("Componente asignado a la Jefa")
-                                .setMessage("El componente '$nuevoComp' está asignado a ti (Jefa de Cocina).\n\n¿Deseas transferirlo a ${manipuladora.nombre}?")
-                                .setPositiveButton("Sí, transferir") { _, _ ->
-                                    componenteJefa = null
-                                    asignarComponente(manipuladora, nuevoComp)
-                                }
-                                .setNegativeButton("Cancelar", null)
-                                .show()
+                            mostrarDialogoConfirmacionCustom(
+                                "Componente asignado a la Jefa",
+                                "El componente '$compElegido' está asignado a ti (Jefa de Cocina).\n\n¿Deseas transferirlo a ${manipuladora.nombre}?",
+                                "Sí, transferir"
+                            ) {
+                                componenteJefa = null
+                                asignarComponente(manipuladora, compElegido)
+                            }
                         }
                         otra != null -> {
-                            AlertDialog.Builder(this)
-                                .setTitle("Componente ya asignado")
-                                .setMessage("El componente '$nuevoComp' ya está asignado a ${otra.nombre}.\n\n¿Deseas transferirlo a ${manipuladora.nombre}?")
-                                .setPositiveButton("Sí, transferir") { _, _ ->
-                                    otra.componenteAsignado = null
-                                    asignarComponente(manipuladora, nuevoComp)
-                                }
-                                .setNegativeButton("Cancelar", null)
-                                .show()
+                            mostrarDialogoConfirmacionCustom(
+                                "Componente ya asignado",
+                                "El componente '$compElegido' ya se encuentra asignado a ${otra.nombre}.\n\nNo se permite que dos personas tengan el mismo componente.\n\n¿Deseas transferirlo a ${manipuladora.nombre}?",
+                                "Sí, transferir"
+                            ) {
+                                otra.componenteAsignado = null
+                                asignarComponente(manipuladora, compElegido)
+                            }
                         }
                         else -> {
-                            asignarComponente(manipuladora, nuevoComp)
+                            asignarComponente(manipuladora, compElegido)
                         }
                     }
                 }
+                posicion == componentes.size -> {
+                    mostrarDialogoComponentePersonalizado(manipuladora)
+                }
+                else -> {
+                    asignarComponente(manipuladora, null)
+                }
             }
-            .setNegativeButton("Cancelar", null)
-            .show()
+        }
+    }
+
+    private fun mostrarDialogoComponentePersonalizado(manipuladora: ManipuladoraLocal) {
+        mostrarDialogoInputCustom(
+            "Componente personalizado",
+            "Escribe el componente que preparará ${manipuladora.nombre}:"
+        ) { nuevoComp ->
+            val otra = manipuladoras.firstOrNull { it != manipuladora && it.componenteAsignado?.equals(nuevoComp, ignoreCase = true) == true }
+            val ocupadoPorJefa = componenteJefa?.equals(nuevoComp, ignoreCase = true) == true
+
+            when {
+                ocupadoPorJefa -> {
+                    mostrarDialogoConfirmacionCustom(
+                        "Componente asignado a la Jefa",
+                        "El componente '$nuevoComp' está asignado a ti (Jefa de Cocina).\n\n¿Deseas transferirlo a ${manipuladora.nombre}?",
+                        "Sí, transferir"
+                    ) {
+                        componenteJefa = null
+                        asignarComponente(manipuladora, nuevoComp)
+                    }
+                }
+                otra != null -> {
+                    mostrarDialogoConfirmacionCustom(
+                        "Componente ya asignado",
+                        "El componente '$nuevoComp' ya está asignado a ${otra.nombre}.\n\n¿Deseas transferirlo a ${manipuladora.nombre}?",
+                        "Sí, transferir"
+                    ) {
+                        otra.componenteAsignado = null
+                        asignarComponente(manipuladora, nuevoComp)
+                    }
+                }
+                else -> {
+                    asignarComponente(manipuladora, nuevoComp)
+                }
+            }
+        }
     }
 
     private fun asignarComponente(manipuladora: ManipuladoraLocal, componente: String?) {
@@ -716,7 +661,7 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
         if (componente != null) {
             Toast.makeText(
                 this,
-                "✓ '$componente' asignado a ${manipuladora.nombre}",
+                "'$componente' asignado a ${manipuladora.nombre}",
                 Toast.LENGTH_SHORT
             ).show()
         } else {
@@ -735,33 +680,28 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
         }
 
         // Obtener manipuladoras del Manager que no estén ya en la lista
-        val disponibles = ManipuladorasManager.obtenerManipuladoras()
+        val disponibles: List<String> = ManipuladorasManager.obtenerManipuladoras()
             .filter { m -> manipuladoras.none { it.correo == m.correo && it.nombre == m.nombre } }
             .map { it.nombre }
-            .toTypedArray()
 
         if (disponibles.isEmpty()) {
             Toast.makeText(this, "No hay más manipuladoras disponibles", Toast.LENGTH_SHORT).show()
             return
         }
 
-        AlertDialog.Builder(this)
-            .setTitle("Seleccionar manipuladora")
-            .setItems(disponibles) { _, posicion ->
-                val nombreSeleccionado = disponibles[posicion]
-                val managerData = ManipuladorasManager.obtenerManipuladoras()
-                    .firstOrNull { it.nombre == nombreSeleccionado }
-                val nueva = ManipuladoraLocal(
-                    nombre = nombreSeleccionado,
-                    correo = managerData?.correo ?: "",
-                    idUsuario = managerData?.idUsuario ?: managerData?.id ?: -1
-                )
-                manipuladoras.add(nueva)
-                actualizarInterfaz()
-                Toast.makeText(this, "${nueva.nombre} agregada", Toast.LENGTH_SHORT).show()
-            }
-            .setNegativeButton("Cancelar", null)
-            .show()
+        mostrarDialogoOpcionesCustom("Seleccionar manipuladora", disponibles) { posicion ->
+            val nombreSeleccionado = disponibles[posicion]
+            val managerData = ManipuladorasManager.obtenerManipuladoras()
+                .firstOrNull { it.nombre == nombreSeleccionado }
+            val nueva = ManipuladoraLocal(
+                nombre = nombreSeleccionado,
+                correo = managerData?.correo ?: "",
+                idUsuario = managerData?.idUsuario ?: managerData?.id ?: -1
+            )
+            manipuladoras.add(nueva)
+            actualizarInterfaz()
+            Toast.makeText(this, "${nueva.nombre} agregada", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun confirmarAsignacion() {
@@ -801,14 +741,32 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
             resumen.append("• ${m.nombre}: $comp ($estM)\n")
         }
 
-        AlertDialog.Builder(this)
-            .setTitle("Confirmar Asignación de Componentes")
-            .setMessage("Plato: $nombreMenu ($jornada)\n\nDistribución:\n$resumen")
-            .setPositiveButton("Confirmar y Guardar") { _, _ ->
-                guardarAsignacion()
-            }
-            .setNegativeButton("Seguir editando", null)
-            .show()
+        val dialogBinding = com.example.movilmanupuladora.databinding.DialogConfirmarAsignacionBinding.inflate(layoutInflater)
+        dialogBinding.txtTituloConfirmacion.text = "Confirmar Asignación de Componentes"
+        dialogBinding.txtMensajeConfirmacionAsignacion.text = "Plato: $nombreMenu ($jornada)\n\nDistribución:\n$resumen"
+        dialogBinding.btnConfirmarGuardarAsignacion.text = "Confirmar y Guardar"
+        dialogBinding.btnSeguirEditandoAsignacion.text = "Seguir editando"
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(dialogBinding.root)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        dialogBinding.btnConfirmarGuardarAsignacion.setOnClickListener {
+            dialog.dismiss()
+            guardarAsignacion()
+        }
+
+        dialogBinding.btnSeguirEditandoAsignacion.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.90).toInt(),
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
     }
 
     private fun guardarAsignacion() {
@@ -819,13 +777,16 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
         editor.putInt("cantidad_manipuladoras", manipuladoras.size)
 
         // Guardar componente de la Jefa de Cocina
+        editor.putString("jefa_nombre", nombreJefa)
+        editor.putString("jefa_correo", correoJefa)
         editor.putString("comp_jefa", componenteJefa ?: "")
         val jefaSinTilde = Normalizer.normalize(nombreJefa, Normalizer.Form.NFD)
             .replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
             .trim().replace(" ", "_").lowercase()
         editor.putString("comp_$jefaSinTilde", componenteJefa ?: "")
         if (correoJefa.isNotBlank()) {
-            val keyCorreoJefa = "comp_correo_" + correoJefa.trim().replace("@", "_").replace(".", "_").lowercase()
+            val keyCorreoJefa =
+                "comp_correo_" + correoJefa.trim().replace("@", "_").replace(".", "_").lowercase()
             editor.putString(keyCorreoJefa, componenteJefa ?: "")
         }
 
@@ -848,7 +809,8 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
             }
 
             if (m.correo.isNotBlank()) {
-                val keyCorreo = "comp_correo_" + m.correo.trim().replace("@", "_").replace(".", "_").lowercase()
+                val keyCorreo =
+                    "comp_correo_" + m.correo.trim().replace("@", "_").replace(".", "_").lowercase()
                 editor.putString(keyCorreo, comp)
             }
 
@@ -872,71 +834,196 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
 
         SessionManager(this).savePlatoSeleccionado(nombreMenu, idPlato)
 
-        // Sincronizar en tiempo real a la nube para que se refleje en todos los dispositivos
-        lifecycleScope.launch {
+        val btnGuardar = binding.btnConfirmarAsignacion
+        btnGuardar.isEnabled = false
+        btnGuardar.text = "Sincronizando con el equipo..."
+
+        val listaItems = mutableListOf<PreparacionSyncManager.AsignacionItem>()
+
+        val sessionMgr = SessionManager(this)
+        val idJefa = sessionMgr.getUserId().let { if (it > 0) it else 19 }
+        val estadoJefa = PreparacionEstadoManager.obtenerEstado(
+            this, nombreJefa, componenteJefa, correoJefa
+        )
+        listaItems.add(
+            PreparacionSyncManager.AsignacionItem(
+                idUsuario = idJefa,
+                nombre = nombreJefa,
+                correo = correoJefa,
+                componente = componenteJefa,
+                estado = estadoJefa
+            )
+        )
+
+        for (m in manipuladoras) {
+            val uid = if (m.idUsuario > 0) m.idUsuario else {
+                val real = ManipuladorasManager.obtenerManipuladoras().firstOrNull {
+                    it.correo.equals(m.correo, ignoreCase = true) || it.nombre.equals(
+                        m.nombre,
+                        ignoreCase = true
+                    )
+                }
+                real?.idUsuario ?: real?.id ?: -1
+            }
+            val est = PreparacionEstadoManager.obtenerEstado(
+                this, m.nombre, m.componenteAsignado, m.correo
+            )
+            listaItems.add(
+                PreparacionSyncManager.AsignacionItem(
+                    idUsuario = uid,
+                    nombre = m.nombre,
+                    correo = m.correo,
+                    componente = m.componenteAsignado,
+                    estado = est
+                )
+            )
+        }
+
+        // Ejecutar en CoroutineScope(Dispatchers.Main) asegurando que no se cancele por el ciclo de vida
+        CoroutineScope(Dispatchers.Main).launch {
             try {
-                // 1. Guardar plato en la nube
-                com.example.movilmanupuladora.utils.PreparacionSyncManager.guardarPlatoSeleccionado(
-                    this@ManipuladorasAsignadasActivity,
-                    nombreMenu,
-                    idPlato,
-                    jornada
-                )
-
-                // 2. Guardar asignación de la Jefa de Cocina
-                val sessionMgr = SessionManager(this@ManipuladorasAsignadasActivity)
-                val idJefa = sessionMgr.getUserId().let { if (it > 0) it else 19 }
-                val estadoJefa = PreparacionEstadoManager.obtenerEstado(
-                    this@ManipuladorasAsignadasActivity,
-                    nombreJefa,
-                    componenteJefa,
-                    correoJefa
-                )
-                com.example.movilmanupuladora.utils.PreparacionSyncManager.guardarAsignacionEnBackend(
-                    idUsuario = idJefa,
-                    componente = componenteJefa,
-                    estado = estadoJefa
-                )
-
-                // 3. Guardar asignación de cada manipuladora
-                for (m in manipuladoras) {
-                    val uid = if (m.idUsuario > 0) m.idUsuario else {
-                        val real = ManipuladorasManager.obtenerManipuladoras().firstOrNull {
-                            it.correo.equals(m.correo, ignoreCase = true) || it.nombre.equals(m.nombre, ignoreCase = true)
-                        }
-                        real?.idUsuario ?: real?.id ?: -1
-                    }
-                    if (uid > 0) {
-                        val est = PreparacionEstadoManager.obtenerEstado(
-                            this@ManipuladorasAsignadasActivity,
-                            m.nombre,
-                            m.componenteAsignado,
-                            m.correo
-                        )
-                        com.example.movilmanupuladora.utils.PreparacionSyncManager.guardarAsignacionEnBackend(
-                            idUsuario = uid,
-                            componente = m.componenteAsignado,
-                            estado = est
-                        )
-                    }
+                withTimeoutOrNull(6000) {
+                    PreparacionSyncManager.guardarPlatoYAsignacionesCompleto(
+                        context = applicationContext,
+                        nombreMenu = nombreMenu,
+                        idPlato = idPlato,
+                        jornada = jornada,
+                        asignaciones = listaItems
+                    )
                 }
             } catch (e: Exception) {
-                android.util.Log.e("ManipuladorasAsignadas", "Error subiendo asignaciones a backend: ${e.message}")
+                android.util.Log.e(
+                    "ManipuladorasAsignadas",
+                    "Error guardando asignaciones: ${e.message}"
+                )
+            }
+
+            Toast.makeText(
+                this@ManipuladorasAsignadasActivity,
+                "¡Asignación de componentes y plato confirmados exitosamente!",
+                Toast.LENGTH_LONG
+            ).show()
+
+            setResult(RESULT_OK)
+            finish()
+        }
+    }
+    private fun mostrarDialogoOpcionesCustom(titulo: String, opciones: List<String>, onOptionSelected: (Int) -> Unit) {
+        val dialogBinding = com.example.movilmanupuladora.databinding.DialogOpcionesJefaBinding.inflate(layoutInflater)
+        dialogBinding.txtTituloOpciones.text = titulo
+        dialogBinding.contenedorBotonesOpciones.removeAllViews()
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(dialogBinding.root)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        for ((index, opcion) in opciones.withIndex()) {
+            val btn = com.google.android.material.button.MaterialButton(this).apply {
+                text = opcion
+                isAllCaps = false
+                setTextColor(Color.parseColor("#1E293B"))
+                textSize = 14f
+                backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFFFFF"))
+                strokeColor = android.content.res.ColorStateList.valueOf(Color.parseColor("#CBD5E1"))
+                strokeWidth = (1 * resources.displayMetrics.density).toInt()
+                cornerRadius = (12 * resources.displayMetrics.density).toInt()
+                gravity = android.view.Gravity.START or android.view.Gravity.CENTER_VERTICAL
+                setPadding(dp(14), dp(12), dp(14), dp(12))
+
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    bottomMargin = dp(8)
+                }
+
+                setOnClickListener {
+                    dialog.dismiss()
+                    onOptionSelected(index)
+                }
+            }
+            dialogBinding.contenedorBotonesOpciones.addView(btn)
+        }
+
+        dialogBinding.btnCancelarOpciones.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.90).toInt(),
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+    }
+
+    private fun mostrarDialogoInputCustom(titulo: String, mensaje: String, onAsignar: (String) -> Unit) {
+        val dialogBinding = com.example.movilmanupuladora.databinding.DialogInputPersonalizadoBinding.inflate(layoutInflater)
+        dialogBinding.txtTituloInputModal.text = titulo
+        dialogBinding.txtMensajeInputModal.text = mensaje
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(dialogBinding.root)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        dialogBinding.btnAsignarInput.setOnClickListener {
+            val texto = dialogBinding.edtInputPersonalizado.text.toString().trim()
+            if (texto.isNotEmpty()) {
+                dialog.dismiss()
+                onAsignar(texto)
+            } else {
+                dialogBinding.edtInputPersonalizado.error = "Escribe un componente válido"
             }
         }
 
-        Toast.makeText(
-            this,
-            "¡Asignación de componentes confirmada exitosamente!",
-            Toast.LENGTH_LONG
-        ).show()
+        dialogBinding.btnCancelarInput.setOnClickListener {
+            dialog.dismiss()
+        }
 
-        setResult(RESULT_OK)
-        finish()
+        dialog.show()
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.90).toInt(),
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
     }
 
+    private fun mostrarDialogoConfirmacionCustom(titulo: String, mensaje: String, textoPositivo: String, onConfirmar: () -> Unit) {
+        val dialogBinding = com.example.movilmanupuladora.databinding.DialogConfirmarAsignacionBinding.inflate(layoutInflater)
+        dialogBinding.txtTituloConfirmacion.text = titulo
+        dialogBinding.txtMensajeConfirmacionAsignacion.text = mensaje
+        dialogBinding.btnConfirmarGuardarAsignacion.text = textoPositivo
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(dialogBinding.root)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        dialogBinding.btnConfirmarGuardarAsignacion.setOnClickListener {
+            dialog.dismiss()
+            onConfirmar()
+        }
+
+        dialogBinding.btnSeguirEditandoAsignacion.text = "Cancelar"
+        dialogBinding.btnSeguirEditandoAsignacion.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.90).toInt(),
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+    }
+
+    private fun dp(valor: Int): Int =
+        (valor * resources.displayMetrics.density).toInt()
+
     private fun confirmarCancelar() {
-        AlertDialog.Builder(this)
+        MaterialAlertDialogBuilder(this)
             .setTitle("Volver")
             .setMessage("¿Deseas volver a la pantalla de preparación?")
             .setPositiveButton("Sí, volver") { _, _ ->

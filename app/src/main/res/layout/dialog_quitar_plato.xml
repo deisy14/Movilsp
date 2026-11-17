@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="22dp"
+    app:cardElevation="8dp"
+    app:strokeColor="#F4B41F"
+    app:strokeWidth="1.5dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:id="@+id/txtTituloQuitarPlato"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Quitar plato del servicio"
+            android:textColor="#1B3317"
+            android:textSize="19sp"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="14dp"
+            android:background="#E2E8F0" />
+
+        <TextView
+            android:id="@+id/txtMensajeQuitarPlato"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="¿Estás segura de que deseas quitar este plato del servicio?"
+            android:textColor="#334155"
+            android:textSize="14sp"
+            android:lineSpacingExtra="5dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSiQuitar"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="#F4B41F"
+            android:text="Sí, quitar"
+            android:textAllCaps="false"
+            android:textColor="#1B3317"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancelarQuitar"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:text="Cancelar"
+            android:textAllCaps="false"
+            android:textColor="#64748B"
+            android:textSize="14sp"
+            app:cornerRadius="12dp"
+            app:strokeColor="#CBD5E1"
+            app:strokeWidth="1dp" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

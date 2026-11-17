@@ -7,13 +7,16 @@
     android:layout_height="match_parent"
     android:background="@color/blanco"
     android:fillViewport="true"
+    android:fitsSystemWindows="true"
     tools:context=".ui.manipuladora_Jefe.ManipuladorasAsignadasActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:paddingHorizontal="20dp"
+        android:paddingTop="48dp"
+        android:paddingBottom="32dp">
 
         <!-- ENCABEZADO -->
         <LinearLayout
@@ -259,7 +262,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="👑 Coordinación PAE (Toca para asignarte un componente)"
+                    android:text="Coordinación PAE (Toca para asignarte un componente)"
                     android:textColor="#7A5500"
                     android:textSize="11sp" />
 
@@ -271,7 +274,7 @@
                     android:background="@drawable/bg_pill_yellow"
                     android:paddingHorizontal="10dp"
                     android:paddingVertical="4dp"
-                    android:text="➕ Asignarme un componente"
+                    android:text="Asignarme un componente"
                     android:textColor="#855B00"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -349,7 +352,7 @@
                     android:background="@drawable/bg_pill_yellow"
                     android:paddingHorizontal="10dp"
                     android:paddingVertical="4dp"
-                    android:text="➕ Asignar Componente"
+                    android:text="Asignar Componente"
                     android:textColor="#855B00"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -427,7 +430,7 @@
                     android:background="@drawable/bg_pill_yellow"
                     android:paddingHorizontal="10dp"
                     android:paddingVertical="4dp"
-                    android:text="➕ Asignar Componente"
+                    android:text="Asignar Componente"
                     android:textColor="#855B00"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -505,7 +508,7 @@
                     android:background="@drawable/bg_pill_yellow"
                     android:paddingHorizontal="10dp"
                     android:paddingVertical="4dp"
-                    android:text="➕ Asignar Componente"
+                    android:text="Asignar Componente"
                     android:textColor="#855B00"
                     android:textSize="12sp"
                     android:textStyle="bold" />

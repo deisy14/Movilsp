@@ -100,7 +100,7 @@ class AsignadasActivity : AppCompatActivity() {
             val miNombre = sessionMgr.getUserName() ?: ""
             val miCorreo = sessionMgr.getUserEmail() ?: ""
             val miEstado = PreparacionEstadoManager.obtenerEstado(this, miNombre, compAsignado, miCorreo)
-            binding.tvComponenteMiPlato.text = "🥣 Tu componente: $compAsignado • $miEstado"
+            binding.tvComponenteMiPlato.text = "Tu componente: $compAsignado • $miEstado"
         } else {
             binding.tvComponenteMiPlato.text = "Componente pendiente de asignación"
         }
@@ -197,9 +197,10 @@ class AsignadasActivity : AppCompatActivity() {
 
         val compJefa = prefs.getString("comp_jefa", null)
         if (!compJefa.isNullOrBlank()) {
-            val nombreJefa = "Isa Pérez (Jefa de Cocina)"
-            val estadoJefa = PreparacionEstadoManager.obtenerEstado(this, "Isa Pérez", compJefa)
-            val esJefaActual = miNombre.contains("isa") || sessionMgr.getUserRole()?.lowercase()?.contains("jef") == true
+            val esJefaActual = sessionMgr.getUserRole()?.lowercase()?.contains("jef") == true
+            val nombreJefa = prefs.getString("jefa_nombre", null)?.takeIf { it.isNotBlank() }
+                ?: (if (esJefaActual) sessionMgr.getUserName() ?: "Jefa de Cocina" else "Jefa de Cocina")
+            val estadoJefa = PreparacionEstadoManager.obtenerEstado(this, nombreJefa, compJefa)
 
             val itemJefaCard = com.google.android.material.card.MaterialCardView(this).apply {
                 cardElevation = if (esJefaActual) 4f else 2f
@@ -243,7 +244,7 @@ class AsignadasActivity : AppCompatActivity() {
             }
 
             val tvCargoJ = TextView(this).apply {
-                text = "🥣 Componente: $compJefa • $estadoJefa"
+                text = "Componente: $compJefa • $estadoJefa"
                 val color = when (estadoJefa) {
                     PreparacionEstadoManager.ESTADO_FINALIZADA -> 0xFF176B35.toInt()
                     PreparacionEstadoManager.ESTADO_EN_PROCESO -> 0xFF855B00.toInt()
@@ -323,7 +324,7 @@ class AsignadasActivity : AppCompatActivity() {
 
             val tvCargo = TextView(this).apply {
                 text = if (!comp.isNullOrBlank()) {
-                    "🥣 Componente: $comp • $estadoOperaria"
+                    "Componente: $comp • $estadoOperaria"
                 } else {
                     "${m.funcion} • Sin asignar"
                 }

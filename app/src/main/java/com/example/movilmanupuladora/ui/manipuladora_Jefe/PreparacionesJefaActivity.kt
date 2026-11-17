@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.databinding.ActivityPreparacionesJefaBinding
@@ -35,22 +36,17 @@ class PreparacionesJefaActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
 
-        binding = ActivityPreparacionesJefaBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        // Barra de estado blanca con iconos oscuros
+        window.statusBarColor = Color.WHITE
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
 
-        sessionManager = SessionManager(this)
-
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
-            insets
-        }
-
-        configurarNavegacionInferior()
-        configurarEventos()
-        actualizarDatosJornada()
+        // Redirigir a AsignarComponentesActivity para mostrar exactamente lo mismo que al configurar equipo
+        val intent = Intent(this, AsignarComponentesActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        startActivity(intent)
+        finish()
+        return
     }
 
     override fun onResume() {
@@ -86,24 +82,25 @@ class PreparacionesJefaActivity : AppCompatActivity() {
 
             if (!compJefa.isNullOrBlank()) {
                 val intent = Intent(this, PreparacionActivity::class.java).apply {
-                putExtra("nombre_plato", plato)
-                putExtra("componente_seleccionado", compJefa)
-                putExtra("id_imagen", InicioJefaActivity.obtenerImagenPlatoPorNombre(plato))
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            }
-            startActivity(intent)
+                    putExtra("nombre_plato", plato)
+                    putExtra("componente_seleccionado", compJefa)
+                    putExtra("id_imagen", InicioJefaActivity.obtenerImagenPlatoPorNombre(plato))
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                }
+                startActivity(intent)
             } else {
-                val intent = Intent(this, IniciarPreparacionActivity::class.java)
-                intent.putExtra("nombre_menu", plato)
-                intent.putExtra("jornada", nombreJornada)
+                val intent = Intent(this, IniciarPreparacionActivity::class.java).apply {
+                    putExtra("nombre_menu", plato)
+                    putExtra("jornada", nombreJornada)
+                }
                 startActivity(intent)
             }
         }
 
         binding.btnVerManipuladoras.setOnClickListener {
-            val intent = Intent(this, ManipuladorasAsignadasActivity::class.java).apply {
-                putExtra("jornada", nombreJornada)
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            val serv = if (jornadaActual == Jornada.MANANA) "Desayuno" else "Almuerzo"
+            val intent = Intent(this, AsignarComponentesActivity::class.java).apply {
+                putExtra("servicio", serv)
             }
             startActivity(intent)
         }
@@ -150,7 +147,7 @@ class PreparacionesJefaActivity : AppCompatActivity() {
 
         val jefaPrefs = getSharedPreferences("ManipuladoraJefe", MODE_PRIVATE)
         val compJefa = jefaPrefs.getString("comp_jefa", null)
-        val miNombre = sessionManager.getUserName() ?: "Isa Pérez"
+        val miNombre = sessionManager.getUserName() ?: "Jefa de Cocina"
         val miCorreo = sessionManager.getUserEmail() ?: ""
 
         val estadoJefa = if (!compJefa.isNullOrBlank()) {
@@ -180,20 +177,18 @@ class PreparacionesJefaActivity : AppCompatActivity() {
             .getString("estado_plato", "PENDIENTE")
 
         if (estado == "EN_PREPARACION" || estadoJefa == PreparacionEstadoManager.ESTADO_EN_PROCESO) {
-            binding.txtEstadoPreparacion.text = "En proceso 🔥"
+            binding.txtEstadoPreparacion.text = "En proceso"
             binding.txtEstadoPreparacion.setTextColor(Color.parseColor("#7A5500"))
-            binding.btnIniciarPreparacion.text =
-                if (!compJefa.isNullOrBlank()) "👨‍🍳 Preparar mi componente: $compJefa" else "Continuar preparación"
+            binding.btnIniciarPreparacion.text = if (!compJefa.isNullOrBlank()) "Preparar mi componente: $compJefa" else "Continuar preparación"
         } else if (estado == "FINALIZADO" || estadoJefa == PreparacionEstadoManager.ESTADO_FINALIZADA) {
-            binding.txtEstadoPreparacion.text = "Completado ✅"
+            binding.txtEstadoPreparacion.text = "Completado"
             binding.txtEstadoPreparacion.setTextColor(Color.parseColor("#2A5226"))
             binding.btnIniciarPreparacion.text =
                 if (!compJefa.isNullOrBlank()) "Preparación completada ($compJefa)" else "Preparación completada"
         } else {
-            binding.txtEstadoPreparacion.text = "Pendiente ⏳"
+            binding.txtEstadoPreparacion.text = "Pendiente"
             binding.txtEstadoPreparacion.setTextColor(Color.parseColor("#D92D20"))
-            binding.btnIniciarPreparacion.text =
-                if (!compJefa.isNullOrBlank()) "👨‍🍳 Iniciar mi componente: $compJefa" else "Iniciar preparación"
+            binding.btnIniciarPreparacion.text = if (!compJefa.isNullOrBlank()) "Iniciar mi componente: $compJefa" else "Iniciar preparación"
         }
     }
 

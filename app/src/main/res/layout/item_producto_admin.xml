@@ -76,7 +76,7 @@
             android:id="@+id/txtCantidadUnidadAdmin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/bg_pill_green"
             android:gravity="center"
             android:paddingHorizontal="10dp"
@@ -85,6 +85,19 @@
             android:textColor="#1B3317"
             android:textSize="14sp"
             android:textStyle="bold" />
+
+        <!-- BOTÓN DE ALERTA QUE ABRE AVISOS -->
+        <ImageButton
+            android:id="@+id/btnAlertaProductoAdmin"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/bg_icono_circular"
+            android:backgroundTint="#FEE2E2"
+            android:contentDescription="Ver avisos de alerta"
+            android:padding="8dp"
+            android:src="@drawable/ic_warning"
+            app:tint="#DC2626" />
 
         <!-- ACCIONES: LÁPIZ PARA EDITAR -->
         <ImageButton

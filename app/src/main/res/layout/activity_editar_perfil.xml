@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -20,7 +19,7 @@
         android:clipToPadding="false"
         android:paddingBottom="20dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/barraNavegacion"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -34,28 +33,18 @@
             android:paddingBottom="25dp">
 
             <!-- ================================= -->
-            <!-- ENCABEZADO -->
+            <!-- ENCABEZADO CENTRADO -->
             <!-- ================================= -->
-
-            <TextView
-                android:id="@+id/txtSirae"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="SIRAE"
-                android:textColor="#477A26"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.05"/>
 
             <TextView
                 android:id="@+id/txtTitulo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
                 android:text="Editar perfil"
                 android:textColor="#30302C"
-                android:textSize="27sp"
+                android:textSize="26sp"
                 android:textStyle="bold"/>
 
             <TextView
@@ -63,10 +52,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
+                android:gravity="center"
                 android:text="Actualiza tu información personal."
                 android:textColor="#686862"
-                android:textSize="14sp"/>
-
+                android:textSize="13sp"/>
 
             <!-- ================================= -->
             <!-- AVATAR -->
@@ -75,7 +64,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
+                android:layout_marginTop="20dp"
                 android:gravity="center"
                 android:orientation="vertical">
 
@@ -100,7 +89,6 @@
 
             </LinearLayout>
 
-
             <!-- NOTA INSTITUCIONAL -->
             <TextView
                 android:layout_width="match_parent"
@@ -108,7 +96,7 @@
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_banner_aprobado"
                 android:padding="12dp"
-                android:text="🔒 Nombre, documento y correo son asignados por el Administrador del PAE y no pueden modificarse. Solo puedes actualizar tu contraseña de acceso y teléfono."
+                android:text="Nombre, documento y correo son asignados por el Administrador del PAE y no pueden modificarse. Solo puedes actualizar tu contraseña de acceso y teléfono."
                 android:textColor="#176B35"
                 android:textSize="12sp" />
 
@@ -140,7 +128,6 @@
                 android:textColor="#77776F"
                 android:textSize="14sp"/>
 
-
             <!-- ================================= -->
             <!-- CORREO -->
             <!-- ================================= -->
@@ -170,7 +157,6 @@
                 android:textColor="#77776F"
                 android:textSize="14sp"/>
 
-
             <!-- ================================= -->
             <!-- TELÉFONO -->
             <!-- ================================= -->
@@ -199,7 +185,6 @@
                 android:textColor="#3F3F3A"
                 android:textColorHint="#999991"
                 android:textSize="15sp"/>
-
 
             <!-- ================================= -->
             <!-- SECCIÓN: CAMBIAR CONTRASEÑA -->
@@ -253,7 +238,6 @@
                 android:textColorHint="#999991"
                 android:textSize="15sp"/>
 
-
             <!-- ================================= -->
             <!-- BOTÓN GUARDAR -->
             <!-- ================================= -->
@@ -271,7 +255,6 @@
                 android:textColor="#493C0B"
                 android:textSize="16sp"
                 android:textStyle="bold"/>
-
 
             <!-- ================================= -->
             <!-- CANCELAR -->
@@ -294,19 +277,5 @@
         </LinearLayout>
 
     </ScrollView>
-
-
-    <!-- ========================================= -->
-    <!-- BARRA -->
-    <!-- ========================================= -->
-
-    <include
-        android:id="@+id/barraNavegacion"
-        layout="@layout/activity_barra_navegacion"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

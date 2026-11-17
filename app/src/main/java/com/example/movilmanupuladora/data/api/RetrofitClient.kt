@@ -2,6 +2,8 @@
 package com.example.movilmanupuladora.data.api
 
 import android.content.Context
+import com.example.movilmanupuladora.SiraeApp
+import com.example.movilmanupuladora.utils.SessionManager
 import java.util.concurrent.TimeUnit
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -11,8 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
 
-    private const val BASE_URL =
-        "https://backend-sirae-pyim.onrender.com/api/"
+    private const val BASE_URL = "https://backend-sirae-pyim.onrender.com/api/"
 
     private const val PREFS_NAME = "user_prefs"
     private const val TOKEN_KEY = "auth_token"
@@ -97,17 +98,14 @@ object RetrofitClient {
                                     request.method == "POST"
                             )
 
-        // Recupera el token guardado si aún no está en memoria.
-        val token = authToken
-            ?: run {
-                null
-            }
+        if (!isAuthEndpoint) {
+            val token = authToken ?: try {
+                SessionManager(SiraeApp.instance).fetchAuthToken()
+            } catch (_: Throwable) { null }
 
-        if (!isAuthEndpoint && !token.isNullOrBlank()) {
-            requestBuilder.header(
-                "Authorization",
-                "Bearer $token"
-            )
+            if (!token.isNullOrEmpty()) {
+                requestBuilder.header("Authorization", "Bearer $token")
+            }
         }
 
         chain.proceed(requestBuilder.build())
@@ -117,9 +115,9 @@ object RetrofitClient {
      * Cliente HTTP con tiempos de espera y autenticación.
      */
     private val client = OkHttpClient.Builder()
-        .connectTimeout(60, TimeUnit.SECONDS)
-        .readTimeout(60, TimeUnit.SECONDS)
-        .writeTimeout(60, TimeUnit.SECONDS)
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
         .addInterceptor(logging)
         .addInterceptor(authInterceptor)
         .build()
