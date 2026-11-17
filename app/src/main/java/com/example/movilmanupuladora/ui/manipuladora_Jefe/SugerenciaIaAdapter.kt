@@ -7,11 +7,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.movilmanupuladora.databinding.ItemSugerenciaIaBinding
 
 class SugerenciaIaAdapter(
-    private val listaPlatos: List<InicioJefaActivity.Plato>,
-    private val onItemClick: (InicioJefaActivity.Plato) -> Unit
+    private val listaPlatos: List<PlatoItem>,
+    private val onItemClick: (PlatoItem) -> Unit
 ) : RecyclerView.Adapter<SugerenciaIaAdapter.ViewHolder>() {
 
-    inner class ViewHolder(val binding: ItemSugerenciaIaBinding) :
+    class ViewHolder(val binding: ItemSugerenciaIaBinding) :
         RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

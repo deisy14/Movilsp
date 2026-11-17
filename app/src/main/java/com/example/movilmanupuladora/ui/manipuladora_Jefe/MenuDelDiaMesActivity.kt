@@ -79,7 +79,10 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
 
         // Botón amarillo inferior que abre la Pantalla 3 deslizándola hacia arriba
         binding.btnSeleccionarSiguienteSemana.setOnClickListener {
-            val intent = Intent(this, PlanificacionSemanalJefaActivity::class.java)
+            val intent = Intent(this, PlanificacionSemanalJefaActivity::class.java).apply {
+                putExtra("EXTRA_ORIGEN", "MenuDelDiaMes")
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
             startActivity(intent)
             overridePendingTransition(R.anim.slide_in_bottom, R.anim.stay)
         }

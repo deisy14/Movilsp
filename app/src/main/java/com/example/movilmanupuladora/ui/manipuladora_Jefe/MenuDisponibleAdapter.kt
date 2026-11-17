@@ -6,8 +6,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.movilmanupuladora.databinding.ItemMenuDisponiblePaeBinding
 
 class MenuDisponibleAdapter(
-    private val listaPlatos: List<InicioJefaActivity.Plato>,
-    private val onItemClick: (InicioJefaActivity.Plato) -> Unit
+    private val listaPlatos: List<PlatoItem>,
+    private val onItemClick: (PlatoItem) -> Unit
 ) : RecyclerView.Adapter<MenuDisponibleAdapter.ViewHolder>() {
 
     class ViewHolder(val binding: ItemMenuDisponiblePaeBinding) :

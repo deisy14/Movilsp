@@ -4,6 +4,7 @@ package com.example.movilmanupuladora.ui.manipuladora
 import android.content.ContentResolver
 import android.graphics.Color
 import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
@@ -26,6 +27,7 @@ import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.model.Notificacion
 import com.example.movilmanupuladora.databinding.ActivityAvisosBinding
 import com.example.movilmanupuladora.utils.NavigationHelper
+import com.example.movilmanupuladora.utils.SessionManager
 import com.google.gson.JsonPrimitive
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -66,7 +68,9 @@ class AvisosActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { vista, insets ->
-            val barras = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val barras = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars()
+            )
 
             vista.setPadding(
                 barras.left,
@@ -74,9 +78,24 @@ class AvisosActivity : AppCompatActivity() {
                 barras.right,
                 barras.bottom
             )
-
             insets
         }
+
+        val sessionManager = SessionManager(this)
+        val token = sessionManager.fetchAuthToken()
+
+        if (token.isNullOrBlank()) {
+            Toast.makeText(
+                this,
+                "Tu sesión ha expirado. Inicia sesión nuevamente.",
+                Toast.LENGTH_LONG
+            ).show()
+            finish()
+            return
+        }
+
+        // Se configura el token sin acceder directamente a una propiedad privada.
+        RetrofitClient.establecerToken(token)
 
         configurarBarraNavegacion()
         cargarNotificaciones()
@@ -113,7 +132,7 @@ class AvisosActivity : AppCompatActivity() {
             setHintTextColor(Color.GRAY)
             setPadding(dp(12), dp(10), dp(12), dp(10))
 
-            background = android.graphics.drawable.GradientDrawable().apply {
+            background = GradientDrawable().apply {
                 setColor(Color.WHITE)
                 setStroke(dp(1), Color.rgb(215, 220, 215))
                 cornerRadius = dp(10).toFloat()
@@ -123,7 +142,6 @@ class AvisosActivity : AppCompatActivity() {
                 inputType =
                     android.text.InputType.TYPE_CLASS_TEXT or
                             android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE
-
                 minLines = 4
                 maxLines = 6
                 gravity = Gravity.TOP or Gravity.START
@@ -131,7 +149,6 @@ class AvisosActivity : AppCompatActivity() {
                 inputType =
                     android.text.InputType.TYPE_CLASS_TEXT or
                             android.text.InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
-
                 maxLines = 1
             }
 
@@ -190,7 +207,6 @@ class AvisosActivity : AppCompatActivity() {
             "Describe una novedad de tu sede. Puedes adjuntar una fotografía.",
             13f
         )
-
         descripcion.setPadding(0, dp(6), 0, dp(16))
         contenido.addView(descripcion)
 
@@ -216,14 +232,12 @@ class AvisosActivity : AppCompatActivity() {
             12f,
             Color.GRAY
         )
-
         textoImagen.setPadding(0, 0, 0, dp(8))
         contenido.addView(textoImagen)
 
         vistaPreviaImagen = ImageView(this).apply {
             visibility = View.GONE
             scaleType = ImageView.ScaleType.CENTER_CROP
-
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 dp(180)
@@ -231,39 +245,33 @@ class AvisosActivity : AppCompatActivity() {
                 bottomMargin = dp(10)
             }
         }
-
         contenido.addView(vistaPreviaImagen)
 
         val botonImagen = crearBoton(
             "Seleccionar fotografía",
             Color.rgb(100, 100, 100)
         )
-
         botonImagen.setOnClickListener {
             selectorImagen.launch("image/*")
         }
-
         contenido.addView(botonImagen)
 
         val botonQuitarImagen = crearBoton(
             "Quitar fotografía",
             Color.rgb(120, 70, 70)
         )
-
         botonQuitarImagen.setOnClickListener {
             imagenSeleccionada = null
             vistaPreviaImagen.setImageDrawable(null)
             vistaPreviaImagen.visibility = View.GONE
             textoImagen.text = "No has seleccionado ninguna imagen."
         }
-
         contenido.addView(botonQuitarImagen)
 
         botonEnviar = crearBoton(
             "Enviar aviso",
             Color.rgb(42, 82, 38)
         )
-
         botonEnviar.setOnClickListener {
             enviarNotificacion()
         }
@@ -285,7 +293,6 @@ class AvisosActivity : AppCompatActivity() {
     private fun cargarNotificaciones() {
         lifecycleScope.launch {
             val contenedor = binding.contenedorAvisos
-
             contenedor.removeAllViews()
             configurarFormulario(contenedor)
 
@@ -294,7 +301,6 @@ class AvisosActivity : AppCompatActivity() {
                 13f,
                 Color.GRAY
             )
-
             contenedor.addView(indicador)
 
             try {
@@ -338,7 +344,6 @@ class AvisosActivity : AppCompatActivity() {
         mensajeEstado: String?
     ) {
         val contenedor = binding.contenedorAvisos
-
         contenedor.removeAllViews()
         configurarFormulario(contenedor)
 
@@ -348,7 +353,6 @@ class AvisosActivity : AppCompatActivity() {
                 13f,
                 Color.rgb(100, 100, 100)
             )
-
             estado.setPadding(dp(4), dp(4), dp(4), dp(16))
             contenedor.addView(estado)
         }
@@ -361,7 +365,6 @@ class AvisosActivity : AppCompatActivity() {
             Color.rgb(27, 51, 23),
             true
         )
-
         encabezado.setPadding(0, dp(4), 0, dp(12))
         contenedor.addView(encabezado)
 
@@ -397,7 +400,6 @@ class AvisosActivity : AppCompatActivity() {
                 notificacion.mensaje.orEmpty(),
                 13f
             )
-
             mensaje.setPadding(0, dp(6), 0, dp(6))
             contenido.addView(mensaje)
 
@@ -438,6 +440,22 @@ class AvisosActivity : AppCompatActivity() {
             botonEnviar.text = "Enviando..."
 
             try {
+                val token = SessionManager(this@AvisosActivity)
+                    .fetchAuthToken()
+
+                if (token.isNullOrBlank()) {
+                    Toast.makeText(
+                        this@AvisosActivity,
+                        "Tu sesión ha expirado. Inicia sesión nuevamente.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    finish()
+                    return@launch
+                }
+
+                // Método público que configura el token en RetrofitClient.
+                RetrofitClient.establecerToken(token)
+
                 val tipoTexto = "text/plain".toMediaTypeOrNull()
 
                 val tituloBody: RequestBody =
@@ -468,7 +486,10 @@ class AvisosActivity : AppCompatActivity() {
 
                     val cantidad = respuesta.body()
                         ?.get("cantidad_destinatarios")
-                        ?.takeIf { it is JsonPrimitive && it.asJsonPrimitive.isNumber }
+                        ?.takeIf {
+                            it is JsonPrimitive &&
+                                    it.asJsonPrimitive.isNumber
+                        }
                         ?.asInt
 
                     val confirmacion = if (cantidad != null) {
@@ -526,8 +547,8 @@ class AvisosActivity : AppCompatActivity() {
             "No se pudo leer la imagen seleccionada."
         )
 
-        require(bytes.size <= 5 * 1024 * 1024) {
-            "La imagen no puede superar los 5 MB."
+        require(bytes.size <= 15 * 1024 * 1024) {
+            "La imagen no puede superar los 15 MB."
         }
 
         val nombreArchivo = resolver.query(
@@ -541,7 +562,6 @@ class AvisosActivity : AppCompatActivity() {
                 val columna = cursor.getColumnIndex(
                     OpenableColumns.DISPLAY_NAME
                 )
-
                 if (columna >= 0) cursor.getString(columna) else null
             } else {
                 null

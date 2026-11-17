@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    
     <application
         android:name=".SiraeApp"
         android:allowBackup="true"
@@ -19,178 +20,216 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
 
-        <!-- PANTALLA PRINCIPAL / LOGIN (LAUNCHER) -->
+        <!-- LOGIN: PANTALLA INICIAL DE LA APLICACIÓN -->
         <activity
             android:name=".ui.auth.LoginActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
-        <!-- MainActivity (rueda de platos interactiva) -->
+        <!-- PANTALLA PRINCIPAL DE LA MANIPULADORA -->
         <activity
             android:name=".ui.manipuladora.MainActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
-        <!-- ACTIVIDADES DEL MÓDULO -->
+        <!-- MÓDULO DE AUTENTICACIÓN -->
         <activity
             android:name=".ui.auth.RegistroActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.auth.RecuperarPasswordActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
+        <!-- MÓDULO DE MANIPULADORA -->
         <activity
             android:name=".ui.manipuladora.TurnoActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora.PerfilActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora.AvisosActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora.MenuDiaActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora.InventarioActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora.AsignadasActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora.PreparacionActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora.ConfirmacionActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora.IngredientesActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora.BarraNavegacionActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora.RegistrarEntradaActivity"
             android:exported="false" />
+
         <activity
             android:name=".ui.manipuladora.EditarPerfilActivity"
             android:exported="false" />
+
         <activity
             android:name=".ui.manipuladora.AyudaActivity"
             android:exported="false" />
 
-        <!-- ===================================== -->
-        <!-- MÓDULO JEFA DE MANIPULADORAS          -->
-        <!-- ===================================== -->
+        <!-- MÓDULO JEFA DE MANIPULADORAS -->
         <activity
             android:name=".ui.manipuladora_Jefe.InicioJefaActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora_Jefe.MenuDelDiaMesActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora_Jefe.PlanificacionSemanalJefaActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora_Jefe.AlimentosDisponiblesActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora_Jefe.AsistenciaJefaActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora_Jefe.CalendarioMenuActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora_Jefe.DetallePreparacionActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora_Jefe.HistorialPreparacionesActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora_Jefe.IniciarPreparacionActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora_Jefe.InventarioJefaActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora_Jefe.ManipuladorasAsignadasActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora_Jefe.ManipuladorasJefaActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora_Jefe.MisPreparacionesManipuladoraActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora_Jefe.PerfilJefaActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora_Jefe.PopupNotificacionesActivity"
             android:exported="false"
             android:theme="@style/Theme.AppCompat.Dialog"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora_Jefe.PreparacionCompletadaActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora_Jefe.PreparacionEnCursoActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora_Jefe.PreparacionesJefaActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora_Jefe.TodosLosPlatosActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora_Jefe.ProgramacionSemanalActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora_Jefe.RegistrarEntregaActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora_Jefe.ResumenDiaActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.manipuladora_Jefe.RedactarRecetaActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
     </application>
 
 </manifest>

@@ -14,6 +14,8 @@ import androidx.lifecycle.lifecycleScope
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.model.PlatoResponse
+import com.example.movilmanupuladora.data.model.SugerenciaRequest
+import com.example.movilmanupuladora.data.model.SugerenciaRecetaResponse
 import com.example.movilmanupuladora.databinding.ActivityMenuDiaBinding
 import com.example.movilmanupuladora.utils.SessionManager
 import kotlinx.coroutines.launch
@@ -26,27 +28,47 @@ class MenuDiaActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Restaurar token
+        // Restaurar token de sesión
         sessionManager = SessionManager(this)
         RetrofitClient.authToken = sessionManager.fetchAuthToken()
 
         enableEdgeToEdge()
 
-        // Inicialización con ViewBinding
+        // Inicializar la vista
         binding = ActivityMenuDiaBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         // Ajustar la pantalla a las barras del sistema
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            val systemBars =
+                insets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            v.setPadding(
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                systemBars.bottom
+            )
+
             insets
         }
 
-        // Botón "Ver componentes" -> Navega a PreparacionActivity (Proceso de preparación)
+        // Botón para ver componentes
         binding.btnVerComponentes.setOnClickListener {
-            val intent = Intent(this, PreparacionActivity::class.java)
+            val intent = Intent(
+                this@MenuDiaActivity,
+                PreparacionActivity::class.java
+            )
             startActivity(intent)
+        }
+
+        findViewById<View>(R.id.navAvisos)?.setOnClickListener {
+            startActivity(
+                Intent(
+                    this@MenuDiaActivity,
+                    AvisosActivity::class.java
+                )
+            )
         }
 
         // Cargar platos desde el backend
@@ -58,7 +80,9 @@ class MenuDiaActivity : AppCompatActivity() {
             try {
                 val response = RetrofitClient.apiService.obtenerPlatos()
 
-                if (response.isSuccessful && !response.body().isNullOrEmpty()) {
+                if (response.isSuccessful &&
+                    !response.body().isNullOrEmpty()
+                ) {
                     val platos = response.body()!!
                     mostrarPlatos(platos)
                 } else {
@@ -79,17 +103,23 @@ class MenuDiaActivity : AppCompatActivity() {
     }
 
     private fun mostrarPlatos(platos: List<PlatoResponse>) {
-        val contenedorPrincipal = findViewById<LinearLayout>(R.id.contenedorPlatoPrincipal)
-        val contenedorOtros = findViewById<LinearLayout>(R.id.contenedorOtrosPlatos)
-        val tvOtrosPlatos = findViewById<TextView>(R.id.tvOtrosPlatos)
+        val contenedorPrincipal =
+            findViewById<LinearLayout>(R.id.contenedorPlatoPrincipal)
+
+        val contenedorOtros =
+            findViewById<LinearLayout>(R.id.contenedorOtrosPlatos)
+
+        val tvOtrosPlatos =
+            findViewById<TextView>(R.id.tvOtrosPlatos)
 
         contenedorPrincipal?.removeAllViews()
         contenedorOtros?.removeAllViews()
 
         if (platos.isEmpty()) return
 
-        // PRIMER PLATO = destacado
+        // Primer plato destacado
         val principal = platos.first()
+
         val cardPrincipal = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             setBackgroundResource(R.drawable.bg_seccion_seleccionada)
@@ -99,7 +129,11 @@ class MenuDiaActivity : AppCompatActivity() {
 
         val infoLayout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            layoutParams = LinearLayout.LayoutParams(
+                0,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                1f
+            )
         }
 
         val tvSeccion = TextView(this).apply {
@@ -127,10 +161,19 @@ class MenuDiaActivity : AppCompatActivity() {
         infoLayout.addView(tvSeccion)
         infoLayout.addView(tvAsignado)
         infoLayout.addView(tvNombrePrincipal)
+
         cardPrincipal.addView(infoLayout)
+
+        // Evento de clic en el plato principal para invocar la IA adaptada
+        cardPrincipal.setOnClickListener {
+            val idMenuActual = 1
+            val idPlatoActual = principal.idPlato ?: 1
+            solicitarSugerenciaIA(idMenuActual, idPlatoActual)
+        }
+
         contenedorPrincipal?.addView(cardPrincipal)
 
-        // OTROS PLATOS (del segundo en adelante)
+        // Otros platos
         if (platos.size > 1) {
             tvOtrosPlatos?.visibility = View.VISIBLE
             tvOtrosPlatos?.text = "Otros platos del menú"
@@ -142,19 +185,27 @@ class MenuDiaActivity : AppCompatActivity() {
                     orientation = LinearLayout.HORIZONTAL
                     gravity = android.view.Gravity.CENTER_VERTICAL
                     setPadding(20, 26, 20, 26)
+
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
-                    ).also { it.topMargin = 20 }
+                    ).also {
+                        it.topMargin = 20
+                    }
                 }
 
                 val tvNombre = TextView(this).apply {
                     text = plato.nombrePlato ?: "Sin nombre"
                     setTextColor(0xFF34443A.toInt())
                     textSize = 14f
+
                     layoutParams = LinearLayout.LayoutParams(
-                        0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
-                    ).also { it.marginStart = 30 }
+                        0,
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        1f
+                    ).also {
+                        it.marginStart = 30
+                    }
                 }
 
                 val tvFlecha = TextView(this).apply {
@@ -166,11 +217,11 @@ class MenuDiaActivity : AppCompatActivity() {
                 fila.addView(tvNombre)
                 fila.addView(tvFlecha)
 
-                // Al tocar un plato secundario se puede navegar a ingredientes
+                // Evento de clic en los otros platos para abrir ingredientes o solicitar IA
                 fila.setOnClickListener {
-                    val intent = Intent(this@MenuDiaActivity, IngredientesActivity::class.java)
-                    intent.putExtra("nombre_plato", plato.nombrePlato)
-                    startActivity(intent)
+                    val idMenuActual = 1
+                    val idPlatoActual = plato.idPlato ?: 1
+                    solicitarSugerenciaIA(idMenuActual, idPlatoActual)
                 }
 
                 contenedorOtros?.addView(fila)
@@ -178,12 +229,48 @@ class MenuDiaActivity : AppCompatActivity() {
                 // Línea separadora
                 val linea = View(this).apply {
                     setBackgroundColor(0xFFEDEDED.toInt())
+
                     layoutParams = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT, 2
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        2
                     )
                 }
+
                 contenedorOtros?.addView(linea)
             }
+        } else {
+            tvOtrosPlatos?.visibility = View.GONE
         }
+    }
+
+    // --- Integración de Sugerencia de Receta con IA adaptada al Inventario (Corrutina) ---
+    private fun solicitarSugerenciaIA(idMenu: Int, idPlato: Int) {
+        val request = SugerenciaRequest(id_menu = idMenu, id_plato = idPlato)
+
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitClient.apiService.obtenerSugerenciaReceta(request)
+                if (response.isSuccessful && response.body() != null) {
+                    val data = response.body()!!
+                    mostrarIngredientesAdaptados(data)
+                } else {
+                    Toast.makeText(this@MenuDiaActivity, "Error al calcular sugerencia", Toast.LENGTH_SHORT).show()
+                }
+            } catch (t: Throwable) {
+                Toast.makeText(this@MenuDiaActivity, "Fallo de red: ${t.localizedMessage}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun mostrarIngredientesAdaptados(sugerencia: SugerenciaRecetaResponse) {
+        // Recorre los ingredientes calculados por el backend en función de los niños presentes y stock
+        for (ingrediente in sugerencia.ingredientes) {
+            val nombre = ingrediente.nombre
+            val cantidadTotal = ingrediente.cantidad_total
+            val unidad = ingrediente.unidad
+            val alcanza = ingrediente.alcanza // Indica si hay suficiente stock en la sede
+        }
+
+        Toast.makeText(this, "Sugerencia cargada para: ${sugerencia.nombre_plato}", Toast.LENGTH_SHORT).show()
     }
 }
