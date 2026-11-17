@@ -389,10 +389,12 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
         // 0. ASISTENCIA DEL DÍA POR GRADO
         val detalleAsist = AsistenciaManager.obtenerDetalleGradosFecha(this, fechaClave)
         val totalAsist = AsistenciaManager.obtenerTotalFecha(this, fechaClave)
+        val nombreSedeActual = SessionManager(this).getSedeNombre() ?: "Sede"
+        binding.txtTituloAsistencia.text = "👥 Asistencia del Día ($nombreSedeActual)"
 
         if (totalAsist > 0) {
             binding.cardAsistenciaDia.visibility = View.VISIBLE
-            binding.txtTotalAsistenciaDia.text = "$totalAsist / 227 niños"
+            binding.txtTotalAsistenciaDia.text = "$totalAsist niños presentes"
             binding.txtTotalAsistenciaDia.setBackgroundResource(R.drawable.bg_pill_green)
             binding.txtTotalAsistenciaDia.setTextColor(Color.parseColor("#2A5226"))
 

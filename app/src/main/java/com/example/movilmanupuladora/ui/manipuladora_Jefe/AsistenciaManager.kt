@@ -35,39 +35,63 @@ object AsistenciaManager {
     }
 
     // =========================================================
-    // GUARDAR Y OBTENER DETALLE POR GRADO (Permite vacíos)
+    // GUARDAR Y OBTENER DETALLE POR GRADO (Por Fecha Dinámica)
     // =========================================================
 
-    fun guardarDetalleGradosHoy(context: Context, detalle: Map<String, String>) {
+    fun guardarDetalleGradosFecha(context: Context, fecha: String, detalle: Map<String, String>) {
         val editor = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit()
-        editor.putString(KEY_FECHA_DETALLE, obtenerFechaHoy())
-        editor.putString(KEY_JAR, detalle["jar"].orEmpty())
-        editor.putString(KEY_P1, detalle["p1"].orEmpty())
-        editor.putString(KEY_P2, detalle["p2"].orEmpty())
-        editor.putString(KEY_P3, detalle["p3"].orEmpty())
-        editor.putString(KEY_P4, detalle["p4"].orEmpty())
-        editor.putString(KEY_P5, detalle["p5"].orEmpty())
+        val prefix = "asist_${fecha}_"
+        editor.putString(KEY_FECHA_DETALLE, fecha)
+        editor.putString(prefix + KEY_JAR, detalle["jar"].orEmpty())
+        editor.putString(prefix + KEY_P1, detalle["p1"].orEmpty())
+        editor.putString(prefix + KEY_P2, detalle["p2"].orEmpty())
+        editor.putString(prefix + KEY_P3, detalle["p3"].orEmpty())
+        editor.putString(prefix + KEY_P4, detalle["p4"].orEmpty())
+        editor.putString(prefix + KEY_P5, detalle["p5"].orEmpty())
 
-        editor.putString(KEY_S6, detalle["s6"].orEmpty())
-        editor.putString(KEY_S7, detalle["s7"].orEmpty())
-        editor.putString(KEY_S8, detalle["s8"].orEmpty())
-        editor.putString(KEY_S9, detalle["s9"].orEmpty())
-        editor.putString(KEY_S10, detalle["s10"].orEmpty())
-        editor.putString(KEY_S11, detalle["s11"].orEmpty())
+        editor.putString(prefix + KEY_S6, detalle["s6"].orEmpty())
+        editor.putString(prefix + KEY_S7, detalle["s7"].orEmpty())
+        editor.putString(prefix + KEY_S8, detalle["s8"].orEmpty())
+        editor.putString(prefix + KEY_S9, detalle["s9"].orEmpty())
+        editor.putString(prefix + KEY_S10, detalle["s10"].orEmpty())
+        editor.putString(prefix + KEY_S11, detalle["s11"].orEmpty())
         editor.apply()
     }
 
-    private val FECHAS_20_DIAS = listOf(
-        "2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22", "2026-10-23",
-        "2026-10-26", "2026-10-27", "2026-10-28", "2026-10-29", "2026-10-30",
-        "2026-11-02", "2026-11-03", "2026-11-04", "2026-11-05", "2026-11-06",
-        "2026-11-09", "2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13"
-    )
+    fun guardarDetalleGradosHoy(context: Context, detalle: Map<String, String>) {
+        guardarDetalleGradosFecha(context, obtenerFechaHoy(), detalle)
+    }
 
     fun obtenerDetalleGradosFecha(context: Context, fecha: String): Map<String, String> {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val fechaGuardada = prefs.getString(KEY_FECHA_DETALLE, null)
+        val prefix = "asist_${fecha}_"
 
+        val jar = prefs.getString(prefix + KEY_JAR, "") ?: ""
+        val p1 = prefs.getString(prefix + KEY_P1, "") ?: ""
+        val p2 = prefs.getString(prefix + KEY_P2, "") ?: ""
+        val p3 = prefs.getString(prefix + KEY_P3, "") ?: ""
+        val p4 = prefs.getString(prefix + KEY_P4, "") ?: ""
+        val p5 = prefs.getString(prefix + KEY_P5, "") ?: ""
+        val s6 = prefs.getString(prefix + KEY_S6, "") ?: ""
+        val s7 = prefs.getString(prefix + KEY_S7, "") ?: ""
+        val s8 = prefs.getString(prefix + KEY_S8, "") ?: ""
+        val s9 = prefs.getString(prefix + KEY_S9, "") ?: ""
+        val s10 = prefs.getString(prefix + KEY_S10, "") ?: ""
+        val s11 = prefs.getString(prefix + KEY_S11, "") ?: ""
+
+        // Si se guardó específicamente para esta fecha
+        if (jar.isNotBlank() || p1.isNotBlank() || p2.isNotBlank() || p3.isNotBlank() ||
+            p4.isNotBlank() || p5.isNotBlank() || s6.isNotBlank() || s7.isNotBlank() ||
+            s8.isNotBlank() || s9.isNotBlank() || s10.isNotBlank() || s11.isNotBlank()) {
+            return mapOf(
+                "jar" to jar, "p1" to p1, "p2" to p2, "p3" to p3,
+                "p4" to p4, "p5" to p5, "s6" to s6, "s7" to s7,
+                "s8" to s8, "s9" to s9, "s10" to s10, "s11" to s11
+            )
+        }
+
+        // Retrocompatibilidad con la fecha del día registrada previamente
+        val fechaGuardada = prefs.getString(KEY_FECHA_DETALLE, null)
         if (fechaGuardada == fecha) {
             return mapOf(
                 "jar" to (prefs.getString(KEY_JAR, "") ?: ""),
@@ -85,22 +109,7 @@ object AsistenciaManager {
             )
         }
 
-        val idx = FECHAS_20_DIAS.indexOf(fecha)
-        if (idx != -1) {
-            val p1 = 35 + (idx % 4)
-            val p2 = 36 + ((idx + 1) % 4)
-            val p4 = 40 + ((idx + 2) % 4)
-            val p5 = 42 + ((idx + 3) % 4)
-            val s6 = 50 + ((idx + 4) % 5)
-            return mapOf(
-                "p1" to p1.toString(),
-                "p2" to p2.toString(),
-                "p4" to p4.toString(),
-                "p5" to p5.toString(),
-                "s6" to s6.toString()
-            )
-        }
-
+        // Si no hay registro para esta fecha (ej. no hubo clases, día futuro o sin reporte): devuelve vacío
         return emptyMap()
     }
 
