@@ -107,12 +107,16 @@ class TurnoActivity : AppCompatActivity() {
                     binding.txtTituloTurno.text = "Iniciando tu turno"
                 }
 
-                binding.txtPlatoAsignado.text = platoJefa
-
-                if (!componenteAsignado.isNullOrBlank()) {
-                    binding.txtSubtituloTurno.text = "Tu componente: $componenteAsignado"
+                if (platoJefa.isNotBlank()) {
+                    binding.txtPlatoAsignado.text = platoJefa
+                    if (!componenteAsignado.isNullOrBlank()) {
+                        binding.txtSubtituloTurno.text = "Tu componente: $componenteAsignado"
+                    } else {
+                        binding.txtSubtituloTurno.text = "Sin componente asignado"
+                    }
                 } else {
-                    binding.txtSubtituloTurno.text = "Plato seleccionado por la Jefa:"
+                    binding.txtPlatoAsignado.text = "La jefa aún no ha seleccionado el menú de hoy"
+                    binding.txtSubtituloTurno.text = "Menú pendiente de selección"
                 }
 
                 // Cargar horario de turno institucional (filtrando los registros PAE)

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="28dp"
+    app:cardElevation="10dp"
+    app:strokeWidth="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- CONTENEDOR DINÁMICO DE OPCIONES (TODAS Y POR MANIPULADORA) -->
+        <LinearLayout
+            android:id="@+id/contenedorOpciones"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <!-- BOTÓN ACEPTAR -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAceptarDialogo"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:text="Aceptar"
+            android:textAllCaps="false"
+            android:textColor="#181B1F"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:backgroundTint="#F4B41F"
+            app:cornerRadius="25dp"
+            app:elevation="0dp" />
+
+        <!-- BOTÓN CANCELAR -->
+        <TextView
+            android:id="@+id/btnCancelarDialogo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:paddingVertical="10dp"
+            android:text="Cancelar"
+            android:textColor="#64748B"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

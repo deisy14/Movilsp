@@ -199,10 +199,21 @@ interface ApiService {
         @Body asistencia: com.example.movilmanupuladora.data.model.AsistenciaDiaria
     ): Response<com.example.movilmanupuladora.data.model.AsistenciaDiaria>
 
+    @POST("asistencia-diaria/")
+    suspend fun registrarAsistenciaDiariaMap(
+        @Body asistencia: Map<String, @JvmSuppressWildcards Any?>
+    ): Response<com.example.movilmanupuladora.data.model.AsistenciaDiaria>
+
     @PUT("asistencia-diaria/{id}/")
     suspend fun actualizarAsistenciaDiaria(
         @Path("id") id: Int,
         @Body asistencia: com.example.movilmanupuladora.data.model.AsistenciaDiaria
+    ): Response<com.example.movilmanupuladora.data.model.AsistenciaDiaria>
+
+    @PATCH("asistencia-diaria/{id}/")
+    suspend fun patchAsistenciaDiaria(
+        @Path("id") id: Int,
+        @Body asistencia: Map<String, @JvmSuppressWildcards Any?>
     ): Response<com.example.movilmanupuladora.data.model.AsistenciaDiaria>
 
     @DELETE("asistencia-diaria/{id}/")

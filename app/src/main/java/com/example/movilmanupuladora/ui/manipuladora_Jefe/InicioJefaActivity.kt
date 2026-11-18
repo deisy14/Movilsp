@@ -105,6 +105,10 @@ class InicioJefaActivity : AppCompatActivity() {
         cargarAsistenciaDelBackend()
         lifecycleScope.launch {
             try {
+                val idSede = sessionManager.getSedeId().takeIf { it > 0 }
+                ManipuladorasManager.cargarDesdeBackend(this@InicioJefaActivity, idSede)
+                actualizarResumen()
+
                 val res = RetrofitClient.apiService.obtenerPlatos()
                 if (res.isSuccessful && !res.body().isNullOrEmpty()) {
                     MenuPaeCatalog.registrarPlatosDesdeBackend(res.body()!!)
@@ -428,8 +432,11 @@ class InicioJefaActivity : AppCompatActivity() {
         }
 
         binding.btnNotificacionesJefa.setOnClickListener {
+            val prefs = getSharedPreferences("JEFA_NOTIFS", MODE_PRIVATE)
+            val hayNueva = prefs.getBoolean("HAY_NUEVA_MANIP", false)
+
             val popupBinding = com.example.movilmanupuladora.databinding.PopupNotificacionesBinding.inflate(layoutInflater)
-            popupBinding.txtCantidadNotificaciones.text = "3"
+            popupBinding.txtCantidadNotificaciones.text = if (hayNueva) "4" else "3"
 
             val dialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                 .setView(popupBinding.root)
@@ -437,9 +444,22 @@ class InicioJefaActivity : AppCompatActivity() {
 
             dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
-            popupBinding.notificacionPreparacion.setOnClickListener {
-                dialog.dismiss()
-                startActivity(Intent(this, HistorialPreparacionesActivity::class.java))
+            if (hayNueva) {
+                val titulo = prefs.getString("TITULO_NUEVA_MANIP", "Nuevo integrante en el equipo") ?: "Nuevo integrante en el equipo"
+                val mensaje = prefs.getString("MSG_NUEVA_MANIP", "Una nueva manipuladora ingresó al equipo de trabajo de tu sede.") ?: "Una nueva manipuladora ingresó al equipo de trabajo de tu sede."
+
+                popupBinding.iconoPreparacion.setImageResource(R.drawable.ic_people)
+                popupBinding.txtTituloPreparacion.text = titulo
+                popupBinding.txtMensajePreparacion.text = mensaje
+                popupBinding.notificacionPreparacion.setOnClickListener {
+                    dialog.dismiss()
+                    startActivity(Intent(this, ManipuladorasJefaActivity::class.java))
+                }
+            } else {
+                popupBinding.notificacionPreparacion.setOnClickListener {
+                    dialog.dismiss()
+                    startActivity(Intent(this, HistorialPreparacionesActivity::class.java))
+                }
             }
 
             popupBinding.notificacionInventario.setOnClickListener {
@@ -454,7 +474,7 @@ class InicioJefaActivity : AppCompatActivity() {
 
             popupBinding.btnVerTodasNotificaciones.setOnClickListener {
                 dialog.dismiss()
-                startActivity(Intent(this, com.example.movilmanupuladora.ui.manipuladora.AvisosActivity::class.java))
+                startActivity(Intent(this, HistorialNotificacionesJefaActivity::class.java))
             }
 
             dialog.show()
@@ -474,8 +494,9 @@ class InicioJefaActivity : AppCompatActivity() {
         binding.txtRacionesTotales.text = guardados.toString()
         binding.txtMenusActivos.text = "3"
 
-        val cantManipuladoras = ManipuladorasManager.obtenerManipuladoras().size
-        binding.txtCantManipuladoras.text = if (cantManipuladoras > 0) cantManipuladoras.toString() else "8"
+        val idSede = sessionManager.getSedeId().takeIf { it > 0 }
+        val cantManipuladoras = ManipuladorasManager.obtenerManipuladorasSede(idSede, sessionManager.getSedeNombre(), this).size
+        binding.txtCantManipuladoras.text = cantManipuladoras.toString()
     }
 
     private fun cargarAsistenciaDelBackend() {
@@ -500,8 +521,7 @@ class InicioJefaActivity : AppCompatActivity() {
                     var s = regSecundaria?.ninosPresentes ?: AsistenciaManager.obtenerSecundaria(this@InicioJefaActivity)
 
                     if (regPrimaria == null && regSecundaria == null && asistenciasHoy.isNotEmpty()) {
-                        val regLegacy = asistenciasHoy.maxByOrNull { it.obtenerIdReal() ?: 0 }!!
-                        val tot = regLegacy.ninosPresentes
+                        val tot = asistenciasHoy.sumOf { it.ninosPresentes }
                         p = (tot * 0.6).toInt()
                         s = tot - p
                     }

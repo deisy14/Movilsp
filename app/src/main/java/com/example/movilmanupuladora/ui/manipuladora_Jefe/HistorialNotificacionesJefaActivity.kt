@@ -1,5 +1,7 @@
 package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
+import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
@@ -32,11 +34,31 @@ class HistorialNotificacionesJefaActivity : AppCompatActivity() {
         }
 
         binding.cardNotif1.setOnClickListener {
-            val intent = android.content.Intent(this, RegistrarEntregaActivity::class.java)
+            val intent = Intent(this, RegistrarEntregaActivity::class.java)
             startActivity(intent)
         }
 
+        configurarNotificacionNuevaManipuladora()
         configurarFiltros()
+    }
+
+    private fun configurarNotificacionNuevaManipuladora() {
+        val prefs = getSharedPreferences("JEFA_NOTIFS", Context.MODE_PRIVATE)
+        val hayNueva = prefs.getBoolean("HAY_NUEVA_MANIP", false)
+
+        if (hayNueva) {
+            val titulo = prefs.getString("TITULO_NUEVA_MANIP", "Nuevo integrante en el equipo") ?: "Nuevo integrante en el equipo"
+            val mensaje = prefs.getString("MSG_NUEVA_MANIP", "Una nueva manipuladora ingresó al equipo de trabajo de tu sede.") ?: "Una nueva manipuladora ingresó al equipo de trabajo de tu sede."
+
+            binding.txtTituloNotif4.text = titulo
+            binding.txtFechaNotif4.text = "Equipo PAE · Reciente"
+            binding.badgeNotif4.text = "Equipo"
+            binding.txtMensajeNotif4.text = mensaje
+
+            binding.cardNotif4.setOnClickListener {
+                startActivity(Intent(this, ManipuladorasJefaActivity::class.java))
+            }
+        }
     }
 
     private fun configurarFiltros() {
