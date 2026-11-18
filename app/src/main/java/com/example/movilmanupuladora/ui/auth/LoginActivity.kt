@@ -379,6 +379,14 @@ class LoginActivity : AppCompatActivity() {
 
                         when {
 
+                            detail.contains("bloque", ignoreCase = true) ||
+                            detail.contains("lock", ignoreCase = true) ||
+                            detail.contains("intentos", ignoreCase = true) ->
+                                "Cuenta bloqueada temporalmente por múltiples intentos fallidos. Por favor espera unos minutos antes de reintentar."
+
+                            response.code() == 429 ->
+                                "Demasiados intentos de inicio de sesión. Por seguridad, espera unos minutos antes de volver a intentar."
+
                             detail.contains(
                                 "No existe ninguna cuenta",
                                 ignoreCase = true

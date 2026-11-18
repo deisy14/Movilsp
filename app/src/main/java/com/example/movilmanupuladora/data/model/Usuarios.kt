@@ -51,10 +51,19 @@ data class Usuario(
         get() = if (apellido.isNotBlank()) "$nombre $apellido" else nombre
 }
 
-// Modelo para la petición de Login
+// Modelo para la petición de Login compatible con todos los esquemas del backend (Django/DRF)
 data class LoginRequest(
+    @SerializedName("correo")
     val correo: String,
-    val password: String
+
+    @SerializedName("username")
+    val username: String = correo,
+
+    @SerializedName("password")
+    val password: String,
+
+    @SerializedName("clave")
+    val clave: String = password
 )
 
 // Modelo para la respuesta de Login

@@ -536,42 +536,26 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                     val idP = if (jornadaActual == "MANANA") idAsistenciaPrimariaManana else idAsistenciaPrimariaTarde
                     val idS = if (jornadaActual == "MANANA") idAsistenciaSecundariaManana else idAsistenciaSecundariaTarde
 
-                    val payloadPrimaria = AsistenciaDiaria(
-                        idAsistencia = idP,
+                    val resP = asistenciaRepository.guardarAsistenciaLimpia(
+                        idExistente = idP,
                         idGrado = idGradoPrimaria,
-                        grado = idGradoPrimaria,
                         fecha = fechaHoy,
                         ninosPresentes = totalPrimaria,
-                        idUsuarioManipuladora = userId,
-                        usuarioManipuladora = userId
+                        idUsuario = userId
                     )
-                    var resP = if (idP != null) {
-                        asistenciaRepository.actualizarAsistencia(idP, payloadPrimaria)
-                    } else null
-                    if (resP == null || !resP.isSuccessful) {
-                        resP = asistenciaRepository.registrarAsistencia(payloadPrimaria)
-                    }
                     if (resP.isSuccessful && resP.body() != null) {
                         val nuevoId = resP.body()!!.obtenerIdReal()
                         if (jornadaActual == "MANANA") idAsistenciaPrimariaManana = nuevoId
                         else idAsistenciaPrimariaTarde = nuevoId
                     }
 
-                    val payloadSecundaria = AsistenciaDiaria(
-                        idAsistencia = idS,
+                    val resS = asistenciaRepository.guardarAsistenciaLimpia(
+                        idExistente = idS,
                         idGrado = idGradoSecundaria,
-                        grado = idGradoSecundaria,
                         fecha = fechaHoy,
                         ninosPresentes = totalSecundaria,
-                        idUsuarioManipuladora = userId,
-                        usuarioManipuladora = userId
+                        idUsuario = userId
                     )
-                    var resS = if (idS != null) {
-                        asistenciaRepository.actualizarAsistencia(idS, payloadSecundaria)
-                    } else null
-                    if (resS == null || !resS.isSuccessful) {
-                        resS = asistenciaRepository.registrarAsistencia(payloadSecundaria)
-                    }
                     if (resS.isSuccessful && resS.body() != null) {
                         val nuevoId = resS.body()!!.obtenerIdReal()
                         if (jornadaActual == "MANANA") idAsistenciaSecundariaManana = nuevoId

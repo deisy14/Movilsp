@@ -237,7 +237,7 @@ class SessionManager(context: Context) {
         return turnoPref.getString("plato_nombre", null)
             ?: jefaPref.getString("plato_actual", null)
             ?: prefs.getString("plato_seleccionado_nombre", null)
-            ?: "Arroz con Pollo"
+            ?: ""
     }
 
     /**
@@ -469,17 +469,6 @@ class SessionManager(context: Context) {
             .getString("plan_${fecha}_${servKey}", null)
         if (!jVal.isNullOrBlank()) return jVal
 
-        // Ver si corresponde a uno de los 20 días escolares oficiales registrados
-        val idx = FECHAS_20_DIAS.indexOf(fecha)
-        if (idx != -1) {
-            return when (servKey) {
-                "desayuno" -> PLATOS_DESAYUNO_20.getOrNull(idx)
-                "almuerzo" -> PLATOS_ALMUERZO_20.getOrNull(idx)
-                "merienda" -> PLATOS_MERIENDA_20.getOrNull(idx)
-                else -> null
-            }
-        }
-
         return null
     }
 
@@ -500,11 +489,6 @@ class SessionManager(context: Context) {
         val jId = context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE)
             .getInt("plan_${fecha}_${servKey}_id", -1)
         if (jId != -1) return jId
-
-        val idx = FECHAS_20_DIAS.indexOf(fecha)
-        if (idx != -1) {
-            return idx + 1
-        }
 
         return -1
     }

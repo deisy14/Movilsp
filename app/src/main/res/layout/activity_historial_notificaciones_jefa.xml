@@ -455,6 +455,7 @@
                             android:orientation="vertical">
 
                             <TextView
+                                android:id="@+id/txtTituloNotif4"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Confirmación de Programación PAE"
@@ -463,6 +464,7 @@
                                 android:textStyle="bold" />
 
                             <TextView
+                                android:id="@+id/txtFechaNotif4"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="1dp"
@@ -473,6 +475,7 @@
                         </LinearLayout>
 
                         <TextView
+                            android:id="@+id/badgeNotif4"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:background="@drawable/bg_pill_yellow"
@@ -486,6 +489,7 @@
                     </LinearLayout>
 
                     <TextView
+                        android:id="@+id/txtMensajeNotif4"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"

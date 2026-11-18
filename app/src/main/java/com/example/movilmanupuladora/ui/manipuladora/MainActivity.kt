@@ -132,36 +132,15 @@ class MainActivity : AppCompatActivity() {
 
         // Detectar plato y componente asignado por la Jefa
         binding.btnVerPreparacion.setOnClickListener {
-            val intent = Intent(this, PreparacionActivity::class.java).apply {
-                val platoJefa = sessionMgr.getPlatoJefa(this@MainActivity)
-                val compJefa = sessionMgr.getComponenteAsignado(this@MainActivity)
-                putExtra("nombre_plato", platoJefa)
-                putExtra("componente_seleccionado", compJefa)
-                putExtra("id_imagen", com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity.obtenerImagenPlatoPorNombre(platoJefa))
-            }
-            startActivity(intent)
+            abrirPreparacionODetalles()
         }
 
         binding.cardPlatoMain.setOnClickListener {
-            val intent = Intent(this, PreparacionActivity::class.java).apply {
-                val platoJefa = sessionMgr.getPlatoJefa(this@MainActivity)
-                val compJefa = sessionMgr.getComponenteAsignado(this@MainActivity)
-                putExtra("nombre_plato", platoJefa)
-                putExtra("componente_seleccionado", compJefa)
-                putExtra("id_imagen", com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity.obtenerImagenPlatoPorNombre(platoJefa))
-            }
-            startActivity(intent)
+            abrirPreparacionODetalles()
         }
 
         binding.cardAccesoAsignadas.setOnClickListener {
-            val intent = Intent(this, PreparacionActivity::class.java).apply {
-                val platoJefa = sessionMgr.getPlatoJefa(this@MainActivity)
-                val compJefa = sessionMgr.getComponenteAsignado(this@MainActivity)
-                putExtra("nombre_plato", platoJefa)
-                putExtra("componente_seleccionado", compJefa)
-                putExtra("id_imagen", com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity.obtenerImagenPlatoPorNombre(platoJefa))
-            }
-            startActivity(intent)
+            abrirPreparacionODetalles()
         }
 
         configurarMenusAnteriores()
@@ -386,6 +365,27 @@ class MainActivity : AppCompatActivity() {
         card.layoutParams = params
     }
 
+    private fun abrirPreparacionODetalles() {
+        val sessionMgr = SessionManager(this)
+        val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        val nombreSeccion = seccionesNombres[seccionSeleccionada]
+
+        val platoDia = sessionMgr.getPlatoDiaServicio(this, fechaHoy, nombreSeccion)
+            ?: sessionMgr.getPlatoServicio(this, nombreSeccion)
+            ?: sessionMgr.getPlatoJefa(this).takeIf { it.isNotBlank() }
+
+        val comp = sessionMgr.getComponenteAsignado(this, nombreSeccion)
+
+        val intent = Intent(this, PreparacionActivity::class.java).apply {
+            putExtra("nombre_plato", platoDia)
+            putExtra("componente_seleccionado", comp)
+            if (!platoDia.isNullOrBlank()) {
+                putExtra("id_imagen", InicioJefaActivity.obtenerImagenPlatoPorNombre(platoDia))
+            }
+        }
+        startActivity(intent)
+    }
+
     private fun actualizarInformacionSeccion() {
         val sessionMgr = SessionManager(this)
         val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
@@ -393,26 +393,29 @@ class MainActivity : AppCompatActivity() {
         // 1. Obtener los platos asignados por la Jefa para los 3 servicios del día
         val platoDes = sessionMgr.getPlatoDiaServicio(this, fechaHoy, "Desayuno")
             ?: sessionMgr.getPlatoServicio(this, "Desayuno")
-            ?: "Huevos pericos con arroz blanco"
 
         val platoAlm = sessionMgr.getPlatoDiaServicio(this, fechaHoy, "Almuerzo")
             ?: sessionMgr.getPlatoServicio(this, "Almuerzo")
-            ?: "Arroz con Pollo Criollo"
 
         val platoMer = sessionMgr.getPlatoDiaServicio(this, fechaHoy, "Merienda")
             ?: sessionMgr.getPlatoServicio(this, "Merienda")
-            ?: "Chocolate en leche con hojaldras"
 
-        // 2. Asignar imágenes circulares correspondientes a cada sector de la ruleta
-        binding.imgRuletaDesayuno.setImageResource(
-            com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity.obtenerImagenPlatoPorNombre(platoDes)
-        )
-        binding.imgRuletaAlmuerzo.setImageResource(
-            com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity.obtenerImagenPlatoPorNombre(platoAlm)
-        )
-        binding.imgRuletaMerienda.setImageResource(
-            com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity.obtenerImagenPlatoPorNombre(platoMer)
-        )
+        // 2. Asignar imágenes circulares correspondientes a cada sector de la ruleta si existen
+        if (!platoDes.isNullOrBlank()) {
+            binding.imgRuletaDesayuno.setImageResource(
+                InicioJefaActivity.obtenerImagenPlatoPorNombre(platoDes)
+            )
+        }
+        if (!platoAlm.isNullOrBlank()) {
+            binding.imgRuletaAlmuerzo.setImageResource(
+                InicioJefaActivity.obtenerImagenPlatoPorNombre(platoAlm)
+            )
+        }
+        if (!platoMer.isNullOrBlank()) {
+            binding.imgRuletaMerienda.setImageResource(
+                InicioJefaActivity.obtenerImagenPlatoPorNombre(platoMer)
+            )
+        }
 
         // 3. Actualizar información de la sección actualmente seleccionada
         val nombreSeccion = seccionesNombres[seccionSeleccionada]
@@ -423,22 +426,32 @@ class MainActivity : AppCompatActivity() {
             0 -> platoDes
             1 -> platoAlm
             else -> platoMer
+        }?.takeIf { it.isNotBlank() } ?: sessionMgr.getPlatoJefa(this).takeIf { it.isNotBlank() }
+
+        if (!platoActivo.isNullOrBlank()) {
+            binding.imgPlatoMain.setImageResource(
+                InicioJefaActivity.obtenerImagenPlatoPorNombre(platoActivo)
+            )
         }
 
-        binding.imgPlatoMain.setImageResource(
-            com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity.obtenerImagenPlatoPorNombre(platoActivo)
-        )
-
-        // 4. Mostrar componente asignado a esta manipuladora más grande y en el centro, y abajo el nombre del plato
+        // 4. Mostrar componente asignado a esta manipuladora o estado correspondiente
         val componenteJefa = sessionMgr.getComponenteAsignado(this, nombreSeccion)
-        if (!componenteJefa.isNullOrBlank()) {
+
+        if (platoActivo.isNullOrBlank()) {
+            // Caso 1: La jefa aún no ha seleccionado nada del menú
+            binding.tvComponenteAsignado.text = "La jefa aún no ha seleccionado el menú de hoy"
+            binding.tvPlatoSeleccionado.text = "Servicio: $nombreSeccion · Menú pendiente"
+            binding.tvSubtituloCardAsignadas.text = "Toca para ver el menú del día y asistencia"
+        } else if (componenteJefa.isNullOrBlank()) {
+            // Caso 2: La jefa ya eligió menú pero no le asignó componente a ella
+            binding.tvComponenteAsignado.text = "Sin componente asignado"
+            binding.tvPlatoSeleccionado.text = "Plato de hoy: $platoActivo"
+            binding.tvSubtituloCardAsignadas.text = "Toca para ver detalles y preparación"
+        } else {
+            // Caso 3: La jefa eligió menú y le asignó componente
             binding.tvComponenteAsignado.text = componenteJefa
             binding.tvPlatoSeleccionado.text = "Plato: $platoActivo"
             binding.tvSubtituloCardAsignadas.text = "Tu tarea: $componenteJefa · $platoActivo"
-        } else {
-            binding.tvComponenteAsignado.text = platoActivo
-            binding.tvPlatoSeleccionado.text = "Servicio: $nombreSeccion"
-            binding.tvSubtituloCardAsignadas.text = "Plato: $platoActivo · Continuar preparación"
         }
     }
 
@@ -510,13 +523,30 @@ class MainActivity : AppCompatActivity() {
                     var totalSecundaria = regSecundaria?.ninosPresentes ?: 0
 
                     if (regPrimaria == null && regSecundaria == null && registrosFecha.isNotEmpty()) {
-                        val regLegacy = registrosFecha.maxByOrNull { it.obtenerIdReal() ?: 0 }!!
-                        val tot = regLegacy.ninosPresentes
-                        totalPrimaria = (tot * 0.6).toInt()
-                        totalSecundaria = tot - totalPrimaria
+                        val sumTot = registrosFecha.sumOf { it.ninosPresentes }
+                        totalPrimaria = (sumTot * 0.6).toInt()
+                        totalSecundaria = sumTot - totalPrimaria
                     }
 
-                    val totalEstudiantes = totalPrimaria + totalSecundaria
+                    var totalEstudiantes = totalPrimaria + totalSecundaria
+                    if (totalEstudiantes == 0 && registrosFecha.isNotEmpty()) {
+                        totalEstudiantes = registrosFecha.sumOf { it.ninosPresentes }
+                        totalPrimaria = (totalEstudiantes * 0.6).toInt()
+                        totalSecundaria = totalEstudiantes - totalPrimaria
+                    }
+
+                    if (totalEstudiantes == 0) {
+                        val pLocal = AsistenciaManager.obtenerPrimaria(this@MainActivity)
+                        val sLocal = AsistenciaManager.obtenerSecundaria(this@MainActivity)
+                        val totLocal = (pLocal + sLocal).takeIf { it > 0 }
+                            ?: AsistenciaManager.obtenerManana(this@MainActivity).takeIf { it > 0 }
+                            ?: AsistenciaManager.obtenerTarde(this@MainActivity)
+                        if (totLocal > 0) {
+                            totalEstudiantes = totLocal
+                            totalPrimaria = pLocal
+                            totalSecundaria = sLocal
+                        }
+                    }
 
                     // Solo actualizar la caché si el servidor devolvió datos reales de hoy (> 0)
                     if (totalEstudiantes > 0) {
