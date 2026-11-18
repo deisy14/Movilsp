@@ -1,20 +1,25 @@
 package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
-import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.databinding.ActivityHistorialNotificacionesJefaBinding
+import com.example.movilmanupuladora.databinding.ItemNotificacionJefaBinding
 
 class HistorialNotificacionesJefaActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHistorialNotificacionesJefaBinding
+    private var filtroSeleccionado: String = "Todas"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,30 +38,99 @@ class HistorialNotificacionesJefaActivity : AppCompatActivity() {
             finish()
         }
 
-        binding.cardNotif1.setOnClickListener {
-            val intent = Intent(this, RegistrarEntregaActivity::class.java)
-            startActivity(intent)
-        }
-
-        configurarNotificacionNuevaManipuladora()
         configurarFiltros()
+        cargarNotificaciones()
+
+        lifecycleScope.launch {
+            NotificacionesJefaManager.sincronizarNotificacionesDelBackend(this@HistorialNotificacionesJefaActivity)
+            cargarNotificaciones()
+        }
     }
 
-    private fun configurarNotificacionNuevaManipuladora() {
-        val prefs = getSharedPreferences("JEFA_NOTIFS", Context.MODE_PRIVATE)
-        val hayNueva = prefs.getBoolean("HAY_NUEVA_MANIP", false)
+    override fun onResume() {
+        super.onResume()
+        cargarNotificaciones()
+    }
 
-        if (hayNueva) {
-            val titulo = prefs.getString("TITULO_NUEVA_MANIP", "Nuevo integrante en el equipo") ?: "Nuevo integrante en el equipo"
-            val mensaje = prefs.getString("MSG_NUEVA_MANIP", "Una nueva manipuladora ingresó al equipo de trabajo de tu sede.") ?: "Una nueva manipuladora ingresó al equipo de trabajo de tu sede."
+    private fun cargarNotificaciones() {
+        val notifsSede = NotificacionesJefaManager.obtenerNotificacionesSede(this)
+        binding.btnFiltroTodas.text = "Todas (${notifsSede.size})"
 
-            binding.txtTituloNotif4.text = titulo
-            binding.txtFechaNotif4.text = "Equipo PAE · Reciente"
-            binding.badgeNotif4.text = "Equipo"
-            binding.txtMensajeNotif4.text = mensaje
+        val filtradas = when (filtroSeleccionado) {
+            "Equipo" -> notifsSede.filter { it.categoria.equals("Equipo", ignoreCase = true) }
+            "Inventario" -> notifsSede.filter { it.categoria.equals("Inventario", ignoreCase = true) }
+            "Preparaciones" -> notifsSede.filter { it.categoria.contains("Prep", ignoreCase = true) }
+            "Asistencia" -> notifsSede.filter { it.categoria.equals("Asistencia", ignoreCase = true) }
+            else -> notifsSede
+        }
 
-            binding.cardNotif4.setOnClickListener {
-                startActivity(Intent(this, ManipuladorasJefaActivity::class.java))
+        binding.contenedorHistorialNotificaciones.removeAllViews()
+
+        if (filtradas.isEmpty()) {
+            binding.contenedorHistorialNotificaciones.visibility = View.GONE
+            binding.layoutSinNotificaciones.visibility = View.VISIBLE
+            binding.txtMensajeVacio.text = if (filtroSeleccionado == "Todas") {
+                "No tienes notificaciones pendientes para tu sede."
+            } else {
+                "No hay notificaciones de $filtroSeleccionado para tu sede."
+            }
+        } else {
+            binding.contenedorHistorialNotificaciones.visibility = View.VISIBLE
+            binding.layoutSinNotificaciones.visibility = View.GONE
+
+            val inflater = LayoutInflater.from(this)
+            for (notif in filtradas) {
+                val itemBinding = ItemNotificacionJefaBinding.inflate(inflater, binding.contenedorHistorialNotificaciones, false)
+
+                itemBinding.txtTituloNotif.text = notif.titulo
+                itemBinding.txtMensajeNotif.text = notif.mensaje
+                itemBinding.txtFechaNotif.text = notif.fecha
+                itemBinding.badgeCategoriaNotif.text = notif.categoria
+
+                when (notif.categoria.lowercase()) {
+                    "equipo" -> {
+                        itemBinding.imgIconoNotif.setImageResource(R.drawable.ic_people)
+                        itemBinding.imgIconoNotif.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FEF3C7"))
+                        itemBinding.badgeCategoriaNotif.background = getDrawable(R.drawable.bg_pill_yellow)
+                        itemBinding.badgeCategoriaNotif.setTextColor(Color.parseColor("#854D0E"))
+                        itemBinding.cardItemNotificacion.setOnClickListener {
+                            startActivity(Intent(this, ManipuladorasJefaActivity::class.java))
+                        }
+                    }
+                    "inventario" -> {
+                        itemBinding.imgIconoNotif.setImageResource(R.drawable.ic_nav_inventory)
+                        itemBinding.imgIconoNotif.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#DCFCE7"))
+                        itemBinding.badgeCategoriaNotif.background = getDrawable(R.drawable.bg_pill_green)
+                        itemBinding.badgeCategoriaNotif.setTextColor(Color.parseColor("#166534"))
+                        itemBinding.cardItemNotificacion.setOnClickListener {
+                            startActivity(Intent(this, InventarioJefaActivity::class.java))
+                        }
+                    }
+                    "preparaciones", "preparacion" -> {
+                        itemBinding.imgIconoNotif.setImageResource(R.drawable.ic_nav_preparations)
+                        itemBinding.imgIconoNotif.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FEF3C7"))
+                        itemBinding.badgeCategoriaNotif.background = getDrawable(R.drawable.bg_pill_yellow)
+                        itemBinding.badgeCategoriaNotif.setTextColor(Color.parseColor("#854D0E"))
+                        itemBinding.cardItemNotificacion.setOnClickListener {
+                            startActivity(Intent(this, HistorialPreparacionesActivity::class.java))
+                        }
+                    }
+                    "asistencia" -> {
+                        itemBinding.imgIconoNotif.setImageResource(R.drawable.ic_people)
+                        itemBinding.imgIconoNotif.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#DCFCE7"))
+                        itemBinding.badgeCategoriaNotif.background = getDrawable(R.drawable.bg_pill_green)
+                        itemBinding.badgeCategoriaNotif.setTextColor(Color.parseColor("#166534"))
+                        itemBinding.cardItemNotificacion.setOnClickListener {
+                            startActivity(Intent(this, AsistenciaJefaActivity::class.java))
+                        }
+                    }
+                    else -> {
+                        itemBinding.imgIconoNotif.setImageResource(R.drawable.ic_notificaciones)
+                        itemBinding.cardItemNotificacion.setOnClickListener(null)
+                    }
+                }
+
+                binding.contenedorHistorialNotificaciones.addView(itemBinding.root)
             }
         }
     }
@@ -74,56 +148,21 @@ class HistorialNotificacionesJefaActivity : AppCompatActivity() {
             btn.strokeWidth = (1.5f * resources.displayMetrics.density).toInt()
         }
 
-        binding.btnFiltroTodas.setOnClickListener {
-            resetBoton(binding.btnFiltroTodas)
-            resetBoton(binding.btnFiltroInventario)
-            resetBoton(binding.btnFiltroPreparaciones)
-            resetBoton(binding.btnFiltroAsistencia)
-            seleccionarBoton(binding.btnFiltroTodas)
+        val botones = listOf(
+            Pair(binding.btnFiltroTodas, "Todas"),
+            Pair(binding.btnFiltroEquipo, "Equipo"),
+            Pair(binding.btnFiltroInventario, "Inventario"),
+            Pair(binding.btnFiltroPreparaciones, "Preparaciones"),
+            Pair(binding.btnFiltroAsistencia, "Asistencia")
+        )
 
-            binding.cardNotif1.visibility = View.VISIBLE
-            binding.cardNotif2.visibility = View.VISIBLE
-            binding.cardNotif3.visibility = View.VISIBLE
-            binding.cardNotif4.visibility = View.VISIBLE
-        }
-
-        binding.btnFiltroInventario.setOnClickListener {
-            resetBoton(binding.btnFiltroTodas)
-            resetBoton(binding.btnFiltroInventario)
-            resetBoton(binding.btnFiltroPreparaciones)
-            resetBoton(binding.btnFiltroAsistencia)
-            seleccionarBoton(binding.btnFiltroInventario)
-
-            binding.cardNotif1.visibility = View.VISIBLE
-            binding.cardNotif2.visibility = View.GONE
-            binding.cardNotif3.visibility = View.GONE
-            binding.cardNotif4.visibility = View.GONE
-        }
-
-        binding.btnFiltroPreparaciones.setOnClickListener {
-            resetBoton(binding.btnFiltroTodas)
-            resetBoton(binding.btnFiltroInventario)
-            resetBoton(binding.btnFiltroPreparaciones)
-            resetBoton(binding.btnFiltroAsistencia)
-            seleccionarBoton(binding.btnFiltroPreparaciones)
-
-            binding.cardNotif1.visibility = View.GONE
-            binding.cardNotif2.visibility = View.VISIBLE
-            binding.cardNotif3.visibility = View.GONE
-            binding.cardNotif4.visibility = View.GONE
-        }
-
-        binding.btnFiltroAsistencia.setOnClickListener {
-            resetBoton(binding.btnFiltroTodas)
-            resetBoton(binding.btnFiltroInventario)
-            resetBoton(binding.btnFiltroPreparaciones)
-            resetBoton(binding.btnFiltroAsistencia)
-            seleccionarBoton(binding.btnFiltroAsistencia)
-
-            binding.cardNotif1.visibility = View.GONE
-            binding.cardNotif2.visibility = View.GONE
-            binding.cardNotif3.visibility = View.VISIBLE
-            binding.cardNotif4.visibility = View.GONE
+        botones.forEach { (btn, categoria) ->
+            btn.setOnClickListener {
+                botones.forEach { resetBoton(it.first) }
+                seleccionarBoton(btn)
+                filtroSeleccionado = categoria
+                cargarNotificaciones()
+            }
         }
     }
 }

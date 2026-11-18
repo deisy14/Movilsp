@@ -3,12 +3,16 @@ package com.example.movilmanupuladora.ui.auth
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.data.api.RetrofitClient
@@ -99,10 +103,48 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // 1. Permitir que el fondo se dibuje detrás de las barras (Edge-to-Edge moderno)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        // 2. Extender el fondo alrededor de la cámara/notch
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            window.attributes.layoutInDisplayCutoutMode =
+                android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+        }
+
+        // 3. Configurar el color de los iconos de la barra para que sean legibles sobre la foto
+        val insetsController = WindowCompat.getInsetsController(window, window.decorView)
+        // true = iconos oscuros (para que resalten sobre los gorros blancos y cocina clara)
+        insetsController.isAppearanceLightStatusBars = true
+        insetsController.isAppearanceLightNavigationBars = false
+
+        window.statusBarColor = Color.TRANSPARENT
+        window.navigationBarColor = Color.TRANSPARENT
+
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         sessionManager = SessionManager(this)
+
+        // Si ya hay una sesión iniciada, entrar directamente sin pedir login de nuevo.
+        // La sesión se mantiene siempre activa hasta que el usuario elija "Cerrar sesión".
+        if (sessionManager.isLoggedIn()) {
+            val token = sessionManager.fetchAuthToken()
+            RetrofitClient.authToken = token
+
+            val rol = sessionManager.getUserRole()
+            val email = sessionManager.getUserEmail()
+            val esJefa = esUsuarioJefa(rol = rol, email = email)
+
+            val destino = if (esJefa) {
+                InicioJefaActivity::class.java
+            } else {
+                TurnoActivity::class.java
+            }
+            startActivity(Intent(this, destino))
+            finish()
+            return
+        }
 
         // Hacer scroll automático al enfocar campos de texto cuando sale el teclado
         binding.txtCorreo.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
@@ -523,5 +565,11 @@ class LoginActivity : AppCompatActivity() {
             binding.root.windowToken,
             0
         )
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val insetsController = WindowCompat.getInsetsController(window, window.decorView)
+        insetsController.isAppearanceLightStatusBars = true
     }
 }

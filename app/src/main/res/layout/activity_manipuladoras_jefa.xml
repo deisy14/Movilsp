@@ -7,9 +7,39 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FAF9F5"
-    android:fitsSystemWindows="true"
+    android:fitsSystemWindows="false"
     android:orientation="vertical"
     tools:context=".ui.manipuladora_Jefe.ManipuladorasJefaActivity">
+
+    <!-- ENCABEZADO FIJO (ESTILO WHATSAPP): TÍTULO Y SUBTÍTULO -->
+    <LinearLayout
+        android:id="@+id/headerTurnos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FAF9F5"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:text="Asignación de turnos"
+            android:textColor="#1E293B"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Programa el horario de tu equipo"
+            android:textColor="#64748B"
+            android:textSize="14sp" />
+
+    </LinearLayout>
 
     <!-- ===================================================== -->
     <!-- CONTENIDO CON SCROLL                                  -->
@@ -23,55 +53,13 @@
         android:scrollbars="none">
 
         <LinearLayout
+            android:id="@+id/layoutContenidoTurnos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingHorizontal="20dp"
-            android:paddingTop="36dp"
+            android:paddingTop="6dp"
             android:paddingBottom="24dp">
-
-            <!-- ================================================= -->
-            <!-- ENCABEZADO: BOTÓN VOLVER CIRCULAR                 -->
-            <!-- ================================================= -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/btnVolver"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#E2E8F0"
-                app:strokeWidth="1dp">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_gravity="center"
-                    android:contentDescription="Volver"
-                    android:src="@drawable/ic_chevron_left"
-                    app:tint="#1E293B" />
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- TÍTULO Y SUBTÍTULO -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Asignación de turnos"
-                android:textColor="#1E293B"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Programa el horario de tu equipo"
-                android:textColor="#64748B"
-                android:textSize="14sp" />
 
             <!-- ================================================= -->
             <!-- 1. SELECCIONAR MANIPULADORAS                      -->
