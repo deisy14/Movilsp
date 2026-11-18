@@ -63,19 +63,12 @@ class SessionManager(context: Context) {
     }
 
     /**
-     * Valida si existe un token de sesión y si la hora actual está dentro
-     * de la ventana de sesión permitida (7:00 AM a 7:00 PM).
+     * Valida si existe una sesión activa.
+     * La sesión permanece abierta indefinidamente hasta que el usuario
+     * presiona explícitamente "Cerrar sesión".
      */
     fun esSesionValidaHorario(): Boolean {
-        val token = fetchAuthToken()
-        if (token.isNullOrBlank()) return false
-
-        val cal = java.util.Calendar.getInstance()
-        val hora = cal.get(java.util.Calendar.HOUR_OF_DAY)
-        val minuto = cal.get(java.util.Calendar.MINUTE)
-
-        // De 7:00 AM a 7:00 PM (19:00 inclusive)
-        return (hora in 7..18) || (hora == 19 && minuto == 0)
+        return isLoggedIn()
     }
 
     // Guarda los datos del usuario autenticado, su sede e institución.

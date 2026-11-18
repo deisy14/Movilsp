@@ -45,19 +45,30 @@ class AsignarComponentesActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-            window.isStatusBarContrastEnforced = false
+        // Edge-to-Edge: fondo se dibuja detrás de la barra de estado
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            window.attributes.layoutInDisplayCutoutMode =
+                android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
         }
+
+        window.statusBarColor = android.graphics.Color.TRANSPARENT
+        window.navigationBarColor = android.graphics.Color.TRANSPARENT
         androidx.core.view.WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
 
         binding = ActivityAsignarComponentesBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(binding.headerComponentes) { view, insets ->
+            val statusBarHeight = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars()).top
+            view.setPadding(
+                view.paddingLeft,
+                statusBarHeight + (10 * resources.displayMetrics.density).toInt(),
+                view.paddingRight,
+                view.paddingBottom
+            )
             insets
         }
 
@@ -101,10 +112,6 @@ class AsignarComponentesActivity : AppCompatActivity() {
     }
 
     private fun configurarEventos() {
-        binding.btnVolver.setOnClickListener {
-            finish()
-        }
-
         binding.btnInfo.setOnClickListener {
             MaterialAlertDialogBuilder(this)
                 .setTitle("Asignación de componentes")

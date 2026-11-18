@@ -12,6 +12,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -39,14 +40,30 @@ class InventarioJefaActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
+        // Edge-to-Edge: fondo se dibuja detrás de la barra de estado
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            window.attributes.layoutInDisplayCutoutMode =
+                android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+        }
+
+        window.statusBarColor = Color.TRANSPARENT
+        window.navigationBarColor = Color.TRANSPARENT
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
 
         binding = ActivityInventarioJefaBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.headerInventario) { view, insets ->
+            val statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.systemBars()).top
+            view.setPadding(
+                view.paddingLeft,
+                statusBarHeight + (10 * resources.displayMetrics.density).toInt(),
+                view.paddingRight,
+                view.paddingBottom
+            )
             insets
         }
 
@@ -55,10 +72,6 @@ class InventarioJefaActivity : AppCompatActivity() {
         configurarBotonesCategorias()
         configurarNavegacionInferior()
         cargarDatosDesdeServidor()
-
-        binding.btnVolver.setOnClickListener {
-            finish()
-        }
 
         binding.cardBannerEntregaSupervisor.setOnClickListener {
             val intent = Intent(this, RegistrarEntregaActivity::class.java)

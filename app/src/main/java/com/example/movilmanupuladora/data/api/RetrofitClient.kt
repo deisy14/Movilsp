@@ -125,9 +125,12 @@ object RetrofitClient {
 
     /**
      * Gson configurado con soporte para respuestas paginadas de Django REST Framework ({ results: [...] })
+     * y deserializador tolerante a esquemas para Usuario.
      */
     val gson = GsonBuilder()
         .registerTypeAdapterFactory(PaginatedListTypeAdapterFactory())
+        .registerTypeAdapter(com.example.movilmanupuladora.data.model.Usuario::class.java, com.example.movilmanupuladora.data.model.UsuarioDeserializer())
+        .registerTypeAdapter(com.example.movilmanupuladora.data.model.UsuarioInfo::class.java, com.example.movilmanupuladora.data.model.UsuarioInfoDeserializer())
         .create()
 
     /**

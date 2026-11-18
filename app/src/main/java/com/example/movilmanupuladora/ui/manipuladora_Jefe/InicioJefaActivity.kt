@@ -75,16 +75,29 @@ class InicioJefaActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Barra de estado amarilla (#F5B81F) con iconos oscuros (hora, wifi, batería)
-        window.statusBarColor = Color.parseColor("#F5B81F")
+        // Edge-to-Edge: el fondo amarillo se dibuja detrás de la barra de estado como en el login
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            window.attributes.layoutInDisplayCutoutMode =
+                android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+        }
+
+        window.statusBarColor = Color.TRANSPARENT
+        window.navigationBarColor = Color.TRANSPARENT
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
 
         binding = ActivityInicioJefaBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { vista, insets ->
-            val barras = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            vista.setPadding(0, barras.top, 0, 0)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.franjaSuperiorAmarilla) { view, insets ->
+            val statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.systemBars()).top
+            view.setPadding(
+                view.paddingLeft,
+                statusBarHeight + (10 * resources.displayMetrics.density).toInt(),
+                view.paddingRight,
+                view.paddingBottom
+            )
             insets
         }
 
@@ -97,16 +110,29 @@ class InicioJefaActivity : AppCompatActivity() {
 
         actualizarResumen()
         cargarAsistenciaDelBackend()
+
+        lifecycleScope.launch {
+            try {
+                val idSede = sessionManager.getSedeId().takeIf { it > 0 }
+                val sedeNombre = sessionManager.getSedeNombre()
+                ManipuladorasManager.cargarDesdeBackend(this@InicioJefaActivity, idSede, sedeNombre)
+                NotificacionesJefaManager.sincronizarNotificacionesDelBackend(this@InicioJefaActivity)
+                actualizarResumen()
+            } catch (_: Exception) { }
+        }
     }
 
     override fun onResume() {
         super.onResume()
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
         actualizarResumen()
         cargarAsistenciaDelBackend()
         lifecycleScope.launch {
             try {
                 val idSede = sessionManager.getSedeId().takeIf { it > 0 }
-                ManipuladorasManager.cargarDesdeBackend(this@InicioJefaActivity, idSede)
+                val sedeNombre = sessionManager.getSedeNombre()
+                ManipuladorasManager.cargarDesdeBackend(this@InicioJefaActivity, idSede, sedeNombre)
+                NotificacionesJefaManager.sincronizarNotificacionesDelBackend(this@InicioJefaActivity)
                 actualizarResumen()
 
                 val res = RetrofitClient.apiService.obtenerPlatos()
@@ -432,11 +458,10 @@ class InicioJefaActivity : AppCompatActivity() {
         }
 
         binding.btnNotificacionesJefa.setOnClickListener {
-            val prefs = getSharedPreferences("JEFA_NOTIFS", MODE_PRIVATE)
-            val hayNueva = prefs.getBoolean("HAY_NUEVA_MANIP", false)
+            val notifs = NotificacionesJefaManager.obtenerNotificacionesSede(this)
 
             val popupBinding = com.example.movilmanupuladora.databinding.PopupNotificacionesBinding.inflate(layoutInflater)
-            popupBinding.txtCantidadNotificaciones.text = if (hayNueva) "4" else "3"
+            popupBinding.txtCantidadNotificaciones.text = notifs.size.toString()
 
             val dialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                 .setView(popupBinding.root)
@@ -444,32 +469,79 @@ class InicioJefaActivity : AppCompatActivity() {
 
             dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
-            if (hayNueva) {
-                val titulo = prefs.getString("TITULO_NUEVA_MANIP", "Nuevo integrante en el equipo") ?: "Nuevo integrante en el equipo"
-                val mensaje = prefs.getString("MSG_NUEVA_MANIP", "Una nueva manipuladora ingresó al equipo de trabajo de tu sede.") ?: "Una nueva manipuladora ingresó al equipo de trabajo de tu sede."
-
-                popupBinding.iconoPreparacion.setImageResource(R.drawable.ic_people)
-                popupBinding.txtTituloPreparacion.text = titulo
-                popupBinding.txtMensajePreparacion.text = mensaje
-                popupBinding.notificacionPreparacion.setOnClickListener {
-                    dialog.dismiss()
-                    startActivity(Intent(this, ManipuladorasJefaActivity::class.java))
-                }
+            if (notifs.isEmpty()) {
+                popupBinding.contenedorNotificaciones.visibility = View.GONE
+                popupBinding.contenedorSinNotificaciones.visibility = View.VISIBLE
             } else {
-                popupBinding.notificacionPreparacion.setOnClickListener {
-                    dialog.dismiss()
-                    startActivity(Intent(this, HistorialPreparacionesActivity::class.java))
+                popupBinding.contenedorNotificaciones.visibility = View.VISIBLE
+                popupBinding.contenedorSinNotificaciones.visibility = View.GONE
+                popupBinding.contenedorNotificaciones.removeAllViews()
+
+                val density = resources.displayMetrics.density
+                for (notif in notifs.take(4)) {
+                    val itemLayout = android.widget.LinearLayout(this).apply {
+                        orientation = android.widget.LinearLayout.HORIZONTAL
+                        gravity = android.view.Gravity.CENTER_VERTICAL
+                        setPadding(0, (8 * density).toInt(), 0, (8 * density).toInt())
+                        isClickable = true
+                        isFocusable = true
+                        val typedValue = android.util.TypedValue()
+                        theme.resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true)
+                        setBackgroundResource(typedValue.resourceId)
+                    }
+
+                    val icono = android.widget.ImageView(this).apply {
+                        layoutParams = android.widget.LinearLayout.LayoutParams((38 * density).toInt(), (38 * density).toInt())
+                        setBackgroundResource(R.drawable.bg_pill_yellow)
+                        setPadding((8 * density).toInt(), (8 * density).toInt(), (8 * density).toInt(), (8 * density).toInt())
+                        if (notif.categoria.equals("Equipo", ignoreCase = true)) {
+                            setImageResource(R.drawable.ic_people)
+                            imageTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#854D0E"))
+                        } else {
+                            setImageResource(R.drawable.ic_notificaciones)
+                            imageTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#854D0E"))
+                        }
+                    }
+
+                    val infoLayout = android.widget.LinearLayout(this).apply {
+                        orientation = android.widget.LinearLayout.VERTICAL
+                        val params = android.widget.LinearLayout.LayoutParams(0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
+                        params.marginStart = (12 * density).toInt()
+                        layoutParams = params
+                    }
+
+                    val txtTitulo = android.widget.TextView(this).apply {
+                        text = notif.titulo
+                        setTextColor(android.graphics.Color.parseColor("#1B3317"))
+                        textSize = 13f
+                        typeface = android.graphics.Typeface.DEFAULT_BOLD
+                    }
+
+                    val txtMensaje = android.widget.TextView(this).apply {
+                        text = notif.mensaje
+                        setTextColor(android.graphics.Color.parseColor("#64748B"))
+                        textSize = 11f
+                        maxLines = 2
+                        ellipsize = android.text.TextUtils.TruncateAt.END
+                    }
+
+                    infoLayout.addView(txtTitulo)
+                    infoLayout.addView(txtMensaje)
+
+                    itemLayout.addView(icono)
+                    itemLayout.addView(infoLayout)
+
+                    itemLayout.setOnClickListener {
+                        dialog.dismiss()
+                        if (notif.categoria.equals("Equipo", ignoreCase = true)) {
+                            startActivity(Intent(this, ManipuladorasJefaActivity::class.java))
+                        } else {
+                            startActivity(Intent(this, HistorialNotificacionesJefaActivity::class.java))
+                        }
+                    }
+
+                    popupBinding.contenedorNotificaciones.addView(itemLayout)
                 }
-            }
-
-            popupBinding.notificacionInventario.setOnClickListener {
-                dialog.dismiss()
-                startActivity(Intent(this, InventarioJefaActivity::class.java))
-            }
-
-            popupBinding.notificacionAsistencia.setOnClickListener {
-                dialog.dismiss()
-                startActivity(Intent(this, AsistenciaJefaActivity::class.java))
             }
 
             popupBinding.btnVerTodasNotificaciones.setOnClickListener {

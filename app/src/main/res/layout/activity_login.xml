@@ -5,7 +5,7 @@
     android:id="@+id/scrollLogin"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#181D24"
+    android:background="#101215"
     android:fillViewport="true"
     android:fitsSystemWindows="false"
     tools:context=".ui.auth.LoginActivity">
@@ -35,16 +35,18 @@
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="0.498" />
 
-        <!-- RECUADRO DE VIDRIO DE BORDE A BORDE Y HASTA EL FINAL DE LA IMAGEN/PANTALLA -->
+        <!-- RECUADRO DE VIDRIO DE BORDE A BORDE Y HASTA EL FINAL DE LA PANTALLA COMPLETA -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/bottomCard"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:background="@drawable/bg_glass_card_login"
             android:paddingHorizontal="24dp"
             android:paddingTop="18dp"
-            android:paddingBottom="40dp"
+            android:paddingBottom="24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_min="wrap"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/guidelinePanalHuevos">
 
