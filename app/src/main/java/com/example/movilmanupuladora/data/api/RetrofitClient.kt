@@ -94,6 +94,7 @@ object RetrofitClient {
 
         val isAuthEndpoint =
             path.contains("/auth/") ||
+                    path.contains("/verify-face") ||
                     (
                             path.contains("/usuarios/") &&
                                     request.method == "POST"

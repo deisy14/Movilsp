@@ -65,6 +65,36 @@ class LoginActivity : AppCompatActivity() {
 
             return false
         }
+
+        fun esRolAdministrativo(
+            rol: String?,
+            email: String? = null,
+            idRol: Int? = null,
+            nombreRol: String? = null
+        ): Boolean {
+            val r = normalizarTexto(rol)
+            val nr = normalizarTexto(nombreRol)
+            val e = normalizarTexto(email)
+
+            if (idRol in listOf(1, 2, 3)) return true
+
+            val idParsed = r.toIntOrNull() ?: nr.toIntOrNull()
+            if (idParsed in listOf(1, 2, 3)) return true
+
+            val rolTexto = "$r $nr".trim()
+            if (rolTexto.contains("super") ||
+                rolTexto.contains("admin") ||
+                rolTexto.contains("supervisor")
+            ) {
+                return true
+            }
+
+            if (e.contains("superadmin") || e.contains("admin@") || e.contains("supervisor@")) {
+                return true
+            }
+
+            return false
+        }
     }
 
     private lateinit var binding: ActivityLoginBinding
@@ -134,16 +164,22 @@ class LoginActivity : AppCompatActivity() {
 
             val rol = sessionManager.getUserRole()
             val email = sessionManager.getUserEmail()
-            val esJefa = esUsuarioJefa(rol = rol, email = email)
 
-            val destino = if (esJefa) {
-                InicioJefaActivity::class.java
+            if (esRolAdministrativo(rol, email)) {
+                sessionManager.clearSession()
+                RetrofitClient.authToken = null
+                mostrarDialogoAccesoWeb(rol ?: "Administrativo")
             } else {
-                TurnoActivity::class.java
+                val esJefa = esUsuarioJefa(rol = rol, email = email)
+                val destino = if (esJefa) {
+                    InicioJefaActivity::class.java
+                } else {
+                    TurnoActivity::class.java
+                }
+                startActivity(Intent(this, destino))
+                finish()
+                return
             }
-            startActivity(Intent(this, destino))
-            finish()
-            return
         }
 
         // Hacer scroll automático al enfocar campos de texto cuando sale el teclado
@@ -223,6 +259,14 @@ class LoginActivity : AppCompatActivity() {
 
             ocultarTeclado()
             iniciarSesion(correo, password)
+        }
+
+        // Botón de Reconocimiento Facial Biométrico
+        binding.btnReconocimientoFacial.setOnClickListener {
+            val intent = Intent(this, ReconocimientoFacialActivity::class.java).apply {
+                putExtra(ReconocimientoFacialActivity.EXTRA_MODO, ReconocimientoFacialActivity.MODO_LOGIN)
+            }
+            startActivity(intent)
         }
 
         // Recuperación de contraseña.
@@ -313,19 +357,19 @@ class LoginActivity : AppCompatActivity() {
                         .trim()
                         .lowercase()
 
-                    // El administrador ingresa desde la página web.
-                    val esAdmin = rolTexto.contains("admin") ||
-                            userInfo?.isSuperuser == true ||
-                            userInfo?.idRol == 1 ||
-                            userInfo?.idRol == 2
+                    // Los roles administrativos ingresan exclusivamente desde la plataforma Web.
+                    val esAdmin = esRolAdministrativo(
+                        rol = userInfo?.rolEfectivo ?: userInfo?.rol,
+                        email = email,
+                        idRol = userInfo?.idRol,
+                        nombreRol = userInfo?.nombreRol
+                    )
 
                     if (esAdmin) {
                         mostrarCargando(false)
-                        Toast.makeText(
-                            this@LoginActivity,
-                            "Este usuario debe ingresar desde la página web.",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        sessionManager.clearSession()
+                        RetrofitClient.authToken = null
+                        mostrarDialogoAccesoWeb(userInfo?.nombreRol ?: userInfo?.rolEfectivo ?: userInfo?.rol ?: "Administrativo")
                         return@launch
                     }
 
@@ -549,6 +593,14 @@ class LoginActivity : AppCompatActivity() {
             binding.txtAdministrador.isEnabled = true
             binding.layoutAdminContacto.isEnabled = true
         }
+    }
+
+    private fun mostrarDialogoAccesoWeb(rol: String) {
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Acceso Restringido")
+            .setMessage("Tu cuenta tiene rol administrativo ($rol).\n\nEsta aplicación móvil es de uso exclusivo para el personal de cocina (Manipuladoras y Jefas de Manipuladoras).\n\nPor favor ingresa desde la plataforma Web del PAE.")
+            .setPositiveButton("Entendido", null)
+            .show()
     }
 
     // =========================================================
