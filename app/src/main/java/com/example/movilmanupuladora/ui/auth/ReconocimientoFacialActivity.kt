@@ -422,6 +422,9 @@ class ReconocimientoFacialActivity : AppCompatActivity() {
         }
 
         if (detalle.isNotBlank()) {
+            if (detalle.contains("token", ignoreCase = true)) {
+                return "Tu sesión ha expirado. Por favor cierra sesión e inicia de nuevo para renovar tu acceso."
+            }
             return detalle
         }
 
