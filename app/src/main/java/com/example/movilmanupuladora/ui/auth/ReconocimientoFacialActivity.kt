@@ -92,7 +92,7 @@ class ReconocimientoFacialActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         modoActual = intent.getStringExtra(EXTRA_MODO) ?: MODO_LOGIN
-        correoRegistro = intent.getStringExtra(EXTRA_CORREO)
+        correoRegistro = intent.getStringExtra(EXTRA_CORREO)?.ifBlank { null } ?: sessionManager.getUserEmail()
 
         configurarTextosPorModo()
 
@@ -376,7 +376,8 @@ class ReconocimientoFacialActivity : AppCompatActivity() {
 
     private suspend fun ejecutarRegistroFacial(base64Image: String, displayBitmap: Bitmap) {
         try {
-            val response = facialRepository.registrarRostro(base64Image, correoRegistro)
+            val correoFinal = correoRegistro?.ifBlank { null } ?: sessionManager.getUserEmail()
+            val response = facialRepository.registrarRostro(base64Image, correoFinal)
 
             if (response.isSuccessful && response.body() != null) {
                 val data = response.body()!!
@@ -396,6 +397,22 @@ class ReconocimientoFacialActivity : AppCompatActivity() {
                 )
                 withContext(Dispatchers.Main) {
                     restablecerEstadoCaptura(errorMsg)
+                    if (errorMsg.contains("expirado", ignoreCase = true) || errorMsg.contains("sesión", ignoreCase = true)) {
+                        androidx.appcompat.app.AlertDialog.Builder(this@ReconocimientoFacialActivity)
+                            .setTitle("Sesión Expirada")
+                            .setMessage("Tu sesión previa ha caducado. Por favor inicia sesión nuevamente con tu contraseña para renovar tu acceso.")
+                            .setPositiveButton("Iniciar Sesión") { _, _ ->
+                                sessionManager.clearSession()
+                                RetrofitClient.authToken = null
+                                val intent = Intent(this@ReconocimientoFacialActivity, LoginActivity::class.java).apply {
+                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                }
+                                startActivity(intent)
+                                finish()
+                            }
+                            .setNegativeButton("Cancelar", null)
+                            .show()
+                    }
                 }
             }
 
