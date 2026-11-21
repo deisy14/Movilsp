@@ -533,7 +533,17 @@ class InicioJefaActivity : AppCompatActivity() {
 
                     itemLayout.setOnClickListener {
                         dialog.dismiss()
-                        if (notif.categoria.equals("Equipo", ignoreCase = true)) {
+                        val textoCompleto = "${notif.titulo} ${notif.mensaje}"
+                        if (textoCompleto.contains("entrega", ignoreCase = true) ||
+                            textoCompleto.contains("remisi", ignoreCase = true) ||
+                            textoCompleto.contains("despach", ignoreCase = true)) {
+                            val intent = Intent(this, RegistrarEntregaActivity::class.java)
+                            val match = Regex("#REM-[0-9A-Za-z-]+", RegexOption.IGNORE_CASE).find(textoCompleto)
+                            if (match != null) {
+                                intent.putExtra("numero_remision", match.value)
+                            }
+                            startActivity(intent)
+                        } else if (notif.categoria.equals("Equipo", ignoreCase = true)) {
                             startActivity(Intent(this, ManipuladorasJefaActivity::class.java))
                         } else {
                             startActivity(Intent(this, HistorialNotificacionesJefaActivity::class.java))
