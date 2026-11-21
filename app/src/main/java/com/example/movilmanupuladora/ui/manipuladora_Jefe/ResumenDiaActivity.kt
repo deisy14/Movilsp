@@ -39,7 +39,7 @@ class ResumenDiaActivity : AppCompatActivity() {
     }
 
     private fun configurarFecha() {
-        val formato = SimpleDateFormat("EEEE, dd 'de' MMMM", Locale("es", "ES"))
+        val formato = SimpleDateFormat("EEEE, dd 'de' MMMM", Locale.forLanguageTag("es-ES"))
         val fecha = formato.format(Date())
         binding.txtFecha.text = fecha.replaceFirstChar { it.uppercase() }
     }

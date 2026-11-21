@@ -85,7 +85,7 @@ class AsistenciaJefaActivity : AppCompatActivity() {
 
     private fun configurarFecha() {
         try {
-            val formato = SimpleDateFormat("EEEE, d 'de' MMMM 'de' yyyy", Locale("es", "CO"))
+            val formato = SimpleDateFormat("EEEE, d 'de' MMMM 'de' yyyy", Locale.forLanguageTag("es-CO"))
             val fecha = formato.format(Date()).replaceFirstChar { it.uppercase() }
             binding.txtFechaAsistencia.text = fecha
         } catch (_: Exception) {

@@ -38,6 +38,7 @@ class PreparacionesJefaActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         // Barra de estado blanca con iconos oscuros
+        @Suppress("DEPRECATION")
         window.statusBarColor = Color.WHITE
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
 
@@ -51,7 +52,9 @@ class PreparacionesJefaActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        actualizarDatosJornada()
+        if (::binding.isInitialized) {
+            actualizarDatosJornada()
+        }
     }
 
     private fun configurarEventos() {

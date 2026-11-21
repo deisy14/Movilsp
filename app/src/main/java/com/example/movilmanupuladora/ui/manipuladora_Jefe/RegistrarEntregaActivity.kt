@@ -89,7 +89,7 @@ class RegistrarEntregaActivity : AppCompatActivity() {
         binding.txtDetalleSupervisor.text = "Supervisor PAE: $nombreSupervisor • Mercados del Mes"
 
         try {
-            val formato = SimpleDateFormat("EEEE, d 'de' MMMM 'de' yyyy", Locale("es", "CO"))
+            val formato = SimpleDateFormat("EEEE, d 'de' MMMM 'de' yyyy", Locale.forLanguageTag("es-CO"))
             binding.txtFechaDespacho.text = formato.format(Date()).replaceFirstChar { it.uppercase() }
         } catch (_: Exception) {
             binding.txtFechaDespacho.text = "Hoy, 14 Nov 2026"

@@ -125,6 +125,7 @@ object NavigationHelperJefa {
                 val intent = Intent(activity, InicioJefaActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
+                @Suppress("DEPRECATION")
                 activity.overridePendingTransition(0, 0)
                 activity.finish()
             }
@@ -135,6 +136,7 @@ object NavigationHelperJefa {
                 val intent = Intent(activity, InventarioJefaActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
+                @Suppress("DEPRECATION")
                 activity.overridePendingTransition(0, 0)
                 activity.finish()
             }
@@ -145,6 +147,7 @@ object NavigationHelperJefa {
                 val intent = Intent(activity, com.example.movilmanupuladora.ui.manipuladora_Jefe.AsignarComponentesActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
+                @Suppress("DEPRECATION")
                 activity.overridePendingTransition(0, 0)
                 if (activity !is com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity) {
                     activity.finish()
@@ -157,6 +160,7 @@ object NavigationHelperJefa {
                 val intent = Intent(activity, ManipuladorasJefaActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
+                @Suppress("DEPRECATION")
                 activity.overridePendingTransition(0, 0)
                 activity.finish()
             }
@@ -165,6 +169,7 @@ object NavigationHelperJefa {
         fabAdd?.setOnClickListener {
             val intent = Intent(activity, PlanificacionSemanalJefaActivity::class.java)
             activity.startActivity(intent)
+            @Suppress("DEPRECATION")
             activity.overridePendingTransition(R.anim.slide_in_bottom, R.anim.stay)
         }
     }

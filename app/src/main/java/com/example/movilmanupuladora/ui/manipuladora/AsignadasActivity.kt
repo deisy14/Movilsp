@@ -85,7 +85,7 @@ class AsignadasActivity : AppCompatActivity() {
     }
 
     private fun configurarEncabezadoYPlato() {
-        val fechaHoy = SimpleDateFormat("EEEE / d / MMM / yyyy", Locale("es", "CO"))
+        val fechaHoy = SimpleDateFormat("EEEE / d / MMM / yyyy", Locale.forLanguageTag("es-CO"))
             .format(Date())
             .uppercase()
         binding.tvFechaAsignadas.text = fechaHoy

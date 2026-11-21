@@ -89,6 +89,7 @@ object NavigationHelper {
                 val intent = Intent(activity, MainActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
+                @Suppress("DEPRECATION")
                 activity.overridePendingTransition(0, 0)
                 activity.finish()
             }
@@ -99,6 +100,7 @@ object NavigationHelper {
                 val intent = Intent(activity, AsignadasActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
+                @Suppress("DEPRECATION")
                 activity.overridePendingTransition(0, 0)
                 activity.finish()
             }
@@ -109,6 +111,7 @@ object NavigationHelper {
                 val intent = Intent(activity, InventarioActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
+                @Suppress("DEPRECATION")
                 activity.overridePendingTransition(0, 0)
                 activity.finish()
             }
@@ -119,6 +122,7 @@ object NavigationHelper {
                 val intent = Intent(activity, AvisosActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
+                @Suppress("DEPRECATION")
                 activity.overridePendingTransition(0, 0)
                 activity.finish()
             }
@@ -129,6 +133,7 @@ object NavigationHelper {
                 val intent = Intent(activity, PerfilActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 activity.startActivity(intent)
+                @Suppress("DEPRECATION")
                 activity.overridePendingTransition(0, 0)
                 activity.finish()
             }

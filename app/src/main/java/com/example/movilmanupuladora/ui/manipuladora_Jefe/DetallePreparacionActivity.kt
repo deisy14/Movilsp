@@ -77,7 +77,7 @@ class DetallePreparacionActivity : AppCompatActivity() {
         if (fechaIntent.isNullOrEmpty()) {
             val formato = SimpleDateFormat(
                 "EEEE, dd 'de' MMMM",
-                Locale("es", "ES")
+                Locale.forLanguageTag("es-ES")
             )
             val fecha = formato.format(Date())
             binding.txtFecha.text =

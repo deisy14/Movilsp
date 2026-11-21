@@ -113,6 +113,7 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 finish()
+                @Suppress("DEPRECATION")
                 overridePendingTransition(R.anim.stay, R.anim.slide_out_bottom)
             }
         })
@@ -620,6 +621,7 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
     private fun configurarEventos() {
         binding.btnVolver.setOnClickListener {
             finish()
+            @Suppress("DEPRECATION")
             overridePendingTransition(R.anim.stay, R.anim.slide_out_bottom)
         }
 
@@ -640,6 +642,7 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
         binding.btnNuevaReceta.setOnClickListener {
             val intent = Intent(this, RedactarRecetaActivity::class.java)
             startActivity(intent)
+            @Suppress("DEPRECATION")
             overridePendingTransition(R.anim.slide_in_bottom, R.anim.stay)
         }
 

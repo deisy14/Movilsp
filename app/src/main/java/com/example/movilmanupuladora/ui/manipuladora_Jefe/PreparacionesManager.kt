@@ -33,7 +33,7 @@ object PreparacionesManager {
             if (horaInicio.isNotEmpty()) it.horaInicio = horaInicio
             if (observaciones.isNotEmpty()) it.observaciones = observaciones
             if (nuevoEstado == "Completada") {
-                it.horaFin = java.text.SimpleDateFormat("hh:mm a", java.util.Locale("es", "CO")).format(java.util.Date())
+                it.horaFin = java.text.SimpleDateFormat("hh:mm a", java.util.Locale.forLanguageTag("es-CO")).format(java.util.Date())
             }
         }
     }

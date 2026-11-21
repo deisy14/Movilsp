@@ -52,7 +52,7 @@ class ConfirmacionActivity : AppCompatActivity() {
 
         val horaActual = SimpleDateFormat(
             "hh:mm a",
-            Locale("es", "CO")
+            Locale.forLanguageTag("es-CO")
         ).format(Date())
 
         val horaEspañol = horaActual

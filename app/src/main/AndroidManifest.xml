@@ -119,10 +119,6 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.manipuladora_Jefe.CalendarioMenuActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
             android:name=".ui.manipuladora_Jefe.DetallePreparacionActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />

@@ -943,18 +943,19 @@ object PreparacionSyncManager {
 
                 for ((ingNom, cantConsumida) in ingredientesConsumo) {
                     val itemInv = inventarios.firstOrNull { inv ->
-                        val n = inv.idIngrediente?.toString()?.lowercase() ?: ""
-                        n.contains(ingNom) || ingNom.contains(n)
+                        val n = (inv.nombreIngrediente ?: inv.nombre ?: "").lowercase().trim()
+                        n.isNotEmpty() && (n.contains(ingNom) || ingNom.contains(n))
                     } ?: inventarios.firstOrNull()
 
-                    if (itemInv != null && itemInv.idInventario != null) {
+                    val idInvReal = itemInv?.obtenerIdReal() ?: 0
+                    if (itemInv != null && idInvReal > 0) {
                         val cantActual = itemInv.cantidadActual?.toDoubleOrNull() ?: 15.0
                         val nuevaCant = (cantActual - cantConsumida).coerceAtLeast(0.0)
                         val payload = itemInv.copy(
                             cantidadActual = String.format(Locale.US, "%.2f", nuevaCant)
                         )
                         try {
-                            RetrofitClient.apiService.actualizarInventario(itemInv.idInventario, payload)
+                            RetrofitClient.apiService.actualizarInventario(idInvReal, payload)
                             Log.d(TAG, "Deducción de inventario exitosa: $ingNom -$cantConsumida -> Quedan $nuevaCant")
                         } catch (e: Exception) {
                             Log.w(TAG, "No se pudo actualizar inventario en backend para $ingNom: ${e.message}")

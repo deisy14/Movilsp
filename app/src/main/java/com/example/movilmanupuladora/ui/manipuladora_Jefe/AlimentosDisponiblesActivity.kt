@@ -125,13 +125,13 @@ class AlimentosDisponiblesActivity : AppCompatActivity() {
 
         val formato = SimpleDateFormat(
             "EEEE, dd 'de' MMMM",
-            Locale("es", "ES")
+            Locale.forLanguageTag("es-ES")
         )
 
         val fecha = formato.format(Date())
 
         binding.txtFecha.text =
-            fecha.lowercase(Locale("es", "ES"))
+            fecha.lowercase(Locale.forLanguageTag("es-ES"))
     }
 
     // =========================================================
@@ -408,7 +408,7 @@ class AlimentosDisponiblesActivity : AppCompatActivity() {
             binding.edtBuscarAlimento.text
                 .toString()
                 .trim()
-                .lowercase(Locale("es", "ES"))
+                .lowercase(Locale.forLanguageTag("es-ES"))
 
         alimentos.forEach { alimento ->
 
@@ -419,7 +419,7 @@ class AlimentosDisponiblesActivity : AppCompatActivity() {
             val coincideBusqueda =
                 textoBusqueda.isEmpty() ||
                         alimento.nombre
-                            .lowercase(Locale("es", "ES"))
+                            .lowercase(Locale.forLanguageTag("es-ES"))
                             .contains(textoBusqueda)
 
             val visible =
@@ -451,7 +451,7 @@ class AlimentosDisponiblesActivity : AppCompatActivity() {
                     binding.edtBuscarAlimento.text
                         .toString()
                         .trim()
-                        .lowercase(Locale("es", "ES"))
+                        .lowercase(Locale.forLanguageTag("es-ES"))
 
                 val categoriaOk =
                     filtroActual == "TODOS" ||
@@ -460,7 +460,7 @@ class AlimentosDisponiblesActivity : AppCompatActivity() {
                 val busquedaOk =
                     texto.isEmpty() ||
                             alimento.nombre
-                                .lowercase(Locale("es", "ES"))
+                                .lowercase(Locale.forLanguageTag("es-ES"))
                                 .contains(texto)
 
                 categoriaOk && busquedaOk

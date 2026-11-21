@@ -76,6 +76,7 @@ class InicioJefaActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         // Barra de estado amarilla (#F5B81F) con iconos oscuros (hora, wifi, batería)
+        @Suppress("DEPRECATION")
         window.statusBarColor = Color.parseColor("#F5B81F")
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
 
