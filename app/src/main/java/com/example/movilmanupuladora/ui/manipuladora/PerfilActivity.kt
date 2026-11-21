@@ -112,6 +112,25 @@ class PerfilActivity : AppCompatActivity() {
         }
 
         // ==========================================
+        // RECONOCIMIENTO FACIAL
+        // ==========================================
+
+        val btnBiometriaFacialCard = findViewById<View>(R.id.btnBiometriaFacialCard)
+        btnBiometriaFacialCard?.setOnClickListener {
+            val intent = Intent(this, com.example.movilmanupuladora.ui.auth.ReconocimientoFacialActivity::class.java).apply {
+                putExtra(
+                    com.example.movilmanupuladora.ui.auth.ReconocimientoFacialActivity.EXTRA_MODO,
+                    com.example.movilmanupuladora.ui.auth.ReconocimientoFacialActivity.MODO_REGISTRO
+                )
+                putExtra(
+                    com.example.movilmanupuladora.ui.auth.ReconocimientoFacialActivity.EXTRA_CORREO,
+                    sessionManager.getUserEmail()
+                )
+            }
+            startActivity(intent)
+        }
+
+        // ==========================================
         // AYUDA Y SOPORTE
         // ==========================================
 

@@ -5,8 +5,9 @@
     android:viewportWidth="24"
     android:viewportHeight="24">
 
+    <!-- Flecha hacia abajo tipo chevron (v) para menús y selectores desplegables -->
     <path
         android:fillColor="#FF000000"
-        android:pathData="M15.41,7.41L14,6L8,12L14,18L15.41,16.59L10.83,12Z"/>
+        android:pathData="M7.41,8.59L12,13.17l4.59,-4.58L18,10l-6,6 -6,-6 1.41,-1.41z"/>
 
 </vector>

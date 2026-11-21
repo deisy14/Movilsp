@@ -3,12 +3,16 @@ package com.example.movilmanupuladora.ui.auth
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.data.api.RetrofitClient
@@ -61,6 +65,36 @@ class LoginActivity : AppCompatActivity() {
 
             return false
         }
+
+        fun esRolAdministrativo(
+            rol: String?,
+            email: String? = null,
+            idRol: Int? = null,
+            nombreRol: String? = null
+        ): Boolean {
+            val r = normalizarTexto(rol)
+            val nr = normalizarTexto(nombreRol)
+            val e = normalizarTexto(email)
+
+            if (idRol in listOf(1, 2, 3)) return true
+
+            val idParsed = r.toIntOrNull() ?: nr.toIntOrNull()
+            if (idParsed in listOf(1, 2, 3)) return true
+
+            val rolTexto = "$r $nr".trim()
+            if (rolTexto.contains("super") ||
+                rolTexto.contains("admin") ||
+                rolTexto.contains("supervisor")
+            ) {
+                return true
+            }
+
+            if (e.contains("superadmin") || e.contains("admin@") || e.contains("supervisor@")) {
+                return true
+            }
+
+            return false
+        }
     }
 
     private lateinit var binding: ActivityLoginBinding
@@ -99,10 +133,54 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // 1. Permitir que el fondo se dibuje detrás de las barras (Edge-to-Edge moderno)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        // 2. Extender el fondo alrededor de la cámara/notch
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            window.attributes.layoutInDisplayCutoutMode =
+                android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+        }
+
+        // 3. Configurar el color de los iconos de la barra para que sean legibles sobre la foto
+        val insetsController = WindowCompat.getInsetsController(window, window.decorView)
+        // true = iconos oscuros (para que resalten sobre los gorros blancos y cocina clara)
+        insetsController.isAppearanceLightStatusBars = true
+        insetsController.isAppearanceLightNavigationBars = false
+
+        window.statusBarColor = Color.TRANSPARENT
+        window.navigationBarColor = Color.TRANSPARENT
+
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         sessionManager = SessionManager(this)
+
+        // Si ya hay una sesión iniciada, entrar directamente sin pedir login de nuevo.
+        // La sesión se mantiene siempre activa hasta que el usuario elija "Cerrar sesión".
+        if (sessionManager.isLoggedIn()) {
+            val token = sessionManager.fetchAuthToken()
+            RetrofitClient.authToken = token
+
+            val rol = sessionManager.getUserRole()
+            val email = sessionManager.getUserEmail()
+
+            if (esRolAdministrativo(rol, email)) {
+                sessionManager.clearSession()
+                RetrofitClient.authToken = null
+                mostrarDialogoAccesoWeb(rol ?: "Administrativo")
+            } else {
+                val esJefa = esUsuarioJefa(rol = rol, email = email)
+                val destino = if (esJefa) {
+                    InicioJefaActivity::class.java
+                } else {
+                    TurnoActivity::class.java
+                }
+                startActivity(Intent(this, destino))
+                finish()
+                return
+            }
+        }
 
         // Hacer scroll automático al enfocar campos de texto cuando sale el teclado
         binding.txtCorreo.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
@@ -181,6 +259,14 @@ class LoginActivity : AppCompatActivity() {
 
             ocultarTeclado()
             iniciarSesion(correo, password)
+        }
+
+        // Botón de Reconocimiento Facial Biométrico
+        binding.btnReconocimientoFacial.setOnClickListener {
+            val intent = Intent(this, ReconocimientoFacialActivity::class.java).apply {
+                putExtra(ReconocimientoFacialActivity.EXTRA_MODO, ReconocimientoFacialActivity.MODO_LOGIN)
+            }
+            startActivity(intent)
         }
 
         // Recuperación de contraseña.
@@ -271,19 +357,19 @@ class LoginActivity : AppCompatActivity() {
                         .trim()
                         .lowercase()
 
-                    // El administrador ingresa desde la página web.
-                    val esAdmin = rolTexto.contains("admin") ||
-                            userInfo?.isSuperuser == true ||
-                            userInfo?.idRol == 1 ||
-                            userInfo?.idRol == 2
+                    // Los roles administrativos ingresan exclusivamente desde la plataforma Web.
+                    val esAdmin = esRolAdministrativo(
+                        rol = userInfo?.rolEfectivo ?: userInfo?.rol,
+                        email = email,
+                        idRol = userInfo?.idRol,
+                        nombreRol = userInfo?.nombreRol
+                    )
 
                     if (esAdmin) {
                         mostrarCargando(false)
-                        Toast.makeText(
-                            this@LoginActivity,
-                            "Este usuario debe ingresar desde la página web.",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        sessionManager.clearSession()
+                        RetrofitClient.authToken = null
+                        mostrarDialogoAccesoWeb(userInfo?.nombreRol ?: userInfo?.rolEfectivo ?: userInfo?.rol ?: "Administrativo")
                         return@launch
                     }
 
@@ -378,6 +464,14 @@ class LoginActivity : AppCompatActivity() {
                         ).trim()
 
                         when {
+
+                            detail.contains("bloque", ignoreCase = true) ||
+                            detail.contains("lock", ignoreCase = true) ||
+                            detail.contains("intentos", ignoreCase = true) ->
+                                "Cuenta bloqueada temporalmente por múltiples intentos fallidos. Por favor espera unos minutos antes de reintentar."
+
+                            response.code() == 429 ->
+                                "Demasiados intentos de inicio de sesión. Por seguridad, espera unos minutos antes de volver a intentar."
 
                             detail.contains(
                                 "No existe ninguna cuenta",
@@ -501,6 +595,14 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    private fun mostrarDialogoAccesoWeb(rol: String) {
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Acceso Restringido")
+            .setMessage("Tu cuenta tiene rol administrativo ($rol).\n\nEsta aplicación móvil es de uso exclusivo para el personal de cocina (Manipuladoras y Jefas de Manipuladoras).\n\nPor favor ingresa desde la plataforma Web del PAE.")
+            .setPositiveButton("Entendido", null)
+            .show()
+    }
+
     // =========================================================
     // OCULTAR TECLADO
     // =========================================================
@@ -515,5 +617,11 @@ class LoginActivity : AppCompatActivity() {
             binding.root.windowToken,
             0
         )
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val insetsController = WindowCompat.getInsetsController(window, window.decorView)
+        insetsController.isAppearanceLightStatusBars = true
     }
 }

@@ -96,7 +96,7 @@
                         android:layout_marginEnd="6dp"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
-                        android:text="Todas (4)"
+                        android:text="Todas"
                         android:textAllCaps="false"
                         android:textColor="#1B3317"
                         android:textSize="12sp"
@@ -105,6 +105,23 @@
                         app:cornerRadius="12dp"
                         app:strokeColor="#F4B41F"
                         app:strokeWidth="1.5dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFiltroEquipo"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="6dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:text="Equipo"
+                        android:textAllCaps="false"
+                        android:textColor="#1B3317"
+                        android:textSize="12sp"
+                        app:backgroundTint="#FFFFFF"
+                        app:cornerRadius="12dp"
+                        app:strokeColor="#CBD5E1"
+                        app:strokeWidth="1dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnFiltroInventario"
@@ -160,342 +177,52 @@
 
             </HorizontalScrollView>
 
-            <!-- TARJETA 1: INVENTARIO BORDES AMARILLOS -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardNotif1"
+            <!-- CONTENEDOR DINÁMICO DE NOTIFICACIONES DE LA SEDE -->
+            <LinearLayout
+                android:id="@+id/contenedorHistorialNotificaciones"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:layout_marginBottom="12dp"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#F4B41F"
-                app:strokeWidth="1.5dp">
+                android:orientation="vertical" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="38dp"
-                            android:layout_height="38dp"
-                            android:background="@drawable/bg_icono_circular"
-                            android:backgroundTint="#FEE2E2"
-                            android:contentDescription="Icono"
-                            android:padding="8dp"
-                            android:src="@drawable/ic_warning"
-                            app:tint="#DC2626" />
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Alerta de Stock e Insumos PAE"
-                                android:textColor="#1B3317"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="1dp"
-                                android:text="Inventario de bodega · Hoy, 10:30 AM"
-                                android:textColor="#64748B"
-                                android:textSize="11sp" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/bg_pill_green"
-                            android:paddingHorizontal="8dp"
-                            android:paddingVertical="3dp"
-                            android:text="Inventario"
-                            android:textColor="#2A5226"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="Insumos con bajo stock registrado: Leche entera y Carne de res están al mínimo. Se notificó al Administrador para reposición."
-                        android:textColor="#334155"
-                        android:textSize="13sp" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- TARJETA 2: PREPARACIÓN -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardNotif2"
+            <!-- ESTADO VACÍO (CUANDO NO HAY NOTIFICACIONES EN LA SEDE) -->
+            <LinearLayout
+                android:id="@+id/layoutSinNotificaciones"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#F4B41F"
-                app:strokeWidth="1.5dp">
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingVertical="48dp"
+                android:visibility="gone">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:contentDescription="Sin notificaciones"
+                    android:src="@drawable/ic_notificaciones"
+                    app:tint="#CBD5E1" />
+
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:layout_marginTop="16dp"
+                    android:text="Bandeja al día"
+                    android:textColor="#1B3317"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="38dp"
-                            android:layout_height="38dp"
-                            android:background="@drawable/bg_icono_circular"
-                            android:backgroundTint="#FEF3C7"
-                            android:contentDescription="Icono"
-                            android:padding="8dp"
-                            android:src="@drawable/ic_nav_preparations"
-                            app:tint="#854D0E" />
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Preparación Finalizada con Éxito"
-                                android:textColor="#1B3317"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="1dp"
-                                android:text="Cocina principal · Ayer, 01:15 PM"
-                                android:textColor="#64748B"
-                                android:textSize="11sp" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/bg_pill_yellow"
-                            android:paddingHorizontal="8dp"
-                            android:paddingVertical="3dp"
-                            android:text="Preparación"
-                            android:textColor="#854D0E"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="La preparación del menú de almuerzo (Arroz con pollo) se completó a tiempo con control de temperatura verificado."
-                        android:textColor="#334155"
-                        android:textSize="13sp" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- TARJETA 3: ASISTENCIA -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardNotif3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#F4B41F"
-                app:strokeWidth="1.5dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/txtMensajeVacio"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:layout_marginTop="6dp"
+                    android:paddingHorizontal="24dp"
+                    android:text="No tienes notificaciones pendientes para tu sede."
+                    android:textAlignment="center"
+                    android:textColor="#64748B"
+                    android:textSize="13sp" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="38dp"
-                            android:layout_height="38dp"
-                            android:background="@drawable/bg_icono_circular"
-                            android:backgroundTint="#F8FAFC"
-                            android:contentDescription="Icono"
-                            android:padding="8dp"
-                            android:src="@drawable/ic_people"
-                            app:tint="#1E293B" />
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Asistencia Diaria Registrada"
-                                android:textColor="#1B3317"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="1dp"
-                                android:text="Grados Primaria y Secundaria · 28 Oct, 08:00 AM"
-                                android:textColor="#64748B"
-                                android:textSize="11sp" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/bg_pill_green"
-                            android:paddingHorizontal="8dp"
-                            android:paddingVertical="3dp"
-                            android:text="Asistencia"
-                            android:textColor="#2A5226"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="Se registraron 124 raciones atendidas correctamente en la jornada de la mañana."
-                        android:textColor="#334155"
-                        android:textSize="13sp" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- TARJETA 4: SISTEMA -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardNotif4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#F4B41F"
-                app:strokeWidth="1.5dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="38dp"
-                            android:layout_height="38dp"
-                            android:background="@drawable/bg_icono_circular"
-                            android:backgroundTint="#FFFBEB"
-                            android:contentDescription="Icono"
-                            android:padding="8dp"
-                            android:src="@drawable/ic_notificaciones"
-                            app:tint="#854D0E" />
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Confirmación de Programación PAE"
-                                android:textColor="#1B3317"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="1dp"
-                                android:text="Administrador SIRAE · 26 Oct, 04:30 PM"
-                                android:textColor="#64748B"
-                                android:textSize="11sp" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/bg_pill_yellow"
-                            android:paddingHorizontal="8dp"
-                            android:paddingVertical="3dp"
-                            android:text="Sistema"
-                            android:textColor="#854D0E"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="Aprobado el cronograma de menús y despacho de insumos secos para la siguiente semana."
-                        android:textColor="#334155"
-                        android:textSize="13sp" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
 
         </LinearLayout>
 

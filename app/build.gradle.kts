@@ -77,6 +77,13 @@ dependencies {
     implementation("androidx.viewpager2:viewpager2:1.1.0")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
 
+    // CameraX para Reconocimiento Facial Biométrico
+    val cameraxVersion = "1.3.4"
+    implementation("androidx.camera:camera-core:$cameraxVersion")
+    implementation("androidx.camera:camera-camera2:$cameraxVersion")
+    implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
+    implementation("androidx.camera:camera-view:$cameraxVersion")
+
 
     // Pruebas
 

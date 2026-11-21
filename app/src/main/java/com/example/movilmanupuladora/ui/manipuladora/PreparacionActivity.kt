@@ -46,35 +46,46 @@ class PreparacionActivity : AppCompatActivity() {
         componenteAsignado = intent.getStringExtra("componente_seleccionado")
             ?: sessionMgr.getComponenteAsignado(this)
 
-        nombrePlatoActual = intent.getStringExtra("nombre_plato")
-            ?: sessionMgr.getPlatoJefa(this)
+        val platoIntent = intent.getStringExtra("nombre_plato")
+        val platoJefa = sessionMgr.getPlatoJefa(this).takeIf { it.isNotBlank() }
+        val platoResolver = (platoIntent ?: platoJefa)?.takeIf { it.isNotBlank() }
+
+        if (platoResolver.isNullOrBlank()) {
+            nombrePlatoActual = "Menú no seleccionado"
+            binding.tvNombrePlatoPreparacion.text = "La jefa aún no ha seleccionado el menú de hoy"
+        } else {
+            nombrePlatoActual = platoResolver
+            val nombreFormateado = nombrePlatoActual.split(" ").joinToString(" ") { palabra ->
+                palabra.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+            }
+            binding.tvNombrePlatoPreparacion.text = nombreFormateado
+        }
 
         val miNombre = sessionMgr.getUserName() ?: "Manipuladora"
         val miCorreo = sessionMgr.getUserEmail() ?: ""
 
-        val estadoActual = PreparacionEstadoManager.obtenerEstado(
-            this,
-            miNombre,
-            componenteAsignado,
-            miCorreo
-        )
-        actualizarVistaEstado(estadoActual)
+        if (!componenteAsignado.isNullOrBlank()) {
+            val estadoActual = PreparacionEstadoManager.obtenerEstado(
+                this,
+                miNombre,
+                componenteAsignado,
+                miCorreo
+            )
+            actualizarVistaEstado(estadoActual)
+            binding.tvComponentePreparacion.visibility = View.VISIBLE
+            binding.tvComponentePreparacion.text = "Componente a preparar: $componenteAsignado"
+            binding.btnMarcarPreparado.visibility = View.VISIBLE
+        } else {
+            binding.badgeTurnoPreparacion.text = "Estado: Sin asignación"
+            binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_tag_plato)
+            binding.badgeTurnoPreparacion.setTextColor(0xFF64748B.toInt())
+            binding.tvComponentePreparacion.visibility = View.VISIBLE
+            binding.tvComponentePreparacion.text = "Sin componente asignado para ti hoy"
+            binding.btnMarcarPreparado.visibility = View.GONE
+        }
 
         binding.btnMarcarPreparado.setOnClickListener {
             mostrarDialogoEstadoPreparacion()
-        }
-
-        val nombreFormateado = nombrePlatoActual.split(" ").joinToString(" ") { palabra ->
-            palabra.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
-        }
-        binding.tvNombrePlatoPreparacion.text = nombreFormateado
-
-        // Mostrar el componente asignado si existe
-        if (!componenteAsignado.isNullOrBlank()) {
-            binding.tvComponentePreparacion.visibility = View.VISIBLE
-            binding.tvComponentePreparacion.text = "Componente a preparar: $componenteAsignado"
-        } else {
-            binding.tvComponentePreparacion.visibility = View.GONE
         }
 
         val imgIntent = intent.getIntExtra("id_imagen", -1)

@@ -75,17 +75,31 @@ class InicioJefaActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Barra de estado amarilla (#F5B81F) con iconos oscuros (hora, wifi, batería)
+        // Edge-to-Edge: el fondo amarillo se dibuja detrás de la barra de estado como en el login
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            window.attributes.layoutInDisplayCutoutMode =
+                android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+        }
+
         @Suppress("DEPRECATION")
-        window.statusBarColor = Color.parseColor("#F5B81F")
+        window.statusBarColor = Color.TRANSPARENT
+        @Suppress("DEPRECATION")
+        window.navigationBarColor = Color.TRANSPARENT
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
 
         binding = ActivityInicioJefaBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { vista, insets ->
-            val barras = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            vista.setPadding(0, barras.top, 0, 0)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.franjaSuperiorAmarilla) { view, insets ->
+            val statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.systemBars()).top
+            view.setPadding(
+                view.paddingLeft,
+                statusBarHeight + (10 * resources.displayMetrics.density).toInt(),
+                view.paddingRight,
+                view.paddingBottom
+            )
             insets
         }
 
@@ -98,14 +112,31 @@ class InicioJefaActivity : AppCompatActivity() {
 
         actualizarResumen()
         cargarAsistenciaDelBackend()
+
+        lifecycleScope.launch {
+            try {
+                val idSede = sessionManager.getSedeId().takeIf { it > 0 }
+                val sedeNombre = sessionManager.getSedeNombre()
+                ManipuladorasManager.cargarDesdeBackend(this@InicioJefaActivity, idSede, sedeNombre)
+                NotificacionesJefaManager.sincronizarNotificacionesDelBackend(this@InicioJefaActivity)
+                actualizarResumen()
+            } catch (_: Exception) { }
+        }
     }
 
     override fun onResume() {
         super.onResume()
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
         actualizarResumen()
         cargarAsistenciaDelBackend()
         lifecycleScope.launch {
             try {
+                val idSede = sessionManager.getSedeId().takeIf { it > 0 }
+                val sedeNombre = sessionManager.getSedeNombre()
+                ManipuladorasManager.cargarDesdeBackend(this@InicioJefaActivity, idSede, sedeNombre)
+                NotificacionesJefaManager.sincronizarNotificacionesDelBackend(this@InicioJefaActivity)
+                actualizarResumen()
+
                 val res = RetrofitClient.apiService.obtenerPlatos()
                 if (res.isSuccessful && !res.body().isNullOrEmpty()) {
                     MenuPaeCatalog.registrarPlatosDesdeBackend(res.body()!!)
@@ -429,8 +460,10 @@ class InicioJefaActivity : AppCompatActivity() {
         }
 
         binding.btnNotificacionesJefa.setOnClickListener {
+            val notifs = NotificacionesJefaManager.obtenerNotificacionesSede(this)
+
             val popupBinding = com.example.movilmanupuladora.databinding.PopupNotificacionesBinding.inflate(layoutInflater)
-            popupBinding.txtCantidadNotificaciones.text = "3"
+            popupBinding.txtCantidadNotificaciones.text = notifs.size.toString()
 
             val dialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                 .setView(popupBinding.root)
@@ -438,24 +471,84 @@ class InicioJefaActivity : AppCompatActivity() {
 
             dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
-            popupBinding.notificacionPreparacion.setOnClickListener {
-                dialog.dismiss()
-                startActivity(Intent(this, HistorialPreparacionesActivity::class.java))
-            }
+            if (notifs.isEmpty()) {
+                popupBinding.contenedorNotificaciones.visibility = View.GONE
+                popupBinding.contenedorSinNotificaciones.visibility = View.VISIBLE
+            } else {
+                popupBinding.contenedorNotificaciones.visibility = View.VISIBLE
+                popupBinding.contenedorSinNotificaciones.visibility = View.GONE
+                popupBinding.contenedorNotificaciones.removeAllViews()
 
-            popupBinding.notificacionInventario.setOnClickListener {
-                dialog.dismiss()
-                startActivity(Intent(this, InventarioJefaActivity::class.java))
-            }
+                val density = resources.displayMetrics.density
+                for (notif in notifs.take(4)) {
+                    val itemLayout = android.widget.LinearLayout(this).apply {
+                        orientation = android.widget.LinearLayout.HORIZONTAL
+                        gravity = android.view.Gravity.CENTER_VERTICAL
+                        setPadding(0, (8 * density).toInt(), 0, (8 * density).toInt())
+                        isClickable = true
+                        isFocusable = true
+                        val typedValue = android.util.TypedValue()
+                        theme.resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true)
+                        setBackgroundResource(typedValue.resourceId)
+                    }
 
-            popupBinding.notificacionAsistencia.setOnClickListener {
-                dialog.dismiss()
-                startActivity(Intent(this, AsistenciaJefaActivity::class.java))
+                    val icono = android.widget.ImageView(this).apply {
+                        layoutParams = android.widget.LinearLayout.LayoutParams((38 * density).toInt(), (38 * density).toInt())
+                        setBackgroundResource(R.drawable.bg_pill_yellow)
+                        setPadding((8 * density).toInt(), (8 * density).toInt(), (8 * density).toInt(), (8 * density).toInt())
+                        if (notif.categoria.equals("Equipo", ignoreCase = true)) {
+                            setImageResource(R.drawable.ic_people)
+                            imageTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#854D0E"))
+                        } else {
+                            setImageResource(R.drawable.ic_notificaciones)
+                            imageTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#854D0E"))
+                        }
+                    }
+
+                    val infoLayout = android.widget.LinearLayout(this).apply {
+                        orientation = android.widget.LinearLayout.VERTICAL
+                        val params = android.widget.LinearLayout.LayoutParams(0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
+                        params.marginStart = (12 * density).toInt()
+                        layoutParams = params
+                    }
+
+                    val txtTitulo = android.widget.TextView(this).apply {
+                        text = notif.titulo
+                        setTextColor(android.graphics.Color.parseColor("#1B3317"))
+                        textSize = 13f
+                        typeface = android.graphics.Typeface.DEFAULT_BOLD
+                    }
+
+                    val txtMensaje = android.widget.TextView(this).apply {
+                        text = notif.mensaje
+                        setTextColor(android.graphics.Color.parseColor("#64748B"))
+                        textSize = 11f
+                        maxLines = 2
+                        ellipsize = android.text.TextUtils.TruncateAt.END
+                    }
+
+                    infoLayout.addView(txtTitulo)
+                    infoLayout.addView(txtMensaje)
+
+                    itemLayout.addView(icono)
+                    itemLayout.addView(infoLayout)
+
+                    itemLayout.setOnClickListener {
+                        dialog.dismiss()
+                        if (notif.categoria.equals("Equipo", ignoreCase = true)) {
+                            startActivity(Intent(this, ManipuladorasJefaActivity::class.java))
+                        } else {
+                            startActivity(Intent(this, HistorialNotificacionesJefaActivity::class.java))
+                        }
+                    }
+
+                    popupBinding.contenedorNotificaciones.addView(itemLayout)
+                }
             }
 
             popupBinding.btnVerTodasNotificaciones.setOnClickListener {
                 dialog.dismiss()
-                startActivity(Intent(this, com.example.movilmanupuladora.ui.manipuladora.AvisosActivity::class.java))
+                startActivity(Intent(this, HistorialNotificacionesJefaActivity::class.java))
             }
 
             dialog.show()
@@ -475,8 +568,9 @@ class InicioJefaActivity : AppCompatActivity() {
         binding.txtRacionesTotales.text = guardados.toString()
         binding.txtMenusActivos.text = "3"
 
-        val cantManipuladoras = ManipuladorasManager.obtenerManipuladoras().size
-        binding.txtCantManipuladoras.text = if (cantManipuladoras > 0) cantManipuladoras.toString() else "8"
+        val idSede = sessionManager.getSedeId().takeIf { it > 0 }
+        val cantManipuladoras = ManipuladorasManager.obtenerManipuladorasSede(idSede, sessionManager.getSedeNombre(), this).size
+        binding.txtCantManipuladoras.text = cantManipuladoras.toString()
     }
 
     private fun cargarAsistenciaDelBackend() {
@@ -501,8 +595,7 @@ class InicioJefaActivity : AppCompatActivity() {
                     var s = regSecundaria?.ninosPresentes ?: AsistenciaManager.obtenerSecundaria(this@InicioJefaActivity)
 
                     if (regPrimaria == null && regSecundaria == null && asistenciasHoy.isNotEmpty()) {
-                        val regLegacy = asistenciasHoy.maxByOrNull { it.obtenerIdReal() ?: 0 }!!
-                        val tot = regLegacy.ninosPresentes
+                        val tot = asistenciasHoy.sumOf { it.ninosPresentes }
                         p = (tot * 0.6).toInt()
                         s = tot - p
                     }

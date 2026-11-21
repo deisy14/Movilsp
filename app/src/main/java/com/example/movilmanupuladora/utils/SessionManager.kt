@@ -63,19 +63,12 @@ class SessionManager(context: Context) {
     }
 
     /**
-     * Valida si existe un token de sesión y si la hora actual está dentro
-     * de la ventana de sesión permitida (7:00 AM a 7:00 PM).
+     * Valida si existe una sesión activa.
+     * La sesión permanece abierta indefinidamente hasta que el usuario
+     * presiona explícitamente "Cerrar sesión".
      */
     fun esSesionValidaHorario(): Boolean {
-        val token = fetchAuthToken()
-        if (token.isNullOrBlank()) return false
-
-        val cal = java.util.Calendar.getInstance()
-        val hora = cal.get(java.util.Calendar.HOUR_OF_DAY)
-        val minuto = cal.get(java.util.Calendar.MINUTE)
-
-        // De 7:00 AM a 7:00 PM (19:00 inclusive)
-        return (hora in 7..18) || (hora == 19 && minuto == 0)
+        return isLoggedIn()
     }
 
     // Guarda los datos del usuario autenticado, su sede e institución.
@@ -237,7 +230,7 @@ class SessionManager(context: Context) {
         return turnoPref.getString("plato_nombre", null)
             ?: jefaPref.getString("plato_actual", null)
             ?: prefs.getString("plato_seleccionado_nombre", null)
-            ?: "Arroz con Pollo"
+            ?: ""
     }
 
     /**
@@ -469,17 +462,6 @@ class SessionManager(context: Context) {
             .getString("plan_${fecha}_${servKey}", null)
         if (!jVal.isNullOrBlank()) return jVal
 
-        // Ver si corresponde a uno de los 20 días escolares oficiales registrados
-        val idx = FECHAS_20_DIAS.indexOf(fecha)
-        if (idx != -1) {
-            return when (servKey) {
-                "desayuno" -> PLATOS_DESAYUNO_20.getOrNull(idx)
-                "almuerzo" -> PLATOS_ALMUERZO_20.getOrNull(idx)
-                "merienda" -> PLATOS_MERIENDA_20.getOrNull(idx)
-                else -> null
-            }
-        }
-
         return null
     }
 
@@ -500,11 +482,6 @@ class SessionManager(context: Context) {
         val jId = context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE)
             .getInt("plan_${fecha}_${servKey}_id", -1)
         if (jId != -1) return jId
-
-        val idx = FECHAS_20_DIAS.indexOf(fecha)
-        if (idx != -1) {
-            return idx + 1
-        }
 
         return -1
     }

@@ -6,6 +6,15 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <!-- PERMISOS DE CÁMARA PARA RECONOCIMIENTO FACIAL BIOMÉTRICO -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false" />
+
     <application
         android:name=".SiraeApp"
         android:allowBackup="true"
@@ -36,7 +45,7 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
-        <!-- ACTIVIDADES DEL MÓDULO -->
+        <!-- ACTIVIDADES DEL MÓDULO AUTH -->
         <activity
             android:name=".ui.auth.RegistroActivity"
             android:exported="false"
@@ -44,6 +53,11 @@
         <activity
             android:name=".ui.auth.RecuperarPasswordActivity"
             android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.auth.ReconocimientoFacialActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.manipuladora.TurnoActivity"

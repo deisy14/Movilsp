@@ -89,6 +89,20 @@ class PerfilJefaActivity : AppCompatActivity() {
             startActivity(Intent(this, HistorialNotificacionesJefaActivity::class.java))
         }
 
+        binding.btnBiometriaFacialCard.setOnClickListener {
+            val intent = Intent(this, com.example.movilmanupuladora.ui.auth.ReconocimientoFacialActivity::class.java).apply {
+                putExtra(
+                    com.example.movilmanupuladora.ui.auth.ReconocimientoFacialActivity.EXTRA_MODO,
+                    com.example.movilmanupuladora.ui.auth.ReconocimientoFacialActivity.MODO_REGISTRO
+                )
+                putExtra(
+                    com.example.movilmanupuladora.ui.auth.ReconocimientoFacialActivity.EXTRA_CORREO,
+                    sessionManager.getUserEmail()
+                )
+            }
+            startActivity(intent)
+        }
+
         binding.btnCerrarSesion.setOnClickListener {
             val dialogBinding = com.example.movilmanupuladora.databinding.DialogConfirmarAsignacionBinding.inflate(layoutInflater)
             dialogBinding.txtTituloConfirmacion.text = "Cerrar sesión"

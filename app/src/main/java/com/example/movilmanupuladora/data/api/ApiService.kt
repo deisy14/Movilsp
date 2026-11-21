@@ -199,10 +199,21 @@ interface ApiService {
         @Body asistencia: com.example.movilmanupuladora.data.model.AsistenciaDiaria
     ): Response<com.example.movilmanupuladora.data.model.AsistenciaDiaria>
 
+    @POST("asistencia-diaria/")
+    suspend fun registrarAsistenciaDiariaMap(
+        @Body asistencia: Map<String, @JvmSuppressWildcards Any?>
+    ): Response<com.example.movilmanupuladora.data.model.AsistenciaDiaria>
+
     @PUT("asistencia-diaria/{id}/")
     suspend fun actualizarAsistenciaDiaria(
         @Path("id") id: Int,
         @Body asistencia: com.example.movilmanupuladora.data.model.AsistenciaDiaria
+    ): Response<com.example.movilmanupuladora.data.model.AsistenciaDiaria>
+
+    @PATCH("asistencia-diaria/{id}/")
+    suspend fun patchAsistenciaDiaria(
+        @Path("id") id: Int,
+        @Body asistencia: Map<String, @JvmSuppressWildcards Any?>
     ): Response<com.example.movilmanupuladora.data.model.AsistenciaDiaria>
 
     @DELETE("asistencia-diaria/{id}/")
@@ -233,4 +244,23 @@ interface ApiService {
         @Path("id") idEntrega: Int,
         @Body request: com.example.movilmanupuladora.data.model.ConfirmarRecepcionRequest
     ): Response<JsonObject>
+
+    // =========================================================
+    // RECONOCIMIENTO FACIAL BIOMÉTRICO (SIRAE)
+    // =========================================================
+    @POST("reconocimiento-facial/verify-face/")
+    suspend fun verificarRostroFacial(
+        @Body request: com.example.movilmanupuladora.data.model.VerifyFaceRequest
+    ): Response<com.example.movilmanupuladora.data.model.VerifyFaceResponse>
+
+    @POST("reconocimiento-facial/register-face/")
+    suspend fun registrarRostroFacial(
+        @Body request: com.example.movilmanupuladora.data.model.RegisterFaceRequest
+    ): Response<com.example.movilmanupuladora.data.model.RegisterFaceResponse>
+
+    @GET("reconocimiento-facial/estado/")
+    suspend fun consultarEstadoBiometria(): Response<com.example.movilmanupuladora.data.model.EstadoBiometriaResponse>
+
+    @DELETE("reconocimiento-facial/eliminar/")
+    suspend fun eliminarBiometriaFacial(): Response<JsonObject>
 }

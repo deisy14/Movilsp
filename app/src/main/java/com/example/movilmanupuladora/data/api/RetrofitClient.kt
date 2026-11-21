@@ -5,6 +5,7 @@ import android.content.Context
 import com.example.movilmanupuladora.SiraeApp
 import com.example.movilmanupuladora.utils.SessionManager
 import java.util.concurrent.TimeUnit
+import com.google.gson.GsonBuilder
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -93,6 +94,7 @@ object RetrofitClient {
 
         val isAuthEndpoint =
             path.contains("/auth/") ||
+                    path.contains("/verify-face") ||
                     (
                             path.contains("/usuarios/") &&
                                     request.method == "POST"
@@ -123,12 +125,22 @@ object RetrofitClient {
         .build()
 
     /**
+     * Gson configurado con soporte para respuestas paginadas de Django REST Framework ({ results: [...] })
+     * y deserializador tolerante a esquemas para Usuario.
+     */
+    val gson = GsonBuilder()
+        .registerTypeAdapterFactory(PaginatedListTypeAdapterFactory())
+        .registerTypeAdapter(com.example.movilmanupuladora.data.model.Usuario::class.java, com.example.movilmanupuladora.data.model.UsuarioDeserializer())
+        .registerTypeAdapter(com.example.movilmanupuladora.data.model.UsuarioInfo::class.java, com.example.movilmanupuladora.data.model.UsuarioInfoDeserializer())
+        .create()
+
+    /**
      * Servicio Retrofit de la API.
      */
     val apiService: ApiService = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .client(client)
-        .addConverterFactory(GsonConverterFactory.create())
+        .addConverterFactory(GsonConverterFactory.create(gson))
         .build()
         .create(ApiService::class.java)
 }
