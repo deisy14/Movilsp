@@ -125,9 +125,10 @@ object NotificacionesJefaManager {
             val res = withContext(Dispatchers.IO) {
                 RetrofitClient.apiService.obtenerNotificaciones()
             }
+            val listaActual = obtenerNotificacionesSede(context).toMutableList()
+
             if (res.isSuccessful && !res.body().isNullOrEmpty()) {
                 val notifsBackend = res.body()!!
-                val listaActual = obtenerNotificacionesSede(context).toMutableList()
 
                 for (nb in notifsBackend) {
                     val tit = nb.titulo?.trim().orEmpty()
@@ -156,8 +157,49 @@ object NotificacionesJefaManager {
                         )
                     }
                 }
-                guardarLista(context, listaActual)
             }
+
+            // Sincronizar entregas en tránsito despachadas por el supervisor para esta sede
+            try {
+                val session = SessionManager(context)
+                val idSede = session.getSedeId().takeIf { it > 0 }
+                val resEntregas = withContext(Dispatchers.IO) {
+                    RetrofitClient.apiService.obtenerEntregas(
+                        idSede = idSede,
+                        estado = "EN_TRANSITO"
+                    )
+                }
+                if (resEntregas.isSuccessful && !resEntregas.body().isNullOrEmpty()) {
+                    val entregas = resEntregas.body()!!
+                    val agrupadas = entregas.groupBy { it.documentoEntrega ?: "#REM-${it.idEntrega ?: 0}" }
+
+                    for ((rem, items) in agrupadas) {
+                        val tit = "📦 Nueva entrega despachada: $rem"
+                        val nomSup = items.firstOrNull()?.observaciones?.let { obs ->
+                            val match = Regex("Responsable:\\s*([^|;\\n]+)", RegexOption.IGNORE_CASE).find(obs)
+                            match?.groupValues?.get(1)?.trim()
+                        } ?: "Supervisor PAE"
+                        val msg = "El $nomSup ha despachado la remisión $rem con ${items.size} alimentos para tu sede. Toca aquí para revisar cantidades, reportar faltantes y firmar el acta."
+
+                        val yaExiste = listaActual.any { it.titulo == tit }
+                        if (!yaExiste) {
+                            listaActual.add(
+                                0,
+                                NotificacionItem(
+                                    id = "entrega_$rem",
+                                    titulo = tit,
+                                    mensaje = msg,
+                                    fecha = "En tránsito",
+                                    categoria = "Inventario",
+                                    timestamp = System.currentTimeMillis()
+                                )
+                            )
+                        }
+                    }
+                }
+            } catch (_: Exception) {}
+
+            guardarLista(context, listaActual)
         } catch (_: Exception) { }
     }
 

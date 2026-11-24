@@ -26,8 +26,7 @@ object InventarioManager {
         jornada: String
     ) {
 
-        inventario[alimento] =
-            cantidad
+        inventario[alimento] = (inventario[alimento] ?: 0.0) + cantidad
 
         val jornadaTexto =
             if (jornada == "MANANA") {

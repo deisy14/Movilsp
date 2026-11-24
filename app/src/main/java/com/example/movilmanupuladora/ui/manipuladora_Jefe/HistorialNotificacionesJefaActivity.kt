@@ -103,7 +103,19 @@ class HistorialNotificacionesJefaActivity : AppCompatActivity() {
                         itemBinding.badgeCategoriaNotif.background = getDrawable(R.drawable.bg_pill_green)
                         itemBinding.badgeCategoriaNotif.setTextColor(Color.parseColor("#166534"))
                         itemBinding.cardItemNotificacion.setOnClickListener {
-                            startActivity(Intent(this, InventarioJefaActivity::class.java))
+                            val textoCompleto = "${notif.titulo} ${notif.mensaje}"
+                            if (textoCompleto.contains("entrega", ignoreCase = true) ||
+                                textoCompleto.contains("remisi", ignoreCase = true) ||
+                                textoCompleto.contains("despach", ignoreCase = true)) {
+                                val intent = Intent(this, RegistrarEntregaActivity::class.java)
+                                val match = Regex("#REM-[0-9A-Za-z-]+", RegexOption.IGNORE_CASE).find(textoCompleto)
+                                if (match != null) {
+                                    intent.putExtra("numero_remision", match.value)
+                                }
+                                startActivity(intent)
+                            } else {
+                                startActivity(Intent(this, InventarioJefaActivity::class.java))
+                            }
                         }
                     }
                     "preparaciones", "preparacion" -> {
