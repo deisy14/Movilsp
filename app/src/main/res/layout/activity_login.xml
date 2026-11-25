@@ -169,7 +169,7 @@
                 android:id="@+id/txtOlvide"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="4dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:paddingVertical="2dp"
@@ -184,7 +184,7 @@
                 android:id="@+id/btnIngresar"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="8dp"
                 android:backgroundTint="#F4B41F"
                 android:elevation="0dp"
                 android:stateListAnimator="@null"
@@ -208,7 +208,7 @@
                 android:id="@+id/layoutSeparadorFacial"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="8dp"
                 android:gravity="center"
                 android:orientation="horizontal"
                 app:layout_constraintTop_toBottomOf="@+id/btnIngresar">
@@ -240,7 +240,7 @@
                 android:id="@+id/btnReconocimientoFacial"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="8dp"
                 android:background="@drawable/bg_btn_facial_glass"
                 android:clickable="true"
                 android:focusable="true"
@@ -271,8 +271,8 @@
                 android:id="@+id/layoutAdminContacto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="12dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center"
@@ -282,7 +282,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/btnReconocimientoFacial"
-                app:layout_constraintVertical_bias="0.5">
+                app:layout_constraintVertical_bias="0.35">
 
                 <TextView
                     android:layout_width="wrap_content"

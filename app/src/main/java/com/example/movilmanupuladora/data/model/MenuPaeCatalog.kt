@@ -481,42 +481,111 @@ object MenuPaeCatalog {
         return menus.firstOrNull { it.id == id || it.numeroMenu == id } ?: menus[0]
     }
 
+    fun obtenerImagenInteligente(
+        nombre: String?,
+        componente: String? = null,
+        ingredientes: List<String>? = null,
+        idSeccion: Int = 1
+    ): Int {
+        val n = (nombre ?: "")
+            .replace("Sugerencia IA:", "", ignoreCase = true)
+            .replace("Menú:", "", ignoreCase = true)
+            .replace("Plato:", "", ignoreCase = true)
+            .replace("Desayuno:", "", ignoreCase = true)
+            .replace("Almuerzo:", "", ignoreCase = true)
+            .replace("Merienda:", "", ignoreCase = true)
+            .lowercase()
+            .trim()
+
+        val comp = componente.orEmpty().lowercase()
+        val ings = ingredientes.orEmpty().joinToString(" ").lowercase()
+        val todo = "$n $comp $ings"
+
+        // 1. Coincidencia directa por plato base del catálogo PAE
+        val matchDirecto = menus.firstOrNull {
+            it.nombre.lowercase().contains(n) || (n.isNotEmpty() && n.contains(it.nombre.lowercase()))
+        }
+        if (matchDirecto != null) return matchDirecto.imagenRes
+
+        // 2. PROTEÍNA PRINCIPAL Y CATEGORÍA (Prioridad máxima a la proteína sobre acompañamientos)
+        // Huevos (pericos, revueltos, torta de huevo, cazuela, hogao)
+        if (todo.contains("torta de huevo") || todo.contains("torta huevo")) {
+            return R.drawable.plato5
+        }
+        if (todo.contains("revueltos") || todo.contains("huevo revuelto") || todo.contains("huevos revueltos")) {
+            return R.drawable.plato10
+        }
+        if (todo.contains("huevo") || todo.contains("huevos") || todo.contains("perico") || todo.contains("pericos") || todo.contains("cazuela")) {
+            return R.drawable.plato1
+        }
+
+        // Pollo / Aves
+        if (todo.contains("salsa blanca") || (todo.contains("pasta") && todo.contains("pollo"))) {
+            return R.drawable.plato2
+        }
+        if (todo.contains("pollo") || todo.contains("pechuga") || todo.contains("julianas")) {
+            return R.drawable.plato11
+        }
+
+        // Carne de Res
+        if (todo.contains("carne de res") || todo.contains("res guisada") || todo.contains("carne molida") || todo.contains("carne")) {
+            return R.drawable.plato6
+        }
+
+        // Cerdo
+        if (todo.contains("cerdo") || todo.contains("lomo") || todo.contains("costilla")) {
+            return R.drawable.plato15
+        }
+
+        // Leguminosas
+        if (todo.contains("lenteja") || todo.contains("lentejas")) {
+            return R.drawable.plato4
+        }
+        if (todo.contains("frijol") || todo.contains("frijoles")) {
+            return R.drawable.plato8
+        }
+
+        // Cereales y Desayunos
+        if (todo.contains("arepa") || todo.contains("arepas")) {
+            return R.drawable.plato3
+        }
+        if (todo.contains("hojaldra") || todo.contains("hojaldras")) {
+            return R.drawable.plato7
+        }
+        if (todo.contains("chocolate") && idSeccion == 1) {
+            return R.drawable.plato3
+        }
+        if (todo.contains("panela")) {
+            return R.drawable.plato5
+        }
+        if (todo.contains("avena")) {
+            return R.drawable.plato1
+        }
+
+        // Meriendas y Refrigerios (Solo si idSeccion == 3 o si no hay ninguna proteína)
+        if (idSeccion == 3 || todo.contains("merienda") || todo.contains("refrigerio")) {
+            if (todo.contains("yogurt") || todo.contains("manzana") || todo.contains("fruta")) {
+                return R.drawable.plato14
+            }
+            return R.drawable.plato9
+        }
+
+        if (todo.contains("yogurt") || todo.contains("manzana")) {
+            return R.drawable.plato14
+        }
+        if (todo.contains("mango") || todo.contains("cuca") || todo.contains("galleta")) {
+            return R.drawable.plato9
+        }
+
+        return when (idSeccion) {
+            2 -> R.drawable.plato6 // Almuerzo default: carne de res con arroz
+            3 -> R.drawable.plato9 // Merienda default: mango y cuca
+            else -> R.drawable.plato1 // Desayuno default: huevos pericos con chocolate
+        }
+    }
+
     fun obtenerImagenPorNombre(nombre: String?): Int {
-        if (nombre.isNullOrBlank()) return R.drawable.plato1
-        val n = nombre.lowercase().trim()
-
-        // 1. Coincidencia directa con algún menú del catálogo PAE
-        val menuMatch = menus.firstOrNull {
-            it.nombre.lowercase().contains(n) ||
-            n.contains(it.nombre.lowercase()) ||
-            it.componente.lowercase().contains(n) ||
-            n.contains(it.componente.lowercase())
-        }
-        if (menuMatch != null) {
-            return menuMatch.imagenRes
-        }
-
-        // 2. Coincidencia por componentes clave de las recetas PAE
-        return when {
-            n.contains("pericos") || n.contains("huevos pericos") -> R.drawable.plato1
-            n.contains("salsa blanca") || n.contains("pasta") -> R.drawable.plato2
-            n.contains("arepa") || n.contains("banano") -> R.drawable.plato3
-            n.contains("lentejas") || n.contains("lenteja") -> R.drawable.plato4
-            n.contains("torta de huevo") -> R.drawable.plato5
-            n.contains("carne de res") || n.contains("res guisada") -> R.drawable.plato6
-            n.contains("hojaldras") || n.contains("papaya") -> R.drawable.plato7
-            n.contains("frijol") || n.contains("frijoles") || n.contains("fideos") -> R.drawable.plato8
-            n.contains("cuca") || n.contains("galleta") || n.contains("maní") || n.contains("mango") || n.contains("arroz con leche") -> R.drawable.plato9
-            n.contains("huevos revueltos") || n.contains("revueltos") -> R.drawable.plato10
-            n.contains("pollo guisado") || n.contains("julianas") -> R.drawable.plato11
-            n.contains("torta pastel") || n.contains("yogurt") || n.contains("manzana") -> R.drawable.plato14
-            n.contains("cerdo") -> R.drawable.plato15
-            n.contains("pollo") -> R.drawable.plato11
-            n.contains("chocolate") -> R.drawable.plato3
-            n.contains("panela") -> R.drawable.plato8
-            n.contains("avena") -> R.drawable.plato1
-            else -> R.drawable.plato1
-        }
+        return obtenerImagenInteligente(nombre)
     }
 
     fun obtenerComponentesPorNombre(nombre: String?): List<String> {

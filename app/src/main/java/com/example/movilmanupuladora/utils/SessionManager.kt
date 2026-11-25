@@ -542,27 +542,31 @@ class SessionManager(context: Context) {
         val prefixCorreoServ = "asig_correo_${fechaHoy}_${serv}_"
         val prefixUidServ = "asig_uid_${fechaHoy}_${serv}_"
 
+        val compsEncontrados = mutableListOf<String>()
         for ((k, v) in asigPrefs.all) {
             if (k.startsWith(prefixCorreoServ) && v is String && correoUser != null) {
                 if (v.trim().equals(correoUser, ignoreCase = true) || correoUser.contains(v.trim(), ignoreCase = true)) {
-                    return k.removePrefix(prefixCorreoServ)
+                    compsEncontrados.add(k.removePrefix(prefixCorreoServ))
                 }
             }
             if (k.startsWith(prefixUidServ) && v is Int && myUid > 0 && v == myUid) {
-                return k.removePrefix(prefixUidServ)
+                compsEncontrados.add(k.removePrefix(prefixUidServ))
             }
             if (k.startsWith(prefixServ) && v is String) {
                 val cocineraNombre = v.trim().lowercase()
                 if (nombreUser != null && (cocineraNombre.contains(nombreUser) || nombreUser.contains(cocineraNombre))) {
-                    return k.removePrefix(prefixServ)
+                    compsEncontrados.add(k.removePrefix(prefixServ))
                 }
                 if (correoUser?.contains("pool") == true && cocineraNombre.contains("pool")) {
-                    return k.removePrefix(prefixServ)
+                    compsEncontrados.add(k.removePrefix(prefixServ))
                 }
                 if (correoUser?.contains("deis") == true && cocineraNombre.contains("deis")) {
-                    return k.removePrefix(prefixServ)
+                    compsEncontrados.add(k.removePrefix(prefixServ))
                 }
             }
+        }
+        if (compsEncontrados.isNotEmpty()) {
+            return compsEncontrados.distinct().joinToString(", ")
         }
 
         // PRIORIDAD 2: Asignación por servicio específico en claves comp_correo_ / comp_uid_

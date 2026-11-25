@@ -36,7 +36,7 @@ object ManipuladorasManager {
             correo = "silvia@sirae.com",
             idUsuario = 14,
             idSede = 1,
-            sedeNombre = "SEDE PIAGUA"
+            sedeNombre = ""
         ),
         Manipuladora(
             id = 15,
@@ -48,7 +48,7 @@ object ManipuladorasManager {
             correo = "yudi@sirae.com",
             idUsuario = 15,
             idSede = 1,
-            sedeNombre = "SEDE PIAGUA"
+            sedeNombre = ""
         ),
         Manipuladora(
             id = 16,

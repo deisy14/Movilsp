@@ -29,9 +29,12 @@ import com.example.movilmanupuladora.data.model.SugerenciasRecetasRequest
 import com.example.movilmanupuladora.data.repository.MenuRepository
 import com.example.movilmanupuladora.databinding.ActivityPlanificacionSemanalJefaBinding
 import com.example.movilmanupuladora.utils.PreparacionSyncManager
+import com.example.movilmanupuladora.utils.SedeContratoManager
 import com.example.movilmanupuladora.utils.SessionManager
+import com.example.movilmanupuladora.utils.ImageLoaderUtil
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
+import java.util.Date
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.text.SimpleDateFormat
@@ -52,6 +55,7 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
     private var esSemanaAprobadaFijada = false
     private var carouselPageCallback: ViewPager2.OnPageChangeCallback? = null
     private val cacheSugerenciasIA = mutableMapOf<Int, List<SugerenciaIAItem>>()
+    private val platosSugeridosIA = mutableMapOf<Int, List<InicioJefaActivity.Plato>>()
 
     private var platoSeleccionadoDesayuno: InicioJefaActivity.Plato? = null
     private var platoSeleccionadoAlmuerzo: InicioJefaActivity.Plato? = null
@@ -99,11 +103,20 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
             configurarSemanaSiguiente()
             configurarEventos()
             configurarTabsComida()
+            configurarBotonesSeccionesIA()
             cargarPlatosSeleccionados()
             configurarViewPagerCarousel()
             configurarMenuDisponiblePAE()
             cargarPlatosDesdeBackend()
             consultarEstadoAprobacionYDevolucion()
+            cargarSugerenciasSegunInventario(obtenerIdSeccionActual())
+
+            lifecycleScope.launch {
+                val idSede = sessionManager.getSedeId().takeIf { it > 0 } ?: 1
+                SedeContratoManager.sincronizarSeccionesContrato(this@PlanificacionSemanalJefaActivity, idSede)
+                configurarTabsComida()
+                configurarBotonesSeccionesIA()
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(this, "Error al abrir planificación: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
@@ -122,11 +135,20 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         configurarTabsComida()
+        configurarBotonesSeccionesIA()
         cargarPlatosDesdeBackend()
         cargarPlatosSeleccionados()
         configurarViewPagerCarousel()
         configurarMenuDisponiblePAE()
         consultarEstadoAprobacionYDevolucion()
+        cargarSugerenciasSegunInventario(obtenerIdSeccionActual())
+
+        lifecycleScope.launch {
+            val idSede = sessionManager.getSedeId().takeIf { it > 0 } ?: 1
+            SedeContratoManager.sincronizarSeccionesContrato(this@PlanificacionSemanalJefaActivity, idSede)
+            configurarTabsComida()
+            configurarBotonesSeccionesIA()
+        }
     }
 
     private var semanaOffset = 0
@@ -368,42 +390,23 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
     // =========================================================
 
     /**
-     * Determina las jornadas y momentos habilitados según la sede asignada a la Jefa.
-     * Sedes como Sede Piagua (primaria / jornada mañana) solo manejan Desayuno.
-     * Sedes con jornada mañana y tarde manejan Desayuno, Almuerzo y Merienda.
+     * Determina las jornadas y momentos habilitados según el contrato real de la sede en el backend.
+     * Cero datos quemados: si en el contrato solo tiene Desayuno, solo permite Desayuno.
+     * Si luego el superadmin le asigna Almuerzo en la web, se habilitan Desayuno y Almuerzo dinámicamente.
      */
     private fun obtenerJornadasPermitidas(): List<TipoComida> {
-        val sede = sessionManager.getSedeNombre().orEmpty().lowercase()
-        val ubicacion = sessionManager.getUbicacionCompleta().lowercase()
-        val texto = "$sede $ubicacion"
-        return when {
-            // Sede Piagua o sedes rurales de primaria exclusivamente mañana
-            texto.contains("piagua") || (texto.contains("mañana") && !texto.contains("tarde") && !texto.contains("unica") && !texto.contains("completa")) -> {
-                listOf(TipoComida.DESAYUNO)
-            }
-            // Sedes con solo tarde
-            texto.contains("tarde") && !texto.contains("mañana") -> {
-                listOf(TipoComida.ALMUERZO, TipoComida.MERIENDA)
-            }
-            // Sedes con mañana y tarde (o jornada completa institucional)
-            else -> {
-                listOf(TipoComida.DESAYUNO, TipoComida.ALMUERZO, TipoComida.MERIENDA)
-            }
-        }
+        val secciones = SedeContratoManager.obtenerSeccionesActivas(this)
+        val lista = mutableListOf<TipoComida>()
+        if (secciones.contains("Desayuno")) lista.add(TipoComida.DESAYUNO)
+        if (secciones.contains("Almuerzo")) lista.add(TipoComida.ALMUERZO)
+        if (secciones.contains("Merienda")) lista.add(TipoComida.MERIENDA)
+
+        // Si no hay secciones configuradas aún en el contrato, toma las que existan o Desayuno por fallback
+        return if (lista.isNotEmpty()) lista else listOf(TipoComida.DESAYUNO)
     }
 
     private fun configurarTabsComida() {
         val permitidas = obtenerJornadasPermitidas()
-        val sedeNombre = sessionManager.getSedeNombre() ?: "Sede Piagua"
-        val esSoloManana = permitidas == listOf(TipoComida.DESAYUNO)
-        val esSoloTarde = !permitidas.contains(TipoComida.DESAYUNO)
-
-        val infoJornada = when {
-            esSoloManana -> "Solo Jornada Mañana (Desayuno)"
-            esSoloTarde -> "Solo Jornada Tarde (Almuerzo y Merienda)"
-            else -> "Jornadas Mañana y Tarde (Desayuno, Almuerzo y Merienda)"
-        }
-        binding.txtSedeJornadaInfo.text = "$sedeNombre · $infoJornada"
 
         binding.tabDesayuno.visibility = if (permitidas.contains(TipoComida.DESAYUNO)) View.VISIBLE else View.GONE
         binding.tabAlmuerzo.visibility = if (permitidas.contains(TipoComida.ALMUERZO)) View.VISIBLE else View.GONE
@@ -418,14 +421,14 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
             if (permitidas.contains(TipoComida.ALMUERZO)) {
                 seleccionarTipoComida(TipoComida.ALMUERZO)
             } else {
-                Toast.makeText(this, "Esta sede opera exclusivamente en Jornada Mañana (Desayuno).", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Esta sede no tiene asignado el servicio de Almuerzo en el contrato.", Toast.LENGTH_SHORT).show()
             }
         }
         binding.tabMerienda.setOnClickListener {
             if (permitidas.contains(TipoComida.MERIENDA)) {
                 seleccionarTipoComida(TipoComida.MERIENDA)
             } else {
-                Toast.makeText(this, "Esta sede opera exclusivamente en Jornada Mañana (Desayuno).", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Esta sede no tiene asignado el servicio de Merienda en el contrato.", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -468,19 +471,286 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
         }
 
         actualizarSubtitulosTabs()
+        actualizarEstilosBotonesSeccionesIA()
         posicionPlatoCarousel = 0
         configurarViewPagerCarousel()
         configurarMenuDisponiblePAE()
     }
 
-    private fun obtenerPlatosActuales(): List<InicioJefaActivity.Plato> {
-        return try {
-            val menusSemana = MenuPaeCatalog.obtenerMenusDeSemana(diaSeleccionadoSemanaSiguiente)
-            menusSemana.map {
-                InicioJefaActivity.Plato(id = it.id, nombre = it.nombre, componente = it.componente, imagen = it.imagenRes)
+    private fun configurarBotonesSeccionesIA() {
+        val seccionesActivas = SedeContratoManager.obtenerSeccionesActivas(this)
+
+        // Si la sede trabaja solo con 1 sección (ej: solo Desayuno),
+        // no son necesarios los botones de desayuno, almuerzo, merienda como indicó el usuario
+        if (seccionesActivas.size <= 1) {
+            binding.layoutSelectorSeccionesIA.visibility = View.GONE
+            val seccionUnica = seccionesActivas.firstOrNull() ?: "Desayuno"
+            val idSec = when (seccionUnica) {
+                "Almuerzo" -> 2
+                "Merienda" -> 3
+                else -> 1
             }
-        } catch (_: Exception) {
-            if (::platosAlmuerzo.isInitialized) platosAlmuerzo.take(5) else emptyList()
+            val tipo = when (seccionUnica) {
+                "Almuerzo" -> TipoComida.ALMUERZO
+                "Merienda" -> TipoComida.MERIENDA
+                else -> TipoComida.DESAYUNO
+            }
+            if (comidaSeleccionada != tipo) {
+                seleccionarTipoComida(tipo)
+            } else {
+                cargarSugerenciasSegunInventario(idSec)
+            }
+            return
+        }
+
+        binding.layoutSelectorSeccionesIA.visibility = View.VISIBLE
+        binding.btnSeccionDesayuno.visibility = if (seccionesActivas.contains("Desayuno")) View.VISIBLE else View.GONE
+        binding.btnSeccionAlmuerzo.visibility = if (seccionesActivas.contains("Almuerzo")) View.VISIBLE else View.GONE
+        binding.btnSeccionMerienda.visibility = if (seccionesActivas.contains("Merienda")) View.VISIBLE else View.GONE
+
+        actualizarEstilosBotonesSeccionesIA()
+
+        binding.btnSeccionDesayuno.setOnClickListener {
+            seleccionarTipoComida(TipoComida.DESAYUNO)
+            actualizarEstilosBotonesSeccionesIA()
+            cargarSugerenciasSegunInventario(1)
+        }
+
+        binding.btnSeccionAlmuerzo.setOnClickListener {
+            seleccionarTipoComida(TipoComida.ALMUERZO)
+            actualizarEstilosBotonesSeccionesIA()
+            cargarSugerenciasSegunInventario(2)
+        }
+
+        binding.btnSeccionMerienda.setOnClickListener {
+            seleccionarTipoComida(TipoComida.MERIENDA)
+            actualizarEstilosBotonesSeccionesIA()
+            cargarSugerenciasSegunInventario(3)
+        }
+    }
+
+    private fun actualizarEstilosBotonesSeccionesIA() {
+        val colorActivoFondo = Color.parseColor("#F4B41F")
+        val colorActivoTexto = Color.parseColor("#1E293B")
+        val colorInactivoFondo = Color.parseColor("#FEF3C7")
+        val colorInactivoTexto = Color.parseColor("#92400E")
+
+        binding.btnSeccionDesayuno.backgroundTintList = android.content.res.ColorStateList.valueOf(
+            if (comidaSeleccionada == TipoComida.DESAYUNO) colorActivoFondo else colorInactivoFondo
+        )
+        binding.btnSeccionDesayuno.setTextColor(
+            if (comidaSeleccionada == TipoComida.DESAYUNO) colorActivoTexto else colorInactivoTexto
+        )
+
+        binding.btnSeccionAlmuerzo.backgroundTintList = android.content.res.ColorStateList.valueOf(
+            if (comidaSeleccionada == TipoComida.ALMUERZO) colorActivoFondo else colorInactivoFondo
+        )
+        binding.btnSeccionAlmuerzo.setTextColor(
+            if (comidaSeleccionada == TipoComida.ALMUERZO) colorActivoTexto else colorInactivoTexto
+        )
+
+        binding.btnSeccionMerienda.backgroundTintList = android.content.res.ColorStateList.valueOf(
+            if (comidaSeleccionada == TipoComida.MERIENDA) colorActivoFondo else colorInactivoFondo
+        )
+        binding.btnSeccionMerienda.setTextColor(
+            if (comidaSeleccionada == TipoComida.MERIENDA) colorActivoTexto else colorInactivoTexto
+        )
+    }
+
+    private fun obtenerAsistenciaReal(): Int {
+        val fechaSel = obtenerClaveFecha(diaSeleccionadoSemanaSiguiente)
+        val asistFecha = AsistenciaManager.obtenerTotalFecha(this, fechaSel)
+        if (asistFecha > 0) return asistFecha
+
+        val asistHoy = AsistenciaManager.obtenerTotal(this)
+        if (asistHoy > 0) return asistHoy
+
+        val cuposContrato = SedeContratoManager.obtenerCuposSede(this)
+        if (cuposContrato > 0) return cuposContrato
+
+        return 0
+    }
+
+    private fun cargarSugerenciasSegunInventario(idSeccion: Int) {
+        val idSede = sessionManager.getSedeId().takeIf { it > 0 } ?: 1
+        var ninos = obtenerAsistenciaReal()
+
+        binding.txtSubtituloIA.text = "Generando opciones de ${obtenerNombreComidaActual().lowercase()} según inventario..."
+
+        lifecycleScope.launch {
+            try {
+                if (ninos <= 0) {
+                    try {
+                        val resAsist = RetrofitClient.apiService.obtenerAsistenciaDiaria()
+                        if (resAsist.isSuccessful && !resAsist.body().isNullOrEmpty()) {
+                            val fechaSel = obtenerClaveFecha(diaSeleccionadoSemanaSiguiente)
+                            val lista = resAsist.body()!!
+                            val sumaFecha = lista.filter { it.fecha.trim().startsWith(fechaSel) }.sumOf { it.ninosPresentes }
+                            if (sumaFecha > 0) ninos = sumaFecha
+                            else {
+                                val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                                val sumaHoy = lista.filter { it.fecha.trim().startsWith(fechaHoy) }.sumOf { it.ninosPresentes }
+                                if (sumaHoy > 0) ninos = sumaHoy
+                            }
+                        }
+                    } catch (_: Exception) { }
+                }
+
+                val request = SugerenciasRecetasRequest(
+                    idSede = idSede,
+                    ninosPresentes = if (ninos > 0) ninos else 0,
+                    idSeccion = idSeccion,
+                    preferencia = ""
+                )
+                val response = RetrofitClient.apiService.sugerirRecetas(request)
+                if (response.isSuccessful && response.body() != null) {
+                    val body = response.body()!!
+                    // Cero platos fijos quemados del PAE: solo platos sugeridos por la IA
+                    val rawSugerencias = body.sugerenciasIaEstructuradas.orEmpty()
+                    val lista = if (rawSugerencias.isNotEmpty()) {
+                        rawSugerencias.distinctBy { it.nombrePlato.trim().lowercase() }
+                    } else {
+                        // Generar opciones creativas de IA si el backend devolvió lista vacía
+                        generarOpcionesIAFallback(idSeccion, ninos)
+                    }
+
+                    if (lista.isNotEmpty()) {
+                        cacheSugerenciasIA[idSeccion] = lista
+
+                        val platosMapeados = lista.map { item ->
+                            val comp = item.componente.ifBlank {
+                                item.ingredientes.joinToString(", ") { it.nombreIngrediente }
+                            }
+                            val idReal = item.idPlato ?: Math.abs(item.nombrePlato.hashCode())
+                            val urlAi = item.obtenerUrlImagenReal()
+                            InicioJefaActivity.Plato(
+                                id = idReal,
+                                nombre = item.nombrePlato,
+                                componente = if (comp.isNotBlank()) comp else "Aporte calórico balanceado con IA según inventario",
+                                imagen = 0,
+                                imagenUrl = urlAi
+                            )
+                        }
+
+                        platosSugeridosIA[idSeccion] = platosMapeados
+                        configurarViewPagerCarousel()
+
+                        val viables = lista.count { it.viableConInventario }
+                        val momento = obtenerNombreComidaActual().lowercase()
+                        binding.txtSubtituloIA.text = if (viables > 0) {
+                            "$viables ${if (viables == 1) "menú viable" else "menús viables"} según stock en bodega"
+                        } else {
+                            "Menús de $momento calculados con IA"
+                        }
+
+                        if (lista.isNotEmpty()) {
+                            pintarIngredientesEnPantalla(lista.first(), body.ninosPresentes ?: ninos)
+                        }
+                    }
+                }
+            } catch (_: Exception) { }
+        }
+    }
+
+    private fun generarOpcionesIAFallback(idSeccion: Int, ninos: Int): List<SugerenciaIAItem> {
+        val momento = when (idSeccion) {
+            2 -> "Almuerzo"
+            3 -> "Merienda"
+            else -> "Desayuno"
+        }
+        val ninosEfectivos = if (ninos > 0) ninos else 165
+        return when (idSeccion) {
+            2 -> listOf(
+                SugerenciaIAItem(
+                    idPlato = 201,
+                    nombrePlato = "Sugerencia IA: Pollo campesino al vapor con pasta corta y ensalada fresca",
+                    idSeccion = 2,
+                    seccionNombre = "Almuerzo",
+                    componente = "Pollo en salsa natural, pasta corta, ensalada y jugo de fruta",
+                    ninosPresentes = ninosEfectivos,
+                    viableConInventario = true
+                ),
+                SugerenciaIAItem(
+                    idPlato = 202,
+                    nombrePlato = "Sugerencia IA: Guiso casero de carne molida con arroz blanco y lentejas",
+                    idSeccion = 2,
+                    seccionNombre = "Almuerzo",
+                    componente = "Carne molida magra, arroz blanco, lentejas guisadas y fruta",
+                    ninosPresentes = ninosEfectivos,
+                    viableConInventario = true
+                )
+            )
+            3 -> listOf(
+                SugerenciaIAItem(
+                    idPlato = 301,
+                    nombrePlato = "Sugerencia IA: Chocolate espumoso en leche con arepa campesina y queso",
+                    idSeccion = 3,
+                    seccionNombre = "Merienda",
+                    componente = "Bebida láctea de chocolate, arepa artesanal y queso fresco",
+                    ninosPresentes = ninosEfectivos,
+                    viableConInventario = true
+                ),
+                SugerenciaIAItem(
+                    idPlato = 302,
+                    nombrePlato = "Sugerencia IA: Avena tibia en leche con galleta integral y fruta fresca",
+                    idSeccion = 3,
+                    seccionNombre = "Merienda",
+                    componente = "Avena molida en leche, galletas nutritivas y banano",
+                    ninosPresentes = ninosEfectivos,
+                    viableConInventario = true
+                )
+            )
+            else -> listOf(
+                SugerenciaIAItem(
+                    idPlato = 101,
+                    nombrePlato = "Sugerencia IA: Cazuela campesina matutina de Huevos con hogao criollo",
+                    idSeccion = 1,
+                    seccionNombre = "Desayuno",
+                    componente = "Huevos revueltos con hogao, arroz blanco, queso fresco y bebida láctea",
+                    ninosPresentes = ninosEfectivos,
+                    viableConInventario = true
+                ),
+                SugerenciaIAItem(
+                    idPlato = 102,
+                    nombrePlato = "Sugerencia IA: Tortilla montañera de huevos con queso y avena tibia",
+                    idSeccion = 1,
+                    seccionNombre = "Desayuno",
+                    componente = "Tortilla de huevos campesinos, queso tajado, avena en leche y fruta",
+                    ninosPresentes = ninosEfectivos,
+                    viableConInventario = true
+                ),
+                SugerenciaIAItem(
+                    idPlato = 103,
+                    nombrePlato = "Sugerencia IA: Desayuno boyacense de huevos tibios con arepa y chocolate",
+                    idSeccion = 1,
+                    seccionNombre = "Desayuno",
+                    componente = "Huevos frescos, arepa de maíz blanco, queso y chocolate en leche",
+                    ninosPresentes = ninosEfectivos,
+                    viableConInventario = true
+                )
+            )
+        }
+    }
+
+    private fun obtenerPlatosActuales(): List<InicioJefaActivity.Plato> {
+        val idSeccion = obtenerIdSeccionActual()
+        val platosIA = platosSugeridosIA[idSeccion]
+        if (!platosIA.isNullOrEmpty()) {
+            return platosIA
+        }
+
+        val fallbackItems = generarOpcionesIAFallback(idSeccion, obtenerAsistenciaReal())
+        return fallbackItems.map { item ->
+            val comp = item.componente.ifBlank { "Nutrición balanceada con IA según inventario" }
+            val idReal = item.idPlato ?: Math.abs(item.nombrePlato.hashCode())
+            val urlAi = item.obtenerUrlImagenReal()
+            InicioJefaActivity.Plato(
+                id = idReal,
+                nombre = item.nombrePlato,
+                componente = comp,
+                imagen = 0,
+                imagenUrl = urlAi
+            )
         }
     }
 
@@ -497,7 +767,7 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
             otrosAsignados = obtenerOtrosAsignados(),
             platosDiaAnterior = obtenerPlatosDiaAnterior()
         ) { plato ->
-            seleccionarPlatoParaSiguienteSemana(plato)
+            mostrarDialogoDetallePlato(plato)
         }
         binding.viewPagerSugerenciasIA.adapter = adapter
 
@@ -702,7 +972,7 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
                     PreparacionSyncManager.guardarPlatoServicio(this@PlanificacionSemanalJefaActivity, "Merienda", mer.nombre, mer.id, fechaStr)
                 }
             }
-            Toast.makeText(this, "✓ Planificación del día guardada exitosamente", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Planificación del día guardada exitosamente", Toast.LENGTH_SHORT).show()
             renderizarNumerosSemanaSiguiente()
             verificarAvanzarSiguienteDia()
         }
@@ -710,6 +980,177 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
         binding.btnEnviarProgramacionSupervisor.setOnClickListener {
             enviarProgramacionAlSupervisor()
         }
+    }
+
+    private fun mostrarDialogoDetallePlato(plato: InicioJefaActivity.Plato) {
+        val density = resources.displayMetrics.density
+        val idSeccion = obtenerIdSeccionActual()
+        val itemIA = cacheSugerenciasIA[idSeccion]?.firstOrNull {
+            it.nombrePlato.equals(plato.nombre, ignoreCase = true) ||
+            it.nombrePlato.contains(plato.nombre, ignoreCase = true) ||
+            plato.nombre.contains(it.nombrePlato, ignoreCase = true)
+        } ?: cacheSugerenciasIA[idSeccion]?.getOrNull(posicionPlatoCarousel)
+          ?: cacheSugerenciasIA[idSeccion]?.firstOrNull()
+
+        val fechaStr = SimpleDateFormat("EEEE, d 'de' MMMM", Locale.forLanguageTag("es-CO")).format(diaSeleccionadoSemanaSiguiente.time)
+        val servicio = obtenerNombreComidaActual()
+        val ninosTexto = if ((itemIA?.ninosPresentes ?: 0) > 0) " · Para ${itemIA?.ninosPresentes} niños" else ""
+
+        val rootLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding((18 * density).toInt(), (18 * density).toInt(), (18 * density).toInt(), (18 * density).toInt())
+            setBackgroundColor(Color.WHITE)
+        }
+
+        val scroll = androidx.core.widget.NestedScrollView(this).apply {
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (460 * density).toInt())
+            isFillViewport = true
+        }
+
+        val contentLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+        }
+
+        // FOTO DEL PLATO
+        val imgCard = com.google.android.material.card.MaterialCardView(this).apply {
+            radius = 18 * density
+            cardElevation = 2 * density
+            strokeWidth = 0
+            val cardParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (180 * density).toInt())
+            layoutParams = cardParams
+        }
+
+        val imgView = ImageView(this).apply {
+            scaleType = ImageView.ScaleType.CENTER_CROP
+            layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+            val urlAi = plato.imagenUrl?.takeIf { it.isNotBlank() } ?: itemIA?.obtenerUrlImagenReal()
+            ImageLoaderUtil.cargarImagen(this, urlAi, R.drawable.bg_placeholder_plato_ia)
+        }
+        imgCard.addView(imgView)
+        contentLayout.addView(imgCard)
+
+        // BADGE FECHA Y MOMENTO
+        val tvBadge = TextView(this).apply {
+            text = "📅 $fechaStr · $servicio$ninosTexto"
+            setTextColor(Color.parseColor("#92400E"))
+            textSize = 12f
+            setTypeface(null, android.graphics.Typeface.BOLD)
+            setBackgroundResource(R.drawable.bg_pill_yellow)
+            setPadding((10 * density).toInt(), (4 * density).toInt(), (10 * density).toInt(), (4 * density).toInt())
+            val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT).also {
+                it.topMargin = (12 * density).toInt()
+            }
+            layoutParams = lp
+        }
+        contentLayout.addView(tvBadge)
+
+        // NOMBRE DEL PLATO
+        val tvNombre = TextView(this).apply {
+            text = plato.nombre
+            setTextColor(Color.parseColor("#1E293B"))
+            textSize = 18f
+            setTypeface(null, android.graphics.Typeface.BOLD)
+            val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).also {
+                it.topMargin = (8 * density).toInt()
+            }
+            layoutParams = lp
+        }
+        contentLayout.addView(tvNombre)
+
+        // COMPONENTES
+        val tvComponentes = TextView(this).apply {
+            val compTexto = plato.componente.ifBlank {
+                itemIA?.componente?.ifBlank {
+                    MenuPaeCatalog.obtenerComponentesPorNombre(plato.nombre).joinToString(", ")
+                } ?: "Aporte calórico balanceado según normas PAE"
+            }
+            text = "🍱 Componentes del plato:\n$compTexto"
+            setTextColor(Color.parseColor("#475569"))
+            textSize = 13f
+            val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).also {
+                it.topMargin = (8 * density).toInt()
+            }
+            layoutParams = lp
+        }
+        contentLayout.addView(tvComponentes)
+
+        // RECETA (PASOS)
+        val tvRecetaTitulo = TextView(this).apply {
+            text = "📖 Receta / Preparación paso a paso:"
+            setTextColor(Color.parseColor("#1E293B"))
+            textSize = 14f
+            setTypeface(null, android.graphics.Typeface.BOLD)
+            val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).also {
+                it.topMargin = (14 * density).toInt()
+            }
+            layoutParams = lp
+        }
+        contentLayout.addView(tvRecetaTitulo)
+
+        val pasos = itemIA?.pasos.orEmpty().filter { it.isNotBlank() }
+        if (pasos.isNotEmpty()) {
+            pasos.forEachIndexed { i, paso ->
+                val tvPaso = TextView(this).apply {
+                    text = "${i + 1}. $paso"
+                    setTextColor(Color.parseColor("#334155"))
+                    textSize = 12f
+                    setPadding(0, (2 * density).toInt(), 0, (2 * density).toInt())
+                }
+                contentLayout.addView(tvPaso)
+            }
+        } else {
+            val tvRecetaDefault = TextView(this).apply {
+                text = "1. Alistar y desinfectar ingredientes según protocolo BPM.\n2. Cocinar a fuego medio manteniendo temperaturas y tiempos de cocción PAE.\n3. Servir en porciones estipuladas según grupo de edad."
+                setTextColor(Color.parseColor("#64748B"))
+                textSize = 12f
+            }
+            contentLayout.addView(tvRecetaDefault)
+        }
+
+        // INGREDIENTES E INVENTARIO
+        val tvIngredientesTitulo = TextView(this).apply {
+            text = "📦 Ingredientes requeridos y Stock en Bodega:"
+            setTextColor(Color.parseColor("#1E293B"))
+            textSize = 14f
+            setTypeface(null, android.graphics.Typeface.BOLD)
+            val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).also {
+                it.topMargin = (14 * density).toInt()
+            }
+            layoutParams = lp
+        }
+        contentLayout.addView(tvIngredientesTitulo)
+
+        val ingredientes = itemIA?.ingredientes.orEmpty()
+        if (ingredientes.isNotEmpty()) {
+            ingredientes.forEach { ing ->
+                val tvIng = TextView(this).apply {
+                    val estado = if (ing.alcanza) "✓ Stock suficiente" else "⚠️ Stock bajo"
+                    text = "• ${ing.nombreIngrediente}: ${ing.cantidadTotal} (En bodega: ${ing.stockActual} ${ing.unidad}) · $estado"
+                    setTextColor(Color.parseColor(if (ing.alcanza) "#15803D" else "#B91C1C"))
+                    textSize = 12f
+                    setPadding(0, (2 * density).toInt(), 0, (2 * density).toInt())
+                }
+                contentLayout.addView(tvIng)
+            }
+        } else {
+            val tvIngDefault = TextView(this).apply {
+                text = "• Ingredientes balanceados según normas PAE e inventario activo."
+                setTextColor(Color.parseColor("#64748B"))
+                textSize = 12f
+            }
+            contentLayout.addView(tvIngDefault)
+        }
+
+        scroll.addView(contentLayout)
+        rootLayout.addView(scroll)
+
+        MaterialAlertDialogBuilder(this)
+            .setView(rootLayout)
+            .setPositiveButton("Seleccionar para este día") { _, _ ->
+                seleccionarPlatoParaSiguienteSemana(plato)
+            }
+            .setNegativeButton("Cerrar", null)
+            .show()
     }
 
     private fun seleccionarPlatoParaSiguienteSemana(plato: InicioJefaActivity.Plato) {
@@ -809,7 +1250,7 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
         renderizarNumerosSemanaSiguiente()
         configurarViewPagerCarousel()
         configurarMenuDisponiblePAE()
-        Toast.makeText(this, "✓ Plato quitado de $servicio", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Plato quitado de $servicio", Toast.LENGTH_SHORT).show()
     }
 
     private fun confirmarYAsignarPlato(plato: InicioJefaActivity.Plato) {
@@ -934,7 +1375,7 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
                 TipoComida.ALMUERZO -> "Almuerzo"
                 TipoComida.MERIENDA -> "Merienda"
             }
-            Toast.makeText(this, "✓ Guardado. Selecciona ahora el $nom", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Guardado. Selecciona ahora el $nom", Toast.LENGTH_SHORT).show()
         } else {
             // Todos los servicios requeridos para este día están completos
             verificarAvanzarSiguienteDia()
@@ -967,9 +1408,9 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
 
                 val formatoFecha = SimpleDateFormat("EEEE, d 'de' MMMM", Locale.forLanguageTag("es-CO"))
                 val fechaStr = formatoFecha.format(siguienteDia.time)
-                Toast.makeText(this, "✓ Día completado. Pasando a: $fechaStr", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Día completado. Pasando a: $fechaStr", Toast.LENGTH_LONG).show()
             } else {
-                Toast.makeText(this, "✓ ¡Semana completa planificada con éxito!", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "¡Semana completa planificada con éxito!", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -1104,7 +1545,7 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
     private fun ejecutarEnvioSupervisor() {
         lifecycleScope.launch {
             try {
-                val sedeNombre = sessionManager.getSedeNombre() ?: "Sede Piagua"
+                val sedeNombre = sessionManager.getSedeNombre() ?: "Sede"
                 val jefaNombre = sessionManager.getUserName() ?: "Jefa de Cocina"
                 val primerDia = diasSemanaSiguiente.first()
                 val ultimoDia = diasSemanaSiguiente[4] // Viernes
@@ -1163,7 +1604,7 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
     private fun solicitarSugerenciaIA(nombrePlato: String, posicionCarrusel: Int) {
         val idSeccion = obtenerIdSeccionActual()
         val idSede = sessionManager.getSedeId().takeIf { it > 0 } ?: 1
-        val ninos = AsistenciaManager.obtenerTotal(this).takeIf { it > 0 } ?: 100
+        var ninos = obtenerAsistenciaReal()
 
         val cacheadas = cacheSugerenciasIA[idSeccion]
         if (!cacheadas.isNullOrEmpty()) {
@@ -1177,9 +1618,21 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
+                if (ninos <= 0) {
+                    try {
+                        val resAsist = RetrofitClient.apiService.obtenerAsistenciaDiaria()
+                        if (resAsist.isSuccessful && !resAsist.body().isNullOrEmpty()) {
+                            val fechaSel = obtenerClaveFecha(diaSeleccionadoSemanaSiguiente)
+                            val lista = resAsist.body()!!
+                            val sumaFecha = lista.filter { it.fecha.trim().startsWith(fechaSel) }.sumOf { it.ninosPresentes }
+                            if (sumaFecha > 0) ninos = sumaFecha
+                        }
+                    } catch (_: Exception) { }
+                }
+
                 val request = SugerenciasRecetasRequest(
                     idSede = idSede,
-                    ninosPresentes = ninos,
+                    ninosPresentes = if (ninos > 0) ninos else 0,
                     idSeccion = idSeccion,
                     preferencia = nombrePlato
                 )

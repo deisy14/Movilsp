@@ -152,7 +152,7 @@ class RecuperarPasswordActivity : AppCompatActivity() {
 
                     Toast.makeText(
                         this@RecuperarPasswordActivity,
-                        "Servidor de correos del backend no configurado. Se activó el formulario para cambiar tu contraseña.",
+                        "Ingresa tu nueva contraseña.",
                         Toast.LENGTH_LONG
                     ).show()
 

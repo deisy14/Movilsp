@@ -1,10 +1,13 @@
+
 package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
 import android.animation.ValueAnimator
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -20,7 +23,10 @@ import com.example.movilmanupuladora.data.model.MenuPaeCatalog
 import com.example.movilmanupuladora.databinding.ActivityInicioJefaBinding
 import com.example.movilmanupuladora.utils.NavigationHelperJefa
 import com.example.movilmanupuladora.utils.PreparacionSyncManager
+import com.example.movilmanupuladora.utils.SedeContratoManager
 import com.example.movilmanupuladora.utils.SessionManager
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -39,7 +45,8 @@ class InicioJefaActivity : AppCompatActivity() {
         val id: Int,
         val nombre: String,
         val componente: String,
-        val imagen: Int
+        val imagen: Int,
+        val imagenUrl: String? = null
     )
 
     companion object {
@@ -111,6 +118,7 @@ class InicioJefaActivity : AppCompatActivity() {
         configurarNavegacionInferior()
 
         actualizarResumen()
+        actualizarPlatosVisuales()
         cargarAsistenciaDelBackend()
 
         lifecycleScope.launch {
@@ -119,8 +127,22 @@ class InicioJefaActivity : AppCompatActivity() {
                 val sedeNombre = sessionManager.getSedeNombre()
                 ManipuladorasManager.cargarDesdeBackend(this@InicioJefaActivity, idSede, sedeNombre)
                 NotificacionesJefaManager.sincronizarNotificacionesDelBackend(this@InicioJefaActivity)
+                SedeContratoManager.sincronizarSeccionesContrato(this@InicioJefaActivity, idSede ?: 1)
+                actualizarBadgeNotificaciones()
                 actualizarResumen()
+                actualizarPlatosVisuales()
             } catch (_: Exception) { }
+        }
+
+        // Monitoreo periódico en segundo plano para reflejar nuevas notificaciones automáticamente
+        lifecycleScope.launch {
+            while (isActive) {
+                delay(20000)
+                try {
+                    NotificacionesJefaManager.sincronizarNotificacionesDelBackend(this@InicioJefaActivity)
+                    actualizarBadgeNotificaciones()
+                } catch (_: Exception) { }
+            }
         }
     }
 
@@ -128,6 +150,7 @@ class InicioJefaActivity : AppCompatActivity() {
         super.onResume()
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
         actualizarResumen()
+        actualizarPlatosVisuales()
         cargarAsistenciaDelBackend()
         lifecycleScope.launch {
             try {
@@ -135,6 +158,7 @@ class InicioJefaActivity : AppCompatActivity() {
                 val sedeNombre = sessionManager.getSedeNombre()
                 ManipuladorasManager.cargarDesdeBackend(this@InicioJefaActivity, idSede, sedeNombre)
                 NotificacionesJefaManager.sincronizarNotificacionesDelBackend(this@InicioJefaActivity)
+                SedeContratoManager.sincronizarSeccionesContrato(this@InicioJefaActivity, idSede ?: 1)
                 actualizarResumen()
 
                 val res = RetrofitClient.apiService.obtenerPlatos()
@@ -246,35 +270,153 @@ class InicioJefaActivity : AppCompatActivity() {
     // =========================================================
 
     private fun actualizarPlatosVisuales() {
-        val menuDia = MenuPaeCatalog.obtenerMenuDiaCompleto(diaSeleccionado)
         val fechaClave = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(diaSeleccionado.time)
 
-        val nomDes = sessionManager.getPlatoDiaServicio(this, fechaClave, "Desayuno") ?: menuDia.desayuno.nombre
-        val compDes = MenuPaeCatalog.obtenerComponentesPorNombre(nomDes).joinToString(", ")
-        binding.imgDesayuno.setImageResource(obtenerImagenPlatoPorNombre(nomDes))
-        binding.txtNombreDesayuno.text = nomDes
-        binding.txtComponenteDesayuno.text = compDes
-
-        val nomAlm = sessionManager.getPlatoDiaServicio(this, fechaClave, "Almuerzo") ?: menuDia.almuerzo.nombre
-        val compAlm = MenuPaeCatalog.obtenerComponentesPorNombre(nomAlm).joinToString(", ")
-        binding.imgAlmuerzo.setImageResource(obtenerImagenPlatoPorNombre(nomAlm))
-        binding.txtNombreAlmuerzo.text = nomAlm
-        binding.txtComponenteAlmuerzo.text = compAlm
-
-        val nomMer = sessionManager.getPlatoDiaServicio(this, fechaClave, "Merienda") ?: menuDia.merienda.nombre
-        val compMer = MenuPaeCatalog.obtenerComponentesPorNombre(nomMer).joinToString(", ")
-        binding.imgMerienda.setImageResource(obtenerImagenPlatoPorNombre(nomMer))
-        binding.txtNombreMerienda.text = nomMer
-        binding.txtComponenteMerienda.text = compMer
-
-        val sedeTexto = sessionManager.getSedeNombre().orEmpty().lowercase()
-        val esSoloDesayuno = sedeTexto.contains("piagua")
-        if (esSoloDesayuno) {
-            binding.cardAlmuerzo.visibility = View.GONE
-            binding.cardMerienda.visibility = View.GONE
+        // 1. DESAYUNO
+        val nomDes = sessionManager.getPlatoDiaServicio(this, fechaClave, "Desayuno")
+        if (!nomDes.isNullOrBlank()) {
+            binding.badgeEstadoDesayuno.text = "Seleccionado"
+            binding.badgeEstadoDesayuno.setBackgroundResource(R.drawable.bg_chip_seleccionado)
+            binding.badgeEstadoDesayuno.setTextColor(Color.parseColor("#15803D"))
+            binding.imgDesayuno.visibility = View.VISIBLE
+            binding.imgDesayuno.setImageResource(obtenerImagenPlatoPorNombre(nomDes))
+            binding.txtNombreDesayuno.text = nomDes
+            binding.lblComponenteDesayuno.visibility = View.VISIBLE
+            val compDes = MenuPaeCatalog.obtenerComponentesPorNombre(nomDes).joinToString(", ")
+            binding.txtComponenteDesayuno.text = compDes
         } else {
-            binding.cardAlmuerzo.visibility = View.VISIBLE
-            binding.cardMerienda.visibility = View.VISIBLE
+            binding.badgeEstadoDesayuno.text = "Pendiente"
+            binding.badgeEstadoDesayuno.setBackgroundResource(R.drawable.bg_chip_pendiente)
+            binding.badgeEstadoDesayuno.setTextColor(Color.parseColor("#92400E"))
+            binding.imgDesayuno.visibility = View.GONE
+            binding.txtNombreDesayuno.text = "Sin plato seleccionado"
+            binding.lblComponenteDesayuno.visibility = View.GONE
+            binding.txtComponenteDesayuno.text = "La manipuladora jefe aún no ha seleccionado el plato para esta jornada"
+        }
+
+        // 2. ALMUERZO
+        val nomAlm = sessionManager.getPlatoDiaServicio(this, fechaClave, "Almuerzo")
+        if (!nomAlm.isNullOrBlank()) {
+            binding.badgeEstadoAlmuerzo.text = "Seleccionado"
+            binding.badgeEstadoAlmuerzo.setBackgroundResource(R.drawable.bg_chip_seleccionado)
+            binding.badgeEstadoAlmuerzo.setTextColor(Color.parseColor("#15803D"))
+            binding.imgAlmuerzo.visibility = View.VISIBLE
+            binding.imgAlmuerzo.setImageResource(obtenerImagenPlatoPorNombre(nomAlm))
+            binding.txtNombreAlmuerzo.text = nomAlm
+            binding.lblComponenteAlmuerzo.visibility = View.VISIBLE
+            val compAlm = MenuPaeCatalog.obtenerComponentesPorNombre(nomAlm).joinToString(", ")
+            binding.txtComponenteAlmuerzo.text = compAlm
+        } else {
+            binding.badgeEstadoAlmuerzo.text = "Pendiente"
+            binding.badgeEstadoAlmuerzo.setBackgroundResource(R.drawable.bg_chip_pendiente)
+            binding.badgeEstadoAlmuerzo.setTextColor(Color.parseColor("#92400E"))
+            binding.imgAlmuerzo.visibility = View.GONE
+            binding.txtNombreAlmuerzo.text = "Sin plato seleccionado"
+            binding.lblComponenteAlmuerzo.visibility = View.GONE
+            binding.txtComponenteAlmuerzo.text = "La manipuladora jefe aún no ha seleccionado el plato para esta jornada"
+        }
+
+        // 3. MERIENDA
+        val nomMer = sessionManager.getPlatoDiaServicio(this, fechaClave, "Merienda")
+        if (!nomMer.isNullOrBlank()) {
+            binding.badgeEstadoMerienda.text = "Seleccionado"
+            binding.badgeEstadoMerienda.setBackgroundResource(R.drawable.bg_chip_seleccionado)
+            binding.badgeEstadoMerienda.setTextColor(Color.parseColor("#15803D"))
+            binding.imgMerienda.visibility = View.VISIBLE
+            binding.imgMerienda.setImageResource(obtenerImagenPlatoPorNombre(nomMer))
+            binding.txtNombreMerienda.text = nomMer
+            binding.lblComponenteMerienda.visibility = View.VISIBLE
+            val compMer = MenuPaeCatalog.obtenerComponentesPorNombre(nomMer).joinToString(", ")
+            binding.txtComponenteMerienda.text = compMer
+        } else {
+            binding.badgeEstadoMerienda.text = "Pendiente"
+            binding.badgeEstadoMerienda.setBackgroundResource(R.drawable.bg_chip_pendiente)
+            binding.badgeEstadoMerienda.setTextColor(Color.parseColor("#92400E"))
+            binding.imgMerienda.visibility = View.GONE
+            binding.txtNombreMerienda.text = "Sin plato seleccionado"
+            binding.lblComponenteMerienda.visibility = View.GONE
+            binding.txtComponenteMerienda.text = "La manipuladora jefe aún no ha seleccionado el plato para esta jornada"
+        }
+
+        val seccionesActivas = SedeContratoManager.obtenerSeccionesActivas(this).ifEmpty { setOf("Desayuno") }
+        acomodarTarjetasSegunSecciones(seccionesActivas)
+    }
+
+    /**
+     * Acomoda visualmente las tarjetas de menús seleccionados según el contrato de la sede:
+     * - Si la sede solo maneja 1 sección (ej: solo Desayuno), la tarjeta se centra como Hero Card destacada (260dp de ancho).
+     * - Si maneja 2 secciones (ej: Desayuno y Almuerzo), ambas se disponen lado a lado centradas en pantalla (165dp c/u).
+     * - Si maneja 3 secciones (Desayuno, Almuerzo y Merienda), se activan las 3 con el carrusel de desplazamiento horizontal.
+     */
+    private fun acomodarTarjetasSegunSecciones(seccionesActivas: Set<String>) {
+        val density = resources.displayMetrics.density
+
+        val tieneDesayuno = seccionesActivas.contains("Desayuno")
+        val tieneAlmuerzo = seccionesActivas.contains("Almuerzo")
+        val tieneMerienda = seccionesActivas.contains("Merienda")
+
+        binding.cardDesayuno.visibility = if (tieneDesayuno) View.VISIBLE else View.GONE
+        binding.cardAlmuerzo.visibility = if (tieneAlmuerzo) View.VISIBLE else View.GONE
+        binding.cardMerienda.visibility = if (tieneMerienda) View.VISIBLE else View.GONE
+
+        val visibles = listOf(
+            Pair(binding.cardDesayuno, tieneDesayuno),
+            Pair(binding.cardAlmuerzo, tieneAlmuerzo),
+            Pair(binding.cardMerienda, tieneMerienda)
+        ).filter { it.second }.map { it.first }
+
+        val count = visibles.size
+
+        when (count) {
+            1 -> {
+                // Solo 1 sección (ej: solo Desayuno) -> Centrada en la pantalla
+                binding.layoutContenedorCardsComida.gravity = Gravity.CENTER
+                binding.layoutContenedorCardsComida.setPadding((16 * density).toInt(), 0, (16 * density).toInt(), 0)
+
+                val cardUnica = visibles.first()
+                val params = cardUnica.layoutParams as ViewGroup.MarginLayoutParams
+                params.width = (260 * density).toInt()
+                params.setMargins(0, 0, 0, 0)
+                cardUnica.layoutParams = params
+
+                cardUnica.scaleX = 1.0f
+                cardUnica.scaleY = 1.0f
+                cardUnica.alpha = 1.0f
+                cardUnica.elevation = 4f * density
+            }
+            2 -> {
+                // 2 secciones (ej: Desayuno y Almuerzo) -> Centradas y balanceadas
+                binding.layoutContenedorCardsComida.gravity = Gravity.CENTER
+                binding.layoutContenedorCardsComida.setPadding((12 * density).toInt(), 0, (12 * density).toInt(), 0)
+
+                visibles.forEachIndexed { index, card ->
+                    val params = card.layoutParams as ViewGroup.MarginLayoutParams
+                    params.width = (165 * density).toInt()
+                    val marginEnd = if (index == 0) (14 * density).toInt() else 0
+                    params.setMargins(0, 0, marginEnd, 0)
+                    card.layoutParams = params
+
+                    card.scaleX = 1.0f
+                    card.scaleY = 1.0f
+                    card.alpha = 1.0f
+                    card.elevation = 3f * density
+                }
+            }
+            else -> {
+                // 3 o más secciones -> Carrusel horizontal dinámico
+                binding.layoutContenedorCardsComida.gravity = Gravity.CENTER_VERTICAL
+                val relleno = (16 * density).toInt()
+                binding.layoutContenedorCardsComida.setPadding(relleno, 0, relleno, 0)
+
+                visibles.forEachIndexed { index, card ->
+                    val params = card.layoutParams as ViewGroup.MarginLayoutParams
+                    params.width = (180 * density).toInt()
+                    val marginEnd = if (index < visibles.size - 1) (16 * density).toInt() else 0
+                    params.setMargins(0, 0, marginEnd, 0)
+                    card.layoutParams = params
+                }
+                actualizarEscalaCarrusel()
+            }
         }
     }
 
@@ -306,11 +448,6 @@ class InicioJefaActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // Clic en "Asistente IA - Sugerir Menú & Descontar" -> Abre SugerenciaIaActivity
-        binding.bannerSugerenciasIA.setOnClickListener {
-            val intent = Intent(this, SugerenciaIaActivity::class.java)
-            startActivity(intent)
-        }
 
         // Clic en "Resumen del día" -> Abre AsistenciaJefaActivity
         binding.cardResumenDia.setOnClickListener {
@@ -318,41 +455,32 @@ class InicioJefaActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // Clic en tarjetas de comida -> Aplica el efecto de tamaño y abre el plato al confirmar selección
+        // Clic en tarjetas de comida -> Abre AsignarComponentesActivity para el servicio correspondiente
         binding.cardDesayuno.setOnClickListener {
-            if (servicioComidaSeleccionado == 0) {
-                val intent = Intent(this, MenuDelDiaMesActivity::class.java).apply {
-                    putExtra("fecha_milisegundos", diaSeleccionado.timeInMillis)
-                    putExtra("servicio", "Desayuno")
-                }
-                startActivity(intent)
-            } else {
-                aplicarEfectoSeleccionComida(0, animar = true, scroll = true)
+            val fechaClave = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(diaSeleccionado.time)
+            val intent = Intent(this, AsignarComponentesActivity::class.java).apply {
+                putExtra("fecha_seleccionada", fechaClave)
+                putExtra("servicio", "Desayuno")
             }
+            startActivity(intent)
         }
 
         binding.cardAlmuerzo.setOnClickListener {
-            if (servicioComidaSeleccionado == 1) {
-                val intent = Intent(this, MenuDelDiaMesActivity::class.java).apply {
-                    putExtra("fecha_milisegundos", diaSeleccionado.timeInMillis)
-                    putExtra("servicio", "Almuerzo")
-                }
-                startActivity(intent)
-            } else {
-                aplicarEfectoSeleccionComida(1, animar = true, scroll = true)
+            val fechaClave = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(diaSeleccionado.time)
+            val intent = Intent(this, AsignarComponentesActivity::class.java).apply {
+                putExtra("fecha_seleccionada", fechaClave)
+                putExtra("servicio", "Almuerzo")
             }
+            startActivity(intent)
         }
 
         binding.cardMerienda.setOnClickListener {
-            if (servicioComidaSeleccionado == 2) {
-                val intent = Intent(this, MenuDelDiaMesActivity::class.java).apply {
-                    putExtra("fecha_milisegundos", diaSeleccionado.timeInMillis)
-                    putExtra("servicio", "Merienda")
-                }
-                startActivity(intent)
-            } else {
-                aplicarEfectoSeleccionComida(2, animar = true, scroll = true)
+            val fechaClave = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(diaSeleccionado.time)
+            val intent = Intent(this, AsignarComponentesActivity::class.java).apply {
+                putExtra("fecha_seleccionada", fechaClave)
+                putExtra("servicio", "Merienda")
             }
+            startActivity(intent)
         }
 
         // Efecto carrusel: la tarjeta activa se ve más grande de forma suave y continua
@@ -391,13 +519,25 @@ class InicioJefaActivity : AppCompatActivity() {
     private fun actualizarEscalaCarrusel() {
         val scroll = binding.scrollMenusAsignados
         val contenedor = binding.layoutContenedorCardsComida
-        val maxScroll = (contenedor.width - scroll.width).coerceAtLeast(1)
         val density = resources.displayMetrics.density
 
+        val visibles = tarjetasComida.filter { it.visibility == View.VISIBLE }
+        if (visibles.size <= 2) {
+            visibles.forEach { card ->
+                card.scaleX = 1f
+                card.scaleY = 1f
+                card.alpha = 1f
+                card.elevation = 3f * density
+            }
+            return
+        }
+
+        val maxScroll = (contenedor.width - scroll.width).coerceAtLeast(1)
         val progreso = (scroll.scrollX.toFloat() / maxScroll).coerceIn(0f, 1f)
         val idxFloat = progreso * 2f // 0 = Desayuno, 1 = Almuerzo, 2 = Merienda
 
         tarjetasComida.forEachIndexed { i, card ->
+            if (card.visibility != View.VISIBLE) return@forEachIndexed
             val dist = kotlin.math.abs(i - idxFloat)
             val cercania = (1f - dist).coerceIn(0f, 1f)
 
@@ -415,6 +555,9 @@ class InicioJefaActivity : AppCompatActivity() {
 
     /** Al soltar el dedo, acomoda suavemente la tarjeta más cercana en su posición natural */
     private fun ajustarTarjetaAlCentro() {
+        val visibles = tarjetasComida.filter { it.visibility == View.VISIBLE }
+        if (visibles.size <= 2) return
+
         val scroll = binding.scrollMenusAsignados
         val contenedor = binding.layoutContenedorCardsComida
         val maxScroll = (contenedor.width - scroll.width).coerceAtLeast(1)
@@ -427,6 +570,11 @@ class InicioJefaActivity : AppCompatActivity() {
     private fun centrarTarjeta(index: Int, suave: Boolean = true) {
         val scroll = binding.scrollMenusAsignados
         val contenedor = binding.layoutContenedorCardsComida
+        val visibles = tarjetasComida.filter { it.visibility == View.VISIBLE }
+        if (visibles.size <= 2) {
+            actualizarEscalaCarrusel()
+            return
+        }
         scroll.post {
             val maxScroll = (contenedor.width - scroll.width).coerceAtLeast(1)
             val destinoX = (index * maxScroll / 2.0).toInt()
@@ -461,6 +609,8 @@ class InicioJefaActivity : AppCompatActivity() {
 
         binding.btnNotificacionesJefa.setOnClickListener {
             val notifs = NotificacionesJefaManager.obtenerNotificacionesSede(this)
+            NotificacionesJefaManager.marcarTodasComoLeidas(this)
+            actualizarBadgeNotificaciones()
 
             val popupBinding = com.example.movilmanupuladora.databinding.PopupNotificacionesBinding.inflate(layoutInflater)
             popupBinding.txtCantidadNotificaciones.text = notifs.size.toString()
@@ -561,6 +711,10 @@ class InicioJefaActivity : AppCompatActivity() {
                 startActivity(Intent(this, HistorialNotificacionesJefaActivity::class.java))
             }
 
+            dialog.setOnDismissListener {
+                actualizarBadgeNotificaciones()
+            }
+
             dialog.show()
         }
     }
@@ -576,11 +730,29 @@ class InicioJefaActivity : AppCompatActivity() {
         }
 
         binding.txtRacionesTotales.text = guardados.toString()
-        binding.txtMenusActivos.text = "3"
+        binding.txtMenusActivos.text = SedeContratoManager.obtenerSeccionesActivas(this).ifEmpty { setOf("Desayuno") }.size.toString()
 
         val idSede = sessionManager.getSedeId().takeIf { it > 0 }
         val cantManipuladoras = ManipuladorasManager.obtenerManipuladorasSede(idSede, sessionManager.getSedeNombre(), this).size
         binding.txtCantManipuladoras.text = cantManipuladoras.toString()
+        actualizarBadgeNotificaciones()
+    }
+
+    private fun actualizarBadgeNotificaciones() {
+        try {
+            val conteo = NotificacionesJefaManager.obtenerCantidadNoLeidas(this)
+            if (conteo > 0) {
+                binding.badgeNotificacionesJefa.visibility = View.VISIBLE
+                binding.badgeNotificacionesJefa.bringToFront()
+                binding.badgeNotificacionesJefa.text = if (conteo > 99) "99+" else conteo.toString()
+            } else {
+                binding.badgeNotificacionesJefa.visibility = View.GONE
+            }
+        } catch (_: Exception) {
+            try {
+                binding.badgeNotificacionesJefa.visibility = View.GONE
+            } catch (_: Exception) { }
+        }
     }
 
     private fun cargarAsistenciaDelBackend() {

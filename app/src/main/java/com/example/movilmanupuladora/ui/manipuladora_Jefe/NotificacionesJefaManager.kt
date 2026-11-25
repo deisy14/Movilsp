@@ -19,7 +19,8 @@ object NotificacionesJefaManager {
         val mensaje: String,
         val fecha: String,
         val categoria: String, // "Equipo", "Inventario", "Preparaciones", "Asistencia"
-        val timestamp: Long = System.currentTimeMillis()
+        val timestamp: Long = System.currentTimeMillis(),
+        var leida: Boolean = false
     )
 
     private val gson = Gson()
@@ -243,5 +244,18 @@ object NotificacionesJefaManager {
 
     fun obtenerCantidadNotificaciones(context: Context): Int {
         return obtenerNotificacionesSede(context).size
+    }
+
+    fun obtenerCantidadNoLeidas(context: Context): Int {
+        val lista = obtenerNotificacionesSede(context)
+        return lista.count { !it.leida }
+    }
+
+    fun marcarTodasComoLeidas(context: Context) {
+        val lista = obtenerNotificacionesSede(context)
+        if (lista.any { !it.leida }) {
+            val actualizadas = lista.map { it.copy(leida = true) }
+            guardarLista(context, actualizadas)
+        }
     }
 }

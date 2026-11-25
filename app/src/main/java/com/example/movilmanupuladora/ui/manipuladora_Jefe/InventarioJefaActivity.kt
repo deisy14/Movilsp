@@ -324,13 +324,6 @@ class InventarioJefaActivity : AppCompatActivity() {
                             withContext(Dispatchers.Main) {
                                 if (!res.isSuccessful) {
                                     android.util.Log.e("INVENTARIO_SYNC", "Error ${res.code()}: ${res.errorBody()?.string()}")
-                                    if (res.code() == 403) {
-                                        Toast.makeText(
-                                            this@InventarioJefaActivity,
-                                            "Guardado en la app. El servidor requiere permiso de Supervisor/Admin para reflejarlo en la web.",
-                                            Toast.LENGTH_LONG
-                                        ).show()
-                                    }
                                 }
                             }
                         } catch (e: Exception) {

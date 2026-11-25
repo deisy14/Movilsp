@@ -114,12 +114,12 @@ object RetrofitClient {
     }
 
     /**
-     * Cliente HTTP con tiempos de espera y autenticación.
+     * Cliente HTTP con tiempos de espera holgados para soportar arranque en frío de Render y autenticación.
      */
     private val client = OkHttpClient.Builder()
-        .connectTimeout(45, TimeUnit.SECONDS)
-        .readTimeout(45, TimeUnit.SECONDS)
-        .writeTimeout(45, TimeUnit.SECONDS)
+        .connectTimeout(120, TimeUnit.SECONDS)
+        .readTimeout(120, TimeUnit.SECONDS)
+        .writeTimeout(120, TimeUnit.SECONDS)
         .addInterceptor(logging)
         .addInterceptor(authInterceptor)
         .build()
@@ -143,4 +143,26 @@ object RetrofitClient {
         .addConverterFactory(GsonConverterFactory.create(gson))
         .build()
         .create(ApiService::class.java)
+
+    /**
+     * Envía una petición GET ligera en segundo plano para precalentar Render
+     * y despertar el contenedor antes de que el usuario presione ingresar.
+     */
+    fun despertarBackend() {
+        try {
+            val request = okhttp3.Request.Builder()
+                .url(BASE_URL)
+                .get()
+                .build()
+
+            client.newCall(request).enqueue(object : okhttp3.Callback {
+                override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
+                    // Silencioso: solo nos interesa que la petición llegue al balanceador de Render
+                }
+                override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+                    response.close()
+                }
+            })
+        } catch (_: Throwable) { }
+    }
 }

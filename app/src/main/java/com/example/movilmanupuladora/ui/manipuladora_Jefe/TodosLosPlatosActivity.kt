@@ -19,6 +19,7 @@ import com.example.movilmanupuladora.data.repository.MenuRepository
 import com.example.movilmanupuladora.databinding.ActivityTodosLosPlatosBinding
 import com.example.movilmanupuladora.databinding.DialogDetallePlatoBinding
 import com.example.movilmanupuladora.utils.PreparacionSyncManager
+import com.example.movilmanupuladora.utils.SedeContratoManager
 import com.example.movilmanupuladora.utils.SessionManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -195,15 +196,10 @@ class TodosLosPlatosActivity : AppCompatActivity() {
             pintarBoton(dialogBinding.btnAsignarAlmuerzoModal, "Almuerzo", esAlmuerzo, platoAlmuerzo)
             pintarBoton(dialogBinding.btnAsignarMeriendaModal, "Merienda", esMerienda, platoMerienda)
 
-            val sedeTexto = sessionManager.getSedeNombre().orEmpty().lowercase()
-            val esSoloDesayuno = sedeTexto.contains("piagua")
-            if (esSoloDesayuno) {
-                dialogBinding.btnAsignarAlmuerzoModal.visibility = View.GONE
-                dialogBinding.btnAsignarMeriendaModal.visibility = View.GONE
-            } else {
-                dialogBinding.btnAsignarAlmuerzoModal.visibility = View.VISIBLE
-                dialogBinding.btnAsignarMeriendaModal.visibility = View.VISIBLE
-            }
+            val secciones = SedeContratoManager.obtenerSeccionesActivas(this)
+            dialogBinding.btnAsignarDesayunoModal.visibility = if (secciones.isEmpty() || secciones.contains("Desayuno")) View.VISIBLE else View.GONE
+            dialogBinding.btnAsignarAlmuerzoModal.visibility = if (secciones.contains("Almuerzo")) View.VISIBLE else View.GONE
+            dialogBinding.btnAsignarMeriendaModal.visibility = if (secciones.contains("Merienda")) View.VISIBLE else View.GONE
 
             // Texto informativo del estado
             when {
@@ -275,7 +271,7 @@ class TodosLosPlatosActivity : AppCompatActivity() {
                             fecha = fechaSeleccionada
                         )
                     }
-                    Toast.makeText(this@TodosLosPlatosActivity, "✓ Plato quitado de $servicio", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@TodosLosPlatosActivity, "Plato quitado de $servicio", Toast.LENGTH_SHORT).show()
                     dialog.dismiss()
                 }
 
@@ -302,7 +298,7 @@ class TodosLosPlatosActivity : AppCompatActivity() {
                                 fecha = fechaSeleccionada
                             )
                         }
-                        Toast.makeText(this@TodosLosPlatosActivity, "✓ Plato asignado a $servicio", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@TodosLosPlatosActivity, "Plato asignado a $servicio", Toast.LENGTH_SHORT).show()
                         dialog.dismiss()
                     }
                     .setNegativeButton("Cancelar", null)
@@ -320,7 +316,7 @@ class TodosLosPlatosActivity : AppCompatActivity() {
                     fecha = fechaSeleccionada
                 )
             }
-            Toast.makeText(this, "✓ Plato asignado a $servicio", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Plato asignado a $servicio", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
         }
 
