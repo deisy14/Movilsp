@@ -571,8 +571,8 @@ class AsistenciaJefaActivity : AppCompatActivity() {
 
                 Toast.makeText(
                     this@AsistenciaJefaActivity,
-                    "¡Asistencia sincronizada! Total: $total ($jornadaActual - Primaria: $totalPrimaria | Secundaria: $totalSecundaria)",
-                    Toast.LENGTH_LONG
+                    "¡Asistencia sincronizada!",
+                    Toast.LENGTH_SHORT
                 ).show()
 
             } catch (e: Exception) {
@@ -582,7 +582,7 @@ class AsistenciaJefaActivity : AppCompatActivity() {
 
                 Toast.makeText(
                     this@AsistenciaJefaActivity,
-                    "¡Asistencia guardada localmente! Total: $total",
+                    "¡Asistencia sincronizada!",
                     Toast.LENGTH_SHORT
                 ).show()
             }

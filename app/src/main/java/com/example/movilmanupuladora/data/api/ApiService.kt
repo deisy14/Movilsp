@@ -245,6 +245,21 @@ interface ApiService {
         @Body request: com.example.movilmanupuladora.data.model.ConfirmarRecepcionRequest
     ): Response<JsonObject>
 
+    // Contratos y Secciones de Menú asignadas a la sede
+    @GET("contratos/")
+    suspend fun obtenerContratos(): Response<List<com.example.movilmanupuladora.data.model.ContratoModel>>
+
+    @GET("contratos-secciones-menu/")
+    suspend fun obtenerContratosSeccionesMenu(): Response<List<com.example.movilmanupuladora.data.model.ContratoSeccionMenuModel>>
+
+    @GET("contratos/{id}/distribucion/")
+    suspend fun obtenerDistribucionContrato(
+        @retrofit2.http.Path("id") id: Int
+    ): Response<com.google.gson.JsonElement>
+
+    @GET("distribucion-cupos/")
+    suspend fun obtenerDistribucionCupos(): Response<com.google.gson.JsonElement>
+
     // =========================================================
     // RECONOCIMIENTO FACIAL BIOMÉTRICO (SIRAE)
     // =========================================================

@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FAF9F5"
-    android:fitsSystemWindows="true"
+    android:fitsSystemWindows="false"
     android:orientation="vertical"
     tools:context=".ui.manipuladora_Jefe.PlanificacionSemanalJefaActivity">
 
@@ -15,7 +15,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="0dp"
         android:paddingHorizontal="20dp">
 
         <com.google.android.material.card.MaterialCardView
@@ -71,46 +71,6 @@
             android:paddingHorizontal="20dp"
             android:paddingTop="12dp"
             android:paddingBottom="24dp">
-
-            <!-- BADGE SEDE Y JORNADA ACTIVA -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardSedeJornada"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                app:cardBackgroundColor="#FEF3C7"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:strokeColor="#FDE68A"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingHorizontal="14dp"
-                    android:paddingVertical="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="🏫"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:id="@+id/txtSedeJornadaInfo"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_weight="1"
-                        android:text="Sede Piagua · Solo Jornada Mañana (Desayuno)"
-                        android:textColor="#92400E"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
 
             <!-- ALERTA DE ESTADO O PLATO DEVUELTO POR SUPERVISOR -->
             <com.google.android.material.card.MaterialCardView
@@ -421,6 +381,79 @@
 
                 </LinearLayout>
 
+                <!-- BOTONES DE SECCIONES HORIZONTALES AMARILLOS (DESAYUNO, ALMUERZO, MERIENDA) -->
+                <LinearLayout
+                    android:id="@+id/layoutSelectorSeccionesIA"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="4dp"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                    android:weightSum="3">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSeccionDesayuno"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="#F4B41F"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:padding="0dp"
+                        android:text="Desayuno"
+                        android:textAllCaps="false"
+                        android:textColor="#1E293B"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:cornerRadius="20dp"
+                        app:elevation="0dp"
+                        app:strokeColor="#F59E0B"
+                        app:strokeWidth="1dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSeccionAlmuerzo"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="#FEF3C7"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:padding="0dp"
+                        android:text="Almuerzo"
+                        android:textAllCaps="false"
+                        android:textColor="#92400E"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:cornerRadius="20dp"
+                        app:elevation="0dp"
+                        app:strokeColor="#FDE68A"
+                        app:strokeWidth="1dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSeccionMerienda"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="#FEF3C7"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:padding="0dp"
+                        android:text="Merienda"
+                        android:textAllCaps="false"
+                        android:textColor="#92400E"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:cornerRadius="20dp"
+                        app:elevation="0dp"
+                        app:strokeColor="#FDE68A"
+                        app:strokeWidth="1dp" />
+
+                </LinearLayout>
+
                 <!-- CARRUSEL DISCOS DE PLATOS CON BOTONES ANTERIOR / SIGUIENTE -->
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -517,11 +550,12 @@
                     app:cornerRadius="14dp"
                     app:elevation="2dp" />
 
-                <!-- TARJETA DE INGREDIENTES CALCULADOS CON IA -->
+                <!-- TARJETA DE INGREDIENTES CALCULADOS CON IA (OCULTA EN PRINCIPAL, SE MUESTRA EN MODAL AL TOCAR PLATO) -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
+                    android:visibility="gone"
                     app:cardBackgroundColor="#FFFFFF"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="2dp"
@@ -740,7 +774,7 @@
                 android:layout_height="52dp"
                 android:layout_marginBottom="28dp"
                 android:backgroundTint="#166534"
-                android:text="📤 Enviar programación al supervisor"
+                android:text="Enviar programación al supervisor"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp"

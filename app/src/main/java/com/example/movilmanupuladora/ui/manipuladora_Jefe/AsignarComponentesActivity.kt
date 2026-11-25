@@ -420,7 +420,7 @@ class AsignarComponentesActivity : AppCompatActivity() {
 
             Toast.makeText(
                 this@AsignarComponentesActivity,
-                "✓ Asignación de $servicioActual guardada correctamente",
+                "Asignación de $servicioActual guardada correctamente",
                 Toast.LENGTH_SHORT
             ).show()
         }

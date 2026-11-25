@@ -21,6 +21,9 @@ import com.example.movilmanupuladora.databinding.ActivityLoginBinding
 import com.example.movilmanupuladora.ui.manipuladora.TurnoActivity
 import com.example.movilmanupuladora.ui.manipuladora_Jefe.InicioJefaActivity
 import com.example.movilmanupuladora.utils.SessionManager
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
@@ -103,6 +106,7 @@ class LoginActivity : AppCompatActivity() {
         UsuarioRepository(RetrofitClient.apiService)
 
     private lateinit var sessionManager: SessionManager
+    private var jobAnimacionCargando: Job? = null
 
     private val recuperarPasswordLauncher = registerForActivityResult(
         androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
@@ -153,6 +157,9 @@ class LoginActivity : AppCompatActivity() {
 
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Precalentar silenciosamente el backend de Render mientras el usuario escribe sus credenciales
+        RetrofitClient.despertarBackend()
 
         sessionManager = SessionManager(this)
 
@@ -536,8 +543,7 @@ class LoginActivity : AppCompatActivity() {
                         ignoreCase = true
                     ) == true
                 ) {
-                    "El servidor está tardando en responder. " +
-                            "Comprueba la conexión e inténtalo nuevamente."
+                    "Comprueba la conexión e inténtalo nuevamente."
                 } else {
                     "Error de red: " +
                             (e.localizedMessage
@@ -563,7 +569,6 @@ class LoginActivity : AppCompatActivity() {
 
         if (cargando) {
 
-            binding.btnIngresar.text = "Ingresando..."
             binding.btnIngresar.icon = null
 
             binding.txtCorreo.isEnabled = false
@@ -572,7 +577,22 @@ class LoginActivity : AppCompatActivity() {
             binding.txtAdministrador.isEnabled = false
             binding.layoutAdminContacto.isEnabled = false
 
+            // Animación de puntos en el botón: "Ingresando." -> "Ingresando.." -> "Ingresando..."
+            jobAnimacionCargando?.cancel()
+            jobAnimacionCargando = lifecycleScope.launch {
+                val estados = listOf("Ingresando.", "Ingresando..", "Ingresando...")
+                var index = 0
+                while (isActive) {
+                    binding.btnIngresar.text = estados[index]
+                    index = (index + 1) % estados.size
+                    delay(600)
+                }
+            }
+
         } else {
+
+            jobAnimacionCargando?.cancel()
+            jobAnimacionCargando = null
 
             binding.btnIngresar.text = "Ingresar"
 
@@ -623,5 +643,11 @@ class LoginActivity : AppCompatActivity() {
         super.onResume()
         val insetsController = WindowCompat.getInsetsController(window, window.decorView)
         insetsController.isAppearanceLightStatusBars = true
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        jobAnimacionCargando?.cancel()
+        jobAnimacionCargando = null
     }
 }

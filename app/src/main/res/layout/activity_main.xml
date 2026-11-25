@@ -341,7 +341,7 @@
                                 android:layout_height="match_parent"
                                 android:contentDescription="Desayuno"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/comida_desayuno"
+                                android:src="@drawable/plato1"
                                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full" />
 
                         </com.google.android.material.card.MaterialCardView>
@@ -388,7 +388,7 @@
                                 android:layout_height="match_parent"
                                 android:contentDescription="Merienda"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/comida_merienda"
+                                android:src="@drawable/plato3"
                                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full" />
 
                         </com.google.android.material.card.MaterialCardView>
@@ -815,7 +815,7 @@
                                 android:layout_height="match_parent"
                                 android:contentDescription="Desayuno"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/comida_desayuno" />
+                                android:src="@drawable/plato1" />
 
                         </com.google.android.material.card.MaterialCardView>
 
@@ -902,7 +902,7 @@
                                 android:layout_height="match_parent"
                                 android:contentDescription="Merienda"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/comida_merienda" />
+                                android:src="@drawable/plato3" />
 
                         </com.google.android.material.card.MaterialCardView>
 

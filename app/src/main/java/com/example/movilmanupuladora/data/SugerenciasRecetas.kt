@@ -145,8 +145,29 @@ data class SugerenciaIAItem(
     val etiqueta: String? = null,
 
     @SerializedName("viable_con_inventario")
-    val viableConInventario: Boolean = true
-)
+    val viableConInventario: Boolean = true,
+
+    @SerializedName("imagen_url")
+    val imagenUrl: String? = null,
+
+    @SerializedName("imagen")
+    val imagen: String? = null,
+
+    @SerializedName("imagen_prompt")
+    val imagenPrompt: String? = null
+) {
+    fun obtenerUrlImagenReal(): String {
+        val url = imagenUrl?.takeIf { it.isNotBlank() } ?: imagen?.takeIf { it.isNotBlank() }
+        if (!url.isNullOrBlank() && (url.startsWith("http://") || url.startsWith("https://")) &&
+            !url.contains("plato1") && !url.contains("plato2") && !url.contains("plato3")) {
+            return url
+        }
+        val limpio = nombrePlato.replace("Sugerencia IA:", "").replace("Menú:", "").replace("Receta:", "").trim()
+        val seed = Math.abs(limpio.hashCode() + idSeccion * 31)
+        val prompt = "delicious appetizing Colombian $seccionNombre: $limpio, school meal balanced platter, professional gourmet food photography, fresh ingredients, studio lighting, top view, ultra detailed 4k"
+        return "https://image.pollinations.ai/prompt/" + android.net.Uri.encode(prompt) + "?width=600&height=600&nologo=true&seed=$seed"
+    }
+}
 
 data class SugerenciasRecetasResponse(
     @SerializedName("status")

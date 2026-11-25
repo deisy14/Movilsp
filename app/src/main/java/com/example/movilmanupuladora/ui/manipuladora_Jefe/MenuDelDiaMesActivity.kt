@@ -26,6 +26,7 @@ import com.example.movilmanupuladora.databinding.ActivityMenuDelDiaMesBinding
 import com.example.movilmanupuladora.databinding.DialogDetallePlatoBinding
 import com.example.movilmanupuladora.databinding.ItemPlatoCatalogoBinding
 import com.example.movilmanupuladora.utils.PreparacionSyncManager
+import com.example.movilmanupuladora.utils.SedeContratoManager
 import com.example.movilmanupuladora.utils.SessionManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
@@ -286,40 +287,29 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
                         val isToday = esMismoDia(calDiaActual, Calendar.getInstance())
                         val isPast = calDiaActual.before(hoyCero)
                         val isSelected = esMismoDia(calDiaActual, diaSeleccionado)
-                        val esCompleto = esDiaCompletoProgramado(calDiaActual)
 
                         when {
-                            isToday -> {
+                            isSelected -> {
                                 txtDia.setBackgroundResource(R.drawable.circulo_amarillo_badge)
                                 txtDia.setTextColor(Color.parseColor("#1E293B"))
                                 txtDia.typeface = android.graphics.Typeface.DEFAULT_BOLD
                             }
                             isPast -> {
-                                // Días anteriores al 14 (hoy): siempre círculo punteado
-                                txtDia.setBackgroundResource(R.drawable.bg_date_selected)
-                                txtDia.setTextColor(Color.parseColor("#7A5500"))
-                                txtDia.typeface = android.graphics.Typeface.DEFAULT_BOLD
-                            }
-                            isSelected -> {
-                                if (esCompleto) {
-                                    txtDia.setBackgroundResource(R.drawable.bg_pill_green)
-                                    txtDia.setTextColor(Color.parseColor("#2A5226"))
-                                } else {
-                                    txtDia.setBackgroundResource(R.drawable.circulo_amarillo_badge)
-                                    txtDia.setTextColor(Color.parseColor("#1E293B"))
-                                }
-                                txtDia.typeface = android.graphics.Typeface.DEFAULT_BOLD
-                            }
-                            esCompleto -> {
-                                // Día futuro con todos sus momentos programados: VERDE
+                                // Días anteriores: bolita verde rellena (reemplaza círculos punteados)
                                 txtDia.setBackgroundResource(R.drawable.bg_pill_green)
                                 txtDia.setTextColor(Color.parseColor("#2A5226"))
                                 txtDia.typeface = android.graphics.Typeface.DEFAULT_BOLD
                             }
-                            else -> {
-                                txtDia.setBackgroundColor(Color.TRANSPARENT)
+                            isToday -> {
+                                txtDia.setBackgroundResource(R.drawable.circulo_amarillo_badge)
                                 txtDia.setTextColor(Color.parseColor("#1E293B"))
-                                txtDia.typeface = android.graphics.Typeface.DEFAULT
+                                txtDia.typeface = android.graphics.Typeface.DEFAULT_BOLD
+                            }
+                            else -> {
+                                // Días posteriores: circulitos grises
+                                txtDia.setBackgroundResource(R.drawable.bg_pill_gray)
+                                txtDia.setTextColor(Color.parseColor("#64748B"))
+                                txtDia.typeface = android.graphics.Typeface.DEFAULT_BOLD
                             }
                         }
 
@@ -356,15 +346,14 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
 
     private fun esDiaCompletoProgramado(cal: Calendar): Boolean {
         val fStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(cal.time)
-        val des = sessionManager.getPlatoDiaServicio(this, fStr, "Desayuno")
-        val sedeTexto = sessionManager.getSedeNombre().orEmpty().lowercase()
-        val esSoloDesayuno = sedeTexto.contains("piagua")
-        if (esSoloDesayuno) {
+        val secciones = SedeContratoManager.obtenerSeccionesActivas(this)
+        if (secciones.isEmpty()) {
+            val des = sessionManager.getPlatoDiaServicio(this, fStr, "Desayuno")
             return !des.isNullOrBlank()
         }
-        val alm = sessionManager.getPlatoDiaServicio(this, fStr, "Almuerzo")
-        val mer = sessionManager.getPlatoDiaServicio(this, fStr, "Merienda")
-        return !des.isNullOrBlank() && !alm.isNullOrBlank() && !mer.isNullOrBlank()
+        return secciones.all { serv ->
+            !sessionManager.getPlatoDiaServicio(this, fStr, serv).isNullOrBlank()
+        }
     }
 
     // =========================================================
@@ -386,42 +375,8 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
         val esPasado = calDiaSelCero.before(hoyCero)
         val menuDia = MenuPaeCatalog.obtenerMenuDiaCompleto(diaSeleccionado)
 
-        // 0. ASISTENCIA DEL DÍA POR GRADO
-        val detalleAsist = AsistenciaManager.obtenerDetalleGradosFecha(this, fechaClave)
-        val totalAsist = AsistenciaManager.obtenerTotalFecha(this, fechaClave)
-        val nombreSedeActual = SessionManager(this).getSedeNombre() ?: "Sede"
-        binding.txtTituloAsistencia.text = "👥 Asistencia del Día ($nombreSedeActual)"
-
-        if (totalAsist > 0) {
-            binding.cardAsistenciaDia.visibility = View.VISIBLE
-            binding.txtTotalAsistenciaDia.text = "$totalAsist niños presentes"
-            binding.txtTotalAsistenciaDia.setBackgroundResource(R.drawable.bg_pill_green)
-            binding.txtTotalAsistenciaDia.setTextColor(Color.parseColor("#2A5226"))
-
-            val partes = mutableListOf<String>()
-            detalleAsist["p1"]?.takeIf { it.isNotBlank() }?.let { partes.add("1°: $it") }
-            detalleAsist["p2"]?.takeIf { it.isNotBlank() }?.let { partes.add("2°: $it") }
-            detalleAsist["p4"]?.takeIf { it.isNotBlank() }?.let { partes.add("4°: $it") }
-            detalleAsist["p5"]?.takeIf { it.isNotBlank() }?.let { partes.add("5°: $it") }
-            detalleAsist["s6"]?.takeIf { it.isNotBlank() }?.let { partes.add("6°: $it") }
-            val textoGrados = if (partes.isNotEmpty()) partes.joinToString(" | ") else "Asistencia registrada por manipuladora"
-            binding.txtDetalleGradosAsistenciaDia.text = textoGrados
-            binding.txtDetalleGradosAsistenciaDia.setTextColor(Color.parseColor("#334155"))
-        } else if (esPasado) {
-            binding.cardAsistenciaDia.visibility = View.VISIBLE
-            binding.txtTotalAsistenciaDia.text = "Sin registro"
-            binding.txtTotalAsistenciaDia.setBackgroundResource(R.drawable.bg_date_selected)
-            binding.txtTotalAsistenciaDia.setTextColor(Color.parseColor("#854D0E"))
-            binding.txtDetalleGradosAsistenciaDia.text = "No se reportó asistencia de estudiantes en esta fecha"
-            binding.txtDetalleGradosAsistenciaDia.setTextColor(Color.parseColor("#64748B"))
-        } else {
-            binding.cardAsistenciaDia.visibility = View.VISIBLE
-            binding.txtTotalAsistenciaDia.text = "Pendiente registro"
-            binding.txtTotalAsistenciaDia.setBackgroundResource(R.drawable.bg_date_selected)
-            binding.txtTotalAsistenciaDia.setTextColor(Color.parseColor("#854D0E"))
-            binding.txtDetalleGradosAsistenciaDia.text = "La manipuladora reportará la asistencia durante la jornada"
-            binding.txtDetalleGradosAsistenciaDia.setTextColor(Color.parseColor("#64748B"))
-        }
+        // 0. ASISTENCIA DEL DÍA (Oculta según diseño requerido)
+        binding.cardAsistenciaDia.visibility = View.GONE
 
         // 1. DESAYUNO
         if (!customDes.isNullOrBlank()) {
@@ -549,15 +504,10 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
             binding.badgeEstadoMerienda.setTextColor(Color.parseColor("#64748B"))
         }
 
-        val sedeTexto = sessionManager.getSedeNombre().orEmpty().lowercase()
-        val esSoloDesayuno = sedeTexto.contains("piagua")
-        if (esSoloDesayuno) {
-            binding.cardDetalleAlmuerzo.visibility = View.GONE
-            binding.cardDetalleMerienda.visibility = View.GONE
-        } else {
-            binding.cardDetalleAlmuerzo.visibility = View.VISIBLE
-            binding.cardDetalleMerienda.visibility = View.VISIBLE
-        }
+        val secciones = SedeContratoManager.obtenerSeccionesActivas(this)
+        binding.cardDetalleDesayuno.visibility = if (secciones.isEmpty() || secciones.contains("Desayuno")) View.VISIBLE else View.GONE
+        binding.cardDetalleAlmuerzo.visibility = if (secciones.contains("Almuerzo")) View.VISIBLE else View.GONE
+        binding.cardDetalleMerienda.visibility = if (secciones.contains("Merienda")) View.VISIBLE else View.GONE
 
         actualizarBotonSecuenciaSemana()
     }
@@ -626,8 +576,8 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
             val numDia = diaSeleccionado.get(Calendar.DAY_OF_MONTH)
 
             if (!diaActualCompleto && dayOfWeek in Calendar.MONDAY..Calendar.FRIDAY) {
-                val sedeTexto = sessionManager.getSedeNombre().orEmpty().lowercase()
-                val faltantes = if (sedeTexto.contains("piagua")) "el Desayuno" else "Desayuno, Almuerzo y Merienda"
+                val secciones = SedeContratoManager.obtenerSeccionesActivas(this)
+                val faltantes = if (secciones.isNotEmpty()) secciones.joinToString(" y ") else "Desayuno"
                 binding.btnPlanificarSemanaSiguiente.text = "Programar $faltantes de $nombreDia $numDia"
             } else {
                 binding.btnPlanificarSemanaSiguiente.text = "Planificar toda la semana siguiente"
@@ -822,12 +772,11 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
     // =========================================================
 
     private fun mostrarDialogoSeleccionarPlato(servicio: String) {
-        val sedeTexto = sessionManager.getSedeNombre().orEmpty().lowercase()
-        val esSoloDesayuno = sedeTexto.contains("piagua")
-        if (esSoloDesayuno && !servicio.equals("Desayuno", ignoreCase = true)) {
+        val secciones = SedeContratoManager.obtenerSeccionesActivas(this)
+        if (secciones.isNotEmpty() && !secciones.any { it.equals(servicio, ignoreCase = true) }) {
             MaterialAlertDialogBuilder(this)
                 .setTitle("Servicio no autorizado")
-                .setMessage("La Sede Piagua opera exclusivamente para el servicio de Desayuno.")
+                .setMessage("Esta sede no tiene asignado el servicio de $servicio en su contrato.")
                 .setPositiveButton("Entendido", null)
                 .show()
             return
@@ -925,7 +874,7 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
                     )
                 }
 
-                Toast.makeText(this@MenuDelDiaMesActivity, "✓ $servicio programado: ${plato.nombre}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MenuDelDiaMesActivity, "$servicio programado: ${plato.nombre}", Toast.LENGTH_SHORT).show()
                 actualizarDetallePlatos()
                 generarGridMes()
                 dialogRef?.dismiss()

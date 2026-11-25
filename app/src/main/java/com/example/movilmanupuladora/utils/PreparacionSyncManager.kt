@@ -153,7 +153,12 @@ object PreparacionSyncManager {
                         t.observaciones?.contains("merienda", ignoreCase = true) == true -> "Merienda"
                         else -> "Desayuno"
                     }
-                    val key = "$uid:$servTag"
+                    val compName = if (parts.size >= 4) {
+                        parts.subList(3, parts.size).joinToString(":").trim().lowercase()
+                    } else {
+                        parts.subList(2, parts.size).joinToString(":").trim().lowercase()
+                    }
+                    val key = "$uid:$servTag:$compName"
                     val actual = turnosPorUsuarioYServicio[key]
                     if (actual == null || (t.obtenerIdReal() ?: 0) > (actual.obtenerIdReal() ?: 0)) {
                         turnosPorUsuarioYServicio[key] = t

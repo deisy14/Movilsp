@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.movilmanupuladora.databinding.ItemSugerenciaIaBinding
+import com.example.movilmanupuladora.utils.ImageLoaderUtil
 
 class SugerenciaIaAdapter(
     private val listaPlatos: List<InicioJefaActivity.Plato>,
@@ -29,7 +30,8 @@ class SugerenciaIaAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val plato = listaPlatos[position]
-        holder.binding.imgPlatoCarousel.setImageResource(plato.imagen)
+        val fallback = if (plato.imagen != 0) plato.imagen else com.example.movilmanupuladora.R.drawable.bg_placeholder_plato_ia
+        ImageLoaderUtil.cargarImagen(holder.binding.imgPlatoCarousel, plato.imagenUrl, fallback)
         holder.binding.tvNombrePlatoCarousel.text = plato.nombre
 
         val esEsteServicio = platoSeleccionadoActual != null &&
@@ -57,6 +59,12 @@ class SugerenciaIaAdapter(
         }
 
         holder.binding.cardPlatoContenedor.setOnClickListener {
+            onItemClick(plato)
+        }
+        holder.binding.imgPlatoCarousel.setOnClickListener {
+            onItemClick(plato)
+        }
+        holder.binding.tvNombrePlatoCarousel.setOnClickListener {
             onItemClick(plato)
         }
         holder.itemView.setOnClickListener {

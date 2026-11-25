@@ -674,11 +674,6 @@ class ManipuladorasAsignadasActivity : AppCompatActivity() {
     }
 
     private fun mostrarDialogoAgregar() {
-        if (manipuladoras.size >= 3) {
-            Toast.makeText(this, "Máximo 3 manipuladoras", Toast.LENGTH_SHORT).show()
-            return
-        }
-
         // Obtener manipuladoras del Manager que no estén ya en la lista
         val disponibles: List<String> = ManipuladorasManager.obtenerManipuladoras()
             .filter { m -> manipuladoras.none { it.correo == m.correo && it.nombre == m.nombre } }

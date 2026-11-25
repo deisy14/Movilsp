@@ -385,7 +385,7 @@ class RegistrarEntregaActivity : AppCompatActivity() {
     }
 
     private fun notificarSupervisorRechazo(motivo: String) {
-        val sedeNombre = sessionManager.getSedeNombre() ?: "Sede Piagua"
+        val sedeNombre = sessionManager.getSedeNombre() ?: "Sede"
         lifecycleScope.launch {
             try {
                 // Confirmar rechazo en el backend para cada ítem en tránsito
@@ -464,7 +464,7 @@ class RegistrarEntregaActivity : AppCompatActivity() {
 
         val obs = binding.edtObservacionesEntrega.text.toString().trim()
             .ifEmpty { "Víveres verificados y acta firmada en sede escolar." }
-        val sedeNombre = sessionManager.getSedeNombre() ?: "Sede Piagua"
+        val sedeNombre = sessionManager.getSedeNombre() ?: "Sede"
 
         val faltantesConNovedad = listaIngredientesDespacho.filter { it.tieneNovedad && it.cantidadFaltante > 0 }
         val tieneNovedades = faltantesConNovedad.isNotEmpty()

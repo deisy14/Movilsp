@@ -64,28 +64,52 @@
         </LinearLayout>
 
         <!-- NOTIFICACIONES (BLANCO) -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/btnNotificacionesJefa"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:layout_marginEnd="8dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
-            app:cardBackgroundColor="#FFFFFF"
-            app:cardCornerRadius="22dp"
-            app:cardElevation="3dp"
-            app:strokeWidth="0dp">
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:layout_marginEnd="8dp">
 
-            <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:layout_gravity="center"
-                android:contentDescription="Notificaciones"
-                android:src="@drawable/ic_notificaciones"
-                app:tint="#1B3317" />
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnNotificacionesJefa"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="3dp"
+                app:strokeWidth="0dp">
 
-        </com.google.android.material.card.MaterialCardView>
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="Notificaciones"
+                    android:src="@drawable/ic_notificaciones"
+                    app:tint="#1B3317" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/badgeNotificacionesJefa"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="-2dp"
+                android:layout_marginEnd="-2dp"
+                android:elevation="8dp"
+                android:translationZ="8dp"
+                android:background="@drawable/bg_badge_notificacion"
+                android:gravity="center"
+                android:textColor="#FFFFFF"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+        </FrameLayout>
 
         <!-- PERFIL DE LA JEFA (BLANCO) -->
         <com.google.android.material.card.MaterialCardView
@@ -427,14 +451,15 @@
 
                 </LinearLayout>
 
-                <!-- TÍTULO SECCIÓN MENÚS ASIGNADOS -->
+                <!-- TÍTULO SECCIÓN MENÚS SELECCIONADOS -->
                 <TextView
+                    android:id="@+id/txtTituloMenusSeleccionados"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
-                    android:text="Menús asignados a las manipuladoras"
+                    android:text="Menús seleccionados"
                     android:textColor="#1E293B"
-                    android:textSize="16sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <!-- SCROLL HORIZONTAL DE TARJETAS DE MENÚS (DESAYUNO, ALMUERZO, MERIENDA) -->
@@ -445,16 +470,17 @@
                     android:layout_marginTop="8dp"
                     android:clipChildren="false"
                     android:clipToPadding="false"
+                    android:fillViewport="true"
                     android:paddingVertical="12dp"
                     android:overScrollMode="never"
                     android:scrollbars="none">
 
                     <LinearLayout
                         android:id="@+id/layoutContenedorCardsComida"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:clipChildren="false"
-                        android:gravity="center_vertical"
+                        android:gravity="center"
                         android:orientation="horizontal"
                         android:paddingHorizontal="4dp">
 
@@ -464,63 +490,78 @@
                             android:layout_width="180dp"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="12dp"
-                            android:background="@drawable/bg_card_desayuno"
+                            android:background="@drawable/bg_card_menu_seleccionado"
                             android:clickable="true"
                             android:elevation="1dp"
                             android:focusable="true"
                             android:orientation="vertical"
-                            android:padding="14dp">
+                            android:padding="16dp">
+
+                            <TextView
+                                android:id="@+id/txtTituloCardDesayuno"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Desayuno"
+                                android:textColor="#1E293B"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/badgeEstadoDesayuno"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:background="@drawable/bg_chip_pendiente"
+                                android:paddingHorizontal="10dp"
+                                android:paddingVertical="3dp"
+                                android:text="Pendiente"
+                                android:textColor="#92400E"
+                                android:textSize="11sp"
+                                android:textStyle="bold" />
 
                             <com.google.android.material.imageview.ShapeableImageView
                                 android:id="@+id/imgDesayuno"
                                 android:layout_width="match_parent"
                                 android:layout_height="110dp"
+                                android:layout_marginTop="12dp"
                                 android:scaleType="centerCrop"
                                 android:src="@drawable/plato1"
+                                android:visibility="gone"
                                 app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.MediumComponent" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp"
-                                android:background="@drawable/bg_chip_desayuno"
-                                android:paddingHorizontal="8dp"
-                                android:paddingVertical="3dp"
-                                android:text="Desayuno"
-                                android:textColor="#B45309"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
 
                             <TextView
                                 android:id="@+id/txtNombreDesayuno"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
+                                android:layout_marginTop="12dp"
                                 android:ellipsize="end"
                                 android:maxLines="2"
-                                android:text="Huevos pericos con arroz blanco"
+                                android:text="Sin plato seleccionado"
                                 android:textColor="#1E293B"
-                                android:textSize="14sp"
+                                android:textSize="15sp"
                                 android:textStyle="bold" />
 
                             <TextView
+                                android:id="@+id/lblComponenteDesayuno"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
                                 android:text="Componente"
                                 android:textColor="#64748B"
-                                android:textSize="10sp" />
+                                android:textSize="10sp"
+                                android:visibility="gone" />
 
                             <TextView
                                 android:id="@+id/txtComponenteDesayuno"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="1dp"
+                                android:layout_marginTop="4dp"
                                 android:ellipsize="end"
-                                android:maxLines="1"
-                                android:text="Refresco de avena, huevos pericos, arroz blanco"
-                                android:textColor="#475569"
-                                android:textSize="11sp" />
+                                android:lineSpacingExtra="2dp"
+                                android:maxLines="3"
+                                android:text="La manipuladora jefe aún no ha seleccionado el plato para esta jornada"
+                                android:textColor="#64748B"
+                                android:textSize="12sp" />
 
                         </LinearLayout>
 
@@ -530,63 +571,78 @@
                             android:layout_width="180dp"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="12dp"
-                            android:background="@drawable/bg_card_almuerzo"
+                            android:background="@drawable/bg_card_menu_seleccionado"
                             android:clickable="true"
                             android:elevation="1dp"
                             android:focusable="true"
                             android:orientation="vertical"
-                            android:padding="14dp">
+                            android:padding="16dp">
+
+                            <TextView
+                                android:id="@+id/txtTituloCardAlmuerzo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Almuerzo"
+                                android:textColor="#1E293B"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/badgeEstadoAlmuerzo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:background="@drawable/bg_chip_pendiente"
+                                android:paddingHorizontal="10dp"
+                                android:paddingVertical="3dp"
+                                android:text="Pendiente"
+                                android:textColor="#92400E"
+                                android:textSize="11sp"
+                                android:textStyle="bold" />
 
                             <com.google.android.material.imageview.ShapeableImageView
                                 android:id="@+id/imgAlmuerzo"
                                 android:layout_width="match_parent"
                                 android:layout_height="110dp"
+                                android:layout_marginTop="12dp"
                                 android:scaleType="centerCrop"
                                 android:src="@drawable/plato2"
+                                android:visibility="gone"
                                 app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.MediumComponent" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp"
-                                android:background="@drawable/bg_chip_almuerzo"
-                                android:paddingHorizontal="8dp"
-                                android:paddingVertical="3dp"
-                                android:text=" Almuerzo"
-                                android:textColor="#15803D"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
 
                             <TextView
                                 android:id="@+id/txtNombreAlmuerzo"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
+                                android:layout_marginTop="12dp"
                                 android:ellipsize="end"
                                 android:maxLines="2"
-                                android:text="Pollo en salsa blanca con pasta"
+                                android:text="Sin plato seleccionado"
                                 android:textColor="#1E293B"
-                                android:textSize="14sp"
+                                android:textSize="15sp"
                                 android:textStyle="bold" />
 
                             <TextView
+                                android:id="@+id/lblComponenteAlmuerzo"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
                                 android:text="Componente"
                                 android:textColor="#64748B"
-                                android:textSize="10sp" />
+                                android:textSize="10sp"
+                                android:visibility="gone" />
 
                             <TextView
                                 android:id="@+id/txtComponenteAlmuerzo"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="1dp"
+                                android:layout_marginTop="4dp"
                                 android:ellipsize="end"
-                                android:maxLines="1"
-                                android:text="Jugo de fruta en leche, pollo en salsa blanca, pasta"
-                                android:textColor="#475569"
-                                android:textSize="11sp" />
+                                android:lineSpacingExtra="2dp"
+                                android:maxLines="3"
+                                android:text="La manipuladora jefe aún no ha seleccionado el plato para esta jornada"
+                                android:textColor="#64748B"
+                                android:textSize="12sp" />
 
                         </LinearLayout>
 
@@ -595,63 +651,78 @@
                             android:id="@+id/cardMerienda"
                             android:layout_width="180dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/bg_card_merienda"
+                            android:background="@drawable/bg_card_menu_seleccionado"
                             android:clickable="true"
                             android:elevation="1dp"
                             android:focusable="true"
                             android:orientation="vertical"
-                            android:padding="14dp">
+                            android:padding="16dp">
+
+                            <TextView
+                                android:id="@+id/txtTituloCardMerienda"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Merienda"
+                                android:textColor="#1E293B"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/badgeEstadoMerienda"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:background="@drawable/bg_chip_pendiente"
+                                android:paddingHorizontal="10dp"
+                                android:paddingVertical="3dp"
+                                android:text="Pendiente"
+                                android:textColor="#92400E"
+                                android:textSize="11sp"
+                                android:textStyle="bold" />
 
                             <com.google.android.material.imageview.ShapeableImageView
                                 android:id="@+id/imgMerienda"
                                 android:layout_width="match_parent"
                                 android:layout_height="110dp"
+                                android:layout_marginTop="12dp"
                                 android:scaleType="centerCrop"
                                 android:src="@drawable/plato3"
+                                android:visibility="gone"
                                 app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.MediumComponent" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp"
-                                android:background="@drawable/bg_chip_merienda"
-                                android:paddingHorizontal="8dp"
-                                android:paddingVertical="3dp"
-                                android:text="Merienda"
-                                android:textColor="#BE123C"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
 
                             <TextView
                                 android:id="@+id/txtNombreMerienda"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
+                                android:layout_marginTop="12dp"
                                 android:ellipsize="end"
                                 android:maxLines="2"
-                                android:text="Chocolate en leche con arepa"
+                                android:text="Sin plato seleccionado"
                                 android:textColor="#1E293B"
-                                android:textSize="14sp"
+                                android:textSize="15sp"
                                 android:textStyle="bold" />
 
                             <TextView
+                                android:id="@+id/lblComponenteMerienda"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
                                 android:text="Componente"
                                 android:textColor="#64748B"
-                                android:textSize="10sp" />
+                                android:textSize="10sp"
+                                android:visibility="gone" />
 
                             <TextView
                                 android:id="@+id/txtComponenteMerienda"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="1dp"
+                                android:layout_marginTop="4dp"
                                 android:ellipsize="end"
-                                android:maxLines="1"
-                                android:text="Chocolate en leche, arepa de maíz, banano"
-                                android:textColor="#475569"
-                                android:textSize="11sp" />
+                                android:lineSpacingExtra="2dp"
+                                android:maxLines="3"
+                                android:text="La manipuladora jefe aún no ha seleccionado el plato para esta jornada"
+                                android:textColor="#64748B"
+                                android:textSize="12sp" />
 
                         </LinearLayout>
 
@@ -692,61 +763,7 @@
 
                 </LinearLayout>
 
-                <!-- BANNER IA: SUGERENCIAS INTELIGENTES Y DESCUENTO DE BODEGA -->
-                <LinearLayout
-                    android:id="@+id/bannerSugerenciasIA"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:background="@drawable/bg_banner_amarillo_borde"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="16dp"
-                    android:paddingVertical="14dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="10dp"
-                        android:text="🤖"
-                        android:textSize="22sp" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Asistente IA - Sugerir Menú &amp; Descontar"
-                            android:textColor="#1E293B"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Menús según los 20 del PAE y descuento de bodega"
-                            android:textColor="#B45309"
-                            android:textSize="11sp" />
-
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="›"
-                        android:textColor="#D97706"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
 
                 <!-- SECCIÓN RESUMEN DEL DÍA -->
                 <com.google.android.material.card.MaterialCardView
