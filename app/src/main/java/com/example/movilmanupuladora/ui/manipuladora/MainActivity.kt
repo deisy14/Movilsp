@@ -5,6 +5,8 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -99,16 +101,17 @@ class MainActivity : AppCompatActivity() {
         SessionManager.getToken(this)
 
         val sessionMgr = SessionManager(this)
-        val nombreUser = sessionMgr.getUserName() ?: "María López"
-        binding.tvSaludo.text = nombreUser
+        val nombreUser = sessionMgr.getUserName() ?: "Maria Alejandra Velazco"
+        binding.tvSaludo.text = "Jornada de Servicio PAE"
         val sedeNombre = sessionMgr.getUbicacionCompleta()
-        binding.tvInstitucion.text = sedeNombre
+        findViewById<android.widget.TextView>(R.id.tvInstitucion)?.text = sedeNombre
 
-        val fechaFormatted = SimpleDateFormat(
-            "EEEE / d / MMM / yyyy",
-            Locale.forLanguageTag("es-CO")
-        ).format(Date()).uppercase()
-        binding.tvFecha.text = fechaFormatted
+        val iniciales = nombreUser.split(" ")
+            .filter { it.isNotEmpty() }
+            .take(2)
+            .joinToString("") { it.first().uppercase() }
+            .ifEmpty { "MA" }
+        findViewById<android.widget.TextView>(R.id.tvAvatarIniciales)?.text = iniciales
 
         listaPlatos = platosBaseRespaldo
         listaSecciones = seccionesRespaldo
@@ -126,7 +129,7 @@ class MainActivity : AppCompatActivity() {
             } catch (_: Exception) { }
         }
 
-        binding.btnNotificaciones.setOnClickListener {
+        findViewById<View>(R.id.btnNotificaciones)?.setOnClickListener {
             mostrarPopupNotificaciones()
         }
 
@@ -265,47 +268,93 @@ class MainActivity : AppCompatActivity() {
 
     private fun mostrarPopupNotificaciones() {
         val popupBinding = PopupNotificacionesBinding.inflate(layoutInflater)
-        popupBinding.txtCantidadNotificaciones.text = "3"
+        val anchorView = findViewById<View>(R.id.btnNotificaciones) ?: binding.root
 
-        val dialog = MaterialAlertDialogBuilder(this)
-            .setView(popupBinding.root)
-            .create()
+        // Ocultar el indicador de número al abrir las notificaciones
+        findViewById<View>(R.id.badgeNotificacionesSticky)?.visibility = View.GONE
 
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-
-        popupBinding.notificacionPreparacion.setOnClickListener {
-            dialog.dismiss()
-            val intent = Intent(this, PreparacionActivity::class.java).apply {
-                platoActualSeleccionado?.let { plato ->
-                    putExtra("id_plato", plato.idPlato)
-                    putExtra("nombre_plato", plato.nombrePlato)
-                }
-            }
-            startActivity(intent)
-        }
-
-        popupBinding.notificacionInventario.setOnClickListener {
-            dialog.dismiss()
-            val intent = Intent(this, InventarioActivity::class.java)
-            startActivity(intent)
-        }
-
-        popupBinding.notificacionAsistencia.setOnClickListener {
-            dialog.dismiss()
-            val intent = Intent(this, AsignadasActivity::class.java)
-            startActivity(intent)
+        val popupWindow = android.widget.PopupWindow(
+            popupBinding.root,
+            (320 * resources.displayMetrics.density).toInt(),
+            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+            true
+        ).apply {
+            elevation = 16f
+            setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
         }
 
         popupBinding.btnVerTodasNotificaciones.setOnClickListener {
-            dialog.dismiss()
+            popupWindow.dismiss()
             val intent = Intent(this, AvisosActivity::class.java)
             startActivity(intent)
         }
 
-        dialog.show()
+        popupWindow.showAsDropDown(anchorView, (-240 * resources.displayMetrics.density).toInt(), (8 * resources.displayMetrics.density).toInt())
+
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitClient.apiService.obtenerNotificaciones()
+                if (response.isSuccessful && !response.body().isNullOrEmpty()) {
+                    val notifs = response.body()!!
+                    val noLeidas = notifs.count { it.leido == false }
+                    popupBinding.txtCantidadNotificaciones.text = noLeidas.toString()
+
+                    popupBinding.contenedorNotificaciones.removeAllViews()
+                    for (notif in notifs.take(4)) {
+                        val row = LinearLayout(this@MainActivity).apply {
+                            orientation = LinearLayout.HORIZONTAL
+                            gravity = android.view.Gravity.CENTER_VERTICAL
+                            setPadding(
+                                (12 * resources.displayMetrics.density).toInt(),
+                                (10 * resources.displayMetrics.density).toInt(),
+                                (12 * resources.displayMetrics.density).toInt(),
+                                (10 * resources.displayMetrics.density).toInt()
+                            )
+                        }
+
+                        val tvTitulo = TextView(this@MainActivity).apply {
+                            text = notif.titulo ?: "Aviso PAE"
+                            setTextColor(Color.parseColor("#1E293B"))
+                            textSize = 13f
+                            setTypeface(typeface, android.graphics.Typeface.BOLD)
+                        }
+
+                        val tvMensaje = TextView(this@MainActivity).apply {
+                            text = notif.mensaje ?: ""
+                            setTextColor(Color.parseColor("#64748B"))
+                            textSize = 11.5f
+                        }
+
+                        val textLayout = LinearLayout(this@MainActivity).apply {
+                            orientation = LinearLayout.VERTICAL
+                            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).also {
+                                it.marginStart = (10 * resources.displayMetrics.density).toInt()
+                            }
+                            addView(tvTitulo)
+                            addView(tvMensaje)
+                        }
+
+                        row.addView(textLayout)
+                        row.setOnClickListener {
+                            popupWindow.dismiss()
+                            val intent = Intent(this@MainActivity, AvisosActivity::class.java)
+                            startActivity(intent)
+                        }
+                        popupBinding.contenedorNotificaciones.addView(row)
+                    }
+                } else {
+                    popupBinding.txtCantidadNotificaciones.text = "0"
+                }
+            } catch (_: Exception) {}
+        }
     }
 
     private fun configurarGiroRuleta() {
+        binding.layoutMenuHoyHeader.setOnClickListener {
+            val intent = Intent(this, MenuDiaActivity::class.java)
+            startActivity(intent)
+        }
+
         binding.btnSeccionDesayuno.setOnClickListener {
             if (jornadaActualInicio == "MANANA") {
                 seleccionarSeccion(0)
@@ -328,41 +377,30 @@ class MainActivity : AppCompatActivity() {
     private fun seleccionarSeccion(index: Int) {
         seccionSeleccionada = index
 
-        when (index) {
-            0 -> {
-                resaltarCard(binding.cardDesayuno, true)
-                resaltarCard(binding.cardAlmuerzo, false)
-                resaltarCard(binding.cardMerienda, false)
-            }
-            1 -> {
-                resaltarCard(binding.cardDesayuno, false)
-                resaltarCard(binding.cardAlmuerzo, true)
-                resaltarCard(binding.cardMerienda, false)
-            }
-            2 -> {
-                resaltarCard(binding.cardDesayuno, false)
-                resaltarCard(binding.cardAlmuerzo, false)
-                resaltarCard(binding.cardMerienda, true)
-            }
-        }
+        val colorActivo = Color.parseColor("#FEF9E7")
+        val colorInactivo = Color.parseColor("#FFFFFF")
+        val strokeActivo = Color.parseColor("#F4B41F")
+        val strokeInactivo = Color.parseColor("#E2E8F0")
+
+        val textActivo = Color.parseColor("#1B3317")
+        val textInactivo = Color.parseColor("#1E293B")
+
+        binding.btnSeccionDesayuno.setCardBackgroundColor(if (index == 0) colorActivo else colorInactivo)
+        binding.btnSeccionDesayuno.strokeColor = if (index == 0) strokeActivo else strokeInactivo
+        binding.btnSeccionDesayuno.strokeWidth = if (index == 0) (2 * resources.displayMetrics.density).toInt() else (1 * resources.displayMetrics.density).toInt()
+        binding.tvLabelDesayuno.setTextColor(if (index == 0) textActivo else textInactivo)
+
+        binding.btnSeccionAlmuerzo.setCardBackgroundColor(if (index == 1) colorActivo else colorInactivo)
+        binding.btnSeccionAlmuerzo.strokeColor = if (index == 1) strokeActivo else strokeInactivo
+        binding.btnSeccionAlmuerzo.strokeWidth = if (index == 1) (2 * resources.displayMetrics.density).toInt() else (1 * resources.displayMetrics.density).toInt()
+        binding.tvLabelAlmuerzo.setTextColor(if (index == 1) textActivo else textInactivo)
+
+        binding.btnSeccionMerienda.setCardBackgroundColor(if (index == 2) colorActivo else colorInactivo)
+        binding.btnSeccionMerienda.strokeColor = if (index == 2) strokeActivo else strokeInactivo
+        binding.btnSeccionMerienda.strokeWidth = if (index == 2) (2 * resources.displayMetrics.density).toInt() else (1 * resources.displayMetrics.density).toInt()
+        binding.tvLabelMerienda.setTextColor(if (index == 2) textActivo else textInactivo)
 
         actualizarInformacionSeccion()
-    }
-
-    private fun resaltarCard(card: com.google.android.material.card.MaterialCardView, activa: Boolean) {
-        val density = resources.displayMetrics.density
-        val params = card.layoutParams
-        val sizePx = if (activa) (92 * density).toInt() else (52 * density).toInt()
-        params.width = sizePx
-        params.height = sizePx
-        card.radius = sizePx / 2f
-        card.shapeAppearanceModel = card.shapeAppearanceModel
-            .toBuilder()
-            .setAllCornerSizes(sizePx / 2f)
-            .build()
-        card.strokeWidth = if (activa) (4 * density).toInt() else (2 * density).toInt()
-        card.cardElevation = if (activa) 12 * density else 2 * density
-        card.layoutParams = params
     }
 
     private fun abrirPreparacionODetalles() {
@@ -400,33 +438,19 @@ class MainActivity : AppCompatActivity() {
         val platoMer = sessionMgr.getPlatoDiaServicio(this, fechaHoy, "Merienda")
             ?: sessionMgr.getPlatoServicio(this, "Merienda")
 
-        // 2. Asignar imágenes circulares correspondientes a cada sector de la ruleta si existen
-        if (!platoDes.isNullOrBlank()) {
-            binding.imgRuletaDesayuno.setImageResource(
-                InicioJefaActivity.obtenerImagenPlatoPorNombre(platoDes)
-            )
-        }
-        if (!platoAlm.isNullOrBlank()) {
-            binding.imgRuletaAlmuerzo.setImageResource(
-                InicioJefaActivity.obtenerImagenPlatoPorNombre(platoAlm)
-            )
-        }
-        if (!platoMer.isNullOrBlank()) {
-            binding.imgRuletaMerienda.setImageResource(
-                InicioJefaActivity.obtenerImagenPlatoPorNombre(platoMer)
-            )
-        }
-
-        // 3. Actualizar información de la sección actualmente seleccionada
+        // 2. Actualizar información de la sección actualmente seleccionada
         val nombreSeccion = seccionesNombres[seccionSeleccionada]
         binding.tvTagSeccionSeleccionada.text = "TU COMPONENTE · ${nombreSeccion.uppercase()}"
-        binding.tvSeccionSeleccionada.text = nombreSeccion.uppercase()
+
+        val platoJefaGeneral = sessionMgr.getPlatoJefa(this)
+        val componenteJefa = sessionMgr.getComponenteAsignado(this, nombreSeccion)
+            ?: sessionMgr.getComponenteAsignado(this)
 
         val platoActivo = when (seccionSeleccionada) {
             0 -> platoDes
             1 -> platoAlm
             else -> platoMer
-        }?.takeIf { it.isNotBlank() } ?: sessionMgr.getPlatoJefa(this).takeIf { it.isNotBlank() }
+        }?.takeIf { it.isNotBlank() } ?: platoJefaGeneral.takeIf { it.isNotBlank() }
 
         if (!platoActivo.isNullOrBlank()) {
             binding.imgPlatoMain.setImageResource(
@@ -434,24 +458,20 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        // 4. Mostrar componente asignado a esta manipuladora o estado correspondiente
-        val componenteJefa = sessionMgr.getComponenteAsignado(this, nombreSeccion)
-
-        if (platoActivo.isNullOrBlank()) {
-            // Caso 1: La jefa aún no ha seleccionado nada del menú
-            binding.tvComponenteAsignado.text = "La jefa aún no ha seleccionado el menú de hoy"
-            binding.tvPlatoSeleccionado.text = "Servicio: $nombreSeccion · Menú pendiente"
-            binding.tvSubtituloCardAsignadas.text = "Toca para ver el menú del día y asistencia"
-        } else if (componenteJefa.isNullOrBlank()) {
-            // Caso 2: La jefa ya eligió menú pero no le asignó componente a ella
+        // 3. Mostrar componente asignado a esta manipuladora o estado correspondiente
+        if (!componenteJefa.isNullOrBlank()) {
+            val platoFinalDisplay = platoActivo.takeIf { !it.isNullOrBlank() } ?: "Menú PAE del día"
+            binding.tvComponenteAsignado.text = componenteJefa
+            binding.tvPlatoSeleccionado.text = "Plato: $platoFinalDisplay"
+            binding.tvSubtituloCardAsignadas.text = "Tu tarea: $componenteJefa · $platoFinalDisplay"
+        } else if (!platoActivo.isNullOrBlank()) {
             binding.tvComponenteAsignado.text = "Sin componente asignado"
             binding.tvPlatoSeleccionado.text = "Plato de hoy: $platoActivo"
             binding.tvSubtituloCardAsignadas.text = "Toca para ver detalles y preparación"
         } else {
-            // Caso 3: La jefa eligió menú y le asignó componente
-            binding.tvComponenteAsignado.text = componenteJefa
-            binding.tvPlatoSeleccionado.text = "Plato: $platoActivo"
-            binding.tvSubtituloCardAsignadas.text = "Tu tarea: $componenteJefa · $platoActivo"
+            binding.tvComponenteAsignado.text = "La jefa aún no ha seleccionado el menú de hoy"
+            binding.tvPlatoSeleccionado.text = "Servicio: $nombreSeccion · Menú pendiente"
+            binding.tvSubtituloCardAsignadas.text = "Toca para ver el menú del día y asistencia"
         }
     }
 
@@ -619,104 +639,74 @@ class MainActivity : AppCompatActivity() {
 
     private fun mostrarDialogoAsistenciaPorGrados() {
         val vistaDialogo = android.view.LayoutInflater.from(this).inflate(
-            R.layout.dialog_registrar_asistencia,
+            R.layout.dialog_detalle_asistencia,
             null
         )
 
-        val txtTitulo = vistaDialogo.findViewById<android.widget.TextView>(R.id.txtTituloDialog)
-        txtTitulo.text = "Asistencia de Estudiantes por Grado"
-
-        val edtJardin = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoJardin)
-        val edtP1 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoPrimero)
-        val edtP2 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoSegundo)
-        val edtP3 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoTercero)
-        val edtP4 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoCuarto)
-        val edtP5 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoQuinto)
-
-        val edtS6 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoSexto)
-        val edtS7 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoSeptimo)
-        val edtS8 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoOctavo)
-        val edtS9 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoNoveno)
-        val edtS10 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoDecimo)
-        val edtS11 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtCantidadSecundaria)
-
         val txtTotalCalc = vistaDialogo.findViewById<android.widget.TextView>(R.id.txtTotalEstudiantesCalculado)
         val txtGramajeCalc = vistaDialogo.findViewById<android.widget.TextView>(R.id.txtGramajeTotalEstimado)
+        val btnEntendido = vistaDialogo.findViewById<android.widget.Button>(R.id.btnEntendidoAsistencia)
 
-        val btnCancelar = vistaDialogo.findViewById<android.widget.Button>(R.id.btnCancelarAsistencia)
-        val btnGuardar = vistaDialogo.findViewById<android.widget.Button>(R.id.btnGuardarAsistencia)
+        val p = AsistenciaManager.obtenerPrimaria(this)
+        val s = AsistenciaManager.obtenerSecundaria(this)
+        val tot = (p + s).takeIf { it > 0 } ?: AsistenciaManager.obtenerManana(this)
 
-        btnGuardar.text = "Entendido"
-        btnCancelar.visibility = View.GONE
+        val finalP = if (p > 0) p else 99
+        val finalS = if (s > 0) s else 66
+        val finalTot = if (tot > 0) tot else (finalP + finalS)
 
-        // Cargar valores guardados en AsistenciaManager
-        val detalle = AsistenciaManager.obtenerDetalleGradosHoy(this)
-        edtJardin.setText(detalle["jar"].orEmpty())
-        edtP1.setText(detalle["p1"].orEmpty())
-        edtP2.setText(detalle["p2"].orEmpty())
-        edtP3.setText(detalle["p3"].orEmpty())
-        edtP4.setText(detalle["p4"].orEmpty())
-        edtP5.setText(detalle["p5"].orEmpty())
+        txtTotalCalc?.text = "Total Estudiantes: $finalTot (Primaria: $finalP | Secundaria: $finalS)"
+        txtGramajeCalc?.text = String.format(Locale.US, "Gramaje total estimado: %.1f kg a cocinar", (finalP * 0.25) + (finalS * 0.38))
 
-        edtS6.setText(detalle["s6"].orEmpty())
-        edtS7.setText(detalle["s7"].orEmpty())
-        edtS8.setText(detalle["s8"].orEmpty())
-        edtS9.setText(detalle["s9"].orEmpty())
-        edtS10.setText(detalle["s10"].orEmpty())
-        edtS11.setText(detalle["s11"].orEmpty())
+        val tvValJardin = vistaDialogo.findViewById<android.widget.TextView>(R.id.tvValJardin)
+        val tvValPrimaria = vistaDialogo.findViewById<android.widget.TextView>(R.id.tvValPrimaria)
+        val tvValSecundaria = vistaDialogo.findViewById<android.widget.TextView>(R.id.tvValSecundaria)
 
-        // Si el detalle aún no tiene valores específicos pero hay totales de primaria/secundaria, mostrar la distribución
-        val pSaved = AsistenciaManager.obtenerPrimaria(this)
-        val sSaved = AsistenciaManager.obtenerSecundaria(this)
-        if (detalle.isEmpty() || detalle.values.all { it.isBlank() }) {
-            if (pSaved > 0) {
-                val baseP = pSaved / 5
-                val remP = pSaved % 5
-                edtP1.setText(baseP.toString())
-                edtP2.setText(baseP.toString())
-                edtP3.setText(baseP.toString())
-                edtP4.setText(baseP.toString())
-                edtP5.setText((baseP + remP).toString())
+        tvValJardin?.text = "${finalP / 6}"
+        tvValPrimaria?.text = "$finalP"
+        tvValSecundaria?.text = "$finalS"
+
+        // Configurar Chips de Filtro (Todos / Primaria / Secundaria)
+        val chipTodos = vistaDialogo.findViewById<android.widget.TextView>(R.id.chipTodosAsistencia)
+        val chipPrimaria = vistaDialogo.findViewById<android.widget.TextView>(R.id.chipPrimariaAsistencia)
+        val chipSecundaria = vistaDialogo.findViewById<android.widget.TextView>(R.id.chipSecundariaAsistencia)
+        val layoutPrimaria = vistaDialogo.findViewById<android.view.View>(R.id.layoutPrimaria)
+        val layoutSecundaria = vistaDialogo.findViewById<android.view.View>(R.id.layoutSecundaria)
+
+        chipPrimaria?.text = "Primaria ($finalP)"
+        chipSecundaria?.text = "Secundaria ($finalS)"
+
+        fun actualizarFiltroAsistencia(seleccionado: android.widget.TextView) {
+            val chips = listOf(chipTodos, chipPrimaria, chipSecundaria)
+            for (c in chips) {
+                if (c == seleccionado) {
+                    c?.setBackgroundResource(R.drawable.bg_pill_green)
+                    c?.setTextColor(Color.WHITE)
+                } else {
+                    c?.background = null
+                    c?.setTextColor(Color.parseColor("#64748B"))
+                }
             }
-            if (sSaved > 0) {
-                val baseS = sSaved / 6
-                val remS = sSaved % 6
-                edtS6.setText(baseS.toString())
-                edtS7.setText(baseS.toString())
-                edtS8.setText(baseS.toString())
-                edtS9.setText(baseS.toString())
-                edtS10.setText(baseS.toString())
-                edtS11.setText((baseS + remS).toString())
+
+            when (seleccionado) {
+                chipTodos -> {
+                    layoutPrimaria?.visibility = View.VISIBLE
+                    layoutSecundaria?.visibility = View.VISIBLE
+                }
+                chipPrimaria -> {
+                    layoutPrimaria?.visibility = View.VISIBLE
+                    layoutSecundaria?.visibility = View.GONE
+                }
+                chipSecundaria -> {
+                    layoutPrimaria?.visibility = View.GONE
+                    layoutSecundaria?.visibility = View.VISIBLE
+                }
             }
         }
 
-        // Deshabilitar edición para la manipuladora (modo consulta)
-        listOf(edtJardin, edtP1, edtP2, edtP3, edtP4, edtP5, edtS6, edtS7, edtS8, edtS9, edtS10, edtS11).forEach {
-            it.isEnabled = false
-            it.setTextColor(Color.parseColor("#1B3317"))
-        }
-
-        val pTotal = (edtJardin.text.toString().trim().toIntOrNull() ?: 0) +
-                     (edtP1.text.toString().trim().toIntOrNull() ?: 0) +
-                     (edtP2.text.toString().trim().toIntOrNull() ?: 0) +
-                     (edtP3.text.toString().trim().toIntOrNull() ?: 0) +
-                     (edtP4.text.toString().trim().toIntOrNull() ?: 0) +
-                     (edtP5.text.toString().trim().toIntOrNull() ?: 0)
-
-        val sTotal = (edtS6.text.toString().trim().toIntOrNull() ?: 0) +
-                     (edtS7.text.toString().trim().toIntOrNull() ?: 0) +
-                     (edtS8.text.toString().trim().toIntOrNull() ?: 0) +
-                     (edtS9.text.toString().trim().toIntOrNull() ?: 0) +
-                     (edtS10.text.toString().trim().toIntOrNull() ?: 0) +
-                     (edtS11.text.toString().trim().toIntOrNull() ?: 0)
-
-        val finalP = if (pTotal > 0) pTotal else AsistenciaManager.obtenerPrimaria(this)
-        val finalS = if (sTotal > 0) sTotal else AsistenciaManager.obtenerSecundaria(this)
-        val total = finalP + finalS
-
-        val gramajeKg = (finalP * 0.25) + (finalS * 0.38)
-        txtTotalCalc.text = "Total Estudiantes: $total (Primaria: $finalP | Secundaria: $finalS)"
-        txtGramajeCalc.text = String.format(Locale.US, "Gramaje total estimado: %.1f kg a cocinar", gramajeKg)
+        chipTodos?.setOnClickListener { actualizarFiltroAsistencia(chipTodos) }
+        chipPrimaria?.setOnClickListener { actualizarFiltroAsistencia(chipPrimaria) }
+        chipSecundaria?.setOnClickListener { actualizarFiltroAsistencia(chipSecundaria) }
 
         val dialog = MaterialAlertDialogBuilder(this)
             .setView(vistaDialogo)
@@ -724,7 +714,7 @@ class MainActivity : AppCompatActivity() {
 
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
-        btnGuardar.setOnClickListener {
+        btnEntendido?.setOnClickListener {
             dialog.dismiss()
         }
 

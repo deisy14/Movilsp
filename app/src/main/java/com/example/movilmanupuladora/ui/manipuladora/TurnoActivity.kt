@@ -4,13 +4,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
+import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.databinding.ActivityTurnoBinding
+import com.example.movilmanupuladora.utils.PreparacionSyncManager
+import com.example.movilmanupuladora.utils.SessionManager
+import kotlinx.coroutines.launch
 
 class TurnoActivity : AppCompatActivity() {
 
@@ -37,95 +41,63 @@ class TurnoActivity : AppCompatActivity() {
 
         enableEdgeToEdge()
 
-        // =====================================================
-        // VIEW BINDING
-        // =====================================================
-
         binding = ActivityTurnoBinding.inflate(layoutInflater)
-
         setContentView(binding.root)
 
-        // =====================================================
-        // BARRAS DEL SISTEMA
-        // =====================================================
-
-        ViewCompat.setOnApplyWindowInsetsListener(
-            binding.main
-        ) { view, insets ->
-
-            val systemBars =
-                insets.getInsets(
-                    WindowInsetsCompat.Type.systemBars()
-                )
-
-            view.setPadding(
-                systemBars.left,
-                systemBars.top,
-                systemBars.right,
-                systemBars.bottom
-            )
-
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        // =====================================================
-        // CARGAR DATOS DEL TURNO DESDE EL BACKEND
-        // =====================================================
-
         cargarTurno()
 
-        // Permitir tocar la tarjeta para continuar sin esperar
         binding.cardTurno.setOnClickListener {
             handler.removeCallbacks(irSiguientePantalla)
             irSiguientePantalla.run()
         }
 
-        // =====================================================
-        // CONTINUAR AUTOMÁTICAMENTE
-        // =====================================================
-
-        handler.postDelayed(
-            irSiguientePantalla,
-            5_000
-        )
+        handler.postDelayed(irSiguientePantalla, 5_000)
     }
 
     private fun cargarTurno() {
+        val sessionMgr = SessionManager(this)
+        var platoJefa = sessionMgr.getPlatoJefa(this)
+        var componenteAsignado = sessionMgr.getComponenteAsignado(this)
+        val nombreUser = sessionMgr.getUserName() ?: ""
+
+        if (nombreUser.isNotBlank()) {
+            binding.txtTituloTurno.text = "¡Hola, $nombreUser!"
+        } else {
+            binding.txtTituloTurno.text = "Iniciando tu turno"
+        }
+
+        if (platoJefa.isNotBlank()) {
+            binding.txtPlatoAsignado.text = "$platoJefa  ➔"
+            binding.txtSubtituloTurno.text = componenteAsignado ?: "Estación asignada por la Jefa"
+        }
+
         lifecycleScope.launch {
             try {
-                // Sincronizar desde la nube para que en cualquier móvil aparezca el plato y componente
-                com.example.movilmanupuladora.utils.PreparacionSyncManager.sincronizarDesdeBackend(this@TurnoActivity)
+                // Sincronizar desde la nube para que aparezca la asignación más reciente hecha por la Jefa
+                PreparacionSyncManager.sincronizarDesdeBackend(this@TurnoActivity)
 
-                val sessionMgr = com.example.movilmanupuladora.utils.SessionManager(this@TurnoActivity)
-                val platoJefa = sessionMgr.getPlatoJefa(this@TurnoActivity)
-                val componenteAsignado = sessionMgr.getComponenteAsignado(this@TurnoActivity)
-                val nombreUser = sessionMgr.getUserName() ?: ""
-
-                if (nombreUser.isNotBlank()) {
-                    binding.txtTituloTurno.text = "¡Hola, $nombreUser!"
-                } else {
-                    binding.txtTituloTurno.text = "Iniciando tu turno"
-                }
+                platoJefa = sessionMgr.getPlatoJefa(this@TurnoActivity)
+                componenteAsignado = sessionMgr.getComponenteAsignado(this@TurnoActivity)
 
                 if (platoJefa.isNotBlank()) {
-                    binding.txtPlatoAsignado.text = platoJefa
-                    if (!componenteAsignado.isNullOrBlank()) {
-                        binding.txtSubtituloTurno.text = "Tu componente: $componenteAsignado"
-                    } else {
-                        binding.txtSubtituloTurno.text = "Sin componente asignado"
-                    }
-                } else {
-                    binding.txtPlatoAsignado.text = "La jefa aún no ha seleccionado el menú de hoy"
-                    binding.txtSubtituloTurno.text = "Menú pendiente de selección"
+                    binding.txtPlatoAsignado.text = "$platoJefa  ➔"
+                }
+                if (!componenteAsignado.isNullOrBlank()) {
+                    binding.txtSubtituloTurno.text = componenteAsignado
                 }
 
-                // Cargar horario de turno institucional (filtrando los registros PAE)
-                val res = com.example.movilmanupuladora.data.api.RetrofitClient.apiService.obtenerTurnos()
+                // Cargar horario de turno institucional
+                val res = RetrofitClient.apiService.obtenerTurnos()
                 if (res.isSuccessful && !res.body().isNullOrEmpty()) {
                     val turno = res.body()!!.firstOrNull { !it.nombreTurno.orEmpty().startsWith("PAE_") }
                         ?: res.body()!!.first()
                     val nombreRaw = turno.nombreTurno ?: "Mañana"
-                    // Evitar repetir la palabra "Turno" si el backend ya la trae (ej. "Turno Mañana MOD")
                     val nombreLimpio = if (nombreRaw.trim().startsWith("Turno", ignoreCase = true)) {
                         nombreRaw.trim()
                     } else {
@@ -138,26 +110,13 @@ class TurnoActivity : AppCompatActivity() {
                     binding.txtMensajeTurno.text = "Turno Mañana · 6:00 a. m. - 2:00 p. m. · Ingresando..."
                 }
             } catch (e: Exception) {
-                val sessionMgr = com.example.movilmanupuladora.utils.SessionManager(this@TurnoActivity)
-                val platoJefa = sessionMgr.getPlatoJefa(this@TurnoActivity)
-                val comp = sessionMgr.getComponenteAsignado(this@TurnoActivity)
-                binding.txtTituloTurno.text = "Iniciando tu turno"
-                binding.txtPlatoAsignado.text = platoJefa
-                if (!comp.isNullOrBlank()) {
-                    binding.txtSubtituloTurno.text = "Tu componente: $comp"
-                }
-                binding.txtMensajeTurno.text = "Turno Mañana · 6:00 a. m. - 2:00 p. m. · Ingresando..."
+                Log.e("TurnoActivity", "Error al sincronizar turno: ${e.message}")
             }
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-
-        // Evita que la navegación se ejecute
-        // si la Activity se destruye antes.
-        handler.removeCallbacks(
-            irSiguientePantalla
-        )
+        handler.removeCallbacks(irSiguientePantalla)
     }
 }

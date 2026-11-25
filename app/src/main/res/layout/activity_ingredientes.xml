@@ -1,261 +1,419 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="#FAF9F5"
+    tools:context=".ui.manipuladora.IngredientesActivity">
 
-    <!-- ===================================== -->
-    <!-- CONTENIDO QUE SE PUEDE DESLIZAR -->
-    <!-- ===================================== -->
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <!-- CONTENIDO CON SCROLL -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:fillViewport="true"
-        android:paddingBottom="90dp">
+        android:overScrollMode="never"
+        android:scrollbars="none"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:paddingHorizontal="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="24dp">
 
-            <!-- =============================== -->
-            <!-- BARRA SUPERIOR -->
-            <!-- =============================== -->
-
+            <!-- SUB-ENCABEZADO: FLECHA ATRÁS, TÍTULO Y RACIONES -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingBottom="16dp">
+                android:layout_marginBottom="16dp">
 
-                <ImageView
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/btnVolver"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:contentDescription="Volver"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:clickable="true"
                     android:focusable="true"
-                    android:src="@drawable/ic_arrow_back"
-                    app:tint="#173F2A" />
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="18dp"
+                    app:cardElevation="1dp"
+                    app:strokeColor="#CBD5E1"
+                    app:strokeWidth="1dp">
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="SIRAE"
-                    android:textColor="#176B35"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
-
-                <View
-                    android:layout_width="28dp"
-                    android:layout_height="28dp" />
-
-            </LinearLayout>
-
-
-            <!-- =============================== -->
-            <!-- TITULO -->
-            <!-- =============================== -->
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="Ingredientes"
-                android:textColor="#173F2A"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Cantidades y unidades de cada ingrediente"
-                android:textColor="#65736A"
-                android:textSize="14sp" />
-
-
-            <!-- =============================== -->
-            <!-- CARD DESTACADA: PLATO ASIGNADO -->
-            <!-- =============================== -->
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                android:background="@drawable/bg_seccion_seleccionada"
-                android:gravity="center_horizontal"
-                android:orientation="vertical"
-                android:padding="14dp">
-
-                <ImageView
-                    android:id="@+id/imgPlatoIngredientes"
-                    android:layout_width="130dp"
-                    android:layout_height="110dp"
-                    android:contentDescription="Imagen del plato"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/plato3" />
-
-                <TextView
-                    android:id="@+id/tvNombrePlatoIngredientes"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Cargando..."
-                    android:textColor="#173F2A"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvComponenteSubtitulo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Componente seleccionado"
-                    android:textColor="#176B35"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:visibility="gone" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:background="@drawable/bg_badge_asignado"
-                    android:paddingStart="14dp"
-                    android:paddingTop="4dp"
-                    android:paddingEnd="14dp"
-                    android:paddingBottom="4dp"
-                    android:text="Asignado"
-                    android:textColor="#FFFFFF"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-
-            <!-- =============================== -->
-            <!-- LISTA DE INGREDIENTES -->
-            <!-- =============================== -->
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="Tabla de ingredientes y sazón"
-                android:textColor="#173F2A"
-                android:textSize="17sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:text="Nombre, marca y función de sabor para dar sazón al plato:"
-                android:textColor="#65736A"
-                android:textSize="13sp" />
-
-            <!-- Lista de ingredientes dinámica desde el backend -->
-            <LinearLayout
-                android:id="@+id/contenedorIngredientes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:orientation="vertical" />
-
-
-            <!-- =============================== -->
-            <!-- BANNER: INGREDIENTES APROBADOS -->
-            <!-- =============================== -->
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:background="@drawable/bg_banner_aprobado"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="14dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:contentDescription="Aprobado"
-                    android:src="@drawable/ic_check_circle"
-                    app:tint="#176B35" />
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="Volver"
+                        android:src="@drawable/ic_arrow_back"
+                        app:tint="#1E293B" />
+                </com.google.android.material.card.MaterialCardView>
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
                     android:layout_weight="1"
-                    android:layout_marginStart="10dp"
                     android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Ingredientes aprobados"
-                        android:textColor="#173F2A"
-                        android:textSize="14sp"
+                        android:text="Ingredientes"
+                        android:textColor="#1E293B"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Todos los ingredientes cuentan con el certificado de calidad."
-                        android:textColor="#4A5A4F"
-                        android:textSize="12sp" />
+                        android:text="Cantidades, marca y sazón de cada ingr..."
+                        android:textColor="#64748B"
+                        android:textSize="11.5sp" />
 
                 </LinearLayout>
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_pill_light_green"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="6dp"
+                    android:text="165 raciones"
+                    android:textColor="#1B3317"
+                    android:textSize="11.5sp"
+                    android:textStyle="bold" />
+
             </LinearLayout>
 
-
-            <!-- =============================== -->
-            <!-- BOTÓN -->
-            <!-- =============================== -->
-
-            <Button
-                android:id="@+id/btnContinuarPreparacion"
+            <!-- TARJETA BLANCA CON CABECERA VERDE OSCURO Y BORDE DORADO -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
-                android:layout_height="58dp"
-                android:layout_marginTop="20dp"
-                android:backgroundTint="#FFD928"
-                android:text="Continuar a preparación     ›"
-                android:textAllCaps="false"
-                android:textColor="#173F2A"
-                android:textSize="15sp"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="2dp"
+                app:strokeColor="#F4B41F"
+                app:strokeWidth="1.5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- CABECERA VERDE OSCURO DE BORDE A BORDE -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#1B3317"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="10dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="DESAYUNO · CONTROL DE GRAMAJE"
+                            android:textColor="#FFFFFF"
+                            android:textSize="10.5sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Prim: 99 · Sec: 66"
+                            android:textColor="#FFFFFF"
+                            android:textSize="10.5sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                    <!-- CUERPO BLANCO DE LA TARJETA -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <!-- FOTO DEL PLATO CON BORDE DORADO -->
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="84dp"
+                                android:layout_height="84dp"
+                                app:cardBackgroundColor="#FFFFFF"
+                                app:cardCornerRadius="16dp"
+                                app:cardElevation="0dp"
+                                app:strokeColor="#F4B41F"
+                                app:strokeWidth="2dp">
+
+                                <ImageView
+                                    android:id="@+id/imgPlatoIngredientes"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:contentDescription="Imagen del plato"
+                                    android:scaleType="centerCrop"
+                                    android:src="@drawable/plato3" />
+
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="14dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tvNombrePlatoIngredientes"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Huevos pericos con arroz blanco"
+                                    android:textColor="#1E293B"
+                                    android:textSize="16.5sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvComponenteSubtitulo"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Estación pendiente de asignación"
+                                    android:textColor="#64748B"
+                                    android:textSize="12sp" />
+
+                                <!-- BOTÓN ASIGNAR ESTACIÓN (AMARILLO SUAVE #FEF9E7 CON BORDE DORADO) -->
+                                <com.google.android.material.button.MaterialButton
+                                    style="@style/Widget.Material3.Button.OutlinedButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="36dp"
+                                    android:layout_marginTop="8dp"
+                                    android:insetTop="0dp"
+                                    android:insetBottom="0dp"
+                                    android:text="Asignar estación"
+                                    android:textAllCaps="false"
+                                    android:textColor="#7A5500"
+                                    android:textSize="11.5sp"
+                                    android:textStyle="bold"
+                                    app:backgroundTint="#FEF9E7"
+                                    app:cornerRadius="10dp"
+                                    app:strokeColor="#F4B41F"
+                                    app:strokeWidth="1dp" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- TÍTULO: TABLA DE INGREDIENTES Y SAZÓN -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="Tabla de Ingredientes y Sazón"
+                android:textColor="#1E293B"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <!-- Espacio para que el último contenido -->
-            <!-- no quede oculto detrás de la barra -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Nombre, marca y función de sabor para dar sazón al plato"
+                android:textColor="#64748B"
+                android:textSize="12sp" />
 
-            <View
+            <!-- CHIPS DE FILTRO (TODOS / BASE DEL PLATO / SAZÓN) -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="90dp" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/chipTodos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_tag_plato"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="7dp"
+                    android:text="Todos"
+                    android:textColor="#64748B"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/chipBasePlato"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_pill_green"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="7dp"
+                    android:text="Base del plato"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/chipSazon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_tag_plato"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="7dp"
+                    android:text="Sazón"
+                    android:textColor="#64748B"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- ENCABEZADO DE TABLA (BANNER VERDE OSCURO #1B3317) -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="#1B3317"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="10dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="INGREDIENTE, MARCA Y SAZÓN"
+                        android:textColor="#FFFFFF"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CANTIDAD"
+                        android:textColor="#F4B41F"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- LISTA DE INGREDIENTES DINÁMICA -->
+            <LinearLayout
+                android:id="@+id/contenedorIngredientes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical" />
+
+            <!-- BANNER: INGREDIENTES APROBADOS -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="#E8F5E9"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:strokeColor="#15803D"
+                app:strokeWidth="1.5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:contentDescription="Aprobado"
+                        android:src="@drawable/ic_check_circle"
+                        app:tint="#15803D" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ingredientes aprobados"
+                            android:textColor="#1B3317"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Todos los ingredientes cuentan con el certificado de calidad e inocuidad PAE."
+                            android:textColor="#2A5226"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- BOTÓN: CONTINUAR A PREPARACIÓN -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnContinuarPreparacion"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="20dp"
+                android:backgroundTint="#F4B41F"
+                android:text="Continuar a preparación"
+                android:textAllCaps="false"
+                android:textColor="#1B3317"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:cornerRadius="14dp"
+                app:elevation="0dp" />
 
         </LinearLayout>
 
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
-
-    <!-- ===================================== -->
-    <!-- BARRA INFERIOR FIJA -->
-    <!-- ===================================== -->
-
-    <include
-        layout="@layout/activity_barra_navegacion"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom" />
-
-</FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

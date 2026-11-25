@@ -19,6 +19,8 @@ import kotlinx.coroutines.launch
 
 class IngredientesActivity : AppCompatActivity() {
 
+    private var listaIngredientesGlobal = listOf<Ingrediente>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -163,7 +165,6 @@ class IngredientesActivity : AppCompatActivity() {
                     val tieneOregano = listaBackend.any { it.nombreIngrediente?.contains("or", ignoreCase = true) == true }
 
                     val listaFinal = if (!tieneSal || !tieneOregano) {
-                        // Complementar con los ingredientes de sazón requeridos si no están en el backend
                         val condimentosFaltantes = ingredientesFallback.filter { fallback ->
                             listaBackend.none { backend ->
                                 backend.nombreIngrediente?.contains(fallback.nombreIngrediente?.split(" ")?.firstOrNull() ?: "", ignoreCase = true) == true
@@ -174,13 +175,63 @@ class IngredientesActivity : AppCompatActivity() {
                         listaBackend
                     }
 
+                    listaIngredientesGlobal = listaFinal
+                    configurarFiltrosChips()
                     mostrarIngredientes(listaFinal)
                 } else {
+                    listaIngredientesGlobal = ingredientesFallback
+                    configurarFiltrosChips()
                     mostrarIngredientes(ingredientesFallback)
                 }
             } catch (e: Exception) {
+                listaIngredientesGlobal = ingredientesFallback
+                configurarFiltrosChips()
                 mostrarIngredientes(ingredientesFallback)
             }
+        }
+    }
+
+    private fun configurarFiltrosChips() {
+        val chipTodos = findViewById<TextView>(R.id.chipTodos)
+        val chipBasePlato = findViewById<TextView>(R.id.chipBasePlato)
+        val chipSazon = findViewById<TextView>(R.id.chipSazon)
+
+        fun actualizarEstilos(seleccionado: TextView) {
+            val chips = listOf(chipTodos, chipBasePlato, chipSazon)
+            for (c in chips) {
+                if (c == seleccionado) {
+                    c?.setBackgroundResource(R.drawable.bg_pill_green)
+                    c?.setTextColor(android.graphics.Color.WHITE)
+                } else {
+                    c?.setBackgroundResource(R.drawable.bg_tag_plato)
+                    c?.setTextColor(android.graphics.Color.parseColor("#64748B"))
+                }
+            }
+        }
+
+        chipTodos?.setOnClickListener {
+            actualizarEstilos(chipTodos)
+            mostrarIngredientes(listaIngredientesGlobal)
+        }
+
+        chipBasePlato?.setOnClickListener {
+            actualizarEstilos(chipBasePlato)
+            val filtrados = listaIngredientesGlobal.filter { ing ->
+                val n = (ing.nombreIngrediente ?: "").lowercase()
+                !n.contains("sal") && !n.contains("orégano") && !n.contains("oregano") && !n.contains("ajo") &&
+                !n.contains("comino") && !n.contains("color") && !n.contains("triguisar") && !n.contains("pimienta") && !n.contains("aceite")
+            }
+            mostrarIngredientes(filtrados)
+        }
+
+        chipSazon?.setOnClickListener {
+            actualizarEstilos(chipSazon)
+            val filtrados = listaIngredientesGlobal.filter { ing ->
+                val n = (ing.nombreIngrediente ?: "").lowercase()
+                n.contains("sal") || n.contains("orégano") || n.contains("oregano") || n.contains("ajo") ||
+                n.contains("comino") || n.contains("color") || n.contains("triguisar") || n.contains("pimienta") || n.contains("aceite")
+            }
+            mostrarIngredientes(filtrados)
         }
     }
 
@@ -199,7 +250,18 @@ class IngredientesActivity : AppCompatActivity() {
             itemBinding.tvNombreIngrediente.text = ingrediente.nombreIngrediente ?: "Ingrediente"
 
             // Marca / Presentación
-            itemBinding.tvMarcaIngrediente.text = ingrediente.marcaIngrediente ?: "Certificado"
+            itemBinding.tvMarcaIngrediente.text = "Marca: ${ingrediente.marcaIngrediente ?: "Certificado"}"
+
+            // Cantidad por defecto según posición o tipo
+            val cantidadDefault = when {
+                ingrediente.nombreIngrediente?.contains("huevo", true) == true -> "9.7 kg"
+                ingrediente.nombreIngrediente?.contains("arroz", true) == true -> "8.4 kg"
+                ingrediente.nombreIngrediente?.contains("tomate", true) == true -> "3.6 kg"
+                ingrediente.nombreIngrediente?.contains("cebolla", true) == true -> "1.8 kg"
+                ingrediente.nombreIngrediente?.contains("leche", true) == true -> "31.0 L"
+                else -> "2.5 kg"
+            }
+            itemBinding.tvCantidadIngrediente.text = cantidadDefault
 
             // Descripción / función para dar sabor
             val descripcion = if (!ingrediente.descripcion.isNullOrBlank()) {
@@ -233,4 +295,4 @@ class IngredientesActivity : AppCompatActivity() {
             else -> "Insumo certificado para preparación y sazón con estándar de calidad"
         }
     }
-}
+}

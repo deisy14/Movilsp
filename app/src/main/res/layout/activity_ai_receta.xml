@@ -403,7 +403,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="👨‍🍳 Receta y Preparación Paso a Paso"
+                            android:text="Receta y Preparación Paso a Paso"
                             android:textColor="#1E293B"
                             android:textSize="14sp"
                             android:textStyle="bold" />

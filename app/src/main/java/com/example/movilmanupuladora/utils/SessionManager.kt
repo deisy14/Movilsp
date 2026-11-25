@@ -218,16 +218,16 @@ class SessionManager(context: Context) {
      * Obtiene el plato seleccionado por la Jefa para el turno actual.
      */
     fun getPlatoJefa(context: Context): String {
-        val turnoPref = context.getSharedPreferences(
-            "TURNO_PAE",
-            Context.MODE_PRIVATE
-        )
-        val jefaPref = context.getSharedPreferences(
-            "ManipuladoraJefe",
-            Context.MODE_PRIVATE
-        )
+        val turnoPref = context.getSharedPreferences("TURNO_PAE", Context.MODE_PRIVATE)
+        val jefaPref = context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE)
 
-        return turnoPref.getString("plato_nombre", null)
+        return turnoPref.getString("plato_desayuno", null)
+            ?: turnoPref.getString("plato_almuerzo", null)
+            ?: turnoPref.getString("plato_merienda", null)
+            ?: turnoPref.getString("plato_nombre", null)
+            ?: jefaPref.getString("plato_desayuno", null)
+            ?: jefaPref.getString("plato_almuerzo", null)
+            ?: jefaPref.getString("plato_merienda", null)
             ?: jefaPref.getString("plato_actual", null)
             ?: prefs.getString("plato_seleccionado_nombre", null)
             ?: ""
@@ -537,36 +537,40 @@ class SessionManager(context: Context) {
         val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
         val serv = servicio ?: "Desayuno"
 
-        // PRIORIDAD 1: Asignación oficial guardada por la Jefa para la fecha de hoy y el servicio actual
-        val prefixServ = "asig_${fechaHoy}_${serv}_"
-        val prefixCorreoServ = "asig_correo_${fechaHoy}_${serv}_"
-        val prefixUidServ = "asig_uid_${fechaHoy}_${serv}_"
-
-        val compsEncontrados = mutableListOf<String>()
-        for ((k, v) in asigPrefs.all) {
-            if (k.startsWith(prefixCorreoServ) && v is String && correoUser != null) {
-                if (v.trim().equals(correoUser, ignoreCase = true) || correoUser.contains(v.trim(), ignoreCase = true)) {
-                    compsEncontrados.add(k.removePrefix(prefixCorreoServ))
-                }
-            }
-            if (k.startsWith(prefixUidServ) && v is Int && myUid > 0 && v == myUid) {
-                compsEncontrados.add(k.removePrefix(prefixUidServ))
-            }
-            if (k.startsWith(prefixServ) && v is String) {
-                val cocineraNombre = v.trim().lowercase()
-                if (nombreUser != null && (cocineraNombre.contains(nombreUser) || nombreUser.contains(cocineraNombre))) {
-                    compsEncontrados.add(k.removePrefix(prefixServ))
-                }
-                if (correoUser?.contains("pool") == true && cocineraNombre.contains("pool")) {
-                    compsEncontrados.add(k.removePrefix(prefixServ))
-                }
-                if (correoUser?.contains("deis") == true && cocineraNombre.contains("deis")) {
-                    compsEncontrados.add(k.removePrefix(prefixServ))
-                }
-            }
+        // PRIORIDAD ABSOLUTA: Asignación directa guardada por la Jefa por correo, UID o nombre
+        if (keyCorreo.isNotBlank()) {
+            val cServCorreo = jefaPrefs.getString("comp_correo_${serv}_$keyCorreo", null)
+                ?: jefaPrefs.getString("comp_correo_$keyCorreo", null)
+                ?: asigPrefs.getString("comp_correo_${serv}_$keyCorreo", null)
+                ?: asigPrefs.getString("comp_correo_$keyCorreo", null)
+            if (!cServCorreo.isNullOrBlank()) return cServCorreo
         }
-        if (compsEncontrados.isNotEmpty()) {
-            return compsEncontrados.distinct().joinToString(", ")
+
+        if (myUid > 0) {
+            val cServUid = jefaPrefs.getString("comp_uid_${serv}_$myUid", null)
+                ?: jefaPrefs.getString("comp_uid_$myUid", null)
+                ?: asigPrefs.getString("comp_uid_${serv}_$myUid", null)
+                ?: asigPrefs.getString("comp_uid_$myUid", null)
+            if (!cServUid.isNullOrBlank()) return cServUid
+        }
+
+        if (!nombreUser.isNullOrBlank()) {
+            val normNombre = normalizar(nombreUser)
+            val cNombre = jefaPrefs.getString("comp_${serv}_$normNombre", null)
+                ?: jefaPrefs.getString("comp_$normNombre", null)
+                ?: asigPrefs.getString("comp_${serv}_$normNombre", null)
+                ?: asigPrefs.getString("comp_$normNombre", null)
+            if (!cNombre.isNullOrBlank()) return cNombre
+
+            val primerNombre = nombreUser.trim().split(" ").firstOrNull() ?: ""
+            if (primerNombre.isNotBlank()) {
+                val normPrimer = normalizar(primerNombre)
+                val cPrimer = jefaPrefs.getString("comp_${serv}_$normPrimer", null)
+                    ?: jefaPrefs.getString("comp_$normPrimer", null)
+                    ?: asigPrefs.getString("comp_${serv}_$normPrimer", null)
+                    ?: asigPrefs.getString("comp_$normPrimer", null)
+                if (!cPrimer.isNullOrBlank()) return cPrimer
+            }
         }
 
         // PRIORIDAD 2: Asignación por servicio específico en claves comp_correo_ / comp_uid_
@@ -656,6 +660,32 @@ class SessionManager(context: Context) {
             if (!compK.isNullOrBlank()) return compK
         }
 
+        // PRIORIDAD 6: Búsqueda directa por nombre completo o primer nombre del usuario en jefaPrefs
+        if (!nombreUser.isNullOrBlank()) {
+            val normNombre = normalizar(nombreUser)
+            val cNombre = jefaPrefs.getString("comp_$normNombre", null)
+                ?: asigPrefs.getString("comp_$normNombre", null)
+            if (!cNombre.isNullOrBlank()) return cNombre
+
+            val primerNombre = nombreUser.trim().split(" ").firstOrNull() ?: ""
+            if (primerNombre.isNotBlank()) {
+                val normPrimer = normalizar(primerNombre)
+                val cPrimer = jefaPrefs.getString("comp_$normPrimer", null)
+                    ?: asigPrefs.getString("comp_$normPrimer", null)
+                if (!cPrimer.isNullOrBlank()) return cPrimer
+            }
+        }
+
         return null
+    }
+
+    private fun normalizar(texto: String?): String {
+        if (texto.isNullOrBlank()) return ""
+        val sinTildes = java.text.Normalizer.normalize(texto, java.text.Normalizer.Form.NFD)
+            .replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
+        return sinTildes.lowercase().trim()
+            .replace("@", "_")
+            .replace(".", "_")
+            .replace(" ", "_")
     }
 }

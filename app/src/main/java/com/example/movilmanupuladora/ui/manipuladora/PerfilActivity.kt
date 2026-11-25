@@ -4,8 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -43,20 +41,12 @@ class PerfilActivity : AppCompatActivity() {
         // ==========================================
 
         val main = findViewById<View>(R.id.main)
-
-        ViewCompat.setOnApplyWindowInsetsListener(main) { v, insets ->
-
-            val systemBars =
-                insets.getInsets(WindowInsetsCompat.Type.systemBars())
-
-            v.setPadding(
-                systemBars.left,
-                systemBars.top,
-                systemBars.right,
-                0
-            )
-
-            insets
+        if (main != null) {
+            ViewCompat.setOnApplyWindowInsetsListener(main) { v, insets ->
+                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+                insets
+            }
         }
 
         // ==========================================
@@ -66,55 +56,36 @@ class PerfilActivity : AppCompatActivity() {
         cargarDatosUsuario()
 
         // ==========================================
-        // BOTONES DEL PERFIL
+        // BOTONES Y ACCIONES DEL PERFIL
         // ==========================================
 
-        val btnCambiarFoto =
-            findViewById<View>(R.id.btnCambiarFotoPerfil)
+        val btnCambiarFoto = findViewById<View>(R.id.btnCambiarFotoPerfil)
+        val btnEditarPerfil = findViewById<View>(R.id.btnEditarPerfilCard) ?: findViewById<View>(R.id.btnEditarPerfil)
+        val btnNotificaciones = findViewById<View>(R.id.btnNotificacionesCard) ?: findViewById<View>(R.id.btnNotificaciones)
+        val btnAyuda = findViewById<View>(R.id.btnAyuda)
+        val btnCerrarSesion = findViewById<View>(R.id.btnCerrarSesion)
 
-        val btnEditarPerfil =
-            findViewById<LinearLayout>(R.id.btnEditarPerfil)
-
-        val btnNotificaciones =
-            findViewById<LinearLayout>(R.id.btnNotificaciones)
-
-        val btnAyuda =
-            findViewById<LinearLayout>(R.id.btnAyuda)
-
-        val btnCerrarSesion =
-            findViewById<Button>(R.id.btnCerrarSesion)
-
-        // ==========================================
         // CAMBIAR FOTO DE PERFIL
-        // ==========================================
-
         btnCambiarFoto?.setOnClickListener {
             selectorFotoPerfil.launch("image/*")
         }
 
-        // ==========================================
         // EDITAR PERFIL (VENTANA EMERGENTE)
-        // ==========================================
-
-        btnEditarPerfil.setOnClickListener {
+        btnEditarPerfil?.setOnClickListener {
             mostrarVentanaEmergenteEditarPerfil()
         }
 
-        // ==========================================
-        // NOTIFICACIONES
-        // ==========================================
-
-        btnNotificaciones.setOnClickListener {
-
-            startActivity(
-                Intent(this, AvisosActivity::class.java)
-            )
+        // AVISOS Y NOTIFICACIONES
+        btnNotificaciones?.setOnClickListener {
+            startActivity(Intent(this, AvisosActivity::class.java))
         }
 
-        // ==========================================
-        // RECONOCIMIENTO FACIAL
-        // ==========================================
+        // NOTIFICACIONES DESDE LA BARRA STICKY SUPERIOR
+        findViewById<View>(R.id.btnNotificaciones)?.setOnClickListener {
+            startActivity(Intent(this, AvisosActivity::class.java))
+        }
 
+        // RECONOCIMIENTO FACIAL
         val btnBiometriaFacialCard = findViewById<View>(R.id.btnBiometriaFacialCard)
         btnBiometriaFacialCard?.setOnClickListener {
             val intent = Intent(this, com.example.movilmanupuladora.ui.auth.ReconocimientoFacialActivity::class.java).apply {
@@ -130,42 +101,26 @@ class PerfilActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // ==========================================
-        // AYUDA Y SOPORTE
-        // ==========================================
-
-        btnAyuda.setOnClickListener {
-
-            startActivity(
-                Intent(this, AyudaActivity::class.java)
-            )
+        // AYUDA Y SOPORTE INSTITUCIONAL
+        btnAyuda?.setOnClickListener {
+            startActivity(Intent(this, AyudaActivity::class.java))
         }
 
-        // ==========================================
         // CERRAR SESIÓN
-        // ==========================================
-
-        btnCerrarSesion.setOnClickListener {
+        btnCerrarSesion?.setOnClickListener {
             sessionManager.clearSession()
-            val intent = Intent(
-                this,
-                LoginActivity::class.java
-            )
-
-            intent.flags =
-                Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_CLEAR_TASK
-
+            val intent = Intent(this, LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
             startActivity(intent)
-
             finish()
         }
 
         // ==========================================
-        // BARRA DE NAVEGACIÓN
+        // BARRA DE NAVEGACIÓN INFERIOR
         // ==========================================
 
-        val barraView = findViewById<android.view.View>(R.id.barraNavegacion)
+        val barraView = findViewById<View>(R.id.barraNavegacion) ?: findViewById<View>(R.id.barra_navegacion)
         if (barraView != null) {
             val barraBinding = com.example.movilmanupuladora.databinding.ActivityBarraNavegacionBinding.bind(barraView)
             com.example.movilmanupuladora.utils.NavigationHelper.setupBarraNavegacion(
@@ -177,19 +132,20 @@ class PerfilActivity : AppCompatActivity() {
     }
 
     private fun cargarDatosUsuario() {
-        val nombre = sessionManager.getUserName() ?: "Manipuladora PAE"
-        val cargo = sessionManager.getUserRole() ?: "Manipuladora de alimentos"
+        val nombre = sessionManager.getUserName() ?: "Maria Alejandra Velazco"
+        val cargo = sessionManager.getUserRole() ?: "Manipuladora de Alimentos"
         val ubicacion = sessionManager.getUbicacionCompleta()
 
         findViewById<android.widget.TextView>(R.id.txtNombreUsuario)?.text = nombre
         findViewById<android.widget.TextView>(R.id.txtCargoUsuario)?.text = "$cargo · $ubicacion"
+        findViewById<android.widget.TextView>(R.id.tvInstitucion)?.text = ubicacion
     }
 
     private fun mostrarVentanaEmergenteEditarPerfil() {
         try {
             val dialogBinding = DialogEditarPerfilBinding.inflate(layoutInflater)
 
-            val nombreGuardado = sessionManager.getUserName() ?: "Manipuladora PAE"
+            val nombreGuardado = sessionManager.getUserName() ?: "Maria Alejandra Velazco"
             val correoGuardado = sessionManager.getUserEmail() ?: ""
             val telefonoGuardado = sessionManager.getUserPhone() ?: ""
 

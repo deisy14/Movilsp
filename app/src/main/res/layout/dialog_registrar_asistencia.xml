@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="12dp"
+    android:layout_margin="16dp"
     app:cardBackgroundColor="#FFFFFF"
-    app:cardCornerRadius="22dp"
-    app:cardElevation="6dp"
-    app:strokeColor="#E2E8F0"
-    app:strokeWidth="1dp">
+    app:cardCornerRadius="24dp"
+    app:cardElevation="8dp"
+    app:strokeColor="#F4B41F"
+    app:strokeWidth="1.5dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,43 +17,176 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <!-- TÍTULO -->
-        <TextView
-            android:id="@+id/txtTituloDialog"
+        <!-- HANDLE SUPERIOR -->
+        <View
+            android:layout_width="36dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="12dp"
+            android:background="#CBD5E1" />
+
+        <!-- TÍTULO Y BOTÓN CERRAR -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Registrar Asistencia por Grado"
-            android:textColor="#1B3317"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/txtDescriptionDialog"
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="PRIMARIA (JARDÍN A 5°) Y SECUNDARIA/BACHILLERATO (6° A 11°)."
+                    android:textColor="#92400E"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/txtTituloDialog"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Registrar Asistencia por Grado"
+                    android:textColor="#1E293B"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCancelarAsistencia"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:text="✕"
+                android:textColor="#64748B"
+                android:textSize="14sp"
+                app:iconTint="#64748B" />
+
+        </LinearLayout>
+
+        <!-- JORNADA -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Primaria (Jardín a 5°) y Secundaria/Bachillerato (6° a 11°)."
-            android:textColor="#64748B"
-            android:textSize="12sp" />
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/txtJornadaDialog"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/txtJornadaDialog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_pill_light_green"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="5dp"
+                android:text="Jornada: Mañana"
+                android:textColor="#15803D"
+                android:textSize="11.5sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- CHIPS DE FILTRO (TODOS / PRIMARIA / SECUNDARIA) -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="14dp"
             android:background="@drawable/bg_tag_plato"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="5dp"
-            android:text="Jornada: Mañana"
-            android:textColor="#1B3317"
-            android:textSize="12sp"
-            android:textStyle="bold" />
+            android:orientation="horizontal"
+            android:padding="3dp"
+            android:weightSum="3">
 
-        <!-- LISTADO DE GRADOS -->
+            <TextView
+                android:id="@+id/chipTodosAsistencia"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_pill_yellow"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="Todos"
+                android:textColor="#1B3317"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/chipPrimariaAsistencia"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="Primaria"
+                android:textColor="#64748B"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/chipSecundariaAsistencia"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="Secundaria"
+                android:textColor="#64748B"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- ENCABEZADO DE TABLA (BANNER VERDE OSCURO #1B3317) -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            app:cardBackgroundColor="#FFBD00"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="1dp"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="10dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="GRADO Y PORCIÓN"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CANTIDAD ASISTENTES"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- LISTA DE GRADOS CON EDITTEXTS DE ENTRADA -->
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="240dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="8dp"
             android:overScrollMode="never"
             android:scrollbars="none">
 
@@ -61,202 +195,364 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- CONTENEDOR PRIMARIA (JARDÍN A 5°) -->
+                <!-- CONTENEDOR PRIMARIA -->
                 <LinearLayout
                     android:id="@+id/layoutPrimaria"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- JARDÍN / PREESCOLAR -->
-                    <LinearLayout
+                    <!-- JARDÍN -->
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="1dp"
+                        app:strokeColor="#E2E8F0"
+                        app:strokeWidth="1dp">
 
-                        <TextView
-                            android:layout_width="0dp"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Jardín / Preescolar (150g)"
-                            android:textColor="#1B3317"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="12dp">
 
-                        <EditText
-                            android:id="@+id/edtGradoJardin"
-                            android:layout_width="80dp"
-                            android:layout_height="38dp"
-                            android:background="@drawable/bg_edittext"
-                            android:gravity="center"
-                            android:hint="0"
-                            android:importantForAutofill="no"
-                            android:inputType="number"
-                            android:maxLines="1"
-                            android:textColor="#1B3317"
-                            android:textSize="14sp" />
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
 
-                    </LinearLayout>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Jardín / Preescolar"
+                                    android:textColor="#1E293B"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Porción estándar: 150 g · Primaria"
+                                    android:textColor="#64748B"
+                                    android:textSize="11sp" />
+
+                            </LinearLayout>
+
+                            <EditText
+                                android:id="@+id/edtGradoJardin"
+                                android:layout_width="64dp"
+                                android:layout_height="38dp"
+                                android:background="@drawable/bg_input"
+                                android:gravity="center"
+                                android:hint="0"
+                                android:inputType="number"
+                                android:maxLines="1"
+                                android:textColor="#1E293B"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
                     <!-- 1° PRIMERO -->
-                    <LinearLayout
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="1dp"
+                        app:strokeColor="#E2E8F0"
+                        app:strokeWidth="1dp">
 
-                        <TextView
-                            android:layout_width="0dp"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="1° Primero (250g)"
-                            android:textColor="#1B3317"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="12dp">
 
-                        <EditText
-                            android:id="@+id/edtGradoPrimero"
-                            android:layout_width="80dp"
-                            android:layout_height="38dp"
-                            android:background="@drawable/bg_edittext"
-                            android:gravity="center"
-                            android:hint="0"
-                            android:importantForAutofill="no"
-                            android:inputType="number"
-                            android:maxLines="1"
-                            android:textColor="#1B3317"
-                            android:textSize="14sp" />
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
 
-                    </LinearLayout>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="1° Primero"
+                                    android:textColor="#1E293B"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Porción estándar: 250 g · Primaria"
+                                    android:textColor="#64748B"
+                                    android:textSize="11sp" />
+
+                            </LinearLayout>
+
+                            <EditText
+                                android:id="@+id/edtGradoPrimero"
+                                android:layout_width="64dp"
+                                android:layout_height="38dp"
+                                android:background="@drawable/bg_input"
+                                android:gravity="center"
+                                android:hint="0"
+                                android:inputType="number"
+                                android:maxLines="1"
+                                android:textColor="#1E293B"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
                     <!-- 2° SEGUNDO -->
-                    <LinearLayout
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="1dp"
+                        app:strokeColor="#E2E8F0"
+                        app:strokeWidth="1dp">
 
-                        <TextView
-                            android:layout_width="0dp"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="2° Segundo (250g)"
-                            android:textColor="#1B3317"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="12dp">
 
-                        <EditText
-                            android:id="@+id/edtGradoSegundo"
-                            android:layout_width="80dp"
-                            android:layout_height="38dp"
-                            android:background="@drawable/bg_edittext"
-                            android:gravity="center"
-                            android:hint="0"
-                            android:importantForAutofill="no"
-                            android:inputType="number"
-                            android:maxLines="1"
-                            android:textColor="#1B3317"
-                            android:textSize="14sp" />
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
 
-                    </LinearLayout>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="2° Segundo"
+                                    android:textColor="#1E293B"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Porción estándar: 250 g · Primaria"
+                                    android:textColor="#64748B"
+                                    android:textSize="11sp" />
+
+                            </LinearLayout>
+
+                            <EditText
+                                android:id="@+id/edtGradoSegundo"
+                                android:layout_width="64dp"
+                                android:layout_height="38dp"
+                                android:background="@drawable/bg_input"
+                                android:gravity="center"
+                                android:hint="0"
+                                android:inputType="number"
+                                android:maxLines="1"
+                                android:textColor="#1E293B"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
                     <!-- 3° TERCERO -->
-                    <LinearLayout
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="1dp"
+                        app:strokeColor="#E2E8F0"
+                        app:strokeWidth="1dp">
 
-                        <TextView
-                            android:layout_width="0dp"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="3° Tercero (250g)"
-                            android:textColor="#1B3317"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="12dp">
 
-                        <EditText
-                            android:id="@+id/edtGradoTercero"
-                            android:layout_width="80dp"
-                            android:layout_height="38dp"
-                            android:background="@drawable/bg_edittext"
-                            android:gravity="center"
-                            android:hint="0"
-                            android:importantForAutofill="no"
-                            android:inputType="number"
-                            android:maxLines="1"
-                            android:textColor="#1B3317"
-                            android:textSize="14sp" />
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
 
-                    </LinearLayout>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="3° Tercero"
+                                    android:textColor="#1E293B"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Porción estándar: 250 g · Primaria"
+                                    android:textColor="#64748B"
+                                    android:textSize="11sp" />
+
+                            </LinearLayout>
+
+                            <EditText
+                                android:id="@+id/edtGradoTercero"
+                                android:layout_width="64dp"
+                                android:layout_height="38dp"
+                                android:background="@drawable/bg_input"
+                                android:gravity="center"
+                                android:hint="0"
+                                android:inputType="number"
+                                android:maxLines="1"
+                                android:textColor="#1E293B"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
                     <!-- 4° CUARTO -->
-                    <LinearLayout
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="1dp"
+                        app:strokeColor="#E2E8F0"
+                        app:strokeWidth="1dp">
 
-                        <TextView
-                            android:layout_width="0dp"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="4° Cuarto (250g)"
-                            android:textColor="#1B3317"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="12dp">
 
-                        <EditText
-                            android:id="@+id/edtGradoCuarto"
-                            android:layout_width="80dp"
-                            android:layout_height="38dp"
-                            android:background="@drawable/bg_edittext"
-                            android:gravity="center"
-                            android:hint="0"
-                            android:importantForAutofill="no"
-                            android:inputType="number"
-                            android:maxLines="1"
-                            android:textColor="#1B3317"
-                            android:textSize="14sp" />
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
 
-                    </LinearLayout>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="4° Cuarto"
+                                    android:textColor="#1E293B"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Porción estándar: 250 g · Primaria"
+                                    android:textColor="#64748B"
+                                    android:textSize="11sp" />
+
+                            </LinearLayout>
+
+                            <EditText
+                                android:id="@+id/edtGradoCuarto"
+                                android:layout_width="64dp"
+                                android:layout_height="38dp"
+                                android:background="@drawable/bg_input"
+                                android:gravity="center"
+                                android:hint="0"
+                                android:inputType="number"
+                                android:maxLines="1"
+                                android:textColor="#1E293B"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
                     <!-- 5° QUINTO -->
-                    <LinearLayout
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="1dp"
+                        app:strokeColor="#E2E8F0"
+                        app:strokeWidth="1dp">
 
-                        <TextView
-                            android:layout_width="0dp"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="5° Quinto (250g)"
-                            android:textColor="#1B3317"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="12dp">
 
-                        <EditText
-                            android:id="@+id/edtGradoQuinto"
-                            android:layout_width="80dp"
-                            android:layout_height="38dp"
-                            android:background="@drawable/bg_edittext"
-                            android:gravity="center"
-                            android:hint="0"
-                            android:importantForAutofill="no"
-                            android:inputType="number"
-                            android:maxLines="1"
-                            android:textColor="#1B3317"
-                            android:textSize="14sp" />
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
 
-                    </LinearLayout>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="5° Quinto"
+                                    android:textColor="#1E293B"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Porción estándar: 250 g · Primaria"
+                                    android:textColor="#64748B"
+                                    android:textSize="11sp" />
+
+                            </LinearLayout>
+
+                            <EditText
+                                android:id="@+id/edtGradoQuinto"
+                                android:layout_width="64dp"
+                                android:layout_height="38dp"
+                                android:background="@drawable/bg_input"
+                                android:gravity="center"
+                                android:hint="0"
+                                android:inputType="number"
+                                android:maxLines="1"
+                                android:textColor="#1E293B"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
                 </LinearLayout>
 
-                <!-- CONTENEDOR SECUNDARIA (6° A 11°) -->
+                <!-- CONTENEDOR SECUNDARIA -->
                 <LinearLayout
                     android:id="@+id/layoutSecundaria"
                     android:layout_width="match_parent"
@@ -264,190 +560,352 @@
                     android:orientation="vertical">
 
                     <!-- 6° SEXTO -->
-                    <LinearLayout
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="1dp"
+                        app:strokeColor="#E2E8F0"
+                        app:strokeWidth="1dp">
 
-                        <TextView
-                            android:layout_width="0dp"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="6° Sexto (380g)"
-                            android:textColor="#1B3317"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="12dp">
 
-                        <EditText
-                            android:id="@+id/edtGradoSexto"
-                            android:layout_width="80dp"
-                            android:layout_height="38dp"
-                            android:background="@drawable/bg_edittext"
-                            android:gravity="center"
-                            android:hint="0"
-                            android:importantForAutofill="no"
-                            android:inputType="number"
-                            android:maxLines="1"
-                            android:textColor="#1B3317"
-                            android:textSize="14sp" />
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
 
-                    </LinearLayout>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="6° Sexto"
+                                    android:textColor="#1E293B"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Porción estándar: 380 g · Secundaria"
+                                    android:textColor="#64748B"
+                                    android:textSize="11sp" />
+
+                            </LinearLayout>
+
+                            <EditText
+                                android:id="@+id/edtGradoSexto"
+                                android:layout_width="64dp"
+                                android:layout_height="38dp"
+                                android:background="@drawable/bg_input"
+                                android:gravity="center"
+                                android:hint="0"
+                                android:inputType="number"
+                                android:maxLines="1"
+                                android:textColor="#1E293B"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
                     <!-- 7° SÉPTIMO -->
-                    <LinearLayout
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="1dp"
+                        app:strokeColor="#E2E8F0"
+                        app:strokeWidth="1dp">
 
-                        <TextView
-                            android:layout_width="0dp"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="7° Séptimo (380g)"
-                            android:textColor="#1B3317"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="12dp">
 
-                        <EditText
-                            android:id="@+id/edtGradoSeptimo"
-                            android:layout_width="80dp"
-                            android:layout_height="38dp"
-                            android:background="@drawable/bg_edittext"
-                            android:gravity="center"
-                            android:hint="0"
-                            android:importantForAutofill="no"
-                            android:inputType="number"
-                            android:maxLines="1"
-                            android:textColor="#1B3317"
-                            android:textSize="14sp" />
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
 
-                    </LinearLayout>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="7° Séptimo"
+                                    android:textColor="#1E293B"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Porción estándar: 380 g · Secundaria"
+                                    android:textColor="#64748B"
+                                    android:textSize="11sp" />
+
+                            </LinearLayout>
+
+                            <EditText
+                                android:id="@+id/edtGradoSeptimo"
+                                android:layout_width="64dp"
+                                android:layout_height="38dp"
+                                android:background="@drawable/bg_input"
+                                android:gravity="center"
+                                android:hint="0"
+                                android:inputType="number"
+                                android:maxLines="1"
+                                android:textColor="#1E293B"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
                     <!-- 8° OCTAVO -->
-                    <LinearLayout
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="1dp"
+                        app:strokeColor="#E2E8F0"
+                        app:strokeWidth="1dp">
 
-                        <TextView
-                            android:layout_width="0dp"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="8° Octavo (380g)"
-                            android:textColor="#1B3317"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="12dp">
 
-                        <EditText
-                            android:id="@+id/edtGradoOctavo"
-                            android:layout_width="80dp"
-                            android:layout_height="38dp"
-                            android:background="@drawable/bg_edittext"
-                            android:gravity="center"
-                            android:hint="0"
-                            android:importantForAutofill="no"
-                            android:inputType="number"
-                            android:maxLines="1"
-                            android:textColor="#1B3317"
-                            android:textSize="14sp" />
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
 
-                    </LinearLayout>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="8° Octavo"
+                                    android:textColor="#1E293B"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Porción estándar: 380 g · Secundaria"
+                                    android:textColor="#64748B"
+                                    android:textSize="11sp" />
+
+                            </LinearLayout>
+
+                            <EditText
+                                android:id="@+id/edtGradoOctavo"
+                                android:layout_width="64dp"
+                                android:layout_height="38dp"
+                                android:background="@drawable/bg_input"
+                                android:gravity="center"
+                                android:hint="0"
+                                android:inputType="number"
+                                android:maxLines="1"
+                                android:textColor="#1E293B"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
                     <!-- 9° NOVENO -->
-                    <LinearLayout
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="1dp"
+                        app:strokeColor="#E2E8F0"
+                        app:strokeWidth="1dp">
 
-                        <TextView
-                            android:layout_width="0dp"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="9° Noveno (380g)"
-                            android:textColor="#1B3317"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="12dp">
 
-                        <EditText
-                            android:id="@+id/edtGradoNoveno"
-                            android:layout_width="80dp"
-                            android:layout_height="38dp"
-                            android:background="@drawable/bg_edittext"
-                            android:gravity="center"
-                            android:hint="0"
-                            android:importantForAutofill="no"
-                            android:inputType="number"
-                            android:maxLines="1"
-                            android:textColor="#1B3317"
-                            android:textSize="14sp" />
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
 
-                    </LinearLayout>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="9° Noveno"
+                                    android:textColor="#1E293B"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Porción estándar: 380 g · Secundaria"
+                                    android:textColor="#64748B"
+                                    android:textSize="11sp" />
+
+                            </LinearLayout>
+
+                            <EditText
+                                android:id="@+id/edtGradoNoveno"
+                                android:layout_width="64dp"
+                                android:layout_height="38dp"
+                                android:background="@drawable/bg_input"
+                                android:gravity="center"
+                                android:hint="0"
+                                android:inputType="number"
+                                android:maxLines="1"
+                                android:textColor="#1E293B"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
                     <!-- 10° DÉCIMO -->
-                    <LinearLayout
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="1dp"
+                        app:strokeColor="#E2E8F0"
+                        app:strokeWidth="1dp">
 
-                        <TextView
-                            android:layout_width="0dp"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="10° Décimo (380g)"
-                            android:textColor="#1B3317"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="12dp">
 
-                        <EditText
-                            android:id="@+id/edtGradoDecimo"
-                            android:layout_width="80dp"
-                            android:layout_height="38dp"
-                            android:background="@drawable/bg_edittext"
-                            android:gravity="center"
-                            android:hint="0"
-                            android:importantForAutofill="no"
-                            android:inputType="number"
-                            android:maxLines="1"
-                            android:textColor="#1B3317"
-                            android:textSize="14sp" />
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
 
-                    </LinearLayout>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="10° Décimo"
+                                    android:textColor="#1E293B"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Porción estándar: 380 g · Secundaria"
+                                    android:textColor="#64748B"
+                                    android:textSize="11sp" />
+
+                            </LinearLayout>
+
+                            <EditText
+                                android:id="@+id/edtGradoDecimo"
+                                android:layout_width="64dp"
+                                android:layout_height="38dp"
+                                android:background="@drawable/bg_input"
+                                android:gravity="center"
+                                android:hint="0"
+                                android:inputType="number"
+                                android:maxLines="1"
+                                android:textColor="#1E293B"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
                     <!-- 11° UNDÉCIMO -->
-                    <LinearLayout
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="1dp"
+                        app:strokeColor="#E2E8F0"
+                        app:strokeWidth="1dp">
 
-                        <TextView
-                            android:layout_width="0dp"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="11° Undécimo (380g)"
-                            android:textColor="#1B3317"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="12dp">
 
-                        <EditText
-                            android:id="@+id/edtCantidadSecundaria"
-                            android:layout_width="80dp"
-                            android:layout_height="38dp"
-                            android:background="@drawable/bg_edittext"
-                            android:gravity="center"
-                            android:hint="0"
-                            android:importantForAutofill="no"
-                            android:inputType="number"
-                            android:maxLines="1"
-                            android:textColor="#1B3317"
-                            android:textSize="14sp" />
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
 
-                    </LinearLayout>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="11° Undécimo"
+                                    android:textColor="#1E293B"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Porción estándar: 380 g · Secundaria"
+                                    android:textColor="#64748B"
+                                    android:textSize="11sp" />
+
+                            </LinearLayout>
+
+                            <EditText
+                                android:id="@+id/edtCantidadSecundaria"
+                                android:layout_width="64dp"
+                                android:layout_height="38dp"
+                                android:background="@drawable/bg_input"
+                                android:gravity="center"
+                                android:hint="0"
+                                android:inputType="number"
+                                android:maxLines="1"
+                                android:textColor="#1E293B"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
                 </LinearLayout>
 
@@ -455,29 +913,29 @@
 
         </ScrollView>
 
-        <!-- RESUMEN DE GRAMAJE CALCULADO EN TIEMPO REAL -->
+        <!-- TARJETA RESUMEN (AMARILLO SUAVE #FEF9E7) -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            app:cardBackgroundColor="#FAF9F4"
-            app:cardCornerRadius="12dp"
+            app:cardBackgroundColor="#FEF9E7"
+            app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
-            app:strokeColor="#EBE8D8"
-            app:strokeWidth="1dp">
+            app:strokeColor="#F4B41F"
+            app:strokeWidth="1.5dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="14dp">
 
                 <TextView
                     android:id="@+id/txtTotalEstudiantesCalculado"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Total Estudiantes: 0"
-                    android:textColor="#1B3317"
+                    android:textColor="#1E293B"
                     android:textSize="13sp"
                     android:textStyle="bold" />
 
@@ -485,17 +943,16 @@
                     android:id="@+id/txtGramajeTotalEstimado"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="3dp"
                     android:text="Gramaje total estimado: 0.0 kg a cocinar"
-                    android:textColor="#7A5500"
+                    android:textColor="#92400E"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
             </LinearLayout>
-
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- BOTONES -->
+        <!-- BOTONES GUARDAR / CANCELAR -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="48dp"
@@ -503,30 +960,17 @@
             android:orientation="horizontal">
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCancelarAsistencia"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="6dp"
-                android:layout_weight="1"
-                android:text="Cancelar"
-                android:textColor="#1B3317"
-                android:textSize="13sp"
-                app:cornerRadius="12dp"
-                app:strokeColor="#CBD5E1" />
-
-            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnGuardarAsistencia"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1"
                 android:backgroundTint="#F4B41F"
-                android:text="Guardar"
+                android:text="Guardar asistencia"
+                android:textAllCaps="false"
                 android:textColor="#1B3317"
-                android:textSize="13sp"
+                android:textSize="14sp"
                 android:textStyle="bold"
-                app:cornerRadius="12dp" />
+                app:cornerRadius="14dp"
+                app:elevation="0dp" />
 
         </LinearLayout>
 

@@ -58,6 +58,7 @@ class AsignadasActivity : AppCompatActivity() {
 
         configurarEncabezadoYPlato()
         configurarAcciones()
+        configurarConmutadorNutricional()
         configurarListaOperarias()
         configurarNavegacion()
 
@@ -185,6 +186,25 @@ class AsignadasActivity : AppCompatActivity() {
         }
 
         dialog.show()
+    }
+
+    private fun configurarConmutadorNutricional() {
+        val btnPrimaria = findViewById<TextView>(R.id.btnPrimaria)
+        val btnSecundaria = findViewById<TextView>(R.id.btnSecundaria)
+
+        btnPrimaria?.setOnClickListener {
+            btnPrimaria.setBackgroundResource(R.drawable.bg_pill_green)
+            btnPrimaria.setTextColor(android.graphics.Color.WHITE)
+            btnSecundaria?.background = null
+            btnSecundaria?.setTextColor(android.graphics.Color.parseColor("#64748B"))
+        }
+
+        btnSecundaria?.setOnClickListener {
+            btnSecundaria.setBackgroundResource(R.drawable.bg_pill_green)
+            btnSecundaria.setTextColor(android.graphics.Color.WHITE)
+            btnPrimaria?.background = null
+            btnPrimaria?.setTextColor(android.graphics.Color.parseColor("#64748B"))
+        }
     }
 
     private fun configurarListaOperarias() {
