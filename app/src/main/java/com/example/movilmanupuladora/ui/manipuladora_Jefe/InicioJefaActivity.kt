@@ -119,6 +119,7 @@ class InicioJefaActivity : AppCompatActivity() {
 
         actualizarResumen()
         actualizarPlatosVisuales()
+        actualizarBadgeNotificaciones()
         cargarAsistenciaDelBackend()
 
         lifecycleScope.launch {
@@ -151,6 +152,7 @@ class InicioJefaActivity : AppCompatActivity() {
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
         actualizarResumen()
         actualizarPlatosVisuales()
+        actualizarBadgeNotificaciones()
         cargarAsistenciaDelBackend()
         lifecycleScope.launch {
             try {
@@ -160,6 +162,7 @@ class InicioJefaActivity : AppCompatActivity() {
                 NotificacionesJefaManager.sincronizarNotificacionesDelBackend(this@InicioJefaActivity)
                 SedeContratoManager.sincronizarSeccionesContrato(this@InicioJefaActivity, idSede ?: 1)
                 actualizarResumen()
+                actualizarBadgeNotificaciones()
 
                 val res = RetrofitClient.apiService.obtenerPlatos()
                 if (res.isSuccessful && !res.body().isNullOrEmpty()) {
@@ -608,114 +611,8 @@ class InicioJefaActivity : AppCompatActivity() {
         }
 
         binding.btnNotificacionesJefa.setOnClickListener {
-            val notifs = NotificacionesJefaManager.obtenerNotificacionesSede(this)
-            NotificacionesJefaManager.marcarTodasComoLeidas(this)
-            actualizarBadgeNotificaciones()
-
-            val popupBinding = com.example.movilmanupuladora.databinding.PopupNotificacionesBinding.inflate(layoutInflater)
-            popupBinding.txtCantidadNotificaciones.text = notifs.size.toString()
-
-            val dialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-                .setView(popupBinding.root)
-                .create()
-
-            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-
-            if (notifs.isEmpty()) {
-                popupBinding.contenedorNotificaciones.visibility = View.GONE
-                popupBinding.contenedorSinNotificaciones.visibility = View.VISIBLE
-            } else {
-                popupBinding.contenedorNotificaciones.visibility = View.VISIBLE
-                popupBinding.contenedorSinNotificaciones.visibility = View.GONE
-                popupBinding.contenedorNotificaciones.removeAllViews()
-
-                val density = resources.displayMetrics.density
-                for (notif in notifs.take(4)) {
-                    val itemLayout = android.widget.LinearLayout(this).apply {
-                        orientation = android.widget.LinearLayout.HORIZONTAL
-                        gravity = android.view.Gravity.CENTER_VERTICAL
-                        setPadding(0, (8 * density).toInt(), 0, (8 * density).toInt())
-                        isClickable = true
-                        isFocusable = true
-                        val typedValue = android.util.TypedValue()
-                        theme.resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true)
-                        setBackgroundResource(typedValue.resourceId)
-                    }
-
-                    val icono = android.widget.ImageView(this).apply {
-                        layoutParams = android.widget.LinearLayout.LayoutParams((38 * density).toInt(), (38 * density).toInt())
-                        setBackgroundResource(R.drawable.bg_pill_yellow)
-                        setPadding((8 * density).toInt(), (8 * density).toInt(), (8 * density).toInt(), (8 * density).toInt())
-                        if (notif.categoria.equals("Equipo", ignoreCase = true)) {
-                            setImageResource(R.drawable.ic_people)
-                            imageTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#854D0E"))
-                        } else {
-                            setImageResource(R.drawable.ic_notificaciones)
-                            imageTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#854D0E"))
-                        }
-                    }
-
-                    val infoLayout = android.widget.LinearLayout(this).apply {
-                        orientation = android.widget.LinearLayout.VERTICAL
-                        val params = android.widget.LinearLayout.LayoutParams(0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
-                        params.marginStart = (12 * density).toInt()
-                        layoutParams = params
-                    }
-
-                    val txtTitulo = android.widget.TextView(this).apply {
-                        text = notif.titulo
-                        setTextColor(android.graphics.Color.parseColor("#1B3317"))
-                        textSize = 13f
-                        typeface = android.graphics.Typeface.DEFAULT_BOLD
-                    }
-
-                    val txtMensaje = android.widget.TextView(this).apply {
-                        text = notif.mensaje
-                        setTextColor(android.graphics.Color.parseColor("#64748B"))
-                        textSize = 11f
-                        maxLines = 2
-                        ellipsize = android.text.TextUtils.TruncateAt.END
-                    }
-
-                    infoLayout.addView(txtTitulo)
-                    infoLayout.addView(txtMensaje)
-
-                    itemLayout.addView(icono)
-                    itemLayout.addView(infoLayout)
-
-                    itemLayout.setOnClickListener {
-                        dialog.dismiss()
-                        val textoCompleto = "${notif.titulo} ${notif.mensaje}"
-                        if (textoCompleto.contains("entrega", ignoreCase = true) ||
-                            textoCompleto.contains("remisi", ignoreCase = true) ||
-                            textoCompleto.contains("despach", ignoreCase = true)) {
-                            val intent = Intent(this, RegistrarEntregaActivity::class.java)
-                            val match = Regex("#REM-[0-9A-Za-z-]+", RegexOption.IGNORE_CASE).find(textoCompleto)
-                            if (match != null) {
-                                intent.putExtra("numero_remision", match.value)
-                            }
-                            startActivity(intent)
-                        } else if (notif.categoria.equals("Equipo", ignoreCase = true)) {
-                            startActivity(Intent(this, ManipuladorasJefaActivity::class.java))
-                        } else {
-                            startActivity(Intent(this, HistorialNotificacionesJefaActivity::class.java))
-                        }
-                    }
-
-                    popupBinding.contenedorNotificaciones.addView(itemLayout)
-                }
-            }
-
-            popupBinding.btnVerTodasNotificaciones.setOnClickListener {
-                dialog.dismiss()
-                startActivity(Intent(this, HistorialNotificacionesJefaActivity::class.java))
-            }
-
-            dialog.setOnDismissListener {
-                actualizarBadgeNotificaciones()
-            }
-
-            dialog.show()
+            val intent = Intent(this, HistorialNotificacionesJefaActivity::class.java)
+            startActivity(intent)
         }
     }
 

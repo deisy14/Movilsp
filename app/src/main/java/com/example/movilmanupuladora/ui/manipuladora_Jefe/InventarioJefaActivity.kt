@@ -72,121 +72,30 @@ class InventarioJefaActivity : AppCompatActivity() {
         configurarBotonesCategorias()
         configurarNavegacionInferior()
         cargarDatosDesdeServidor()
-
-        binding.cardBannerEntregaSupervisor.setOnClickListener {
-            val intent = Intent(this, RegistrarEntregaActivity::class.java)
-            startActivity(intent)
-        }
     }
 
     override fun onResume() {
         super.onResume()
+        // Cargar inventario local actualizado (con alimentos recibidos de entregas aceptadas)
+        val productosLocales = InventarioManager.obtenerProductos(this)
+        listaProductosAdmin.clear()
+        listaProductosAdmin.addAll(productosLocales)
+        adapter.actualizarLista(listaProductosAdmin)
+        if (categoriaFiltroActiva != null) {
+            adapter.filtrarPorCategoria(categoriaFiltroActiva)
+        }
+        actualizarTextoConteo()
+
         // Cada vez que la jefa abre o regresa a la pantalla, se consulta el stock actualizado del Admin
         cargarDatosDesdeServidor()
     }
 
     /**
-     * Carga inicial con los productos reales del admin registrados en la base de datos
+     * Carga inicial con los productos del inventario
      */
     private fun inicializarListaProductos() {
         listaProductosAdmin.clear()
-
-        // 1. GRANOS
-        listaProductosAdmin.add(
-            ProductoAdmin(
-                id = 1,
-                idInventario = 23,
-                idIngrediente = 3,
-                nombre = "Arroz",
-                cantidad = 20.0,
-                unidadMedida = "kg",
-                categoria = "Granos",
-                descripcion = "Arroz blanco seleccionado",
-                imagenRes = R.drawable.ic_food
-            )
-        )
-        listaProductosAdmin.add(
-            ProductoAdmin(
-                id = 2,
-                idInventario = 25,
-                idIngrediente = 12,
-                nombre = "Frijoles",
-                cantidad = 20.0,
-                unidadMedida = "kg",
-                categoria = "Granos",
-                descripcion = "Frijol bolón",
-                imagenRes = R.drawable.ic_food
-            )
-        )
-        listaProductosAdmin.add(
-            ProductoAdmin(
-                id = 3,
-                idInventario = 27,
-                idIngrediente = 2,
-                nombre = "Carne de res",
-                cantidad = 0.02,
-                unidadMedida = "kg",
-                categoria = "Granos",
-                descripcion = "Carne de res magra",
-                imagenRes = R.drawable.ic_food
-            )
-        )
-        listaProductosAdmin.add(
-            ProductoAdmin(
-                id = 5,
-                idInventario = 24,
-                idIngrediente = 7,
-                nombre = "Aceite vegetal",
-                cantidad = 15.0,
-                unidadMedida = "L",
-                categoria = "Granos",
-                descripcion = "Aceite vegetal para cocina",
-                imagenRes = R.drawable.ic_food
-            )
-        )
-
-        // 2. LÁCTEOS
-        listaProductosAdmin.add(
-            ProductoAdmin(
-                id = 6,
-                idInventario = 22,
-                idIngrediente = 1,
-                nombre = "Leche entera",
-                cantidad = 30.0,
-                unidadMedida = "L",
-                categoria = "Lácteos",
-                descripcion = "Leche pasteurizada",
-                imagenRes = R.drawable.ic_food
-            )
-        )
-        listaProductosAdmin.add(
-            ProductoAdmin(
-                id = 8,
-                idInventario = 21,
-                idIngrediente = 8,
-                nombre = "Huevos",
-                cantidad = 50.0,
-                unidadMedida = "u",
-                categoria = "Lácteos",
-                descripcion = "Huevos frescos tipo A",
-                imagenRes = R.drawable.ic_food
-            )
-        )
-
-        // 3. VERDURAS
-        listaProductosAdmin.add(
-            ProductoAdmin(
-                id = 9,
-                idInventario = 26,
-                idIngrediente = 4,
-                nombre = "Tomate",
-                cantidad = 11.2,
-                unidadMedida = "kg",
-                categoria = "Verduras",
-                descripcion = "Tomate fresco",
-                imagenRes = R.drawable.ic_food
-            )
-        )
+        listaProductosAdmin.addAll(InventarioManager.obtenerProductos(this))
     }
 
     private fun configurarRecyclerView() {
@@ -294,6 +203,7 @@ class InventarioJefaActivity : AppCompatActivity() {
             val nuevoValor = nuevoValorStr.toDoubleOrNull()
             if (nuevoValor != null && nuevoValor >= 0) {
                 producto.cantidad = nuevoValor
+                InventarioManager.guardarProductos(this, listaProductosAdmin)
                 adapter.notifyDataSetChanged()
                 actualizarTextoConteo()
 
@@ -417,8 +327,22 @@ class InventarioJefaActivity : AppCompatActivity() {
                     }
 
                     if (listaServidor.isNotEmpty()) {
+                        // Preservar productos e incrementos locales originados por remisiones recibidas
+                        val locales = InventarioManager.obtenerProductos(this@InventarioJefaActivity)
+                        for (pLocal in locales) {
+                            val localLimpio = InventarioManager.limpiarNombre(pLocal.nombre)
+                            val encontrado = listaServidor.find { 
+                                InventarioManager.limpiarNombre(it.nombre).equals(localLimpio, ignoreCase = true) 
+                            }
+                            if (encontrado == null) {
+                                listaServidor.add(pLocal.copy(nombre = localLimpio))
+                            } else if (pLocal.cantidad > encontrado.cantidad) {
+                                encontrado.cantidad = pLocal.cantidad
+                            }
+                        }
                         listaProductosAdmin.clear()
                         listaProductosAdmin.addAll(listaServidor)
+                        InventarioManager.guardarProductos(this@InventarioJefaActivity, listaProductosAdmin)
                     }
                 } else {
                     android.util.Log.e("INVENTARIO_SYNC", "obtenerInventario: HTTP ${invRes.code()}")

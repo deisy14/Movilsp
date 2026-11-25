@@ -5,88 +5,104 @@
     android:id="@+id/cardItemNotificacion"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
+    android:layout_marginBottom="10dp"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    app:cardBackgroundColor="#FFFFFF"
-    app:cardCornerRadius="18dp"
-    app:cardElevation="2dp"
-    app:strokeColor="#F4B41F"
-    app:strokeWidth="1.5dp">
+    app:cardBackgroundColor="#FEFCE8"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#FDE68A"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:gravity="top"
+        android:orientation="horizontal"
+        android:padding="14dp">
 
+        <!-- Icono redondo suave -->
+        <ImageView
+            android:id="@+id/imgIconoNotif"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/bg_icono_circular"
+            android:backgroundTint="#FEF3C7"
+            android:contentDescription="Icono"
+            android:padding="9dp"
+            android:src="@drawable/ic_nav_inventory"
+            app:tint="#D97706" />
+
+        <!-- Contenido principal -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:id="@+id/imgIconoNotif"
-                android:layout_width="38dp"
-                android:layout_height="38dp"
-                android:background="@drawable/bg_icono_circular"
-                android:backgroundTint="#FEF3C7"
-                android:contentDescription="Icono"
-                android:padding="8dp"
-                android:src="@drawable/ic_people"
-                app:tint="#854D0E" />
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/txtTituloNotif"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
                     android:text="Título de Notificación"
-                    android:textColor="#1B3317"
-                    android:textSize="15sp"
+                    android:textColor="#0F172A"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
+                <!-- Hora / Fecha en la esquina derecha -->
                 <TextView
                     android:id="@+id/txtFechaNotif"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="1dp"
-                    android:text="Reciente"
-                    android:textColor="#64748B"
+                    android:layout_marginStart="6dp"
+                    android:text="10:46 AM"
+                    android:textColor="#94A3B8"
                     android:textSize="11sp" />
 
             </LinearLayout>
 
             <TextView
+                android:id="@+id/txtMensajeNotif"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:ellipsize="end"
+                android:lineSpacingExtra="2dp"
+                android:maxLines="3"
+                android:text="Mensaje de notificación..."
+                android:textColor="#475569"
+                android:textSize="12sp" />
+
+            <!-- Categoría sutil -->
+            <TextView
                 android:id="@+id/badgeCategoriaNotif"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_pill_yellow"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="3dp"
-                android:text="Equipo"
-                android:textColor="#854D0E"
-                android:textSize="10sp"
-                android:textStyle="bold" />
+                android:visibility="gone" />
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/txtMensajeNotif"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="Mensaje de notificación..."
-            android:textColor="#334155"
-            android:textSize="13sp" />
+        <!-- Indicador de punto no leído (amarillo/ámbar) -->
+        <View
+            android:id="@+id/viewDotNoLeida"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_badge_notificacion"
+            android:backgroundTint="#F59E0B"
+            android:visibility="visible" />
 
     </LinearLayout>
 

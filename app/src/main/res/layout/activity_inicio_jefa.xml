@@ -63,7 +63,7 @@
 
         </LinearLayout>
 
-        <!-- NOTIFICACIONES (BLANCO) -->
+        <!-- NOTIFICACIONES (BLANCO) CON BADGE DE AVISO -->
         <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -93,6 +93,7 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Badge numérico / indicador de nueva notificación -->
             <TextView
                 android:id="@+id/badgeNotificacionesJefa"
                 android:layout_width="20dp"

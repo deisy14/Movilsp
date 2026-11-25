@@ -20,7 +20,8 @@ object NotificacionesJefaManager {
         val fecha: String,
         val categoria: String, // "Equipo", "Inventario", "Preparaciones", "Asistencia"
         val timestamp: Long = System.currentTimeMillis(),
-        var leida: Boolean = false
+        var leida: Boolean = false,
+        val numeroRemision: String? = null
     )
 
     private val gson = Gson()
@@ -73,13 +74,37 @@ object NotificacionesJefaManager {
         }
         if (json.isNullOrBlank()) return emptyList()
 
+        val leidas = prefs.getStringSet("NOTIFS_LEIDAS", emptySet()) ?: emptySet()
+
         return try {
             val type = object : TypeToken<List<NotificacionItem>>() {}.type
             val lista: List<NotificacionItem> = gson.fromJson(json, type) ?: emptyList()
-            lista.sortedByDescending { it.timestamp }
+            lista.map {
+                it.copy(leida = leidas.contains(it.id))
+            }.sortedByDescending { it.timestamp }
         } catch (_: Exception) {
             emptyList()
         }
+    }
+
+    fun marcarLeida(context: Context, id: String) {
+        val prefs = context.getSharedPreferences("JEFA_NOTIFS_STORE", Context.MODE_PRIVATE)
+        val leidas = (prefs.getStringSet("NOTIFS_LEIDAS", emptySet()) ?: emptySet()).toMutableSet()
+        leidas.add(id)
+        prefs.edit().putStringSet("NOTIFS_LEIDAS", leidas).apply()
+    }
+
+    fun esLeida(context: Context, id: String): Boolean {
+        val prefs = context.getSharedPreferences("JEFA_NOTIFS_STORE", Context.MODE_PRIVATE)
+        val leidas = prefs.getStringSet("NOTIFS_LEIDAS", emptySet()) ?: emptySet()
+        return leidas.contains(id)
+    }
+
+    fun obtenerConteoNoLeidas(context: Context): Int {
+        val notifs = obtenerNotificacionesSede(context)
+        val prefs = context.getSharedPreferences("JEFA_NOTIFS_STORE", Context.MODE_PRIVATE)
+        val leidas = prefs.getStringSet("NOTIFS_LEIDAS", emptySet()) ?: emptySet()
+        return notifs.count { !leidas.contains(it.id) }
     }
 
     /**
@@ -137,12 +162,23 @@ object NotificacionesJefaManager {
                     if (tit.isBlank() && msg.isBlank()) continue
 
                     val fechaFormateada = formatearFechaBackend(nb.fecha)
+                    val textoCompleto = "$tit $msg"
+                    val esEntrega = textoCompleto.contains("entrega", ignoreCase = true) ||
+                            textoCompleto.contains("remisi", ignoreCase = true) ||
+                            textoCompleto.contains("despach", ignoreCase = true) ||
+                            textoCompleto.contains("factura", ignoreCase = true) ||
+                            textoCompleto.contains("FAC-", ignoreCase = true) ||
+                            textoCompleto.contains("#REM", ignoreCase = true)
+
                     val cat = when {
+                        esEntrega -> "Inventario"
                         nb.tipo.equals("inventario", ignoreCase = true) || tit.contains("inventario", ignoreCase = true) -> "Inventario"
                         nb.tipo.equals("preparacion", ignoreCase = true) || tit.contains("prep", ignoreCase = true) -> "Preparaciones"
                         nb.tipo.equals("asistencia", ignoreCase = true) || tit.contains("asist", ignoreCase = true) -> "Asistencia"
                         else -> "Equipo"
                     }
+
+                    val remMatch = Regex("(?:#REM-|FAC-)[0-9A-Za-z-]+", RegexOption.IGNORE_CASE).find(textoCompleto)?.value
 
                     val yaExiste = listaActual.any { it.titulo == tit && it.mensaje == msg }
                     if (!yaExiste) {
@@ -153,7 +189,8 @@ object NotificacionesJefaManager {
                                 mensaje = msg,
                                 fecha = fechaFormateada,
                                 categoria = cat,
-                                timestamp = System.currentTimeMillis() - 86400000L // Notificaciones anteriores
+                                timestamp = System.currentTimeMillis() - 86400000L, // Notificaciones anteriores
+                                numeroRemision = remMatch
                             )
                         )
                     }
@@ -180,7 +217,7 @@ object NotificacionesJefaManager {
                             val match = Regex("Responsable:\\s*([^|;\\n]+)", RegexOption.IGNORE_CASE).find(obs)
                             match?.groupValues?.get(1)?.trim()
                         } ?: "Supervisor PAE"
-                        val msg = "El $nomSup ha despachado la remisión $rem con ${items.size} alimentos para tu sede. Toca aquí para revisar cantidades, reportar faltantes y firmar el acta."
+                        val msg = "El $nomSup ha despachado la remisión $rem con ${items.size} alimentos para tu sede. Toca aquí para revisar cantidades y firmar el acta."
 
                         val yaExiste = listaActual.any { it.titulo == tit }
                         if (!yaExiste) {
@@ -190,9 +227,10 @@ object NotificacionesJefaManager {
                                     id = "entrega_$rem",
                                     titulo = tit,
                                     mensaje = msg,
-                                    fecha = "En tránsito",
+                                    fecha = SimpleDateFormat("dd MMM, hh:mm a", Locale("es", "CO")).format(Date()),
                                     categoria = "Inventario",
-                                    timestamp = System.currentTimeMillis()
+                                    timestamp = System.currentTimeMillis(),
+                                    numeroRemision = rem
                                 )
                             )
                         }

@@ -87,58 +87,86 @@ class HistorialNotificacionesJefaActivity : AppCompatActivity() {
                 itemBinding.txtFechaNotif.text = notif.fecha
                 itemBinding.badgeCategoriaNotif.text = notif.categoria
 
-                when (notif.categoria.lowercase()) {
-                    "equipo" -> {
-                        itemBinding.imgIconoNotif.setImageResource(R.drawable.ic_people)
-                        itemBinding.imgIconoNotif.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FEF3C7"))
-                        itemBinding.badgeCategoriaNotif.background = getDrawable(R.drawable.bg_pill_yellow)
-                        itemBinding.badgeCategoriaNotif.setTextColor(Color.parseColor("#854D0E"))
-                        itemBinding.cardItemNotificacion.setOnClickListener {
-                            startActivity(Intent(this, ManipuladorasJefaActivity::class.java))
+                val esLeida = NotificacionesJefaManager.esLeida(this, notif.id)
+                val density = resources.displayMetrics.density
+
+                if (esLeida) {
+                    itemBinding.cardItemNotificacion.setCardBackgroundColor(Color.parseColor("#FFFFFF"))
+                    itemBinding.cardItemNotificacion.strokeColor = Color.parseColor("#E2E8F0")
+                    itemBinding.cardItemNotificacion.strokeWidth = (1 * density).toInt()
+                    itemBinding.viewDotNoLeida.visibility = View.GONE
+                } else {
+                    itemBinding.cardItemNotificacion.setCardBackgroundColor(Color.parseColor("#FEFCE8"))
+                    itemBinding.cardItemNotificacion.strokeColor = Color.parseColor("#FDE68A")
+                    itemBinding.cardItemNotificacion.strokeWidth = (1.2f * density).toInt()
+                    itemBinding.viewDotNoLeida.visibility = View.VISIBLE
+                }
+
+                val textoCompleto = "${notif.titulo} ${notif.mensaje}"
+                val esEntrega = textoCompleto.contains("entrega", ignoreCase = true) ||
+                        textoCompleto.contains("remisi", ignoreCase = true) ||
+                        textoCompleto.contains("despach", ignoreCase = true) ||
+                        textoCompleto.contains("factura", ignoreCase = true) ||
+                        textoCompleto.contains("FAC-", ignoreCase = true) ||
+                        textoCompleto.contains("#REM", ignoreCase = true)
+
+                if (esEntrega) {
+                    itemBinding.imgIconoNotif.setImageResource(R.drawable.ic_nav_inventory)
+                    itemBinding.imgIconoNotif.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FEF3C7"))
+                    itemBinding.imgIconoNotif.imageTintList = ColorStateList.valueOf(Color.parseColor("#D97706"))
+                } else {
+                    when (notif.categoria.lowercase()) {
+                        "equipo" -> {
+                            itemBinding.imgIconoNotif.setImageResource(R.drawable.ic_people)
+                            itemBinding.imgIconoNotif.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#E0E7FF"))
+                            itemBinding.imgIconoNotif.imageTintList = ColorStateList.valueOf(Color.parseColor("#4338CA"))
+                        }
+                        "asistencia" -> {
+                            itemBinding.imgIconoNotif.setImageResource(R.drawable.ic_check_circle)
+                            itemBinding.imgIconoNotif.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#DCFCE7"))
+                            itemBinding.imgIconoNotif.imageTintList = ColorStateList.valueOf(Color.parseColor("#166534"))
+                        }
+                        "preparaciones", "preparacion" -> {
+                            itemBinding.imgIconoNotif.setImageResource(R.drawable.ic_nav_preparations)
+                            itemBinding.imgIconoNotif.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FEF3C7"))
+                            itemBinding.imgIconoNotif.imageTintList = ColorStateList.valueOf(Color.parseColor("#854D0E"))
+                        }
+                        else -> {
+                            itemBinding.imgIconoNotif.setImageResource(R.drawable.ic_nav_inventory)
+                            itemBinding.imgIconoNotif.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#DCFCE7"))
+                            itemBinding.imgIconoNotif.imageTintList = ColorStateList.valueOf(Color.parseColor("#166534"))
                         }
                     }
-                    "inventario" -> {
-                        itemBinding.imgIconoNotif.setImageResource(R.drawable.ic_nav_inventory)
-                        itemBinding.imgIconoNotif.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#DCFCE7"))
-                        itemBinding.badgeCategoriaNotif.background = getDrawable(R.drawable.bg_pill_green)
-                        itemBinding.badgeCategoriaNotif.setTextColor(Color.parseColor("#166534"))
-                        itemBinding.cardItemNotificacion.setOnClickListener {
-                            val textoCompleto = "${notif.titulo} ${notif.mensaje}"
-                            if (textoCompleto.contains("entrega", ignoreCase = true) ||
-                                textoCompleto.contains("remisi", ignoreCase = true) ||
-                                textoCompleto.contains("despach", ignoreCase = true)) {
-                                val intent = Intent(this, RegistrarEntregaActivity::class.java)
-                                val match = Regex("#REM-[0-9A-Za-z-]+", RegexOption.IGNORE_CASE).find(textoCompleto)
-                                if (match != null) {
-                                    intent.putExtra("numero_remision", match.value)
-                                }
-                                startActivity(intent)
-                            } else {
-                                startActivity(Intent(this, InventarioJefaActivity::class.java))
+                }
+
+                itemBinding.cardItemNotificacion.setOnClickListener {
+                    NotificacionesJefaManager.marcarLeida(this, notif.id)
+                    itemBinding.cardItemNotificacion.setCardBackgroundColor(Color.parseColor("#FFFFFF"))
+                    itemBinding.cardItemNotificacion.strokeColor = Color.parseColor("#E2E8F0")
+                    itemBinding.viewDotNoLeida.visibility = View.GONE
+
+                    if (esEntrega) {
+                        val intent = Intent(this, RegistrarEntregaActivity::class.java)
+                        val match = notif.numeroRemision
+                            ?: Regex("(?:#REM-|FAC-)[0-9A-Za-z-]+", RegexOption.IGNORE_CASE).find(textoCompleto)?.value
+                        if (match != null) {
+                            intent.putExtra("numero_remision", match)
+                        }
+                        val matchSupervisor = Regex("El\\s+([A-Za-zÁÉÍÓÚáéíóúñÑ]+(?:\\s+[A-Za-zÁÉÍÓÚáéíóúñÑ]+)?)\\s+ha\\s+despachado", RegexOption.IGNORE_CASE).find(textoCompleto)
+                            ?: Regex("Responsable:\\s*([^|;\\n]+)", RegexOption.IGNORE_CASE).find(textoCompleto)
+                        matchSupervisor?.groupValues?.get(1)?.trim()?.let { sup ->
+                            if (!sup.equals("supervisor", ignoreCase = true) && !sup.equals("supervisor pae", ignoreCase = true)) {
+                                intent.putExtra("supervisor_nombre", sup)
                             }
                         }
-                    }
-                    "preparaciones", "preparacion" -> {
-                        itemBinding.imgIconoNotif.setImageResource(R.drawable.ic_nav_preparations)
-                        itemBinding.imgIconoNotif.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FEF3C7"))
-                        itemBinding.badgeCategoriaNotif.background = getDrawable(R.drawable.bg_pill_yellow)
-                        itemBinding.badgeCategoriaNotif.setTextColor(Color.parseColor("#854D0E"))
-                        itemBinding.cardItemNotificacion.setOnClickListener {
-                            startActivity(Intent(this, HistorialPreparacionesActivity::class.java))
+                        startActivity(intent)
+                    } else {
+                        when (notif.categoria.lowercase()) {
+                            "equipo" -> startActivity(Intent(this, ManipuladorasJefaActivity::class.java))
+                            "asistencia" -> startActivity(Intent(this, AsistenciaJefaActivity::class.java))
+                            "preparaciones", "preparacion" -> startActivity(Intent(this, HistorialPreparacionesActivity::class.java))
+                            else -> startActivity(Intent(this, InventarioJefaActivity::class.java))
                         }
-                    }
-                    "asistencia" -> {
-                        itemBinding.imgIconoNotif.setImageResource(R.drawable.ic_people)
-                        itemBinding.imgIconoNotif.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#DCFCE7"))
-                        itemBinding.badgeCategoriaNotif.background = getDrawable(R.drawable.bg_pill_green)
-                        itemBinding.badgeCategoriaNotif.setTextColor(Color.parseColor("#166534"))
-                        itemBinding.cardItemNotificacion.setOnClickListener {
-                            startActivity(Intent(this, AsistenciaJefaActivity::class.java))
-                        }
-                    }
-                    else -> {
-                        itemBinding.imgIconoNotif.setImageResource(R.drawable.ic_notificaciones)
-                        itemBinding.cardItemNotificacion.setOnClickListener(null)
                     }
                 }
 

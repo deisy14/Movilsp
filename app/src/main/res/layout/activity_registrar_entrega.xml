@@ -52,9 +52,9 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="RECEPCIÓN DE ENTREGA"
+                        android:text="Recepción de Entrega"
                         android:textColor="#1B3317"
-                        android:textSize="18sp"
+                        android:textSize="17sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -62,8 +62,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Sede Piagua • Remisión #REM-2026-104"
-                        android:textColor="#3D5C37"
+                        android:text="Sede Central • Remisión FAC-20261123-5057"
+                        android:textColor="#64748B"
                         android:textSize="12sp" />
 
                 </LinearLayout>
@@ -76,7 +76,7 @@
                     android:background="@drawable/bg_pill_yellow"
                     android:backgroundTint="#FEF3C7"
                     android:paddingHorizontal="10dp"
-                    android:paddingVertical="5dp"
+                    android:paddingVertical="4dp"
                     android:text="Por Verificar"
                     android:textColor="#B45309"
                     android:textSize="11sp"
@@ -84,13 +84,13 @@
 
             </LinearLayout>
 
-            <!-- 1. TARJETA RESUMEN DE LA REMISIÓN / DESPACHO -->
+            <!-- 1. TARJETA RESUMEN DE LA REMISIÓN / DESPACHO (LIMPIA, SIN ICONO FEO Y SIN MUCHO TEXTO) -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="16dp"
+                app:cardCornerRadius="14dp"
                 app:cardElevation="0dp"
                 app:strokeColor="#E2E8F0"
                 app:strokeWidth="1dp">
@@ -98,114 +98,106 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="12dp">
 
+                    <!-- Columna Supervisor -->
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:layout_weight="1.2"
+                        android:orientation="vertical">
 
-                        <ImageView
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
-                            android:background="@drawable/bg_icono_circular"
-                            android:backgroundTint="#FEF3C7"
-                            android:contentDescription="Camión"
-                            android:padding="6dp"
-                            android:src="@drawable/ic_food"
-                            app:tint="#F4B41F" />
-
-                        <LinearLayout
-                            android:layout_width="0dp"
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:text="SUPERVISOR"
+                            android:textColor="#94A3B8"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
 
-                            <TextView
-                                android:id="@+id/txtTituloDespacho"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Entrega Despachada por Supervisor"
-                                android:textColor="#0F172A"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/txtDetalleSupervisor"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:text="Supervisor PAE: Carlos Méndez • Mercados del Mes"
-                                android:textColor="#64748B"
-                                android:textSize="12sp" />
-
-                        </LinearLayout>
+                        <TextView
+                            android:id="@+id/txtDetalleSupervisor"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:text="Carlos Méndez"
+                            android:textColor="#0F172A"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
 
                     </LinearLayout>
 
                     <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginVertical="12dp"
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginHorizontal="10dp"
                         android:background="#F1F5F9" />
 
+                    <!-- Columna Fecha -->
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
-                        <LinearLayout
-                            android:layout_width="0dp"
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:text="FECHA"
+                            android:textColor="#94A3B8"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Fecha de Entrega"
-                                android:textColor="#64748B"
-                                android:textSize="11sp" />
-
-                            <TextView
-                                android:id="@+id/txtFechaDespacho"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:text="Hoy, 14 Nov 2026"
-                                android:textColor="#0F172A"
-                                android:textSize="13sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
+                        <TextView
+                            android:id="@+id/txtFechaDespacho"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:layout_marginTop="2dp"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:text="23 Nov 2026"
+                            android:textColor="#0F172A"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Sede Destino"
-                                android:textColor="#64748B"
-                                android:textSize="11sp" />
+                    </LinearLayout>
 
-                            <TextView
-                                android:id="@+id/txtSedeDestino"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:text="Sede Piagua (Primaria)"
-                                android:textColor="#0F172A"
-                                android:textSize="13sp"
-                                android:textStyle="bold" />
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginHorizontal="10dp"
+                        android:background="#F1F5F9" />
 
-                        </LinearLayout>
+                    <!-- Columna Sede Destino -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="DESTINO"
+                            android:textColor="#94A3B8"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/txtSedeDestino"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:text="Sede Central"
+                            android:textColor="#0F172A"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
 
                     </LinearLayout>
 
@@ -213,11 +205,11 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- 2. SECCIÓN: VERIFICACIÓN DE INGREDIENTES (CHECKLIST) -->
+            <!-- 2. SECCIÓN: INSUMOS A RECIBIR -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="16dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -230,9 +222,9 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Verificación de Ingredientes"
+                        android:text="Insumos a recibir"
                         android:textColor="#0F172A"
-                        android:textSize="16sp"
+                        android:textSize="15sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -240,7 +232,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Chulea cada alimento que baja conforme del camión"
+                        android:text="5 de 5 insumos verificados"
                         android:textColor="#64748B"
                         android:textSize="12sp" />
 
@@ -251,7 +243,7 @@
                     style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Marcar todos"
+                    android:text="Desmarcar todos"
                     android:textColor="#5F7625"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -266,13 +258,13 @@
                 android:layout_marginTop="8dp"
                 android:orientation="vertical" />
 
-            <!-- 3. SECCIÓN: OBSERVACIONES / NOVEDADES -->
+            <!-- 3. SECCIÓN: OBSERVACIONES -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="14dp"
                 app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="16dp"
+                app:cardCornerRadius="14dp"
                 app:cardElevation="0dp"
                 app:strokeColor="#E2E8F0"
                 app:strokeWidth="1dp">
@@ -281,12 +273,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="14dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Observaciones y Novedades"
+                        android:text="Observaciones de entrega"
                         android:textColor="#0F172A"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -295,7 +287,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Escribe aquí si algún alimento llegó golpeado, dañado o con faltante."
+                        android:text="Opcional. Escribe si se presentó alguna novedad."
                         android:textColor="#64748B"
                         android:textSize="11sp" />
 
@@ -303,14 +295,14 @@
                         android:id="@+id/edtObservacionesEntrega"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
+                        android:layout_marginTop="8dp"
                         android:background="@drawable/bg_edittext"
                         android:gravity="top|start"
-                        android:hint="Ej: Los sacos de arroz llegaron en buen estado. En el tomate llegaron 2 kg dañados por humedad..."
+                        android:hint="Observaciones sobre la entrega..."
                         android:inputType="textMultiLine"
-                        android:lines="3"
-                        android:minLines="3"
-                        android:padding="12dp"
+                        android:lines="2"
+                        android:minLines="2"
+                        android:padding="10dp"
                         android:textColor="#0F172A"
                         android:textColorHint="#94A3B8"
                         android:textSize="13sp" />
@@ -323,9 +315,9 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="14dp"
                 app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="16dp"
+                app:cardCornerRadius="14dp"
                 app:cardElevation="0dp"
                 app:strokeColor="#E2E8F0"
                 app:strokeWidth="1dp">
@@ -334,7 +326,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="14dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -351,7 +343,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Firma Digital de Recibido"
+                                android:text="Firma Digital"
                                 android:textColor="#0F172A"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
@@ -360,7 +352,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="2dp"
-                                android:text="Manipuladora Jefe: Firma en el recuadro con el dedo"
+                                android:text="Firma en el recuadro para validar la recepción"
                                 android:textColor="#64748B"
                                 android:textSize="11sp" />
 
@@ -371,7 +363,7 @@
                             style="@style/Widget.Material3.Button.TextButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Borrar firma"
+                            android:text="Borrar"
                             android:textColor="#DC2626"
                             android:textSize="12sp" />
 
@@ -380,13 +372,13 @@
                     <!-- Lienzo de Firma Digital -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
-                        android:layout_height="140dp"
-                        android:layout_marginTop="10dp"
+                        android:layout_height="120dp"
+                        android:layout_marginTop="8dp"
                         app:cardBackgroundColor="#FAF9F5"
-                        app:cardCornerRadius="12dp"
+                        app:cardCornerRadius="10dp"
                         app:cardElevation="0dp"
                         app:strokeColor="#CBD5E1"
-                        app:strokeWidth="1.5dp">
+                        app:strokeWidth="1dp">
 
                         <FrameLayout
                             android:layout_width="match_parent"
@@ -399,7 +391,7 @@
                                 android:layout_gravity="center"
                                 android:text="✍️ Toca y firma aquí con el dedo"
                                 android:textColor="#94A3B8"
-                                android:textSize="13sp"
+                                android:textSize="12sp"
                                 android:textStyle="italic" />
 
                             <com.example.movilmanupuladora.utils.SignatureView

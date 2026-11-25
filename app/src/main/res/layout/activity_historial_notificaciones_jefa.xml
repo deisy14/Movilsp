@@ -29,7 +29,7 @@
             android:contentDescription="Volver"
             android:padding="8dp"
             android:src="@drawable/ic_arrow_back"
-            app:tint="#1B3317" />
+            app:tint="#0F172A" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -41,17 +41,18 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="HISTORIAL DE NOTIFICACIONES"
-                android:textColor="#1B3317"
-                android:textSize="17sp"
+                android:text="Notificaciones"
+                android:textColor="#0F172A"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/txtSubtituloNotificaciones"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="Alertas de inventario, preparaciones y novedades del sistema"
-                android:textColor="#3D5C37"
+                android:text="Novedades, entregas y alertas de tu sede"
+                android:textColor="#64748B"
                 android:textSize="12sp" />
 
         </LinearLayout>

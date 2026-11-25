@@ -1,15 +1,16 @@
 package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
+import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -50,16 +51,12 @@ class RegistrarEntregaActivity : AppCompatActivity() {
         var motivoFaltante: String = ""
     )
 
-    private val listaIngredientesDespacho = mutableListOf(
-        ItemIngredienteVerificar(1, "Arroz Blanco", 50.0, "kg", "Grano seleccionado primera calidad", true),
-        ItemIngredienteVerificar(2, "Pechuga de Pollo", 25.0, "kg", "Pollo fresco refrigerado en cadena de frío", true),
-        ItemIngredienteVerificar(3, "Lentejas", 15.0, "kg", "Leguminosa seca en empaque hermético", true),
-        ItemIngredienteVerificar(4, "Aceite Vegetal", 10.0, "Litros", "Aceite vegetal 100% puro para cocción", true),
-        ItemIngredienteVerificar(5, "Tomate Chonto", 8.0, "kg", "Verdura fresca para ensaladas", true)
-    )
+    // Lista inicialmente vacía para evitar mostrar datos ficticios (Carlos Méndez)
+    private val listaIngredientesDespacho = mutableListOf<ItemIngredienteVerificar>()
 
-    private var numeroRemision = "#REM-2026-104"
-    private var nombreSupervisor = "Carlos Méndez"
+    private var numeroRemision = ""
+    private var nombreSupervisor = ""
+    private var entregaYaAceptada = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,7 +72,17 @@ class RegistrarEntregaActivity : AppCompatActivity() {
         }
 
         sessionManager = SessionManager(this)
+        sessionManager.fetchAuthToken()
+        RetrofitClient.cargarToken(this)
 
+        if (intent.hasExtra("numero_remision")) {
+            numeroRemision = intent.getStringExtra("numero_remision")?.trim() ?: ""
+        }
+        if (intent.hasExtra("supervisor_nombre")) {
+            nombreSupervisor = intent.getStringExtra("supervisor_nombre")?.trim() ?: ""
+        }
+
+        verificarSiYaFueAceptadaLocalmente()
         configurarEncabezado()
         renderizarIngredientes()
         cargarEntregasDesdeServidor()
@@ -83,99 +90,206 @@ class RegistrarEntregaActivity : AppCompatActivity() {
         configurarBotonesAccion()
     }
 
+    private fun normalizarClaveRemision(rem: String): String {
+        return rem.replace("[^A-Za-z0-9_-]".toRegex(), "")
+    }
+
+    private fun verificarSiYaFueAceptadaLocalmente() {
+        if (numeroRemision.isBlank()) return
+        val prefs = getSharedPreferences("ENTREGAS_RECIBIDAS_PREFS", Context.MODE_PRIVATE)
+        val key = normalizarClaveRemision(numeroRemision)
+        if (prefs.getBoolean("remision_aceptada_$key", false)) {
+            entregaYaAceptada = true
+        }
+    }
+
     private fun configurarEncabezado(sedeNombrePersonalizado: String? = null) {
         val sedeNombre = sedeNombrePersonalizado ?: sessionManager.getSedeNombre() ?: "Sede Escolar"
-        if (intent.hasExtra("numero_remision")) {
-            numeroRemision = intent.getStringExtra("numero_remision") ?: numeroRemision
+        if (intent.hasExtra("numero_remision") && numeroRemision.isBlank()) {
+            numeroRemision = intent.getStringExtra("numero_remision")?.trim() ?: ""
         }
-        if (intent.hasExtra("supervisor_nombre")) {
-            nombreSupervisor = intent.getStringExtra("supervisor_nombre") ?: nombreSupervisor
+        if (intent.hasExtra("supervisor_nombre") && nombreSupervisor.isBlank()) {
+            nombreSupervisor = intent.getStringExtra("supervisor_nombre")?.trim() ?: ""
         }
 
-        binding.txtSubtituloRemision.text = "$sedeNombre • Remisión $numeroRemision"
+        val subtitulo = if (numeroRemision.isNotBlank()) {
+            "$sedeNombre • Remisión $numeroRemision"
+        } else {
+            "$sedeNombre • Recepción de Despacho"
+        }
+        binding.txtSubtituloRemision.text = subtitulo
         binding.txtSedeDestino.text = sedeNombre
-        binding.txtDetalleSupervisor.text = "Supervisor PAE: $nombreSupervisor • Mercados del Mes"
+        binding.txtDetalleSupervisor.text = if (nombreSupervisor.isNotBlank()) nombreSupervisor else "Supervisor PAE"
 
         try {
-            val formato = SimpleDateFormat("EEEE, d 'de' MMMM 'de' yyyy", Locale.forLanguageTag("es-CO"))
-            binding.txtFechaDespacho.text = formato.format(Date()).replaceFirstChar { it.uppercase() }
+            val formato = SimpleDateFormat("d 'de' MMMM, yyyy", Locale.forLanguageTag("es-CO"))
+            binding.txtFechaDespacho.text = formato.format(Date())
         } catch (_: Exception) {
-            binding.txtFechaDespacho.text = "Hoy, 14 Nov 2026"
+            binding.txtFechaDespacho.text = "Hoy"
         }
 
         binding.btnVolver.setOnClickListener {
             finish()
         }
+
+        if (entregaYaAceptada) {
+            aplicarModoEntregaAceptada()
+        }
     }
 
     private fun cargarEntregasDesdeServidor() {
         val idSede = sessionManager.getSedeId()
+        sessionManager.fetchAuthToken()
+        RetrofitClient.cargarToken(this)
+
         lifecycleScope.launch {
             try {
+                // Traer todas las entregas para poder consultar tanto las pendientes como las ya recibidas
                 val resp = RetrofitClient.apiService.obtenerEntregas(
                     idSede = if (idSede > 0) idSede else null,
-                    estado = "EN_TRANSITO"
+                    estado = null
                 )
                 if (resp.isSuccessful) {
                     val lista = resp.body()
                     if (!lista.isNullOrEmpty()) {
-                        val remisionParam = intent.getStringExtra("numero_remision")
-                        val remisionTarget = if (!remisionParam.isNullOrBlank()) {
-                            remisionParam
+                        val remisionParam = intent.getStringExtra("numero_remision")?.trim() ?: numeroRemision.trim()
+                        val entregasRemision = if (remisionParam.isNotBlank()) {
+                            lista.filter {
+                                val doc = it.documentoEntrega?.trim() ?: ""
+                                doc.equals(remisionParam, ignoreCase = true) ||
+                                        doc.contains(remisionParam, ignoreCase = true) ||
+                                        remisionParam.contains(doc, ignoreCase = true)
+                            }
                         } else {
-                            lista.firstOrNull { !it.documentoEntrega.isNullOrBlank() }?.documentoEntrega
-                                ?: lista.first().documentoEntrega ?: "#REM-2026-001"
+                            val primerDoc = lista.firstOrNull { !it.documentoEntrega.isNullOrBlank() }?.documentoEntrega
+                            if (!primerDoc.isNullOrBlank()) {
+                                lista.filter { it.documentoEntrega == primerDoc }
+                            } else {
+                                listOf(lista.first())
+                            }
                         }
 
-                        numeroRemision = remisionTarget
-                        val entregasRemision = lista.filter { it.documentoEntrega == remisionTarget || remisionTarget.isBlank() }
-                        val sedeNombre = entregasRemision.firstOrNull()?.sedeNombre
-                            ?: sessionManager.getSedeNombre()
-                            ?: "Sede Escolar"
+                        if (entregasRemision.isNotEmpty()) {
+                            val docDefinitivo = entregasRemision.first().documentoEntrega?.takeIf { it.isNotBlank() }
+                                ?: remisionParam.ifBlank { "#REM-2026-001" }
+                            numeroRemision = docDefinitivo
 
-                        val supervisor = entregasRemision.firstOrNull()?.observaciones?.let { obs ->
-                            val match = Regex("Responsable:\\s*([^|;\\n]+)", RegexOption.IGNORE_CASE).find(obs)
-                            match?.groupValues?.get(1)?.trim()
-                        } ?: intent.getStringExtra("supervisor_nombre") ?: "Supervisor PAE"
-                        nombreSupervisor = supervisor
+                            val sedeNombre = entregasRemision.firstOrNull()?.sedeNombre
+                                ?: sessionManager.getSedeNombre()
+                                ?: "Sede Escolar"
 
-                        listaIngredientesDespacho.clear()
-                        for (e in entregasRemision) {
-                            val id = e.idIngrediente ?: e.idEntrega ?: (listaIngredientesDespacho.size + 1)
-                            val nombre = e.ingredienteNombre ?: "Alimento PAE"
-                            val cant = e.cantidad ?: 1.0
-                            val uni = e.unidad ?: "kg"
-                            val desc = e.observaciones?.takeIf { it.isNotBlank() } ?: "Víveres entregados por Supervisor"
-                            listaIngredientesDespacho.add(
-                                ItemIngredienteVerificar(
-                                    id = id,
-                                    idEntrega = e.idEntrega,
-                                    nombre = nombre,
-                                    cantidad = cant,
-                                    unidad = uni,
-                                    descripcion = desc,
-                                    verificado = true,
-                                    tieneNovedad = false,
-                                    cantidadRecibida = cant,
-                                    cantidadFaltante = 0.0,
-                                    motivoFaltante = ""
+                            val supervisor = entregasRemision.firstOrNull()?.observaciones?.let { obs ->
+                                val match = Regex("Responsable:\\s*([^|;\\n]+)", RegexOption.IGNORE_CASE).find(obs)
+                                match?.groupValues?.get(1)?.trim()
+                            } ?: intent.getStringExtra("supervisor_nombre")?.takeIf { it.isNotBlank() } ?: "Santiago"
+                            nombreSupervisor = supervisor
+
+                            // Verificar si todos los alimentos de esta remisión ya fueron aceptados
+                            val yaAceptadaBackend = entregasRemision.all {
+                                (it.estado ?: "").equals("RECIBIDA", ignoreCase = true)
+                            }
+
+                            val key = normalizarClaveRemision(numeroRemision)
+                            val prefs = getSharedPreferences("ENTREGAS_RECIBIDAS_PREFS", Context.MODE_PRIVATE)
+                            val yaAceptadaLocal = prefs.getBoolean("remision_aceptada_$key", false)
+
+                            if (yaAceptadaBackend || yaAceptadaLocal) {
+                                entregaYaAceptada = true
+                            }
+
+                            listaIngredientesDespacho.clear()
+                            for (e in entregasRemision) {
+                                val id = e.idIngrediente ?: e.idEntrega ?: (listaIngredientesDespacho.size + 1)
+                                val nombreLimpio = InventarioManager.limpiarNombre(e.ingredienteNombre ?: "Alimento PAE")
+                                val cant = e.cantidad ?: 1.0
+                                val uni = e.unidad ?: "kg"
+                                val desc = e.observaciones?.takeIf { it.isNotBlank() } ?: "Víveres entregados por Supervisor"
+                                listaIngredientesDespacho.add(
+                                    ItemIngredienteVerificar(
+                                        id = id,
+                                        idEntrega = e.idEntrega,
+                                        nombre = nombreLimpio,
+                                        cantidad = cant,
+                                        unidad = uni,
+                                        descripcion = desc,
+                                        verificado = true,
+                                        tieneNovedad = false,
+                                        cantidadRecibida = cant,
+                                        cantidadFaltante = 0.0,
+                                        motivoFaltante = ""
+                                    )
                                 )
-                            )
-                        }
+                            }
 
-                        configurarEncabezado(sedeNombrePersonalizado = sedeNombre)
-                        renderizarIngredientes()
+                            configurarEncabezado(sedeNombrePersonalizado = sedeNombre)
+                            renderizarIngredientes()
+
+                            if (entregaYaAceptada) {
+                                aplicarModoEntregaAceptada(entregasRemision.firstOrNull()?.observaciones)
+                            }
+                        } else {
+                            mostrarVistaVacia("No se encontraron alimentos para la remisión $numeroRemision")
+                        }
+                    } else {
+                        mostrarVistaVacia("No hay despachos registrados para esta sede escolar.")
                     }
+                } else {
+                    mostrarVistaVacia("No se pudieron cargar los datos del despacho (Código ${resp.code()}).")
                 }
-            } catch (_: Exception) {
-                // Conserva los alimentos precargados si el backend no responde
+            } catch (e: Exception) {
+                mostrarVistaVacia("Error al conectar con el servidor: ${e.message}")
             }
         }
+    }
+
+    private fun mostrarVistaVacia(mensaje: String) {
+        val contenedor = binding.contenedorIngredientesCheck
+        contenedor.removeAllViews()
+        binding.txtConteoCheck.text = "0 insumos"
+        binding.btnMarcarTodos.visibility = View.GONE
+
+        val txt = TextView(this).apply {
+            text = mensaje
+            setTextColor(Color.parseColor("#94A3B8"))
+            textSize = 13f
+            gravity = Gravity.CENTER
+            setPadding(dpToPx(16f), dpToPx(32f), dpToPx(16f), dpToPx(32f))
+        }
+        contenedor.addView(txt)
     }
 
     private fun renderizarIngredientes() {
         val contenedor = binding.contenedorIngredientesCheck
         contenedor.removeAllViews()
+
+        if (listaIngredientesDespacho.isEmpty()) {
+            binding.txtConteoCheck.text = "Consultando insumos..."
+            binding.btnMarcarTodos.visibility = View.GONE
+
+            val layoutLoading = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                gravity = Gravity.CENTER
+                setPadding(dpToPx(16f), dpToPx(32f), dpToPx(16f), dpToPx(32f))
+            }
+
+            val progressBar = ProgressBar(this).apply {
+                indeterminateTintList = ColorStateList.valueOf(Color.parseColor("#5F7625"))
+            }
+            val txtLoading = TextView(this).apply {
+                text = "Cargando insumos despachados por el supervisor..."
+                setTextColor(Color.parseColor("#64748B"))
+                textSize = 13f
+                gravity = Gravity.CENTER
+                setPadding(0, dpToPx(12f), 0, 0)
+            }
+
+            layoutLoading.addView(progressBar)
+            layoutLoading.addView(txtLoading)
+            contenedor.addView(layoutLoading)
+            return
+        }
+
+        binding.btnMarcarTodos.visibility = if (entregaYaAceptada) View.GONE else View.VISIBLE
 
         val inflater = LayoutInflater.from(this)
 
@@ -188,138 +302,54 @@ class RegistrarEntregaActivity : AppCompatActivity() {
             val txtDetalle = itemView.findViewById<TextView>(R.id.txtDetalleIngrediente)
             val badge = itemView.findViewById<TextView>(R.id.badgeEstadoCheck)
 
-            val btnToggleReportarFaltante = itemView.findViewById<TextView>(R.id.btnToggleReportarFaltante)
-            val panelFaltante = itemView.findViewById<LinearLayout>(R.id.panelFaltanteInputs)
-            val edtCantidadRecibida = itemView.findViewById<EditText>(R.id.edtCantidadRecibidaItem)
-            val txtUnidadMedida = itemView.findViewById<TextView>(R.id.txtUnidadMedidaItem)
-            val txtFaltanteCalculado = itemView.findViewById<TextView>(R.id.txtFaltanteCalculadoItem)
-            val edtMotivoFaltante = itemView.findViewById<EditText>(R.id.edtMotivoFaltanteItem)
-
             txtNombre.text = item.nombre
-            txtUnidadMedida.text = item.unidad
-            txtDetalle.text = "Despachado: ${formatearNumero(item.cantidad)} ${item.unidad} • ${item.descripcion}"
-
-            val cantTexto = if (item.tieneNovedad) formatearNumero(item.cantidadRecibida) else formatearNumero(item.cantidad)
-            edtCantidadRecibida.setText(cantTexto)
-            edtMotivoFaltante.setText(item.motivoFaltante)
+            txtDetalle.text = "Cantidad: ${formatearNumero(item.cantidad)} ${item.unidad}"
 
             fun actualizarVisualItem() {
-                if (!item.verificado) {
+                if (!item.verificado && !entregaYaAceptada) {
                     imgCheck.setImageResource(R.drawable.ic_check_circle)
                     imgCheck.imageTintList = ColorStateList.valueOf(Color.parseColor("#CBD5E1"))
                     badge.text = "Pendiente"
                     badge.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#F1F5F9"))
                     badge.setTextColor(Color.parseColor("#94A3B8"))
-                    card.strokeColor = Color.parseColor("#E2E8F0")
-                    card.strokeWidth = dpToPx(1f)
-                    panelFaltante.visibility = View.GONE
-                } else if (item.tieneNovedad && item.cantidadFaltante > 0) {
-                    imgCheck.setImageResource(R.drawable.ic_check_circle)
-                    imgCheck.imageTintList = ColorStateList.valueOf(Color.parseColor("#D97706"))
-                    val faltanteStr = formatearNumero(item.cantidadFaltante)
-                    badge.text = "Faltan $faltanteStr ${item.unidad}"
-                    badge.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FEF3C7"))
-                    badge.setTextColor(Color.parseColor("#B45309"))
-                    card.strokeColor = Color.parseColor("#F59E0B")
-                    card.strokeWidth = dpToPx(1.5f)
-                    panelFaltante.visibility = View.VISIBLE
-                    btnToggleReportarFaltante.text = "✓ Marcar producto completo conforme"
-                    btnToggleReportarFaltante.setTextColor(Color.parseColor("#15803D"))
                 } else {
                     imgCheck.setImageResource(R.drawable.ic_check_circle)
                     imgCheck.imageTintList = ColorStateList.valueOf(Color.parseColor("#5F7625"))
-                    badge.text = "Recibido Conforme"
+                    badge.text = "Conforme"
                     badge.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#EEF4DF"))
-                    badge.setTextColor(Color.parseColor("#5F7625"))
-                    card.strokeColor = Color.parseColor("#5F7625")
-                    card.strokeWidth = dpToPx(1.5f)
-                    panelFaltante.visibility = if (item.tieneNovedad) View.VISIBLE else View.GONE
-                    btnToggleReportarFaltante.text = "⚠️ ¿Llegó incompleto o con faltante? Reportar"
-                    btnToggleReportarFaltante.setTextColor(Color.parseColor("#D97706"))
+                    badge.setTextColor(Color.parseColor("#3D5C37"))
                 }
-
-                val faltante = (item.cantidad - item.cantidadRecibida).coerceAtLeast(0.0)
-                txtFaltanteCalculado.text = "Faltan: ${formatearNumero(faltante)} ${item.unidad}"
             }
 
             actualizarVisualItem()
 
-            filaCabecera.setOnClickListener {
-                item.verificado = !item.verificado
-                actualizarVisualItem()
-                actualizarConteoCheck()
-            }
-
-            imgCheck.setOnClickListener {
-                item.verificado = !item.verificado
-                actualizarVisualItem()
-                actualizarConteoCheck()
-            }
-
-            btnToggleReportarFaltante.setOnClickListener {
-                if (item.tieneNovedad) {
-                    item.tieneNovedad = false
-                    item.cantidadRecibida = item.cantidad
-                    item.cantidadFaltante = 0.0
-                    item.motivoFaltante = ""
-                    edtCantidadRecibida.setText(formatearNumero(item.cantidad))
-                    edtMotivoFaltante.setText("")
-                } else {
-                    item.tieneNovedad = true
-                    item.verificado = true
-                    panelFaltante.visibility = View.VISIBLE
-                    val actual = edtCantidadRecibida.text.toString().toDoubleOrNull() ?: item.cantidad
-                    item.cantidadRecibida = actual
-                    item.cantidadFaltante = (item.cantidad - actual).coerceAtLeast(0.0)
+            if (!entregaYaAceptada) {
+                val toggleItem = View.OnClickListener {
+                    item.verificado = !item.verificado
+                    actualizarVisualItem()
+                    actualizarConteoCheck()
                 }
-                actualizarVisualItem()
-                actualizarConteoCheck()
+
+                filaCabecera.setOnClickListener(toggleItem)
+                imgCheck.setOnClickListener(toggleItem)
+                card.setOnClickListener(toggleItem)
+            } else {
+                filaCabecera.isClickable = false
+                imgCheck.isClickable = false
+                card.isClickable = false
             }
-
-            edtCantidadRecibida.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-                override fun afterTextChanged(s: Editable?) {
-                    val valor = s?.toString()?.toDoubleOrNull() ?: 0.0
-                    item.cantidadRecibida = valor
-                    val faltante = (item.cantidad - valor).coerceAtLeast(0.0)
-                    item.cantidadFaltante = faltante
-                    val faltanteStr = formatearNumero(faltante)
-                    txtFaltanteCalculado.text = "Faltan: $faltanteStr ${item.unidad}"
-
-                    if (item.verificado && item.tieneNovedad) {
-                        if (faltante > 0) {
-                            badge.text = "Faltan $faltanteStr ${item.unidad}"
-                            badge.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FEF3C7"))
-                            badge.setTextColor(Color.parseColor("#B45309"))
-                            card.strokeColor = Color.parseColor("#F59E0B")
-                        } else {
-                            badge.text = "Recibido Completo"
-                            badge.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#EEF4DF"))
-                            badge.setTextColor(Color.parseColor("#5F7625"))
-                            card.strokeColor = Color.parseColor("#5F7625")
-                        }
-                    }
-                }
-            })
-
-            edtMotivoFaltante.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-                override fun afterTextChanged(s: Editable?) {
-                    item.motivoFaltante = s?.toString()?.trim().orEmpty()
-                }
-            })
 
             contenedor.addView(itemView)
         }
 
         actualizarConteoCheck()
 
-        binding.btnMarcarTodos.setOnClickListener {
-            val todosMarcados = listaIngredientesDespacho.all { it.verificado }
-            listaIngredientesDespacho.forEach { it.verificado = !todosMarcados }
-            renderizarIngredientes()
+        if (!entregaYaAceptada) {
+            binding.btnMarcarTodos.setOnClickListener {
+                val todosMarcados = listaIngredientesDespacho.all { it.verificado }
+                listaIngredientesDespacho.forEach { it.verificado = !todosMarcados }
+                renderizarIngredientes()
+            }
         }
     }
 
@@ -333,8 +363,13 @@ class RegistrarEntregaActivity : AppCompatActivity() {
 
     private fun actualizarConteoCheck() {
         val total = listaIngredientesDespacho.size
+        if (entregaYaAceptada) {
+            binding.txtConteoCheck.text = "$total de $total insumos verificados conforme"
+            binding.btnMarcarTodos.visibility = View.GONE
+            return
+        }
         val marcados = listaIngredientesDespacho.count { it.verificado }
-        binding.txtConteoCheck.text = "$marcados de $total alimentos verificados conforme"
+        binding.txtConteoCheck.text = "$marcados de $total insumos verificados"
         if (marcados == total) {
             binding.btnMarcarTodos.text = "Desmarcar todos"
         } else {
@@ -344,25 +379,76 @@ class RegistrarEntregaActivity : AppCompatActivity() {
 
     private fun configurarLienzoFirma() {
         binding.signatureView.setOnTouchListener { _, _ ->
-            binding.txtPistaFirma.visibility = View.GONE
+            if (!entregaYaAceptada) {
+                binding.txtPistaFirma.visibility = View.GONE
+            }
             false
         }
 
         binding.btnBorrarFirma.setOnClickListener {
-            binding.signatureView.clear()
-            binding.txtPistaFirma.visibility = View.VISIBLE
+            if (!entregaYaAceptada) {
+                binding.signatureView.clear()
+                binding.txtPistaFirma.visibility = View.VISIBLE
+            }
         }
     }
 
     private fun configurarBotonesAccion() {
-        // BOTÓN RECHAZAR ENTREGA
         binding.btnRechazarEntrega.setOnClickListener {
-            mostrarDialogoRechazo()
+            if (!entregaYaAceptada) {
+                mostrarDialogoRechazo()
+            }
         }
 
-        // BOTÓN ACEPTAR ENTREGA Y NOTIFICAR
         binding.btnAceptarEntrega.setOnClickListener {
-            confirmarYAceptarEntrega()
+            if (entregaYaAceptada) {
+                finish()
+            } else {
+                confirmarYAceptarEntrega()
+            }
+        }
+    }
+
+    private fun aplicarModoEntregaAceptada(obsGuardada: String? = null) {
+        entregaYaAceptada = true
+
+        // Badge superior de estado: Verde "Verificada Conforme"
+        binding.badgeEstadoEntrega.text = "Verificada Conforme"
+        binding.badgeEstadoEntrega.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#DCFCE7"))
+        binding.badgeEstadoEntrega.setTextColor(Color.parseColor("#15803D"))
+
+        // Ocultar botón de marcar todos y actualizar conteo
+        binding.btnMarcarTodos.visibility = View.GONE
+        binding.txtConteoCheck.text = "${listaIngredientesDespacho.size} de ${listaIngredientesDespacho.size} insumos recibidos conforme"
+
+        // Inhabilitar campo de observaciones mostrando lo registrado
+        val obsTexto = obsGuardada?.takeIf { it.isNotBlank() }
+            ?: run {
+                val key = normalizarClaveRemision(numeroRemision)
+                getSharedPreferences("ENTREGAS_RECIBIDAS_PREFS", Context.MODE_PRIVATE)
+                    .getString("remision_obs_$key", null)
+            } ?: "Víveres verificados y acta firmada en sede escolar."
+
+        binding.edtObservacionesEntrega.setText(obsTexto)
+        binding.edtObservacionesEntrega.isEnabled = false
+        binding.edtObservacionesEntrega.isFocusable = false
+
+        // Bloquear lienzo de firma digital
+        binding.btnBorrarFirma.visibility = View.GONE
+        binding.signatureView.isEnabled = false
+        binding.txtPistaFirma.text = "✓ Factura firmada y aceptada digitalmente"
+        binding.txtPistaFirma.setTextColor(Color.parseColor("#15803D"))
+        binding.txtPistaFirma.visibility = View.VISIBLE
+
+        // Ocultar botón rechazar y transformar botón aceptar en botón de regreso
+        binding.btnRechazarEntrega.visibility = View.GONE
+        binding.btnAceptarEntrega.visibility = View.VISIBLE
+        binding.btnAceptarEntrega.isEnabled = true
+        binding.btnAceptarEntrega.text = "Volver al Inicio"
+        binding.btnAceptarEntrega.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#1B3317"))
+        binding.btnAceptarEntrega.setIconResource(R.drawable.ic_arrow_back)
+        binding.btnAceptarEntrega.setOnClickListener {
+            finish()
         }
     }
 
@@ -386,9 +472,11 @@ class RegistrarEntregaActivity : AppCompatActivity() {
 
     private fun notificarSupervisorRechazo(motivo: String) {
         val sedeNombre = sessionManager.getSedeNombre() ?: "Sede"
+        sessionManager.fetchAuthToken()
+        RetrofitClient.cargarToken(this)
+
         lifecycleScope.launch {
             try {
-                // Confirmar rechazo en el backend para cada ítem en tránsito
                 for (item in listaIngredientesDespacho) {
                     item.idEntrega?.let { idEnt ->
                         try {
@@ -416,37 +504,21 @@ class RegistrarEntregaActivity : AppCompatActivity() {
     }
 
     private fun confirmarYAceptarEntrega() {
+        if (entregaYaAceptada) {
+            finish()
+            return
+        }
+
         if (!binding.signatureView.hasSignature()) {
             Toast.makeText(this, "Por favor estampa tu firma digital en el recuadro antes de aceptar.", Toast.LENGTH_LONG).show()
             return
         }
 
-        val faltantesConNovedad = listaIngredientesDespacho.filter { it.tieneNovedad && it.cantidadFaltante > 0 }
         val noVerificados = listaIngredientesDespacho.filter { !it.verificado }
-
-        if (faltantesConNovedad.isNotEmpty()) {
-            val listaReporte = faltantesConNovedad.joinToString("\n") {
-                val fStr = formatearNumero(it.cantidadFaltante)
-                val recStr = formatearNumero(it.cantidadRecibida)
-                val mot = if (it.motivoFaltante.isNotBlank()) " - Motivo: ${it.motivoFaltante}" else ""
-                "• ${it.nombre}: Recibidos $recStr ${it.unidad} (Faltaron $fStr ${it.unidad}$mot)"
-            }
-
-            MaterialAlertDialogBuilder(this)
-                .setTitle("Confirmar Entrega con Faltantes")
-                .setMessage("Vas a firmar la entrega reportando los siguientes faltantes:\n\n$listaReporte\n\nEl supervisor recibirá esta notificación con el reporte exacto y se sumará lo recibido al inventario de la sede. ¿Deseas firmar y enviar?")
-                .setPositiveButton("Sí, firmar y enviar") { _, _ ->
-                    ejecutarAceptacionFinal()
-                }
-                .setNegativeButton("Revisar", null)
-                .show()
-            return
-        }
-
         if (noVerificados.isNotEmpty()) {
             MaterialAlertDialogBuilder(this)
-                .setTitle("Alimentos sin chulear")
-                .setMessage("Hay ${noVerificados.size} alimentos sin verificar. ¿Deseas continuar y registrar la entrega?")
+                .setTitle("Alimentos sin verificar")
+                .setMessage("Hay ${noVerificados.size} insumo(s) sin marcar como recibidos conforme. ¿Deseas continuar y registrar la entrega?")
                 .setPositiveButton("Sí, continuar") { _, _ ->
                     ejecutarAceptacionFinal()
                 }
@@ -459,121 +531,105 @@ class RegistrarEntregaActivity : AppCompatActivity() {
     }
 
     private fun ejecutarAceptacionFinal() {
+        if (entregaYaAceptada) {
+            finish()
+            return
+        }
+
         binding.btnAceptarEntrega.isEnabled = false
         binding.btnAceptarEntrega.text = "Enviando..."
 
         val obs = binding.edtObservacionesEntrega.text.toString().trim()
             .ifEmpty { "Víveres verificados y acta firmada en sede escolar." }
-        val sedeNombre = sessionManager.getSedeNombre() ?: "Sede"
-
-        val faltantesConNovedad = listaIngredientesDespacho.filter { it.tieneNovedad && it.cantidadFaltante > 0 }
-        val tieneNovedades = faltantesConNovedad.isNotEmpty()
-
-        val reporteFaltantesTexto = if (tieneNovedades) {
-            faltantesConNovedad.joinToString("\n") {
-                val fStr = formatearNumero(it.cantidadFaltante)
-                val recStr = formatearNumero(it.cantidadRecibida)
-                val mot = if (it.motivoFaltante.isNotBlank()) " - Motivo: ${it.motivoFaltante}" else ""
-                "• ${it.nombre}: Recibido $recStr ${it.unidad} (Faltaron $fStr ${it.unidad}$mot)"
-            }
-        } else ""
+        val sedeNombre = sessionManager.getSedeNombre() ?: "Sede Central"
 
         lifecycleScope.launch {
+            // 1. PERSISTENCIA LOCAL GARANTIZADA DE ACEPTACIÓN
+            val key = normalizarClaveRemision(numeroRemision)
+            val prefs = getSharedPreferences("ENTREGAS_RECIBIDAS_PREFS", Context.MODE_PRIVATE)
+            prefs.edit()
+                .putBoolean("remision_aceptada_$key", true)
+                .putString("remision_obs_$key", obs)
+                .putLong("remision_fecha_$key", System.currentTimeMillis())
+                .apply()
+
+            // 2. AGREGAR AUTOMÁTICAMENTE TODOS LOS PRODUCTOS VERIFICADOS AL INVENTARIO
+            val itemsVerificados = listaIngredientesDespacho.filter { it.verificado }
             try {
-                // 1. Confirmar recepción en el backend (actualiza estado a RECIBIDA o CON_NOVEDAD en base de datos y suma al Inventario de la sede)
-                for (item in listaIngredientesDespacho) {
-                    item.idEntrega?.let { idEnt ->
-                        try {
-                            val cantRecibida = if (!item.verificado) 0.0 else (if (item.tieneNovedad) item.cantidadRecibida else item.cantidad)
-                            val cantRechazada = if (!item.verificado) item.cantidad else (if (item.tieneNovedad) item.cantidadFaltante else 0.0)
-                            val motivoItem = if (!item.verificado) {
-                                "No verificado por la sede: $obs"
-                            } else if (item.tieneNovedad && item.cantidadFaltante > 0) {
-                                item.motivoFaltante.ifEmpty { "Producto recibido incompleto / faltante en sede" }
-                            } else {
-                                ""
-                            }
-
-                            RetrofitClient.apiService.confirmarRecepcionEntrega(
-                                idEnt,
-                                ConfirmarRecepcionRequest(
-                                    cantidadRecibida = cantRecibida,
-                                    cantidadRechazada = cantRechazada,
-                                    motivoRechazo = motivoItem
-                                )
-                            )
-                        } catch (_: Exception) {}
-                    }
-                }
-
-                // 2. Notificación al Supervisor
-                val titSup = if (tieneNovedades) {
-                    "⚠️ Entrega Recibida CON NOVEDAD en $sedeNombre"
-                } else {
-                    "✅ Entrega Aceptada Conforme en $sedeNombre"
-                }
-
-                val msgSup = if (tieneNovedades) {
-                    "La Jefa de Manipuladoras ha firmado la remisión $numeroRemision en $sedeNombre con reporte de faltantes:\n\n$reporteFaltantesTexto\n\nFirma digital registrada. Observaciones: $obs."
-                } else {
-                    "La remisión $numeroRemision ha sido verificada completa, firmada digitalmente y aceptada conforme por la Jefa de manipuladoras en $sedeNombre. El inventario fue actualizado."
-                }
-
-                try {
-                    RetrofitClient.apiService.enviarNotificacion(
-                        titSup.toRequestBody("text/plain".toMediaTypeOrNull()),
-                        msgSup.toRequestBody("text/plain".toMediaTypeOrNull()),
-                        null
+                InventarioManager.agregarOIncrementarAlimentos(this@RegistrarEntregaActivity, itemsVerificados)
+                for (item in itemsVerificados) {
+                    InventarioManager.guardarCantidad(
+                        alimento = item.nombre,
+                        cantidad = item.cantidad,
+                        jornada = "MANANA"
                     )
-                } catch (_: Exception) {}
-
-                // 3. Notificación al Administrador Institucional
-                val titAdmin = "🔔 Recepción firmada en sede: $sedeNombre"
-                val msgAdmin = if (tieneNovedades) {
-                    "Acta de recepción firmada para remisión $numeroRemision con reporte de faltantes en $sedeNombre:\n$reporteFaltantesTexto"
-                } else {
-                    "La Jefa de Manipuladoras ha firmado la remisión $numeroRemision en $sedeNombre sin novedades. Ingreso acreditado al inventario."
                 }
-                try {
-                    RetrofitClient.apiService.enviarNotificacion(
-                        titAdmin.toRequestBody("text/plain".toMediaTypeOrNull()),
-                        msgAdmin.toRequestBody("text/plain".toMediaTypeOrNull()),
-                        null
-                    )
-                } catch (_: Exception) {}
+            } catch (e: Exception) {
+                android.util.Log.e("REGISTRAR_ENTREGA", "Error actualizando inventario local: ${e.message}")
+            }
 
-                // 4. Cargar cantidades verificadas al inventario de la sede
-                for (item in listaIngredientesDespacho.filter { it.verificado }) {
-                    val cantFinal = if (item.tieneNovedad) item.cantidadRecibida else item.cantidad
-                    if (cantFinal > 0) {
-                        InventarioManager.guardarCantidad(
-                            alimento = item.nombre,
-                            cantidad = cantFinal,
-                            jornada = "MANANA"
-                        )
-                    }
-                }
-
-                // 5. Agregar notificación local en la app para la Jefa y su equipo
+            // 3. NOTIFICACIÓN LOCAL EN LA APP PARA LA JEFA
+            try {
                 NotificacionesJefaManager.agregarNotificacionSede(
                     this@RegistrarEntregaActivity,
-                    if (tieneNovedades) "⚠️ Entrega recibida con novedades ($numeroRemision)" else "✅ Entrega recibida conforme ($numeroRemision)",
-                    if (tieneNovedades) "Se aceptó la remisión con reporte de faltantes:\n$reporteFaltantesTexto" else "Remisión $numeroRemision aceptada e ingresada al inventario de la sede.",
+                    "✅ Entrega recibida conforme ($numeroRemision)",
+                    "Remisión $numeroRemision aceptada e ingresada al inventario de la sede. Observaciones: $obs",
                     "Inventario"
                 )
+            } catch (_: Exception) {}
 
-            } catch (_: Exception) {
-                // Sigue adelante si el backend no responde
+            // 4. AUTENTICACIÓN Y CONFIRMACIÓN EN EL BACKEND
+            sessionManager.fetchAuthToken()
+            RetrofitClient.cargarToken(this@RegistrarEntregaActivity)
+
+            for (item in listaIngredientesDespacho) {
+                item.idEntrega?.let { idEnt ->
+                    try {
+                        val cantRecibida = if (item.verificado) item.cantidad else 0.0
+                        val cantRechazada = if (item.verificado) 0.0 else item.cantidad
+                        val motivoItem = if (!item.verificado) "No verificado por la sede: $obs" else ""
+
+                        RetrofitClient.apiService.confirmarRecepcionEntrega(
+                            idEnt,
+                            ConfirmarRecepcionRequest(
+                                cantidadRecibida = cantRecibida,
+                                cantidadRechazada = cantRechazada,
+                                motivoRechazo = motivoItem
+                            )
+                        )
+                    } catch (e: Exception) {
+                        android.util.Log.e("REGISTRAR_ENTREGA", "Error confirmando entrega $idEnt en backend: ${e.message}")
+                    }
+                }
             }
 
-            val mensajeFinal = if (tieneNovedades) {
-                "Se ha enviado el acta firmada con novedades.\n\n• El Supervisor ($nombreSupervisor) fue notificado del reporte de faltantes:\n$reporteFaltantesTexto\n\n• Las cantidades efectivamente recibidas ya se agregaron al inventario de tu sede."
-            } else {
-                "Se ha enviado el comprobante firmado digitalmente.\n\n• El Supervisor ($nombreSupervisor) recibió la confirmación conforme.\n• Todos los productos despachados fueron agregados al inventario de la sede."
-            }
+            // 5. NOTIFICACIONES REMOTAS AL SUPERVISOR Y AL ADMINISTRADOR
+            try {
+                val titSup = "✅ Entrega Aceptada Conforme en $sedeNombre"
+                val msgSup = "La remisión $numeroRemision ha sido verificada completa, firmada digitalmente y aceptada por la Jefa de Manipuladoras en $sedeNombre. Observaciones: $obs."
+                RetrofitClient.apiService.enviarNotificacion(
+                    titSup.toRequestBody("text/plain".toMediaTypeOrNull()),
+                    msgSup.toRequestBody("text/plain".toMediaTypeOrNull()),
+                    null
+                )
+            } catch (_: Exception) {}
+
+            try {
+                val titAdmin = "🔔 Recepción firmada en sede: $sedeNombre"
+                val msgAdmin = "La Jefa de Manipuladoras ha firmado la remisión $numeroRemision en $sedeNombre. Ingreso acreditado al inventario. Observaciones: $obs."
+                RetrofitClient.apiService.enviarNotificacion(
+                    titAdmin.toRequestBody("text/plain".toMediaTypeOrNull()),
+                    msgAdmin.toRequestBody("text/plain".toMediaTypeOrNull()),
+                    null
+                )
+            } catch (_: Exception) {}
+
+            aplicarModoEntregaAceptada(obs)
+
+            val mensajeFinal = "Se ha enviado el comprobante firmado digitalmente.\n\n• El Supervisor ($nombreSupervisor) recibió la confirmación conforme.\n• Todos los insumos verificados fueron agregados al inventario de la sede."
 
             MaterialAlertDialogBuilder(this@RegistrarEntregaActivity)
-                .setTitle(if (tieneNovedades) "¡Entrega Aceptada con Novedades!" else "¡Entrega Aceptada Conforme!")
+                .setTitle("¡Entrega Aceptada Conforme!")
                 .setMessage(mensajeFinal)
                 .setPositiveButton("Aceptar") { _, _ ->
                     finish()
