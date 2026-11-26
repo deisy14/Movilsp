@@ -116,6 +116,11 @@ interface ApiService {
     suspend fun obtenerUnidadesMedida():
             Response<List<com.example.movilmanupuladora.data.model.UnidadMedida>>
 
+    // Categorías de inventario
+    @GET("categorias_inventario/")
+    suspend fun obtenerCategoriasInventario():
+            Response<List<com.example.movilmanupuladora.data.model.CategoriaInventario>>
+
     // Notificaciones
     @GET("notificaciones/")
     suspend fun obtenerNotificaciones():

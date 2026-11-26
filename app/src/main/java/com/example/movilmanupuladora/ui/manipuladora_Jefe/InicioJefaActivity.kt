@@ -117,24 +117,6 @@ class InicioJefaActivity : AppCompatActivity() {
         configurarEventos()
         configurarNavegacionInferior()
 
-        actualizarResumen()
-        actualizarPlatosVisuales()
-        actualizarBadgeNotificaciones()
-        cargarAsistenciaDelBackend()
-
-        lifecycleScope.launch {
-            try {
-                val idSede = sessionManager.getSedeId().takeIf { it > 0 }
-                val sedeNombre = sessionManager.getSedeNombre()
-                ManipuladorasManager.cargarDesdeBackend(this@InicioJefaActivity, idSede, sedeNombre)
-                NotificacionesJefaManager.sincronizarNotificacionesDelBackend(this@InicioJefaActivity)
-                SedeContratoManager.sincronizarSeccionesContrato(this@InicioJefaActivity, idSede ?: 1)
-                actualizarBadgeNotificaciones()
-                actualizarResumen()
-                actualizarPlatosVisuales()
-            } catch (_: Exception) { }
-        }
-
         // Monitoreo periódico en segundo plano para reflejar nuevas notificaciones automáticamente
         lifecycleScope.launch {
             while (isActive) {
@@ -155,22 +137,38 @@ class InicioJefaActivity : AppCompatActivity() {
         actualizarBadgeNotificaciones()
         cargarAsistenciaDelBackend()
         lifecycleScope.launch {
-            try {
-                val idSede = sessionManager.getSedeId().takeIf { it > 0 }
-                val sedeNombre = sessionManager.getSedeNombre()
-                ManipuladorasManager.cargarDesdeBackend(this@InicioJefaActivity, idSede, sedeNombre)
-                NotificacionesJefaManager.sincronizarNotificacionesDelBackend(this@InicioJefaActivity)
-                SedeContratoManager.sincronizarSeccionesContrato(this@InicioJefaActivity, idSede ?: 1)
-                actualizarResumen()
-                actualizarBadgeNotificaciones()
-
-                val res = RetrofitClient.apiService.obtenerPlatos()
-                if (res.isSuccessful && !res.body().isNullOrEmpty()) {
-                    MenuPaeCatalog.registrarPlatosDesdeBackend(res.body()!!)
-                }
-                PreparacionSyncManager.sincronizarDesdeBackend(this@InicioJefaActivity)
-                actualizarPlatosVisuales()
-            } catch (_: Exception) { }
+            val idSede = sessionManager.getSedeId().takeIf { it > 0 }
+            val sedeNombre = sessionManager.getSedeNombre()
+            // Lanzar sincronizaciones independientes en paralelo para cargar el inicio más rápido
+            launch {
+                try {
+                    ManipuladorasManager.cargarDesdeBackend(this@InicioJefaActivity, idSede, sedeNombre)
+                    actualizarResumen()
+                } catch (_: Exception) { }
+            }
+            launch {
+                try {
+                    NotificacionesJefaManager.sincronizarNotificacionesDelBackend(this@InicioJefaActivity)
+                    actualizarBadgeNotificaciones()
+                } catch (_: Exception) { }
+            }
+            launch {
+                try {
+                    SedeContratoManager.sincronizarSeccionesContrato(this@InicioJefaActivity, idSede ?: 1)
+                    actualizarResumen()
+                    actualizarPlatosVisuales()
+                } catch (_: Exception) { }
+            }
+            launch {
+                try {
+                    val res = RetrofitClient.apiService.obtenerPlatos()
+                    if (res.isSuccessful && !res.body().isNullOrEmpty()) {
+                        MenuPaeCatalog.registrarPlatosDesdeBackend(res.body()!!)
+                    }
+                    PreparacionSyncManager.sincronizarDesdeBackend(this@InicioJefaActivity)
+                    actualizarPlatosVisuales()
+                } catch (_: Exception) { }
+            }
         }
     }
 

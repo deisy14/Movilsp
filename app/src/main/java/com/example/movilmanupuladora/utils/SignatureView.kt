@@ -39,6 +39,7 @@ class SignatureView @JvmOverloads constructor(
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (!isEnabled) return false
         parent?.requestDisallowInterceptTouchEvent(true)
         val x = event.x
         val y = event.y

@@ -5,87 +5,208 @@
     android:id="@+id/cardItemNotificacion"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="10dp"
+    android:layout_marginBottom="12dp"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    app:cardBackgroundColor="#FEFCE8"
-    app:cardCornerRadius="14dp"
-    app:cardElevation="0dp"
-    app:strokeColor="#FDE68A"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:strokeColor="#F1F5F9"
     app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="top"
-        android:orientation="horizontal"
-        android:padding="14dp">
+        android:orientation="horizontal">
 
-        <!-- Icono redondo suave -->
-        <ImageView
-            android:id="@+id/imgIconoNotif"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
-            android:background="@drawable/bg_icono_circular"
-            android:backgroundTint="#FEF3C7"
-            android:contentDescription="Icono"
-            android:padding="9dp"
-            android:src="@drawable/ic_nav_inventory"
-            app:tint="#D97706" />
+        <!-- Barrita vertical de color en el borde izquierdo -->
+        <View
+            android:id="@+id/viewBarraAcento"
+            android:layout_width="4dp"
+            android:layout_height="match_parent"
+            android:background="#F4B41F" />
 
-        <!-- Contenido principal -->
+        <!-- Contenido de la tarjeta -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="14dp">
 
+            <!-- Cabecera: Título + Tiempo debajo a la izquierda, Pill de estado a la derecha -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="top"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txtTituloNotif"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="2"
+                        android:text="Nueva entrega despachada"
+                        android:textColor="#0F172A"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtFechaNotif"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Hace unos minutos"
+                        android:textColor="#64748B"
+                        android:textSize="11.5sp" />
+
+                </LinearLayout>
+
+                <!-- Pill de estado: Nueva / Leída / Importante / Informativa -->
+                <TextView
+                    android:id="@+id/badgeEstadoNotif"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_pill_yellow"
+                    android:backgroundTint="#FEF3C7"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="3dp"
+                    android:text="Nueva"
+                    android:textColor="#92400E"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- Mensaje + Flechita lateral cuando está colapsada -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/txtTituloNotif"
+                    android:id="@+id/txtMensajeNotif"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:ellipsize="end"
-                    android:maxLines="1"
-                    android:text="Título de Notificación"
-                    android:textColor="#0F172A"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:lineSpacingExtra="2dp"
+                    android:maxLines="4"
+                    android:text="Mensaje de notificación..."
+                    android:textColor="#334155"
+                    android:textSize="13sp" />
 
-                <!-- Hora / Fecha en la esquina derecha -->
-                <TextView
-                    android:id="@+id/txtFechaNotif"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:text="10:46 AM"
-                    android:textColor="#94A3B8"
-                    android:textSize="11sp" />
+                <ImageView
+                    android:id="@+id/imgFlechaDerecha"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginStart="8dp"
+                    android:contentDescription="Ver detalle"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="#475569" />
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/txtMensajeNotif"
+            <!-- Recuadro de detalles (para entregas nuevas: Remisión / Productos / Destino) -->
+            <LinearLayout
+                android:id="@+id/layoutDetallesEntrega"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:ellipsize="end"
-                android:lineSpacingExtra="2dp"
-                android:maxLines="3"
-                android:text="Mensaje de notificación..."
-                android:textColor="#475569"
-                android:textSize="12sp" />
+                android:layout_marginTop="10dp"
+                android:background="#F8FAFC"
+                android:orientation="vertical"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="10dp"
+                android:visibility="gone">
 
-            <!-- Categoría sutil -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Remisión"
+                        android:textColor="#64748B"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/txtDetalleRemision"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="FAC202611200657"
+                        android:textColor="#0F172A"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Productos"
+                        android:textColor="#64748B"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/txtDetalleProductos"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="3 alimentos"
+                        android:textColor="#0F172A"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Destino"
+                        android:textColor="#64748B"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/txtDetalleDestino"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sede Central"
+                        android:textColor="#0F172A"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/badgeCategoriaNotif"
                 android:layout_width="wrap_content"
@@ -93,16 +214,6 @@
                 android:visibility="gone" />
 
         </LinearLayout>
-
-        <!-- Indicador de punto no leído (amarillo/ámbar) -->
-        <View
-            android:id="@+id/viewDotNoLeida"
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:layout_marginTop="4dp"
-            android:background="@drawable/bg_badge_notificacion"
-            android:backgroundTint="#F59E0B"
-            android:visibility="visible" />
 
     </LinearLayout>
 

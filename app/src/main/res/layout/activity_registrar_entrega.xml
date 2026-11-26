@@ -20,32 +20,34 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingHorizontal="16dp"
-            android:paddingTop="20dp">
+            android:orientation="vertical">
 
-            <!-- BARRA SUPERIOR CON BOTÓN VOLVER Y TÍTULO -->
+            <!-- HEADER CURVO AMARILLO PAE -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/bg_header_curved"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingBottom="12dp">
+                android:paddingHorizontal="16dp"
+                android:paddingTop="18dp"
+                android:paddingBottom="24dp">
 
                 <ImageButton
                     android:id="@+id/btnVolver"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:background="@drawable/bg_icono_circular"
+                    android:background="@android:color/transparent"
                     android:contentDescription="Volver"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_arrow_back"
-                    app:tint="#1B3317" />
+                    android:padding="10dp"
+                    android:rotation="180"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="#FFFFFF" />
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
+                    android:layout_marginStart="8dp"
                     android:layout_weight="1"
                     android:orientation="vertical">
 
@@ -53,8 +55,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Recepción de Entrega"
-                        android:textColor="#1B3317"
-                        android:textSize="17sp"
+                        android:textColor="#FFFFFF"
+                        android:textSize="19sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -63,7 +65,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:text="Sede Central • Remisión FAC-20261123-5057"
-                        android:textColor="#64748B"
+                        android:textColor="#FFFDF5"
                         android:textSize="12sp" />
 
                 </LinearLayout>
@@ -78,11 +80,18 @@
                     android:paddingHorizontal="10dp"
                     android:paddingVertical="4dp"
                     android:text="Por Verificar"
-                    android:textColor="#B45309"
-                    android:textSize="11sp"
+                    android:textColor="#92400E"
+                    android:textSize="10.5sp"
                     android:textStyle="bold" />
 
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="14dp">
 
             <!-- 1. TARJETA RESUMEN DE LA REMISIÓN / DESPACHO (LIMPIA, SIN ICONO FEO Y SIN MUCHO TEXTO) -->
             <com.google.android.material.card.MaterialCardView
@@ -244,7 +253,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Desmarcar todos"
-                    android:textColor="#5F7625"
+                    android:textColor="#D97706"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
@@ -364,8 +373,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Borrar"
-                            android:textColor="#DC2626"
-                            android:textSize="12sp" />
+                            android:textColor="#D97706"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
 
                     </LinearLayout>
 
@@ -389,7 +399,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
-                                android:text="✍️ Toca y firma aquí con el dedo"
+                                android:text="Toca y firma aquí con el dedo"
                                 android:textColor="#94A3B8"
                                 android:textSize="12sp"
                                 android:textStyle="italic" />
@@ -409,10 +419,13 @@
 
         </LinearLayout>
 
+        </LinearLayout>
+
     </androidx.core.widget.NestedScrollView>
 
     <!-- BARRA INFERIOR FIJA CON ACCIONES: RECHAZAR / ACEPTAR -->
     <LinearLayout
+        android:id="@+id/barraAccionesEntrega"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
@@ -433,27 +446,27 @@
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
             android:text="Rechazar"
-            android:textColor="#DC2626"
+            android:textColor="#D97706"
             android:textSize="14sp"
             android:textStyle="bold"
-            app:cornerRadius="14dp"
-            app:strokeColor="#FCA5A5"
+            app:cornerRadius="26dp"
+            app:strokeColor="#F4B41F"
             app:strokeWidth="1.5dp" />
 
-        <!-- Botón Aceptar y Notificar -->
+        <!-- Botón Aceptar y Notificar (amarillo con texto blanco) -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAceptarEntrega"
             style="@style/Widget.Material3.Button"
             android:layout_width="0dp"
             android:layout_height="52dp"
             android:layout_marginStart="8dp"
-            android:layout_weight="1.6"
-            android:backgroundTint="#5F7625"
+            android:layout_weight="1.5"
+            android:backgroundTint="#F4B41F"
             android:text="Aceptar y Notificar"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold"
-            app:cornerRadius="14dp"
+            app:cornerRadius="26dp"
             app:icon="@drawable/ic_check"
             app:iconGravity="textStart"
             app:iconTint="#FFFFFF" />

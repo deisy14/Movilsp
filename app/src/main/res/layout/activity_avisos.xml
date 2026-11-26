@@ -83,7 +83,7 @@
                     android:insetBottom="0dp"
                     android:text="Marcar leídas"
                     android:textAllCaps="false"
-                    android:textColor="#1B3317"
+                    android:textColor="#FFFFFF"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     app:cornerRadius="12dp"
@@ -188,7 +188,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Sin leer"
-                                    android:textColor="#1B3317"
+                                    android:textColor="#FFFFFF"
                                     android:textSize="11sp" />
 
                                 <TextView
@@ -196,7 +196,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="4dp"
                                     android:text="2"
-                                    android:textColor="#1B3317"
+                                    android:textColor="#FFFFFF"
                                     android:textSize="20sp"
                                     android:textStyle="bold" />
 
@@ -390,7 +390,7 @@
                                 android:paddingHorizontal="10dp"
                                 android:paddingVertical="4dp"
                                 android:text="Sin leer"
-                                android:textColor="#1B3317"
+                                android:textColor="#FFFFFF"
                                 android:textSize="11sp"
                                 android:textStyle="bold" />
 
@@ -472,7 +472,7 @@
                                 android:paddingHorizontal="10dp"
                                 android:paddingVertical="4dp"
                                 android:text="Sin leer"
-                                android:textColor="#1B3317"
+                                android:textColor="#FFFFFF"
                                 android:textSize="11sp"
                                 android:textStyle="bold" />
 

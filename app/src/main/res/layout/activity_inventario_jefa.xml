@@ -10,39 +10,232 @@
     android:orientation="vertical"
     tools:context=".ui.manipuladora_Jefe.InventarioJefaActivity">
 
-    <!-- ENCABEZADO FIJO (ESTILO WHATSAPP) -->
+    <!-- HEADER CURVO AMARILLO PAE -->
     <LinearLayout
         android:id="@+id/headerInventario"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FAF9F5"
-        android:orientation="vertical"
-        android:paddingHorizontal="20dp"
-        android:paddingTop="12dp"
-        android:paddingBottom="8dp">
+        android:background="@drawable/bg_header_curved"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="22dp">
 
-        <TextView
+        <ImageButton
+            android:id="@+id/btnVolverInventario"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="Volver"
+            android:padding="10dp"
+            android:rotation="180"
+            android:src="@drawable/ic_chevron_right"
+            app:tint="#FFFFFF" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Inventario"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtJornadaTitulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Sede"
+                android:textColor="#FFFDF5"
+                android:textSize="12.5sp" />
+
+        </LinearLayout>
+
+        <!-- CAMPANA NOTIFICACIONES CON BADGE -->
+        <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="INVENTARIO DE INSUMOS PAE"
-            android:textColor="#1B3317"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:layout_marginEnd="8dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
 
-        <TextView
-            android:id="@+id/txtJornadaTitulo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:text="Control general de alimentos en bodega y cocina"
-            android:textColor="#3D5C37"
-            android:textSize="12sp" />
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnNotificacionesInv"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="Notificaciones"
+                    android:src="@drawable/ic_notificaciones"
+                    app:tint="#1B3317" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/badgeNotificacionesInv"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="-2dp"
+                android:layout_marginEnd="-2dp"
+                android:background="@drawable/bg_badge_notificacion"
+                android:elevation="6dp"
+                android:gravity="center"
+                android:textColor="#FFFFFF"
+                android:textSize="9.5sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+        </FrameLayout>
+
+        <!-- AVATAR CON INICIALES -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnPerfilInv"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="0dp">
+
+            <TextView
+                android:id="@+id/txtInicialesPerfilInv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="PA"
+                android:textColor="#1B3317"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 
+    <!-- CARRUSEL DINÁMICO DE CATEGORÍAS DEL BACKEND CON FLECHAS -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="8dp">
+
+        <ImageButton
+            android:id="@+id/btnCatPrev"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="Categorías anteriores"
+            android:padding="6dp"
+            android:rotation="180"
+            android:src="@drawable/ic_chevron_right"
+            app:tint="#F4B41F" />
+
+        <HorizontalScrollView
+            android:id="@+id/scrollCategorias"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/contenedorCategoriasCarrusel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingVertical="4dp" />
+
+        </HorizontalScrollView>
+
+        <ImageButton
+            android:id="@+id/btnCatNext"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="Siguientes categorías"
+            android:padding="6dp"
+            android:src="@drawable/ic_chevron_right"
+            app:tint="#F4B41F" />
+
+    </LinearLayout>
+
+    <!-- BUSCADOR DE INSUMOS -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="10dp"
+        app:cardBackgroundColor="#FFFFFF"
+        app:cardCornerRadius="23dp"
+        app:cardElevation="1dp"
+        app:strokeColor="#E2E8F0"
+        app:strokeWidth="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="14dp">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:contentDescription="Buscar"
+                android:src="@drawable/ic_search"
+                app:tint="#64748B" />
+
+            <EditText
+                android:id="@+id/edtBuscarInsumo"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:hint="Buscar insumo..."
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:maxLines="1"
+                android:textColor="#0F172A"
+                android:textColorHint="#94A3B8"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- CONTENIDO CON LISTA DE INSUMOS -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="10dp"
         android:layout_weight="1"
         android:fillViewport="true"
         android:overScrollMode="never"
@@ -53,112 +246,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="20dp"
-            android:paddingTop="6dp"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="4dp"
             android:paddingBottom="24dp">
 
-            <!-- 3 BOTONES DE CATEGORÍAS HORIZONTALMENTE (GRANOS, LÁCTEOS, VERDURAS) -->
-            <LinearLayout
-                android:layout_width="match_parent"
+            <ProgressBar
+                android:id="@+id/progressInventario"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:weightSum="3">
+                android:layout_gravity="center"
+                android:layout_marginVertical="24dp"
+                android:indeterminateTint="#F4B41F"
+                android:visibility="gone" />
 
-                <!-- BOTÓN 1: GRANOS -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnCategoriaGranos"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_marginEnd="6dp"
-                    android:layout_weight="1"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:text="Granos"
-                    android:textAllCaps="false"
-                    android:textColor="#1B3317"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    app:backgroundTint="#FFFFFF"
-                    app:cornerRadius="12dp"
-                    app:strokeColor="#CBD5E1"
-                    app:strokeWidth="1.5dp" />
-
-                <!-- BOTÓN 2: LÁCTEOS -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnCategoriaLacteos"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_marginHorizontal="3dp"
-                    android:layout_weight="1"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:text="Lácteos"
-                    android:textAllCaps="false"
-                    android:textColor="#1B3317"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    app:backgroundTint="#FFFFFF"
-                    app:cornerRadius="12dp"
-                    app:strokeColor="#CBD5E1"
-                    app:strokeWidth="1.5dp" />
-
-                <!-- BOTÓN 3: VERDURAS -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnCategoriaVerduras"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_marginStart="6dp"
-                    android:layout_weight="1"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:text="Verduras"
-                    android:textAllCaps="false"
-                    android:textColor="#1B3317"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    app:backgroundTint="#FFFFFF"
-                    app:cornerRadius="12dp"
-                    app:strokeColor="#CBD5E1"
-                    app:strokeWidth="1.5dp" />
-
-            </LinearLayout>
-
-            <!-- ENCABEZADO DE PRODUCTOS DEL ADMIN -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"
-                android:layout_marginBottom="12dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/txtTituloSeccionProductos"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Inventario del Administrador"
-                    android:textColor="#1B3317"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/txtConteoProductos"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Todos los insumos"
-                    android:textColor="#64748B"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <!-- LISTA DE PRODUCTOS DEL ADMIN -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvProductosAdmin"
                 android:layout_width="match_parent"
@@ -166,6 +266,27 @@
                 android:nestedScrollingEnabled="false"
                 tools:itemCount="5"
                 tools:listitem="@layout/item_producto_admin" />
+
+            <!-- ESTADO VACÍO -->
+            <LinearLayout
+                android:id="@+id/layoutSinInsumos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingVertical="40dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/txtMensajeVacioInventario"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No se encontraron insumos en esta categoría."
+                    android:textAlignment="center"
+                    android:textColor="#64748B"
+                    android:textSize="13.5sp" />
+
+            </LinearLayout>
 
         </LinearLayout>
 

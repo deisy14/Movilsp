@@ -27,7 +27,7 @@
             android:layout_height="24dp"
             android:contentDescription="Verificado"
             android:src="@drawable/ic_check_circle"
-            app:tint="#5F7625" />
+            app:tint="#F4B41F" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -61,12 +61,12 @@
             android:id="@+id/badgeEstadoCheck"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_pill_green"
-            android:backgroundTint="#EEF4DF"
+            android:background="@drawable/bg_pill_yellow"
+            android:backgroundTint="#FEF3C7"
             android:paddingHorizontal="10dp"
             android:paddingVertical="4dp"
             android:text="Conforme"
-            android:textColor="#3D5C37"
+            android:textColor="#B45309"
             android:textSize="11sp"
             android:textStyle="bold" />
 

@@ -225,7 +225,7 @@ class RegistrarEntregaActivity : AppCompatActivity() {
                             renderizarIngredientes()
 
                             if (entregaYaAceptada) {
-                                aplicarModoEntregaAceptada(entregasRemision.firstOrNull()?.observaciones)
+                                aplicarModoEntregaAceptada(null)
                             }
                         } else {
                             mostrarVistaVacia("No se encontraron alimentos para la remisión $numeroRemision")
@@ -273,7 +273,7 @@ class RegistrarEntregaActivity : AppCompatActivity() {
             }
 
             val progressBar = ProgressBar(this).apply {
-                indeterminateTintList = ColorStateList.valueOf(Color.parseColor("#5F7625"))
+                indeterminateTintList = ColorStateList.valueOf(Color.parseColor("#F4B41F"))
             }
             val txtLoading = TextView(this).apply {
                 text = "Cargando insumos despachados por el supervisor..."
@@ -314,10 +314,11 @@ class RegistrarEntregaActivity : AppCompatActivity() {
                     badge.setTextColor(Color.parseColor("#94A3B8"))
                 } else {
                     imgCheck.setImageResource(R.drawable.ic_check_circle)
-                    imgCheck.imageTintList = ColorStateList.valueOf(Color.parseColor("#5F7625"))
+                    imgCheck.imageTintList = ColorStateList.valueOf(Color.parseColor("#F4B41F"))
                     badge.text = "Conforme"
-                    badge.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#EEF4DF"))
-                    badge.setTextColor(Color.parseColor("#3D5C37"))
+                    badge.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FEF3C7"))
+                    badge.setTextColor(Color.parseColor("#B45309"))
+
                 }
             }
 
@@ -402,7 +403,7 @@ class RegistrarEntregaActivity : AppCompatActivity() {
 
         binding.btnAceptarEntrega.setOnClickListener {
             if (entregaYaAceptada) {
-                finish()
+                finish() 
             } else {
                 confirmarYAceptarEntrega()
             }
@@ -440,16 +441,10 @@ class RegistrarEntregaActivity : AppCompatActivity() {
         binding.txtPistaFirma.setTextColor(Color.parseColor("#15803D"))
         binding.txtPistaFirma.visibility = View.VISIBLE
 
-        // Ocultar botón rechazar y transformar botón aceptar en botón de regreso
+        // Ocultar barra inferior (para devolverse se usa el botón < del header)
+        binding.barraAccionesEntrega.visibility = View.GONE
         binding.btnRechazarEntrega.visibility = View.GONE
-        binding.btnAceptarEntrega.visibility = View.VISIBLE
-        binding.btnAceptarEntrega.isEnabled = true
-        binding.btnAceptarEntrega.text = "Volver al Inicio"
-        binding.btnAceptarEntrega.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#1B3317"))
-        binding.btnAceptarEntrega.setIconResource(R.drawable.ic_arrow_back)
-        binding.btnAceptarEntrega.setOnClickListener {
-            finish()
-        }
+        binding.btnAceptarEntrega.visibility = View.GONE
     }
 
     private fun mostrarDialogoRechazo() {

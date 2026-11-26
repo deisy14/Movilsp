@@ -1,12 +1,12 @@
 package com.example.movilmanupuladora.ui.manipuladora_Jefe
 
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.databinding.ItemProductoAdminBinding
-import com.example.movilmanupuladora.ui.manipuladora.AvisosActivity
+import com.example.movilmanupuladora.utils.ImageLoaderUtil
+import java.util.Locale
 
 class ProductoAdminAdapter(
     private var listaOriginal: List<ProductoAdmin>,
@@ -15,6 +15,8 @@ class ProductoAdminAdapter(
 ) : RecyclerView.Adapter<ProductoAdminAdapter.ProductoViewHolder>() {
 
     private var listaFiltrada: MutableList<ProductoAdmin> = listaOriginal.toMutableList()
+    private var categoriaActual: String? = null
+    private var queryActual: String = ""
 
     inner class ProductoViewHolder(val binding: ItemProductoAdminBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -32,28 +34,42 @@ class ProductoAdminAdapter(
         val item = listaFiltrada[position]
         with(holder.binding) {
             txtNombreProductoAdmin.text = item.nombre
-            txtCategoriaProductoAdmin.text = "${item.categoria} • Inventario Admin"
-            txtCantidadUnidadAdmin.text = item.cantidadConUnidad
+            val unidadBonita = formatearUnidad(item.unidadMedida)
+            txtUnidadProductoAdmin.text = "Unidad: $unidadBonita"
+            txtCantidadValorAdmin.text = String.format(Locale.US, "%.2f", item.cantidad)
+            txtCantidadUnidadMiniAdmin.text = unidadBonita
 
-            // Dejar el icono general de insumo para todos mientras se configuran las URLs de las fotos reales
-            imgProductoAdmin.setImageResource(R.drawable.ic_food)
-
-            btnAlertaProductoAdmin.setOnClickListener {
-                val context = holder.itemView.context
-                val intent = Intent(context, RedactarAvisoJefaActivity::class.java).apply {
-                    putExtra("producto_nombre", item.nombre)
-                }
-                context.startActivity(intent)
+            // Cargar imagen real de Cloudinary si existe; si no, dejar recuadro limpio sin icono amarillo
+            if (!item.imagenUrl.isNullOrBlank()) {
+                cardImagenProductoAdmin.visibility = android.view.View.VISIBLE
+                ImageLoaderUtil.cargarImagen(imgProductoAdmin, item.imagenUrl, android.R.color.transparent)
+            } else {
+                imgProductoAdmin.setImageDrawable(null)
+                cardImagenProductoAdmin.visibility = android.view.View.VISIBLE
             }
 
-            if (modoSoloLectura || onEditarClick == null) {
-                btnEditarProductoAdmin.visibility = android.view.View.GONE
-            } else {
-                btnEditarProductoAdmin.visibility = android.view.View.VISIBLE
-                btnEditarProductoAdmin.setOnClickListener {
+            if (!modoSoloLectura && onEditarClick != null) {
+                imgFlechaItemAdmin.visibility = android.view.View.VISIBLE
+                cardProductoAdmin.isClickable = true
+                cardProductoAdmin.setOnClickListener {
                     onEditarClick(item)
                 }
+            } else {
+                imgFlechaItemAdmin.visibility = android.view.View.GONE
+                cardProductoAdmin.setOnClickListener(null)
+                cardProductoAdmin.isClickable = false
             }
+        }
+    }
+
+    private fun formatearUnidad(unidad: String): String {
+        return when (unidad.lowercase().trim()) {
+            "kg", "kilogramo", "kilogramos", "k" -> "Kg"
+            "g", "gr", "gramo", "gramos" -> "g"
+            "l", "litro", "litros", "ltr" -> "L"
+            "ml", "mililitro", "mililitros" -> "ml"
+            "u", "und", "unidad", "unidades" -> "Und"
+            else -> unidad.ifBlank { "Kg" }
         }
     }
 
@@ -61,20 +77,42 @@ class ProductoAdminAdapter(
 
     fun actualizarLista(nuevaLista: List<ProductoAdmin>) {
         listaOriginal = nuevaLista
-        listaFiltrada = nuevaLista.toMutableList()
-        notifyDataSetChanged()
+        aplicarFiltros(categoriaActual, queryActual)
     }
 
     fun filtrarPorCategoria(categoria: String?) {
-        listaFiltrada = if (categoria.isNullOrEmpty()) {
-            listaOriginal.toMutableList()
-        } else {
-            listaOriginal.filter {
-                it.categoria.trim().equals(categoria.trim(), ignoreCase = true) ||
-                (categoria.equals("Lácteos", ignoreCase = true) && it.categoria.equals("Lacteos", ignoreCase = true)) ||
-                (categoria.equals("Lacteos", ignoreCase = true) && it.categoria.equals("Lácteos", ignoreCase = true))
-            }.toMutableList()
-        }
+        aplicarFiltros(categoria, queryActual)
+    }
+
+    fun filtrarPorTexto(texto: String) {
+        aplicarFiltros(categoriaActual, texto)
+    }
+
+    fun aplicarFiltros(categoria: String?, texto: String) {
+        categoriaActual = categoria
+        queryActual = texto.trim()
+
+        listaFiltrada = listaOriginal.filter { item ->
+            val coincideCat = if (categoriaActual.isNullOrBlank()) {
+                true
+            } else {
+                normalizar(item.categoria) == normalizar(categoriaActual!!)
+            }
+            val coincideTexto = if (queryActual.isEmpty()) {
+                true
+            } else {
+                normalizar(item.nombre).contains(normalizar(queryActual)) ||
+                    normalizar(item.categoria).contains(normalizar(queryActual))
+            }
+            coincideCat && coincideTexto
+        }.toMutableList()
         notifyDataSetChanged()
+    }
+
+    private fun normalizar(txt: String): String {
+        val nfd = java.text.Normalizer.normalize(txt, java.text.Normalizer.Form.NFD)
+        return nfd.replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
+            .lowercase(Locale.getDefault())
+            .trim()
     }
 }

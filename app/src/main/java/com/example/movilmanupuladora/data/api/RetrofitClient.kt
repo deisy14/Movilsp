@@ -80,7 +80,7 @@ object RetrofitClient {
      * Configura el registro de las peticiones HTTP.
      */
     private val logging = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY
+        level = HttpLoggingInterceptor.Level.BASIC
     }
 
     /**

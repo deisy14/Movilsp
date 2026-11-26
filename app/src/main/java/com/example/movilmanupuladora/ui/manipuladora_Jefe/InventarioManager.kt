@@ -25,9 +25,7 @@ object InventarioManager {
                 if (!lista.isNullOrEmpty()) return lista
             } catch (_: Exception) {}
         }
-        val listaDefecto = listaPorDefecto()
-        guardarProductos(context, listaDefecto)
-        return listaDefecto
+        return mutableListOf()
     }
 
     fun guardarProductos(context: Context, lista: List<ProductoAdmin>) {

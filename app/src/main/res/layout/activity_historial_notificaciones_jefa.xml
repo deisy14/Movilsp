@@ -7,19 +7,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FAF9F5"
-    android:fitsSystemWindows="true"
+    android:fitsSystemWindows="false"
     android:orientation="vertical"
     tools:context=".ui.manipuladora_Jefe.HistorialNotificacionesJefaActivity">
 
-    <!-- ENCABEZADO SUPERIOR CON BOTÓN VOLVER Y TÍTULO -->
+    <!-- HEADER CURVO AMARILLO PAE -->
     <LinearLayout
+        android:id="@+id/headerNotificacionesAmarillo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/bg_header_curved"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingHorizontal="20dp"
-        android:paddingTop="48dp"
-        android:paddingBottom="14dp">
+        android:paddingHorizontal="16dp"
+        android:paddingTop="18dp"
+        android:paddingBottom="24dp">
 
         <ImageButton
             android:id="@+id/btnVolver"
@@ -27,14 +29,15 @@
             android:layout_height="40dp"
             android:background="@android:color/transparent"
             android:contentDescription="Volver"
-            android:padding="8dp"
-            android:src="@drawable/ic_arrow_back"
-            app:tint="#0F172A" />
+            android:padding="10dp"
+            android:rotation="180"
+            android:src="@drawable/ic_chevron_right"
+            app:tint="#FFFFFF" />
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="8dp"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -42,8 +45,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Notificaciones"
-                android:textColor="#0F172A"
-                android:textSize="18sp"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -51,9 +54,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="Novedades, entregas y alertas de tu sede"
-                android:textColor="#64748B"
-                android:textSize="12sp" />
+                android:text="Mantente al día con tu sede"
+                android:textColor="#FFFDF5"
+                android:textSize="12.5sp" />
 
         </LinearLayout>
 
@@ -72,121 +75,27 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="20dp"
+            android:paddingHorizontal="18dp"
+            android:paddingTop="16dp"
             android:paddingBottom="24dp">
 
-            <!-- BARRAS / FILTROS RÁPIDOS -->
-            <HorizontalScrollView
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:overScrollMode="never"
-                android:scrollbars="none">
+                android:layout_marginBottom="12dp"
+                android:text="Actividad reciente"
+                android:textColor="#0F172A"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingBottom="12dp">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnFiltroTodas"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="6dp"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        android:text="Todas"
-                        android:textAllCaps="false"
-                        android:textColor="#1B3317"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        app:backgroundTint="#FEF3C7"
-                        app:cornerRadius="12dp"
-                        app:strokeColor="#F4B41F"
-                        app:strokeWidth="1.5dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnFiltroEquipo"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="6dp"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        android:text="Equipo"
-                        android:textAllCaps="false"
-                        android:textColor="#1B3317"
-                        android:textSize="12sp"
-                        app:backgroundTint="#FFFFFF"
-                        app:cornerRadius="12dp"
-                        app:strokeColor="#CBD5E1"
-                        app:strokeWidth="1dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnFiltroInventario"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="6dp"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        android:text="Inventario"
-                        android:textAllCaps="false"
-                        android:textColor="#1B3317"
-                        android:textSize="12sp"
-                        app:backgroundTint="#FFFFFF"
-                        app:cornerRadius="12dp"
-                        app:strokeColor="#CBD5E1"
-                        app:strokeWidth="1dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnFiltroPreparaciones"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="6dp"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        android:text="Preparaciones"
-                        android:textAllCaps="false"
-                        android:textColor="#1B3317"
-                        android:textSize="12sp"
-                        app:backgroundTint="#FFFFFF"
-                        app:cornerRadius="12dp"
-                        app:strokeColor="#CBD5E1"
-                        app:strokeWidth="1dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnFiltroAsistencia"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        android:text="Asistencia"
-                        android:textAllCaps="false"
-                        android:textColor="#1B3317"
-                        android:textSize="12sp"
-                        app:backgroundTint="#FFFFFF"
-                        app:cornerRadius="12dp"
-                        app:strokeColor="#CBD5E1"
-                        app:strokeWidth="1dp" />
-
-                </LinearLayout>
-
-            </HorizontalScrollView>
-
-            <!-- CONTENEDOR DINÁMICO DE NOTIFICACIONES DE LA SEDE -->
+            <!-- CONTENEDOR DINÁMICO DE NOTIFICACIONES -->
             <LinearLayout
                 android:id="@+id/contenedorHistorialNotificaciones"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
                 android:orientation="vertical" />
 
-            <!-- ESTADO VACÍO (CUANDO NO HAY NOTIFICACIONES EN LA SEDE) -->
+            <!-- ESTADO VACÍO -->
             <LinearLayout
                 android:id="@+id/layoutSinNotificaciones"
                 android:layout_width="match_parent"

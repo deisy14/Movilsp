@@ -19,7 +19,6 @@ import com.example.movilmanupuladora.databinding.ItemNotificacionJefaBinding
 class HistorialNotificacionesJefaActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHistorialNotificacionesJefaBinding
-    private var filtroSeleccionado: String = "Todas"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +37,6 @@ class HistorialNotificacionesJefaActivity : AppCompatActivity() {
             finish()
         }
 
-        configurarFiltros()
         cargarNotificaciones()
 
         lifecycleScope.launch {
@@ -54,96 +52,115 @@ class HistorialNotificacionesJefaActivity : AppCompatActivity() {
 
     private fun cargarNotificaciones() {
         val notifsSede = NotificacionesJefaManager.obtenerNotificacionesSede(this)
-        binding.btnFiltroTodas.text = "Todas (${notifsSede.size})"
-
-        val filtradas = when (filtroSeleccionado) {
-            "Equipo" -> notifsSede.filter { it.categoria.equals("Equipo", ignoreCase = true) }
-            "Inventario" -> notifsSede.filter { it.categoria.equals("Inventario", ignoreCase = true) }
-            "Preparaciones" -> notifsSede.filter { it.categoria.contains("Prep", ignoreCase = true) }
-            "Asistencia" -> notifsSede.filter { it.categoria.equals("Asistencia", ignoreCase = true) }
-            else -> notifsSede
-        }
 
         binding.contenedorHistorialNotificaciones.removeAllViews()
 
-        if (filtradas.isEmpty()) {
+        if (notifsSede.isEmpty()) {
             binding.contenedorHistorialNotificaciones.visibility = View.GONE
             binding.layoutSinNotificaciones.visibility = View.VISIBLE
-            binding.txtMensajeVacio.text = if (filtroSeleccionado == "Todas") {
-                "No tienes notificaciones pendientes para tu sede."
-            } else {
-                "No hay notificaciones de $filtroSeleccionado para tu sede."
-            }
+            binding.txtMensajeVacio.text = "No tienes notificaciones pendientes para tu sede."
         } else {
             binding.contenedorHistorialNotificaciones.visibility = View.VISIBLE
             binding.layoutSinNotificaciones.visibility = View.GONE
 
             val inflater = LayoutInflater.from(this)
-            for (notif in filtradas) {
+            for (notif in notifsSede) {
                 val itemBinding = ItemNotificacionJefaBinding.inflate(inflater, binding.contenedorHistorialNotificaciones, false)
 
-                itemBinding.txtTituloNotif.text = notif.titulo
-                itemBinding.txtMensajeNotif.text = notif.mensaje
+                val tituloLimpio = limpiarEmojis(notif.titulo)
+                val mensajeLimpio = limpiarEmojis(notif.mensaje)
+                itemBinding.txtTituloNotif.text = tituloLimpio
+                itemBinding.txtMensajeNotif.text = mensajeLimpio
                 itemBinding.txtFechaNotif.text = notif.fecha
                 itemBinding.badgeCategoriaNotif.text = notif.categoria
 
-                val esLeida = NotificacionesJefaManager.esLeida(this, notif.id)
-                val density = resources.displayMetrics.density
-
-                if (esLeida) {
-                    itemBinding.cardItemNotificacion.setCardBackgroundColor(Color.parseColor("#FFFFFF"))
-                    itemBinding.cardItemNotificacion.strokeColor = Color.parseColor("#E2E8F0")
-                    itemBinding.cardItemNotificacion.strokeWidth = (1 * density).toInt()
-                    itemBinding.viewDotNoLeida.visibility = View.GONE
-                } else {
-                    itemBinding.cardItemNotificacion.setCardBackgroundColor(Color.parseColor("#FEFCE8"))
-                    itemBinding.cardItemNotificacion.strokeColor = Color.parseColor("#FDE68A")
-                    itemBinding.cardItemNotificacion.strokeWidth = (1.2f * density).toInt()
-                    itemBinding.viewDotNoLeida.visibility = View.VISIBLE
-                }
+                val entregaYaRecibida = !notif.numeroRemision.isNullOrBlank() &&
+                        getSharedPreferences("ENTREGAS_RECIBIDAS_PREFS", MODE_PRIVATE)
+                            .getBoolean("recibida_${notif.numeroRemision}", false)
+                val esLeida = notif.leida || entregaYaRecibida || NotificacionesJefaManager.esLeida(this, notif.id)
 
                 val textoCompleto = "${notif.titulo} ${notif.mensaje}"
                 val esEntrega = textoCompleto.contains("entrega", ignoreCase = true) ||
                         textoCompleto.contains("remisi", ignoreCase = true) ||
                         textoCompleto.contains("despach", ignoreCase = true) ||
                         textoCompleto.contains("factura", ignoreCase = true) ||
-                        textoCompleto.contains("FAC-", ignoreCase = true) ||
+                        textoCompleto.contains("FAC", ignoreCase = true) ||
                         textoCompleto.contains("#REM", ignoreCase = true)
 
-                if (esEntrega) {
-                    itemBinding.imgIconoNotif.setImageResource(R.drawable.ic_nav_inventory)
-                    itemBinding.imgIconoNotif.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FEF3C7"))
-                    itemBinding.imgIconoNotif.imageTintList = ColorStateList.valueOf(Color.parseColor("#D97706"))
-                } else {
-                    when (notif.categoria.lowercase()) {
-                        "equipo" -> {
-                            itemBinding.imgIconoNotif.setImageResource(R.drawable.ic_people)
-                            itemBinding.imgIconoNotif.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#E0E7FF"))
-                            itemBinding.imgIconoNotif.imageTintList = ColorStateList.valueOf(Color.parseColor("#4338CA"))
-                        }
-                        "asistencia" -> {
-                            itemBinding.imgIconoNotif.setImageResource(R.drawable.ic_check_circle)
-                            itemBinding.imgIconoNotif.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#DCFCE7"))
-                            itemBinding.imgIconoNotif.imageTintList = ColorStateList.valueOf(Color.parseColor("#166534"))
-                        }
-                        "preparaciones", "preparacion" -> {
-                            itemBinding.imgIconoNotif.setImageResource(R.drawable.ic_nav_preparations)
-                            itemBinding.imgIconoNotif.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FEF3C7"))
-                            itemBinding.imgIconoNotif.imageTintList = ColorStateList.valueOf(Color.parseColor("#854D0E"))
-                        }
-                        else -> {
-                            itemBinding.imgIconoNotif.setImageResource(R.drawable.ic_nav_inventory)
-                            itemBinding.imgIconoNotif.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#DCFCE7"))
-                            itemBinding.imgIconoNotif.imageTintList = ColorStateList.valueOf(Color.parseColor("#166534"))
-                        }
+                val colorBarra = when {
+                    esLeida -> "#F4B41F"
+                    esEntrega -> "#F4B41F"
+                    notif.categoria.equals("equipo", ignoreCase = true) -> "#3B82F6"
+                    notif.categoria.equals("asistencia", ignoreCase = true) -> "#10B981"
+                    else -> "#F4B41F"
+                }
+                itemBinding.viewBarraAcento.setBackgroundColor(Color.parseColor(colorBarra))
+
+                // Pill de estado (Nueva / Leída / Importante / Informativa)
+                when {
+                    esLeida -> {
+                        itemBinding.badgeEstadoNotif.text = "Leída"
+                        itemBinding.badgeEstadoNotif.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#DCFCE7"))
+                        itemBinding.badgeEstadoNotif.setTextColor(Color.parseColor("#166534"))
                     }
+                    textoCompleto.contains("bajo", ignoreCase = true) || textoCompleto.contains("alerta", ignoreCase = true) -> {
+                        itemBinding.badgeEstadoNotif.text = "Importante"
+                        itemBinding.badgeEstadoNotif.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FEF3C7"))
+                        itemBinding.badgeEstadoNotif.setTextColor(Color.parseColor("#92400E"))
+                    }
+                    esEntrega -> {
+                        itemBinding.badgeEstadoNotif.text = "Nueva"
+                        itemBinding.badgeEstadoNotif.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FEF3C7"))
+                        itemBinding.badgeEstadoNotif.setTextColor(Color.parseColor("#92400E"))
+                    }
+                    else -> {
+                        itemBinding.badgeEstadoNotif.text = "Informativa"
+                        itemBinding.badgeEstadoNotif.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#E2E8F0"))
+                        itemBinding.badgeEstadoNotif.setTextColor(Color.parseColor("#475569"))
+                    }
+                }
+
+                // Detalles desplegables: inician colapsados; la pestañita lateral despliega/contrae Remisión / Productos / Destino
+                val remisionCode = notif.numeroRemision
+                    ?: Regex("(?:#REM-|FAC-?)[0-9A-Za-z-]+", RegexOption.IGNORE_CASE).find(textoCompleto)?.value
+                itemBinding.layoutDetallesEntrega.visibility = View.GONE
+                itemBinding.imgFlechaDerecha.visibility = View.VISIBLE
+                itemBinding.imgFlechaDerecha.rotation = if (esEntrega && !remisionCode.isNullOrBlank()) 90f else 0f
+
+                if (esEntrega && !remisionCode.isNullOrBlank()) {
+                    itemBinding.txtDetalleRemision.text = remisionCode
+                    val prodMatch = Regex("(\\d+\\s+alimentos?|\\d+\\s+productos?)", RegexOption.IGNORE_CASE).find(mensajeLimpio)?.value
+                    itemBinding.txtDetalleProductos.text = prodMatch ?: "Ver en remisión"
+                    val sedeActual = com.example.movilmanupuladora.utils.SessionManager(this).getSedeNombre()
+                    itemBinding.txtDetalleDestino.text = if (!sedeActual.isNullOrBlank()) sedeActual else "Sede Central"
+
+                    itemBinding.imgFlechaDerecha.setOnClickListener {
+                        val abierto = itemBinding.layoutDetallesEntrega.visibility == View.VISIBLE
+                        itemBinding.layoutDetallesEntrega.visibility = if (abierto) View.GONE else View.VISIBLE
+                        itemBinding.imgFlechaDerecha.rotation = if (abierto) 90f else 270f
+                    }
+                } else {
+                    itemBinding.imgFlechaDerecha.setOnClickListener(null)
                 }
 
                 itemBinding.cardItemNotificacion.setOnClickListener {
                     NotificacionesJefaManager.marcarLeida(this, notif.id)
-                    itemBinding.cardItemNotificacion.setCardBackgroundColor(Color.parseColor("#FFFFFF"))
-                    itemBinding.cardItemNotificacion.strokeColor = Color.parseColor("#E2E8F0")
-                    itemBinding.viewDotNoLeida.visibility = View.GONE
+                    itemBinding.badgeEstadoNotif.text = "Leída"
+                    itemBinding.badgeEstadoNotif.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#DCFCE7"))
+                    itemBinding.badgeEstadoNotif.setTextColor(Color.parseColor("#166534"))
+
+                    // Marcar también como leída en el backend si proviene de allí
+                    if (notif.id.startsWith("backend_")) {
+                        val idBackend = notif.id.removePrefix("backend_").toIntOrNull()
+                        if (idBackend != null) {
+                            lifecycleScope.launch {
+                                try {
+                                    com.example.movilmanupuladora.data.api.RetrofitClient.apiService
+                                        .marcarNotificacionLeida(idBackend)
+                                } catch (_: Exception) { }
+                            }
+                        }
+                    }
 
                     if (esEntrega) {
                         val intent = Intent(this, RegistrarEntregaActivity::class.java)
@@ -175,34 +192,10 @@ class HistorialNotificacionesJefaActivity : AppCompatActivity() {
         }
     }
 
-    private fun configurarFiltros() {
-        fun resetBoton(btn: com.google.android.material.button.MaterialButton) {
-            btn.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FFFFFF"))
-            btn.strokeColor = ColorStateList.valueOf(Color.parseColor("#CBD5E1"))
-            btn.strokeWidth = (1 * resources.displayMetrics.density).toInt()
-        }
-
-        fun seleccionarBoton(btn: com.google.android.material.button.MaterialButton) {
-            btn.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FEF3C7"))
-            btn.strokeColor = ColorStateList.valueOf(Color.parseColor("#F4B41F"))
-            btn.strokeWidth = (1.5f * resources.displayMetrics.density).toInt()
-        }
-
-        val botones = listOf(
-            Pair(binding.btnFiltroTodas, "Todas"),
-            Pair(binding.btnFiltroEquipo, "Equipo"),
-            Pair(binding.btnFiltroInventario, "Inventario"),
-            Pair(binding.btnFiltroPreparaciones, "Preparaciones"),
-            Pair(binding.btnFiltroAsistencia, "Asistencia")
-        )
-
-        botones.forEach { (btn, categoria) ->
-            btn.setOnClickListener {
-                botones.forEach { resetBoton(it.first) }
-                seleccionarBoton(btn)
-                filtroSeleccionado = categoria
-                cargarNotificaciones()
-            }
-        }
+    private fun limpiarEmojis(texto: String): String {
+        return texto
+            .replace(Regex("[\\uD83C-\\uDBFF\\uDC00-\\uDFFF]+"), "")
+            .replace(Regex("[\\u2600-\\u27BF\\uFE0F]"), "")
+            .trim()
     }
 }

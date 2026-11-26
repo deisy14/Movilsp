@@ -12,12 +12,12 @@ data class Notificacion(
     @SerializedName("mensaje")
     val mensaje: String? = null,
 
-    @SerializedName("fecha")
+    @SerializedName(value = "fecha_hora", alternate = ["fecha", "fecha_creacion", "created_at"])
     val fecha: String? = null,
 
     @SerializedName("tipo")
     val tipo: String? = null,
 
-    @SerializedName("leido")
+    @SerializedName(value = "leida", alternate = ["leido"])
     val leido: Boolean? = false
 )
