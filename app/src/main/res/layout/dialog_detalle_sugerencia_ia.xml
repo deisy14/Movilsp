@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardModalContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="12dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="6dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- CONTENEDOR CON SCROLL FLUIDO (SIN BARRA VERTICAL VISIBLE) -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollDetalleModal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true"
+            android:overScrollMode="never"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="20dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="12dp">
+
+                <!-- BADGE SUPERIOR IZQUIERDA -->
+                <TextView
+                    android:id="@+id/tvBadgeModalSugerencia"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_pill_sugerencia_ia"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:text="Sugerencia IA"
+                    android:textColor="#92400E"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <!-- NOMBRE DEL PLATO (LIMPIO) -->
+                <TextView
+                    android:id="@+id/tvTituloModalPlato"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:lineSpacingExtra="3dp"
+                    android:text="Tortilla montañera de huevos con queso y avena tibia"
+                    android:textColor="#0F172A"
+                    android:textSize="19sp"
+                    android:textStyle="bold" />
+
+                <!-- SUBTÍTULO FECHA -->
+                <TextView
+                    android:id="@+id/tvFechaModalPlato"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Miércoles, 25 de noviembre"
+                    android:textColor="#047857"
+                    android:textSize="13sp" />
+
+                <!-- CARD JORNADA Y RACIONES (AMARILLO DORADO) -->
+                <LinearLayout
+                    android:id="@+id/layoutJornadaRacionesModal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:background="@drawable/bg_card_jornada_raciones"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="12dp">
+
+                    <!-- COLUMNA JORNADA -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Jornada"
+                            android:textColor="#78350F"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/tvJornadaValor"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Desayuno"
+                            android:textColor="#451A03"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- COLUMNA RACIONES / ASISTENCIA -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.4"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Raciones"
+                            android:textColor="#78350F"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/tvRacionesValor"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Sin registro de asistencia"
+                            android:textColor="#451A03"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- SECCIÓN COMPONENTES DEL PLATO -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Componentes del plato"
+                    android:textColor="#1E293B"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvComponentesValor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:lineSpacingExtra="2dp"
+                    android:text="Tortilla de huevos campesinos, queso tajado, avena en leche y fruta"
+                    android:textColor="#475569"
+                    android:textSize="13sp" />
+
+                <!-- SECCIÓN PREPARACIÓN PASO A PASO -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Preparación paso a paso"
+                    android:textColor="#1E293B"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/layoutContenedorPasos"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="vertical" />
+
+                <!-- SECCIÓN INGREDIENTES Y STOCK EN BODEGA -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Ingredientes y stock en bodega"
+                    android:textColor="#1E293B"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <!-- BANNER VERDE STOCK -->
+                <TextView
+                    android:id="@+id/tvBannerStockModal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_stock_suficiente_banner"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="8dp"
+                    android:text="Stock suficiente para los ingredientes requeridos"
+                    android:textColor="#15803D"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <!-- TABLA DE INGREDIENTES -->
+                <LinearLayout
+                    android:id="@+id/layoutTablaIngredientes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical">
+
+                    <!-- CABECERA DE LA TABLA -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_tabla_header"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="7dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.6"
+                            android:text="Ingrediente"
+                            android:textColor="#78350F"
+                            android:textSize="11.5sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.1"
+                            android:gravity="end"
+                            android:text="Requerido"
+                            android:textColor="#78350F"
+                            android:textSize="11.5sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.2"
+                            android:gravity="end"
+                            android:text="En inventario"
+                            android:textColor="#78350F"
+                            android:textSize="11.5sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- FILAS DE INGREDIENTES -->
+                    <LinearLayout
+                        android:id="@+id/layoutContenedorFilasIngredientes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:orientation="vertical" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- SEPARADOR SUTIL -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#F1F5F9" />
+
+        <!-- BOTONES DE ACCIÓN AL PIE (FIJOS, SIEMPRE ACCESIBLES) -->
+        <LinearLayout
+            android:id="@+id/layoutBotonesAccionModal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:orientation="horizontal"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="18dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCerrarModal"
+                android:layout_width="0dp"
+                android:layout_height="46dp"
+                android:layout_weight="1"
+                android:text="Cerrar"
+                android:textAllCaps="false"
+                android:textColor="#047857"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:backgroundTint="#F0FDF4"
+                app:cornerRadius="12dp"
+                app:elevation="0dp"
+                app:strokeColor="#A7F3D0"
+                app:strokeWidth="1dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSeleccionarDiaModal"
+                android:layout_width="0dp"
+                android:layout_height="46dp"
+                android:layout_marginStart="12dp"
+                android:layout_weight="2"
+                android:text="Seleccionar para este día"
+                android:textAllCaps="false"
+                android:textColor="#451A03"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:backgroundTint="#F59E0B"
+                app:cornerRadius="12dp"
+                app:elevation="2dp"
+                app:strokeWidth="0dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

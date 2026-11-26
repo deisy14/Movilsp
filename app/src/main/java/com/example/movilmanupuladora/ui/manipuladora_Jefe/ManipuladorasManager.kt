@@ -23,66 +23,23 @@ object ManipuladorasManager {
     )
 
     private val listaManipuladoras = mutableListOf<Manipuladora>()
-
-    // Manipuladoras base registradas en la base de datos de cada sede (fallback dinámico ante restricciones de red)
-    private val manipuladorasBaseCatalogo = listOf(
-        Manipuladora(
-            id = 14,
-            nombre = "silvia plath",
-            funcion = "Manipuladora de alimentos",
-            jornada = "Mañana",
-            activa = true,
-            estado = "Activa",
-            correo = "silvia@sirae.com",
-            idUsuario = 14,
-            idSede = 1,
-            sedeNombre = ""
-        ),
-        Manipuladora(
-            id = 15,
-            nombre = "yudi potosi",
-            funcion = "Manipuladora de alimentos",
-            jornada = "Mañana",
-            activa = true,
-            estado = "Activa",
-            correo = "yudi@sirae.com",
-            idUsuario = 15,
-            idSede = 1,
-            sedeNombre = ""
-        ),
-        Manipuladora(
-            id = 16,
-            nombre = "niki@sirae.com minach",
-            funcion = "Manipuladora de alimentos",
-            jornada = "Mañana",
-            activa = true,
-            estado = "Activa",
-            correo = "niki@sirae.com",
-            idUsuario = 16,
-            idSede = 2,
-            sedeNombre = "sede valencia"
-        )
-    )
-
-    private fun cargarManipuladorasBaseParaSede(idSede: Int?, nombreSede: String?) {
-        for (base in manipuladorasBaseCatalogo) {
-            if (!esUsuarioActivo(base.activa, base.estado)) continue
-            val match = if (idSede != null || !nombreSede.isNullOrBlank()) {
-                coincideSede(idSede, nombreSede, base.idSede, base.sedeNombre)
-            } else {
-                true
-            }
-            if (match && listaManipuladoras.none { it.id == base.id || it.correo.equals(base.correo, true) || it.nombre.equals(base.nombre, true) }) {
-                listaManipuladoras.add(base.copy())
-            }
-        }
-    }
+    private var ultimaSedeCargadaId: Int? = null
+    private var ultimaSedeCargadaNombre: String? = null
 
     fun obtenerManipuladoras(): List<Manipuladora> = listaManipuladoras.toList()
 
+    private fun normalizarTexto(texto: String?): String {
+        if (texto.isNullOrBlank()) return ""
+        val nfd = java.text.Normalizer.normalize(texto, java.text.Normalizer.Form.NFD)
+        return nfd.replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
+            .lowercase()
+            .trim()
+    }
+
     private fun limpiarNombreSede(nombre: String?): String {
         if (nombre.isNullOrBlank()) return ""
-        return nombre.lowercase()
+        return normalizarTexto(nombre)
+            .replace("institucion educativa", " ")
             .replace("i.e.", " ")
             .replace("i.e", " ")
             .replace("ie", " ")
@@ -90,6 +47,7 @@ object ManipuladorasManager {
             .replace("·", " ")
             .replace("-", " ")
             .replace(",", " ")
+            .replace("\\s+".toRegex(), " ")
             .trim()
     }
 
@@ -102,8 +60,8 @@ object ManipuladorasManager {
         val s2 = limpiarNombreSede(nombreSede2)
         if (s1.isNotBlank() && s2.isNotBlank()) {
             if (s1 == s2 || s1.contains(s2) || s2.contains(s1)) return true
-            val tokens1 = s1.split("\\s+".toRegex()).filter { it.length >= 4 }
-            val tokens2 = s2.split("\\s+".toRegex()).filter { it.length >= 4 }
+            val tokens1 = s1.split(" ").filter { it.length >= 4 }
+            val tokens2 = s2.split(" ").filter { it.length >= 4 }
             if (tokens1.any { t1 -> tokens2.any { t2 -> t1 == t2 } }) return true
         }
         return false
@@ -155,11 +113,6 @@ object ManipuladorasManager {
             }
         }
 
-        // Si la lista está vacía, cargar las manipuladoras base correspondientes a la sede
-        if (listaManipuladoras.isEmpty()) {
-            cargarManipuladorasBaseParaSede(finalIdSede, finalNombreSede)
-        }
-
         // 2. Filtrar únicamente las manipuladoras de esta sede cargadas desde el backend que estén ACTIVAS
         val filtradas = listaManipuladoras.filter { manip ->
             if (!esUsuarioActivo(manip.activa, manip.estado)) return@filter false
@@ -192,7 +145,49 @@ object ManipuladorasManager {
         var idSedeFinal = idSedeJefa ?: session?.getSedeId()?.takeIf { it > 0 }
         var nombreSedeFinal = sedeNombreJefa ?: session?.getSedeNombre()
 
+        // Si cambió de sede en esta sesión, limpiar caché en memoria
+        if ((idSedeFinal != null && idSedeFinal != ultimaSedeCargadaId) ||
+            (!nombreSedeFinal.isNullOrBlank() && !nombreSedeFinal.equals(ultimaSedeCargadaNombre, ignoreCase = true))
+        ) {
+            listaManipuladoras.clear()
+            ultimaSedeCargadaId = idSedeFinal
+            ultimaSedeCargadaNombre = nombreSedeFinal
+        }
+
         try {
+            // Resolver id_sede desde /api/sedes/ si aún no se tiene numérico
+            if ((idSedeFinal == null || idSedeFinal <= 0) && !nombreSedeFinal.isNullOrBlank()) {
+                try {
+                    val sedesRes = withContext(Dispatchers.IO) { RetrofitClient.apiService.obtenerSedes() }
+                    if (sedesRes.isSuccessful && sedesRes.body() != null) {
+                        val root = sedesRes.body()!!
+                        val arr = when {
+                            root.isJsonArray -> root.asJsonArray
+                            root.isJsonObject && root.asJsonObject.has("results") -> root.asJsonObject.getAsJsonArray("results")
+                            root.isJsonObject && root.asJsonObject.has("data") -> root.asJsonObject.getAsJsonArray("data")
+                            else -> null
+                        }
+                        if (arr != null) {
+                            val buscado = limpiarNombreSede(nombreSedeFinal)
+                            for (el in arr) {
+                                if (!el.isJsonObject) continue
+                                val so = el.asJsonObject
+                                val sNom = so.get("nombre_sede")?.takeIf { !it.isJsonNull }?.asString
+                                    ?: so.get("nombre")?.takeIf { !it.isJsonNull }?.asString
+                                if (limpiarNombreSede(sNom) == buscado) {
+                                    val fid = so.get("id_sede")?.takeIf { !it.isJsonNull }?.asInt
+                                        ?: so.get("id")?.takeIf { !it.isJsonNull }?.asInt
+                                    if (fid != null && fid > 0) {
+                                        idSedeFinal = fid
+                                        break
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch (_: Exception) { }
+            }
+
             val response = withContext(Dispatchers.IO) {
                 RetrofitClient.apiService.obtenerUsuarios()
             }
@@ -296,6 +291,11 @@ object ManipuladorasManager {
                     editor.apply()
                 }
 
+                // Reemplazar completamente con la lista fresca y real del backend para esta sede
+                listaManipuladoras.clear()
+                ultimaSedeCargadaId = idSedeFinal
+                ultimaSedeCargadaNombre = nombreSedeFinal
+
                 // Actualizar o agregar los usuarios recibidos del backend
                 for (u in usuariosSedeBackend) {
                     val c = u.correo.lowercase().trim()
@@ -305,46 +305,26 @@ object ManipuladorasManager {
                         u.nombre.isNotBlank() -> u.nombre.trim()
                         else -> u.correo.substringBefore("@")
                     }
-                    val n = nombreCompletoReal.lowercase()
-
-                    val existente = listaManipuladoras.firstOrNull {
-                        (c.isNotBlank() && it.correo.equals(c, ignoreCase = true)) ||
-                        (n.isNotBlank() && it.nombre.lowercase().trim() == n)
-                    }
-
-                    if (existente != null) {
-                        if (u.idUsuario != null && u.idUsuario > 0) existente.idUsuario = u.idUsuario
-                        existente.nombre = nombreCompletoReal
-                        existente.activa = u.isActive ?: true
-                        existente.estado = u.estado ?: if (existente.activa) "Activa" else "Inactiva"
-                        if (c.isNotBlank()) existente.correo = u.correo
-                        existente.idSede = u.idSede ?: idSedeFinal
-                        existente.sedeNombre = u.sedeNombre ?: nombreSedeFinal
-                    } else {
-                        val nuevoId = u.idUsuario ?: ((listaManipuladoras.maxOfOrNull { it.id } ?: 50) + 1)
-                        listaManipuladoras.add(
-                            Manipuladora(
-                                id = nuevoId,
-                                nombre = nombreCompletoReal,
-                                funcion = "Manipuladora de alimentos",
-                                jornada = "Mañana",
-                                activa = u.isActive ?: true,
-                                estado = u.estado ?: "Activa",
-                                correo = u.correo,
-                                idUsuario = u.idUsuario ?: nuevoId,
-                                idSede = u.idSede ?: idSedeFinal,
-                                sedeNombre = u.sedeNombre ?: nombreSedeFinal
-                            )
+                    val nuevoId = u.idUsuario ?: ((listaManipuladoras.maxOfOrNull { it.id } ?: 50) + 1)
+                    val rolTxt = u.nombreRol?.takeIf { it.isNotBlank() } ?: "Manipuladora de alimentos"
+                    listaManipuladoras.add(
+                        Manipuladora(
+                            id = nuevoId,
+                            nombre = nombreCompletoReal,
+                            funcion = rolTxt,
+                            jornada = "Mañana",
+                            activa = u.isActive ?: true,
+                            estado = u.estado ?: "Activa",
+                            correo = u.correo,
+                            idUsuario = u.idUsuario ?: nuevoId,
+                            idSede = u.idSede ?: idSedeFinal,
+                            sedeNombre = u.sedeNombre ?: nombreSedeFinal
                         )
-                    }
+                    )
                 }
-            } else {
-                // Si la respuesta del backend fue vacía o falló, asegurar la carga base de la sede
-                cargarManipuladorasBaseParaSede(idSedeFinal, nombreSedeFinal)
             }
         } catch (e: Exception) {
             Log.e("ManipuladorasManager", "Error cargando manipuladoras del backend: ${e.message}")
-            cargarManipuladorasBaseParaSede(idSedeFinal, nombreSedeFinal)
         }
     }
 

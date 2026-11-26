@@ -167,7 +167,7 @@ object NavigationHelperJefa {
         }
 
         fabAdd?.setOnClickListener {
-            val intent = Intent(activity, PlanificacionSemanalJefaActivity::class.java)
+            val intent = Intent(activity, com.example.movilmanupuladora.ui.manipuladora_Jefe.RedactarRecetaActivity::class.java)
             activity.startActivity(intent)
             @Suppress("DEPRECATION")
             activity.overridePendingTransition(R.anim.slide_in_bottom, R.anim.stay)

@@ -189,10 +189,19 @@ interface ApiService {
     @GET("menus/")
     suspend fun obtenerMenus(): Response<List<menus>>
 
+    @GET("menus/")
+    suspend fun obtenerMenusRaw(): Response<com.google.gson.JsonElement>
+
     @POST("menus/")
     suspend fun registrarMenu(
         @Body menuData: Map<String, @JvmSuppressWildcards Any?>
     ): Response<Map<String, Any?>>
+
+    @PUT("menus/{id}/")
+    suspend fun actualizarMenu(
+        @Path("id") id: Int,
+        @Body menuData: Map<String, @JvmSuppressWildcards Any?>
+    ): Response<com.google.gson.JsonElement>
 
     // Asistencia diaria
     @GET("asistencia-diaria/")
@@ -254,8 +263,14 @@ interface ApiService {
     @GET("contratos/")
     suspend fun obtenerContratos(): Response<List<com.example.movilmanupuladora.data.model.ContratoModel>>
 
+    @GET("contratos/")
+    suspend fun obtenerContratosRaw(): Response<com.google.gson.JsonElement>
+
     @GET("contratos-secciones-menu/")
     suspend fun obtenerContratosSeccionesMenu(): Response<List<com.example.movilmanupuladora.data.model.ContratoSeccionMenuModel>>
+
+    @GET("contratos-secciones-menu/")
+    suspend fun obtenerContratosSeccionesMenuRaw(): Response<com.google.gson.JsonElement>
 
     @GET("contratos/{id}/distribucion/")
     suspend fun obtenerDistribucionContrato(
@@ -264,6 +279,14 @@ interface ApiService {
 
     @GET("distribucion-cupos/")
     suspend fun obtenerDistribucionCupos(): Response<com.google.gson.JsonElement>
+
+    @GET("sedes/")
+    suspend fun obtenerSedes(): Response<com.google.gson.JsonElement>
+
+    @GET("sedes/{id}/configuracion/")
+    suspend fun obtenerConfiguracionSede(
+        @retrofit2.http.Path("id") id: Int
+    ): Response<com.google.gson.JsonElement>
 
     // =========================================================
     // RECONOCIMIENTO FACIAL BIOMÉTRICO (SIRAE)

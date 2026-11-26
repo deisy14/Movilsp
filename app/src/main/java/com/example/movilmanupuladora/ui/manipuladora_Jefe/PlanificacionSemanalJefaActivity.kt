@@ -87,16 +87,27 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
         sessionManager = SessionManager(this)
 
         try {
-            platosDesayuno = MenuPaeCatalog.menus.map {
-                InicioJefaActivity.Plato(id = it.id, nombre = it.nombre, componente = it.componente, imagen = it.imagenRes)
-            }.toMutableList()
+            val esAlmuerzoKeywords = listOf(
+                "pollo", "carne", "res", "cerdo", "hígado", "higado", "pescado", "atún", "atun",
+                "lenteja", "frijol", "fríjol", "garbanzo", "sancocho", "sopa", "pasta", "espagueti",
+                "ensalada", "guisad", "sudado", "albóndiga", "albondiga", "almuerzo"
+            )
+
+            platosDesayuno = MenuPaeCatalog.menus
+                .filter { item ->
+                    val low = item.nombreDesayuno.lowercase()
+                    esAlmuerzoKeywords.none { low.contains(it) }
+                }
+                .map {
+                    InicioJefaActivity.Plato(id = it.id, nombre = it.nombreDesayuno, componente = it.compDesayuno, imagen = it.imgDesayuno)
+                }.toMutableList()
 
             platosAlmuerzo = MenuPaeCatalog.menus.map {
-                InicioJefaActivity.Plato(id = it.id, nombre = it.nombre, componente = it.componente, imagen = it.imagenRes)
+                InicioJefaActivity.Plato(id = it.id, nombre = it.nombreAlmuerzo, componente = it.compAlmuerzo, imagen = it.imgAlmuerzo)
             }.toMutableList()
 
             platosMerienda = MenuPaeCatalog.menus.map {
-                InicioJefaActivity.Plato(id = it.id, nombre = it.nombre, componente = it.componente, imagen = it.imagenRes)
+                InicioJefaActivity.Plato(id = it.id, nombre = it.nombreMerienda, componente = it.compMerienda, imagen = it.imgMerienda)
             }.toMutableList()
 
             semanaOffset = intent.getIntExtra("semana_offset", 0)
@@ -112,7 +123,7 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
             cargarSugerenciasSegunInventario(obtenerIdSeccionActual())
 
             lifecycleScope.launch {
-                val idSede = sessionManager.getSedeId().takeIf { it > 0 } ?: 1
+                val idSede = SedeContratoManager.resolverIdSedeEfectivo(sessionManager)
                 SedeContratoManager.sincronizarSeccionesContrato(this@PlanificacionSemanalJefaActivity, idSede)
                 configurarTabsComida()
                 configurarBotonesSeccionesIA()
@@ -479,34 +490,34 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
 
     private fun configurarBotonesSeccionesIA() {
         val seccionesActivas = SedeContratoManager.obtenerSeccionesActivas(this)
-
-        // Si la sede trabaja solo con 1 sección (ej: solo Desayuno),
-        // no son necesarios los botones de desayuno, almuerzo, merienda como indicó el usuario
-        if (seccionesActivas.size <= 1) {
-            binding.layoutSelectorSeccionesIA.visibility = View.GONE
-            val seccionUnica = seccionesActivas.firstOrNull() ?: "Desayuno"
-            val idSec = when (seccionUnica) {
-                "Almuerzo" -> 2
-                "Merienda" -> 3
-                else -> 1
-            }
-            val tipo = when (seccionUnica) {
-                "Almuerzo" -> TipoComida.ALMUERZO
-                "Merienda" -> TipoComida.MERIENDA
-                else -> TipoComida.DESAYUNO
-            }
-            if (comidaSeleccionada != tipo) {
-                seleccionarTipoComida(tipo)
-            } else {
-                cargarSugerenciasSegunInventario(idSec)
-            }
-            return
-        }
+        val permitidas = obtenerJornadasPermitidas()
 
         binding.layoutSelectorSeccionesIA.visibility = View.VISIBLE
         binding.btnSeccionDesayuno.visibility = if (seccionesActivas.contains("Desayuno")) View.VISIBLE else View.GONE
         binding.btnSeccionAlmuerzo.visibility = if (seccionesActivas.contains("Almuerzo")) View.VISIBLE else View.GONE
         binding.btnSeccionMerienda.visibility = if (seccionesActivas.contains("Merienda")) View.VISIBLE else View.GONE
+
+        // Si la comida seleccionada actualmente ya no está permitida por el contrato, cambiar a la primera permitida
+        if (!permitidas.contains(comidaSeleccionada)) {
+            val primera = permitidas.firstOrNull() ?: TipoComida.DESAYUNO
+            seleccionarTipoComida(primera)
+        } else if (seccionesActivas.size <= 1) {
+            cargarSugerenciasSegunInventario(obtenerIdSeccionActual())
+        }
+
+        // Ajustar márgenes para que el último botón visible no deje hueco a la derecha
+        val density = resources.displayMetrics.density
+        val botonesVisibles = listOf(
+            binding.btnSeccionDesayuno,
+            binding.btnSeccionAlmuerzo,
+            binding.btnSeccionMerienda
+        ).filter { it.visibility == View.VISIBLE }
+
+        botonesVisibles.forEachIndexed { idx, btn ->
+            val lp = btn.layoutParams as LinearLayout.LayoutParams
+            lp.marginEnd = if (idx < botonesVisibles.size - 1) (6 * density).toInt() else 0
+            btn.layoutParams = lp
+        }
 
         actualizarEstilosBotonesSeccionesIA()
 
@@ -992,165 +1003,217 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
         } ?: cacheSugerenciasIA[idSeccion]?.getOrNull(posicionPlatoCarousel)
           ?: cacheSugerenciasIA[idSeccion]?.firstOrNull()
 
-        val fechaStr = SimpleDateFormat("EEEE, d 'de' MMMM", Locale.forLanguageTag("es-CO")).format(diaSeleccionadoSemanaSiguiente.time)
+        val fechaSel = obtenerClaveFecha(diaSeleccionadoSemanaSiguiente)
+        val fechaFormateada = SimpleDateFormat("EEEE, d 'de' MMMM", Locale.forLanguageTag("es-CO"))
+            .format(diaSeleccionadoSemanaSiguiente.time)
+            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+
         val servicio = obtenerNombreComidaActual()
-        val ninosTexto = if ((itemIA?.ninosPresentes ?: 0) > 0) " · Para ${itemIA?.ninosPresentes} niños" else ""
-
-        val rootLayout = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding((18 * density).toInt(), (18 * density).toInt(), (18 * density).toInt(), (18 * density).toInt())
-            setBackgroundColor(Color.WHITE)
+        val asistRegistrada = AsistenciaManager.obtenerTotalFecha(this, fechaSel)
+        val racionesTexto = if (asistRegistrada > 0) {
+            "Para $asistRegistrada niños"
+        } else {
+            "Sin registro de asistencia"
         }
 
-        val scroll = androidx.core.widget.NestedScrollView(this).apply {
-            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (460 * density).toInt())
-            isFillViewport = true
-        }
+        val dialogBinding = com.example.movilmanupuladora.databinding.DialogDetalleSugerenciaIaBinding.inflate(layoutInflater)
 
-        val contentLayout = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-        }
+        // 1. TÍTULO Y FECHA (Limpiar prefijo 'Sugerencia IA:' para evitar redundancia con el badge)
+        val nombreLimpio = plato.nombre
+            .replace("Sugerencia IA:", "", ignoreCase = true)
+            .replace("Sugerencia IA :", "", ignoreCase = true)
+            .replace("Sugerencia:", "", ignoreCase = true)
+            .trim()
+        dialogBinding.tvTituloModalPlato.text = nombreLimpio
+        dialogBinding.tvFechaModalPlato.text = fechaFormateada
 
-        // FOTO DEL PLATO
-        val imgCard = com.google.android.material.card.MaterialCardView(this).apply {
-            radius = 18 * density
-            cardElevation = 2 * density
-            strokeWidth = 0
-            val cardParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (180 * density).toInt())
-            layoutParams = cardParams
-        }
+        // 2. JORNADA Y RACIONES (ASISTENCIA)
+        dialogBinding.tvJornadaValor.text = servicio
+        dialogBinding.tvRacionesValor.text = racionesTexto
 
-        val imgView = ImageView(this).apply {
-            scaleType = ImageView.ScaleType.CENTER_CROP
-            layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
-            val urlAi = plato.imagenUrl?.takeIf { it.isNotBlank() } ?: itemIA?.obtenerUrlImagenReal()
-            ImageLoaderUtil.cargarImagen(this, urlAi, R.drawable.bg_placeholder_plato_ia)
+        // 3. COMPONENTES DEL PLATO
+        val compTexto = plato.componente.ifBlank {
+            itemIA?.componente?.ifBlank {
+                MenuPaeCatalog.obtenerComponentesPorNombre(plato.nombre).joinToString(", ")
+            } ?: "Aporte calórico balanceado según normas PAE"
         }
-        imgCard.addView(imgView)
-        contentLayout.addView(imgCard)
+        dialogBinding.tvComponentesValor.text = compTexto
 
-        // BADGE FECHA Y MOMENTO
-        val tvBadge = TextView(this).apply {
-            text = "📅 $fechaStr · $servicio$ninosTexto"
-            setTextColor(Color.parseColor("#92400E"))
-            textSize = 12f
-            setTypeface(null, android.graphics.Typeface.BOLD)
-            setBackgroundResource(R.drawable.bg_pill_yellow)
-            setPadding((10 * density).toInt(), (4 * density).toInt(), (10 * density).toInt(), (4 * density).toInt())
-            val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT).also {
-                it.topMargin = (12 * density).toInt()
-            }
-            layoutParams = lp
-        }
-        contentLayout.addView(tvBadge)
-
-        // NOMBRE DEL PLATO
-        val tvNombre = TextView(this).apply {
-            text = plato.nombre
-            setTextColor(Color.parseColor("#1E293B"))
-            textSize = 18f
-            setTypeface(null, android.graphics.Typeface.BOLD)
-            val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).also {
-                it.topMargin = (8 * density).toInt()
-            }
-            layoutParams = lp
-        }
-        contentLayout.addView(tvNombre)
-
-        // COMPONENTES
-        val tvComponentes = TextView(this).apply {
-            val compTexto = plato.componente.ifBlank {
-                itemIA?.componente?.ifBlank {
-                    MenuPaeCatalog.obtenerComponentesPorNombre(plato.nombre).joinToString(", ")
-                } ?: "Aporte calórico balanceado según normas PAE"
-            }
-            text = "🍱 Componentes del plato:\n$compTexto"
-            setTextColor(Color.parseColor("#475569"))
-            textSize = 13f
-            val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).also {
-                it.topMargin = (8 * density).toInt()
-            }
-            layoutParams = lp
-        }
-        contentLayout.addView(tvComponentes)
-
-        // RECETA (PASOS)
-        val tvRecetaTitulo = TextView(this).apply {
-            text = "📖 Receta / Preparación paso a paso:"
-            setTextColor(Color.parseColor("#1E293B"))
-            textSize = 14f
-            setTypeface(null, android.graphics.Typeface.BOLD)
-            val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).also {
-                it.topMargin = (14 * density).toInt()
-            }
-            layoutParams = lp
-        }
-        contentLayout.addView(tvRecetaTitulo)
-
+        // 4. PREPARACIÓN PASO A PASO (Con alineación superior y sin recortar letras)
+        dialogBinding.layoutContenedorPasos.removeAllViews()
         val pasos = itemIA?.pasos.orEmpty().filter { it.isNotBlank() }
-        if (pasos.isNotEmpty()) {
-            pasos.forEachIndexed { i, paso ->
-                val tvPaso = TextView(this).apply {
-                    text = "${i + 1}. $paso"
+        val listaPasos = if (pasos.isNotEmpty()) {
+            pasos
+        } else {
+            listOf(
+                "Alistar y pesar las cantidades exactas requeridas para las raciones escolares.",
+                "Preparar y cocinar los alimentos a fuego medio manteniendo temperaturas y tiempos seguros.",
+                "Integrar los componentes asegurando la consistencia y sazón casera según receta PAE.",
+                "Servir caliente siguiendo los gramajes establecidos por el programa de alimentación escolar."
+            )
+        }
+
+        listaPasos.forEachIndexed { i, paso ->
+            val rowPaso = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                isBaselineAligned = false
+                gravity = Gravity.TOP
+                val lp = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).also {
+                    it.topMargin = (5 * density).toInt()
+                    it.bottomMargin = (5 * density).toInt()
+                }
+                layoutParams = lp
+            }
+
+            val badgeNum = TextView(this).apply {
+                text = (i + 1).toString()
+                setTextColor(Color.parseColor("#B45309"))
+                textSize = 12f
+                setTypeface(null, android.graphics.Typeface.BOLD)
+                gravity = Gravity.CENTER
+                setBackgroundResource(R.drawable.bg_step_number)
+                val lp = LinearLayout.LayoutParams(
+                    (22 * density).toInt(),
+                    (22 * density).toInt()
+                ).also {
+                    it.gravity = Gravity.TOP
+                    it.topMargin = (2 * density).toInt()
+                }
+                layoutParams = lp
+            }
+
+            val tvTextoPaso = TextView(this).apply {
+                text = paso
+                setTextColor(Color.parseColor("#475569"))
+                textSize = 13f
+                gravity = Gravity.TOP
+                includeFontPadding = false
+                setLineSpacing(0f, 1.25f)
+                setPadding(0, 0, 0, (4 * density).toInt())
+                val lp = LinearLayout.LayoutParams(
+                    0,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    1f
+                ).also {
+                    it.marginStart = (10 * density).toInt()
+                    it.gravity = Gravity.TOP
+                }
+                layoutParams = lp
+            }
+
+            rowPaso.addView(badgeNum)
+            rowPaso.addView(tvTextoPaso)
+            dialogBinding.layoutContenedorPasos.addView(rowPaso)
+        }
+
+        // 5. INGREDIENTES Y STOCK EN BODEGA
+        dialogBinding.layoutContenedorFilasIngredientes.removeAllViews()
+        val ingredientes = itemIA?.ingredientes.orEmpty()
+        val cantIngredientes = ingredientes.size
+        val todosAlcanzan = ingredientes.all { it.alcanza }
+
+        if (cantIngredientes > 0) {
+            if (todosAlcanzan) {
+                dialogBinding.tvBannerStockModal.text = "Stock suficiente para los $cantIngredientes ingredientes listados"
+                dialogBinding.tvBannerStockModal.setBackgroundResource(R.drawable.bg_stock_suficiente_banner)
+                dialogBinding.tvBannerStockModal.setTextColor(Color.parseColor("#15803D"))
+            } else {
+                val faltantes = ingredientes.count { !it.alcanza }
+                dialogBinding.tvBannerStockModal.text = "⚠️ Alerta: $faltantes ingrediente(s) con stock insuficiente en bodega"
+                dialogBinding.tvBannerStockModal.setBackgroundColor(Color.parseColor("#FEE2E2"))
+                dialogBinding.tvBannerStockModal.setTextColor(Color.parseColor("#B91C1C"))
+            }
+
+            ingredientes.forEach { ing ->
+                val rowIng = LinearLayout(this).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    setPadding((10 * density).toInt(), (6 * density).toInt(), (10 * density).toInt(), (6 * density).toInt())
+                    val lp = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    layoutParams = lp
+                }
+
+                val tvNom = TextView(this).apply {
+                    text = ing.nombreIngrediente
                     setTextColor(Color.parseColor("#334155"))
                     textSize = 12f
-                    setPadding(0, (2 * density).toInt(), 0, (2 * density).toInt())
+                    val lp = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.6f)
+                    layoutParams = lp
                 }
-                contentLayout.addView(tvPaso)
-            }
-        } else {
-            val tvRecetaDefault = TextView(this).apply {
-                text = "1. Alistar y desinfectar ingredientes según protocolo BPM.\n2. Cocinar a fuego medio manteniendo temperaturas y tiempos de cocción PAE.\n3. Servir en porciones estipuladas según grupo de edad."
-                setTextColor(Color.parseColor("#64748B"))
-                textSize = 12f
-            }
-            contentLayout.addView(tvRecetaDefault)
-        }
 
-        // INGREDIENTES E INVENTARIO
-        val tvIngredientesTitulo = TextView(this).apply {
-            text = "📦 Ingredientes requeridos y Stock en Bodega:"
-            setTextColor(Color.parseColor("#1E293B"))
-            textSize = 14f
-            setTypeface(null, android.graphics.Typeface.BOLD)
-            val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).also {
-                it.topMargin = (14 * density).toInt()
-            }
-            layoutParams = lp
-        }
-        contentLayout.addView(tvIngredientesTitulo)
-
-        val ingredientes = itemIA?.ingredientes.orEmpty()
-        if (ingredientes.isNotEmpty()) {
-            ingredientes.forEach { ing ->
-                val tvIng = TextView(this).apply {
-                    val estado = if (ing.alcanza) "✓ Stock suficiente" else "⚠️ Stock bajo"
-                    text = "• ${ing.nombreIngrediente}: ${ing.cantidadTotal} (En bodega: ${ing.stockActual} ${ing.unidad}) · $estado"
-                    setTextColor(Color.parseColor(if (ing.alcanza) "#15803D" else "#B91C1C"))
+                val tvReq = TextView(this).apply {
+                    text = ing.cantidadTotal
+                    setTextColor(Color.parseColor("#475569"))
                     textSize = 12f
-                    setPadding(0, (2 * density).toInt(), 0, (2 * density).toInt())
+                    gravity = Gravity.END
+                    val lp = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.1f)
+                    layoutParams = lp
                 }
-                contentLayout.addView(tvIng)
+
+                val tvStock = TextView(this).apply {
+                    text = "${ing.stockActual} ${ing.unidad}"
+                    setTextColor(Color.parseColor(if (ing.alcanza) "#475569" else "#DC2626"))
+                    textSize = 12f
+                    gravity = Gravity.END
+                    val lp = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.2f)
+                    layoutParams = lp
+                }
+
+                rowIng.addView(tvNom)
+                rowIng.addView(tvReq)
+                rowIng.addView(tvStock)
+                dialogBinding.layoutContenedorFilasIngredientes.addView(rowIng)
             }
         } else {
-            val tvIngDefault = TextView(this).apply {
-                text = "• Ingredientes balanceados según normas PAE e inventario activo."
+            dialogBinding.tvBannerStockModal.text = "Stock suficiente para los ingredientes requeridos"
+            dialogBinding.tvBannerStockModal.setBackgroundResource(R.drawable.bg_stock_suficiente_banner)
+            dialogBinding.tvBannerStockModal.setTextColor(Color.parseColor("#15803D"))
+
+            val rowDef = TextView(this).apply {
+                text = "Ingredientes balanceados según normas PAE e inventario activo de bodega."
                 setTextColor(Color.parseColor("#64748B"))
                 textSize = 12f
+                setPadding((10 * density).toInt(), (8 * density).toInt(), (10 * density).toInt(), (8 * density).toInt())
             }
-            contentLayout.addView(tvIngDefault)
+            dialogBinding.layoutContenedorFilasIngredientes.addView(rowDef)
         }
 
-        scroll.addView(contentLayout)
-        rootLayout.addView(scroll)
+        // 6. MOSTRAR DIÁLOGO
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(dialogBinding.root)
+            .create()
 
-        MaterialAlertDialogBuilder(this)
-            .setView(rootLayout)
-            .setPositiveButton("Seleccionar para este día") { _, _ ->
-                seleccionarPlatoParaSiguienteSemana(plato)
-            }
-            .setNegativeButton("Cerrar", null)
-            .show()
+        dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(Color.TRANSPARENT))
+
+        dialogBinding.btnCerrarModal.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialogBinding.btnSeleccionarDiaModal.setOnClickListener {
+            dialog.dismiss()
+            seleccionarPlatoParaSiguienteSemana(plato)
+        }
+
+        dialog.show()
+
+        // Ocultar barra vertical gris conservando el scroll fluido táctil
+        dialogBinding.scrollDetalleModal.isVerticalScrollBarEnabled = false
+
+        // Ajustar el alto máximo del scroll para que en cualquier pantalla
+        // o tamaño de celular sea 100% scrolleable y nunca quede apretado
+        val dm = resources.displayMetrics
+        val anchoModal = (dm.widthPixels * 0.92).toInt()
+        val altoMaximoScroll = (dm.heightPixels * 0.62).toInt()
+
+        dialog.window?.setLayout(anchoModal, android.view.WindowManager.LayoutParams.WRAP_CONTENT)
+        dialogBinding.scrollDetalleModal.layoutParams = dialogBinding.scrollDetalleModal.layoutParams.apply {
+            height = altoMaximoScroll
+        }
     }
 
     private fun seleccionarPlatoParaSiguienteSemana(plato: InicioJefaActivity.Plato) {
@@ -1749,28 +1812,71 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
                 val platosRes = menuRepository.obtenerPlatos()
                 if (platosRes.isSuccessful && !platosRes.body().isNullOrEmpty()) {
                     val lista = platosRes.body()!!
-                    // Solo reemplazar si el backend contiene el nuevo catálogo completo (15 o más platos)
-                    if (lista.size >= 15) {
-                        val temp = mutableListOf<InicioJefaActivity.Plato>()
+                    val tempDes = mutableListOf<InicioJefaActivity.Plato>()
+                    val tempAlm = mutableListOf<InicioJefaActivity.Plato>()
+                    val tempMer = mutableListOf<InicioJefaActivity.Plato>()
 
-                        for (p in lista) {
-                            val nombre = p.nombrePlato ?: "Plato del día"
-                            val imagen = if (p.idPlato in 1..20) {
-                                MenuPaeCatalog.obtenerMenuPorId(p.idPlato).imagenRes
-                            } else {
-                                MenuPaeCatalog.obtenerImagenPorNombre(p.nombrePlato ?: p.componente)
-                            }
-                            val plato = InicioJefaActivity.Plato(id = p.idPlato, nombre = nombre, componente = p.componente ?: "", imagen = imagen)
-                            temp.add(plato)
+                    for (p in lista) {
+                        val nombre = p.nombrePlato ?: "Plato del día"
+                        val imagen = if (p.idPlato in 1..20) {
+                            MenuPaeCatalog.obtenerMenuPorId(p.idPlato).imagenRes
+                        } else {
+                            MenuPaeCatalog.obtenerImagenPorNombre(p.nombrePlato ?: p.componente)
                         }
+                        val plato = InicioJefaActivity.Plato(
+                            id = p.idPlato,
+                            nombre = nombre,
+                            componente = p.componente ?: "",
+                            imagen = imagen,
+                            imagenUrl = p.imagenUrl
+                        )
+                        val secNom = p.nombreSeccion?.lowercase().orEmpty()
+                        val esDesayuno = p.idSeccion == 1 || secNom.contains("desayun")
+                        val esAlmuerzo = p.idSeccion == 2 || secNom.contains("almuerz")
+                        val esMerienda = p.idSeccion == 3 || secNom.contains("meriend") || secNom.contains("refrigerio")
 
-                        if (temp.isNotEmpty()) {
-                            platosAlmuerzo.clear()
-                            platosAlmuerzo.addAll(temp)
-                            configurarViewPagerCarousel()
-                            configurarMenuDisponiblePAE()
+                        when {
+                            esDesayuno -> tempDes.add(plato)
+                            esAlmuerzo -> tempAlm.add(plato)
+                            esMerienda -> tempMer.add(plato)
+                            else -> {
+                                val nomLow = nombre.lowercase()
+                                val esAlm = listOf(
+                                    "pollo", "carne", "res", "cerdo", "hígado", "higado", "pescado", "atún", "atun",
+                                    "lenteja", "frijol", "fríjol", "garbanzo", "sancocho", "sopa", "pasta", "espagueti",
+                                    "ensalada", "guisad", "sudado", "albóndiga", "albondiga", "almuerzo"
+                                ).any { nomLow.contains(it) }
+
+                                val esMer = listOf("jugo", "avena", "agua de panela", "banano", "fruta", "papaya", "mango", "yogurt", "merienda", "refrigerio")
+                                    .any { nomLow.contains(it) } && !esAlm
+
+                                val esDes = listOf("desayuno", "huevo", "arepa", "chocolate", "calentado", "hojaldra", "pan", "galleta", "queso", "caldo", "changua", "café", "leche", "torta")
+                                    .any { nomLow.contains(it) } && !esAlm
+
+                                when {
+                                    esAlm -> tempAlm.add(plato)
+                                    esMer -> tempMer.add(plato)
+                                    esDes -> tempDes.add(plato)
+                                }
+                            }
                         }
                     }
+
+                    if (tempDes.isNotEmpty()) {
+                        platosDesayuno.clear()
+                        platosDesayuno.addAll(tempDes)
+                    }
+                    if (tempAlm.isNotEmpty()) {
+                        platosAlmuerzo.clear()
+                        platosAlmuerzo.addAll(tempAlm)
+                    }
+                    if (tempMer.isNotEmpty()) {
+                        platosMerienda.clear()
+                        platosMerienda.addAll(tempMer)
+                    }
+
+                    configurarViewPagerCarousel()
+                    configurarMenuDisponiblePAE()
                 }
             } catch (_: Exception) { }
         }
