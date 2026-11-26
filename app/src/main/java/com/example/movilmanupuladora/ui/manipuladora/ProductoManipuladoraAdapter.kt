@@ -1,5 +1,6 @@
 package com.example.movilmanupuladora.ui.manipuladora
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -29,9 +30,25 @@ class ProductoManipuladoraAdapter(
         val item = listaFiltrada[position]
         with(holder.binding) {
             txtNombreProductoManipuladora.text = item.nombre
-            txtCategoriaProductoManipuladora.text = "${item.categoria} • Inventario Admin"
-            txtCantidadUnidadManipuladora.text = item.cantidadConUnidad
-            imgProductoManipuladora.setImageResource(R.drawable.ic_food)
+            txtCategoriaProductoManipuladora.text = "${item.categoria} · Inventario Admin"
+
+            val c = item.cantidad
+            val u = item.unidadMedida
+            val cantidadFormatted = if (c % 1.0 == 0.0) "${c.toInt()}" else "%.1f".format(c)
+            val unidadUpper = u.uppercase().take(1)
+            txtCantidadUnidadManipuladora.text = "$cantidadFormatted$unidadUpper"
+
+            if (item.cantidad > 0.0) {
+                txtEstadoProductoManipuladora.text = "Disponible"
+                txtEstadoProductoManipuladora.setTextColor(Color.parseColor("#15803D"))
+                txtCantidadUnidadManipuladora.setBackgroundResource(R.drawable.bg_pill_green)
+                root.strokeColor = Color.parseColor("#E2E8F0")
+            } else {
+                txtEstadoProductoManipuladora.text = "Agotado"
+                txtEstadoProductoManipuladora.setTextColor(Color.parseColor("#B91C1C"))
+                txtCantidadUnidadManipuladora.setBackgroundResource(R.drawable.bg_chip_desayuno)
+                root.strokeColor = Color.parseColor("#F4B41F")
+            }
         }
     }
 

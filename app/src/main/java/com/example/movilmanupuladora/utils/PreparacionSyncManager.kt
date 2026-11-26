@@ -79,7 +79,7 @@ object PreparacionSyncManager {
                     val jornada = if (data.size > 1 && data[1].isNotBlank()) data[1].trim() else "Mañana"
                     val idPlato = if (data.size > 2) data[2].toIntOrNull() ?: -1 else -1
 
-                    if (idPlato in 1..20) {
+                    if (platoNombre.isBlank() && idPlato in 1..20) {
                         val itemPae = MenuPaeCatalog.menus.find { it.numeroMenu == idPlato || it.id == idPlato }
                         if (itemPae != null) {
                             platoNombre = itemPae.nombre
@@ -113,8 +113,8 @@ object PreparacionSyncManager {
                     val jornada = if (data.size > 1 && data[1].isNotBlank()) data[1].trim() else "Mañana"
                     val idPlato = if (data.size > 2) data[2].toIntOrNull() ?: -1 else -1
 
-                    // Restaurar nombre completo oficial si está en el catálogo PAE
-                    if (idPlato in 1..20) {
+                    // Restaurar nombre completo oficial solo si no venía nombre en la etiqueta
+                    if (platoNombre.isBlank() && idPlato in 1..20) {
                         val itemPae = MenuPaeCatalog.menus.find { it.numeroMenu == idPlato || it.id == idPlato }
                         if (itemPae != null) {
                             platoNombre = itemPae.nombre

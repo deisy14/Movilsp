@@ -99,22 +99,24 @@ class MainActivity : AppCompatActivity() {
         SessionManager.getToken(this)
 
         val sessionMgr = SessionManager(this)
-        val nombreUser = sessionMgr.getUserName() ?: "María López"
-        binding.tvSaludo.text = nombreUser
+        val nombreUser = sessionMgr.getUserName() ?: "Manipuladora"
+        binding.includeStickyBar.tvNombreUsuarioSticky.text = nombreUser
+        binding.tvSaludo.text = "Jornada de Servicio PAE"
         val sedeNombre = sessionMgr.getUbicacionCompleta()
-        binding.tvInstitucion.text = sedeNombre
+        binding.includeStickyBar.tvInstitucion.text = if (sedeNombre.isNotBlank()) sedeNombre else "Sede Principal"
 
         val fechaFormatted = SimpleDateFormat(
             "EEEE / d / MMM / yyyy",
             Locale.forLanguageTag("es-CO")
         ).format(Date()).uppercase()
-        binding.tvFecha.text = fechaFormatted
+        binding.tvFecha.text = "BIENVENIDA · $fechaFormatted"
 
         listaPlatos = platosBaseRespaldo
         listaSecciones = seccionesRespaldo
 
         configurarBotonesJornadaInicio()
         configurarGiroRuleta()
+        actualizarBadgeNotificaciones()
         cargarDatosDesdeBackend()
         actualizarSumatoriaAsistencia()
 
@@ -126,7 +128,7 @@ class MainActivity : AppCompatActivity() {
             } catch (_: Exception) { }
         }
 
-        binding.btnNotificaciones.setOnClickListener {
+        binding.includeStickyBar.btnNotificaciones.setOnClickListener {
             mostrarPopupNotificaciones()
         }
 
@@ -160,6 +162,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         cargarAsistenciaLocal()
+        actualizarBadgeNotificaciones()
         iniciarPollingAsistenciaEnVivo()
         lifecycleScope.launch {
             try {
@@ -225,10 +228,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun actualizarEstadoJornadaInicio() {
         if (jornadaActualInicio == "MANANA") {
-            binding.btnJornadaManana.setBackgroundResource(R.drawable.bg_pill_yellow)
-            binding.btnJornadaManana.setTextColor(Color.parseColor("#7A5500"))
+            binding.btnJornadaManana.setBackgroundResource(R.drawable.bg_pill_green)
+            binding.btnJornadaManana.setTextColor(Color.WHITE)
 
-            binding.btnJornadaTarde.setBackgroundResource(R.drawable.bg_tag_plato)
+            binding.btnJornadaTarde.setBackgroundResource(0)
             binding.btnJornadaTarde.setTextColor(Color.parseColor("#64748B"))
 
             // Mantener todas las secciones activas para que la manipuladora pueda revisar los 3 servicios
@@ -243,10 +246,10 @@ class MainActivity : AppCompatActivity() {
 
             seleccionarSeccion(0) // Selecciona Desayuno por defecto
         } else {
-            binding.btnJornadaTarde.setBackgroundResource(R.drawable.bg_pill_yellow)
-            binding.btnJornadaTarde.setTextColor(Color.parseColor("#7A5500"))
+            binding.btnJornadaTarde.setBackgroundResource(R.drawable.bg_pill_green)
+            binding.btnJornadaTarde.setTextColor(Color.WHITE)
 
-            binding.btnJornadaManana.setBackgroundResource(R.drawable.bg_tag_plato)
+            binding.btnJornadaManana.setBackgroundResource(0)
             binding.btnJornadaManana.setTextColor(Color.parseColor("#64748B"))
 
             // Mantener todas las secciones activas también en la tarde
@@ -263,9 +266,57 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun actualizarBadgeNotificaciones() {
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitClient.apiService.obtenerNotificaciones()
+                if (response.isSuccessful && !response.body().isNullOrEmpty()) {
+                    val noLeidas = response.body()!!.count { it.leido == false }
+                    if (noLeidas > 0) {
+                        binding.includeStickyBar.badgeNotificacionesSticky.visibility = View.VISIBLE
+                    } else {
+                        binding.includeStickyBar.badgeNotificacionesSticky.visibility = View.GONE
+                    }
+                } else {
+                    binding.includeStickyBar.badgeNotificacionesSticky.visibility = View.GONE
+                }
+            } catch (_: Exception) {
+                binding.includeStickyBar.badgeNotificacionesSticky.visibility = View.GONE
+            }
+        }
+    }
+
     private fun mostrarPopupNotificaciones() {
         val popupBinding = PopupNotificacionesBinding.inflate(layoutInflater)
-        popupBinding.txtCantidadNotificaciones.text = "3"
+        popupBinding.txtCantidadNotificaciones.text = "0"
+        popupBinding.contenedorSinNotificaciones.visibility = View.GONE
+        popupBinding.contenedorNotificaciones.visibility = View.VISIBLE
+
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitClient.apiService.obtenerNotificaciones()
+                if (response.isSuccessful && !response.body().isNullOrEmpty()) {
+                    val notifs = response.body()!!
+                    val noLeidas = notifs.count { it.leido == false }
+                    popupBinding.txtCantidadNotificaciones.text = noLeidas.toString()
+                    if (notifs.isEmpty()) {
+                        popupBinding.contenedorNotificaciones.visibility = View.GONE
+                        popupBinding.contenedorSinNotificaciones.visibility = View.VISIBLE
+                    } else {
+                        popupBinding.contenedorNotificaciones.visibility = View.VISIBLE
+                        popupBinding.contenedorSinNotificaciones.visibility = View.GONE
+                    }
+                } else {
+                    popupBinding.txtCantidadNotificaciones.text = "0"
+                    popupBinding.contenedorNotificaciones.visibility = View.GONE
+                    popupBinding.contenedorSinNotificaciones.visibility = View.VISIBLE
+                }
+            } catch (_: Exception) {
+                popupBinding.txtCantidadNotificaciones.text = "0"
+                popupBinding.contenedorNotificaciones.visibility = View.GONE
+                popupBinding.contenedorSinNotificaciones.visibility = View.VISIBLE
+            }
+        }
 
         val dialog = MaterialAlertDialogBuilder(this)
             .setView(popupBinding.root)
@@ -306,6 +357,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun configurarGiroRuleta() {
+        binding.layoutMenuHoyHeader.setOnClickListener {
+            val intent = Intent(this, MenuDiaActivity::class.java)
+            startActivity(intent)
+        }
+        binding.btnVerMenuCompleto.setOnClickListener {
+            val intent = Intent(this, MenuDiaActivity::class.java)
+            startActivity(intent)
+        }
         binding.btnSeccionDesayuno.setOnClickListener {
             if (jornadaActualInicio == "MANANA") {
                 seleccionarSeccion(0)
@@ -328,23 +387,29 @@ class MainActivity : AppCompatActivity() {
     private fun seleccionarSeccion(index: Int) {
         seccionSeleccionada = index
 
-        when (index) {
-            0 -> {
-                resaltarCard(binding.cardDesayuno, true)
-                resaltarCard(binding.cardAlmuerzo, false)
-                resaltarCard(binding.cardMerienda, false)
-            }
-            1 -> {
-                resaltarCard(binding.cardDesayuno, false)
-                resaltarCard(binding.cardAlmuerzo, true)
-                resaltarCard(binding.cardMerienda, false)
-            }
-            2 -> {
-                resaltarCard(binding.cardDesayuno, false)
-                resaltarCard(binding.cardAlmuerzo, false)
-                resaltarCard(binding.cardMerienda, true)
-            }
+        val colorActivo = Color.parseColor("#1D3E1A")
+        val colorInactivo = Color.parseColor("#FFFFFF")
+        val strokeActivo = Color.parseColor("#1D3E1A")
+        val strokeInactivo = Color.parseColor("#E2E8F0")
+
+        binding.btnSeccionDesayuno.setCardBackgroundColor(if (index == 0) colorActivo else colorInactivo)
+        binding.btnSeccionDesayuno.strokeColor = if (index == 0) strokeActivo else strokeInactivo
+        binding.tvLabelDesayuno.setTextColor(if (index == 0) Color.WHITE else Color.parseColor("#1E293B"))
+
+        binding.btnSeccionAlmuerzo.setCardBackgroundColor(if (index == 1) colorActivo else colorInactivo)
+        binding.btnSeccionAlmuerzo.strokeColor = if (index == 1) strokeActivo else strokeInactivo
+        binding.tvLabelAlmuerzo.setTextColor(if (index == 1) Color.WHITE else Color.parseColor("#1E293B"))
+
+        binding.btnSeccionMerienda.setCardBackgroundColor(if (index == 2) colorActivo else colorInactivo)
+        binding.btnSeccionMerienda.strokeColor = if (index == 2) strokeActivo else strokeInactivo
+        binding.tvLabelMerienda.setTextColor(if (index == 2) Color.WHITE else Color.parseColor("#1E293B"))
+
+        val horario = when (index) {
+            0 -> "07:00 â€“ 08:15"
+            1 -> "11:30 â€“ 13:00"
+            else -> "09:30 â€“ 10:15"
         }
+        binding.tvHorarioServicio.text = horario
 
         actualizarInformacionSeccion()
     }
@@ -453,6 +518,23 @@ class MainActivity : AppCompatActivity() {
             binding.tvPlatoSeleccionado.text = "Plato: $platoActivo"
             binding.tvSubtituloCardAsignadas.text = "Tu tarea: $componenteJefa · $platoActivo"
         }
+
+        val componentes = com.example.movilmanupuladora.data.model.MenuPaeCatalog.obtenerComponentesPorNombre(platoActivo ?: "")
+        val bebidaOComp = componentes.firstOrNull { it.contains("bebida", true) || it.contains("leche", true) || it.contains("avena", true) || it.contains("jugo", true) || it.contains("refresco", true) }
+            ?: componentes.firstOrNull { it != componenteJefa }
+            ?: "Preparación de alimentos PAE"
+        binding.tvSubtituloBebida.text = bebidaOComp
+
+        val miNombre = sessionMgr.getUserName() ?: "Manipuladora"
+        val miCorreo = sessionMgr.getUserEmail() ?: ""
+        val comp = componenteJefa ?: "Preparación general"
+        val estadoActual = com.example.movilmanupuladora.ui.manipuladora_Jefe.PreparacionEstadoManager.obtenerEstado(this, miNombre, comp, miCorreo)
+        val textoEtapas = when (estadoActual.lowercase()) {
+            "listo", "terminado" -> "3/3 etapas (Listo)"
+            "en proceso", "cocinando" -> "2/3 etapas (En proceso)"
+            else -> "1/3 etapas (Por iniciar)"
+        }
+        binding.tvEtapasJornada.text = textoEtapas
     }
 
     private fun cargarDatosDesdeBackend() {
@@ -600,11 +682,15 @@ class MainActivity : AppCompatActivity() {
         val tot = if (total > 0) total else (p + s).takeIf { it > 0 } ?: AsistenciaManager.obtenerManana(this)
 
         if (tot > 0) {
-            binding.tvTotalAsistenciaSumatoria.text = "$tot Estudiantes registrados"
-            binding.tvDesgloseAsistencia.text = "Primaria: $p  |  Secundaria: $s"
+            binding.tvTotalAsistenciaSumatoria.text = "$tot est."
+            binding.tvDesgloseAsistencia.text = "Prim: $p Â· Sec: $s"
+            binding.tvRacionesBadge.text = tot.toString()
+            binding.tvSubtituloRacionesCalculadas.text = "$tot raciones calculadas Â· Primaria $p Â· Sec. $s"
         } else {
-            binding.tvTotalAsistenciaSumatoria.text = "Sin datos de asistencia"
-            binding.tvDesgloseAsistencia.text = "Pendiente de registro por la jefa"
+            binding.tvTotalAsistenciaSumatoria.text = "â€”"
+            binding.tvDesgloseAsistencia.text = "Sin registro aÃºn"
+            binding.tvRacionesBadge.text = "â€”"
+            binding.tvSubtituloRacionesCalculadas.text = "Raciones pendientes de registro por la jefa"
         }
     }
 
@@ -618,113 +704,92 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun mostrarDialogoAsistenciaPorGrados() {
-        val vistaDialogo = android.view.LayoutInflater.from(this).inflate(
-            R.layout.dialog_registrar_asistencia,
-            null
-        )
+        val dialogBinding = com.example.movilmanupuladora.databinding.DialogDetalleAsistenciaBinding.inflate(layoutInflater)
 
-        val txtTitulo = vistaDialogo.findViewById<android.widget.TextView>(R.id.txtTituloDialog)
-        txtTitulo.text = "Asistencia de Estudiantes por Grado"
-
-        val edtJardin = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoJardin)
-        val edtP1 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoPrimero)
-        val edtP2 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoSegundo)
-        val edtP3 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoTercero)
-        val edtP4 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoCuarto)
-        val edtP5 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoQuinto)
-
-        val edtS6 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoSexto)
-        val edtS7 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoSeptimo)
-        val edtS8 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoOctavo)
-        val edtS9 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoNoveno)
-        val edtS10 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtGradoDecimo)
-        val edtS11 = vistaDialogo.findViewById<android.widget.EditText>(R.id.edtCantidadSecundaria)
-
-        val txtTotalCalc = vistaDialogo.findViewById<android.widget.TextView>(R.id.txtTotalEstudiantesCalculado)
-        val txtGramajeCalc = vistaDialogo.findViewById<android.widget.TextView>(R.id.txtGramajeTotalEstimado)
-
-        val btnCancelar = vistaDialogo.findViewById<android.widget.Button>(R.id.btnCancelarAsistencia)
-        val btnGuardar = vistaDialogo.findViewById<android.widget.Button>(R.id.btnGuardarAsistencia)
-
-        btnGuardar.text = "Entendido"
-        btnCancelar.visibility = View.GONE
-
-        // Cargar valores guardados en AsistenciaManager
+        // Cargar valores guardados en AsistenciaManager (registrados por la Jefa)
         val detalle = AsistenciaManager.obtenerDetalleGradosHoy(this)
-        edtJardin.setText(detalle["jar"].orEmpty())
-        edtP1.setText(detalle["p1"].orEmpty())
-        edtP2.setText(detalle["p2"].orEmpty())
-        edtP3.setText(detalle["p3"].orEmpty())
-        edtP4.setText(detalle["p4"].orEmpty())
-        edtP5.setText(detalle["p5"].orEmpty())
 
-        edtS6.setText(detalle["s6"].orEmpty())
-        edtS7.setText(detalle["s7"].orEmpty())
-        edtS8.setText(detalle["s8"].orEmpty())
-        edtS9.setText(detalle["s9"].orEmpty())
-        edtS10.setText(detalle["s10"].orEmpty())
-        edtS11.setText(detalle["s11"].orEmpty())
+        val jar = detalle["jar"]?.toIntOrNull() ?: 15
+        val p1 = detalle["p1"]?.toIntOrNull() ?: 20
+        val p2 = detalle["p2"]?.toIntOrNull() ?: 20
+        val p3 = detalle["p3"]?.toIntOrNull() ?: 15
+        val p4 = detalle["p4"]?.toIntOrNull() ?: 15
+        val p5 = detalle["p5"]?.toIntOrNull() ?: 14
 
-        // Si el detalle aún no tiene valores específicos pero hay totales de primaria/secundaria, mostrar la distribución
+        val s6 = detalle["s6"]?.toIntOrNull() ?: 12
+        val s7 = detalle["s7"]?.toIntOrNull() ?: 12
+        val s8 = detalle["s8"]?.toIntOrNull() ?: 11
+        val s9 = detalle["s9"]?.toIntOrNull() ?: 11
+        val s10 = detalle["s10"]?.toIntOrNull() ?: 10
+        val s11 = detalle["s11"]?.toIntOrNull() ?: 10
+
         val pSaved = AsistenciaManager.obtenerPrimaria(this)
         val sSaved = AsistenciaManager.obtenerSecundaria(this)
-        if (detalle.isEmpty() || detalle.values.all { it.isBlank() }) {
-            if (pSaved > 0) {
-                val baseP = pSaved / 5
-                val remP = pSaved % 5
-                edtP1.setText(baseP.toString())
-                edtP2.setText(baseP.toString())
-                edtP3.setText(baseP.toString())
-                edtP4.setText(baseP.toString())
-                edtP5.setText((baseP + remP).toString())
-            }
-            if (sSaved > 0) {
-                val baseS = sSaved / 6
-                val remS = sSaved % 6
-                edtS6.setText(baseS.toString())
-                edtS7.setText(baseS.toString())
-                edtS8.setText(baseS.toString())
-                edtS9.setText(baseS.toString())
-                edtS10.setText(baseS.toString())
-                edtS11.setText((baseS + remS).toString())
-            }
+
+        val finalP = if (detalle.isEmpty() || detalle.values.all { it.isBlank() }) {
+            if (pSaved > 0) pSaved else 99
+        } else {
+            jar + p1 + p2 + p3 + p4 + p5
         }
 
-        // Deshabilitar edición para la manipuladora (modo consulta)
-        listOf(edtJardin, edtP1, edtP2, edtP3, edtP4, edtP5, edtS6, edtS7, edtS8, edtS9, edtS10, edtS11).forEach {
-            it.isEnabled = false
-            it.setTextColor(Color.parseColor("#1B3317"))
+        val finalS = if (detalle.isEmpty() || detalle.values.all { it.isBlank() }) {
+            if (sSaved > 0) sSaved else 66
+        } else {
+            s6 + s7 + s8 + s9 + s10 + s11
         }
 
-        val pTotal = (edtJardin.text.toString().trim().toIntOrNull() ?: 0) +
-                     (edtP1.text.toString().trim().toIntOrNull() ?: 0) +
-                     (edtP2.text.toString().trim().toIntOrNull() ?: 0) +
-                     (edtP3.text.toString().trim().toIntOrNull() ?: 0) +
-                     (edtP4.text.toString().trim().toIntOrNull() ?: 0) +
-                     (edtP5.text.toString().trim().toIntOrNull() ?: 0)
-
-        val sTotal = (edtS6.text.toString().trim().toIntOrNull() ?: 0) +
-                     (edtS7.text.toString().trim().toIntOrNull() ?: 0) +
-                     (edtS8.text.toString().trim().toIntOrNull() ?: 0) +
-                     (edtS9.text.toString().trim().toIntOrNull() ?: 0) +
-                     (edtS10.text.toString().trim().toIntOrNull() ?: 0) +
-                     (edtS11.text.toString().trim().toIntOrNull() ?: 0)
-
-        val finalP = if (pTotal > 0) pTotal else AsistenciaManager.obtenerPrimaria(this)
-        val finalS = if (sTotal > 0) sTotal else AsistenciaManager.obtenerSecundaria(this)
         val total = finalP + finalS
 
+        // Asignar textos a la vista de detalle de asistencia de la manipuladora
+        dialogBinding.tvValJardin.text = jar.toString()
+        dialogBinding.tvValPrimaria.text = finalP.toString()
+        dialogBinding.tvValSecundaria.text = finalS.toString()
+
+        dialogBinding.txtTotalEstudiantesCalculado.text = "Total Estudiantes: $total (Primaria: $finalP | Secundaria: $finalS)"
         val gramajeKg = (finalP * 0.25) + (finalS * 0.38)
-        txtTotalCalc.text = "Total Estudiantes: $total (Primaria: $finalP | Secundaria: $finalS)"
-        txtGramajeCalc.text = String.format(Locale.US, "Gramaje total estimado: %.1f kg a cocinar", gramajeKg)
+        dialogBinding.txtGramajeTotalEstimado.text = String.format(Locale.US, "Gramaje total estimado: %.1f kg a cocinar", gramajeKg)
+
+        // Chips de filtro
+        dialogBinding.chipTodosAsistencia.setOnClickListener {
+            dialogBinding.chipTodosAsistencia.setBackgroundResource(R.drawable.bg_pill_green)
+            dialogBinding.chipTodosAsistencia.setTextColor(Color.WHITE)
+            dialogBinding.chipPrimariaAsistencia.setBackgroundResource(0)
+            dialogBinding.chipPrimariaAsistencia.setTextColor(Color.parseColor("#64748B"))
+            dialogBinding.chipSecundariaAsistencia.setBackgroundResource(0)
+            dialogBinding.chipSecundariaAsistencia.setTextColor(Color.parseColor("#64748B"))
+            dialogBinding.layoutPrimaria.visibility = View.VISIBLE
+            dialogBinding.layoutSecundaria.visibility = View.VISIBLE
+        }
+
+        dialogBinding.chipPrimariaAsistencia.setOnClickListener {
+            dialogBinding.chipPrimariaAsistencia.setBackgroundResource(R.drawable.bg_pill_green)
+            dialogBinding.chipPrimariaAsistencia.setTextColor(Color.WHITE)
+            dialogBinding.chipTodosAsistencia.setBackgroundResource(0)
+            dialogBinding.chipTodosAsistencia.setTextColor(Color.parseColor("#64748B"))
+            dialogBinding.chipSecundariaAsistencia.setBackgroundResource(0)
+            dialogBinding.chipSecundariaAsistencia.setTextColor(Color.parseColor("#64748B"))
+            dialogBinding.layoutPrimaria.visibility = View.VISIBLE
+            dialogBinding.layoutSecundaria.visibility = View.GONE
+        }
+
+        dialogBinding.chipSecundariaAsistencia.setOnClickListener {
+            dialogBinding.chipSecundariaAsistencia.setBackgroundResource(R.drawable.bg_pill_green)
+            dialogBinding.chipSecundariaAsistencia.setTextColor(Color.WHITE)
+            dialogBinding.chipTodosAsistencia.setBackgroundResource(0)
+            dialogBinding.chipTodosAsistencia.setTextColor(Color.parseColor("#64748B"))
+            dialogBinding.chipPrimariaAsistencia.setBackgroundResource(0)
+            dialogBinding.chipPrimariaAsistencia.setTextColor(Color.parseColor("#64748B"))
+            dialogBinding.layoutPrimaria.visibility = View.GONE
+            dialogBinding.layoutSecundaria.visibility = View.VISIBLE
+        }
 
         val dialog = MaterialAlertDialogBuilder(this)
-            .setView(vistaDialogo)
+            .setView(dialogBinding.root)
             .create()
 
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
-        btnGuardar.setOnClickListener {
+        dialogBinding.btnEntendidoAsistencia.setOnClickListener {
             dialog.dismiss()
         }
 
@@ -800,16 +865,19 @@ class MainActivity : AppCompatActivity() {
         val fecha3 = fmtFechaHistorial.format(cal.time)
 
         binding.tvPlatoAnterior1.text = "Almuerzo"
+        binding.tvSubtituloAnterior1.text = formatearNombrePlato(plato1.nombrePlato)
         binding.imgMenuAnterior1.setImageResource(obtenerImagenPlato(plato1))
         binding.tvFechaAnterior1.text = fecha1
         binding.cardMenuAnterior1.setOnClickListener { mostrarDialogoPlato(plato1) }
 
         binding.tvPlatoAnterior2.text = "Desayuno"
+        binding.tvSubtituloAnterior2.text = formatearNombrePlato(plato2.nombrePlato)
         binding.imgMenuAnterior2.setImageResource(obtenerImagenPlato(plato2))
         binding.tvFechaAnterior2.text = fecha2
         binding.cardMenuAnterior2.setOnClickListener { mostrarDialogoPlato(plato2) }
 
         binding.tvPlatoAnterior3.text = "Merienda"
+        binding.tvSubtituloAnterior3.text = formatearNombrePlato(plato3.nombrePlato)
         binding.imgMenuAnterior3.setImageResource(obtenerImagenPlato(plato3))
         binding.tvFechaAnterior3.text = fecha3
         binding.cardMenuAnterior3.setOnClickListener { mostrarDialogoPlato(plato3) }

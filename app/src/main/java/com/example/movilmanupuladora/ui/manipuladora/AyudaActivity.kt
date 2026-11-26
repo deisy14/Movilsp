@@ -20,89 +20,14 @@ class AyudaActivity : AppCompatActivity() {
         binding = ActivityAyudaBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // ==========================================
-        // INSETS
-        // ==========================================
-
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-
-            val systemBars =
-                insets.getInsets(WindowInsetsCompat.Type.systemBars())
-
-            v.setPadding(
-                systemBars.left,
-                systemBars.top,
-                systemBars.right,
-                systemBars.bottom
-            )
-
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        // ==========================================
-        // VOLVER AL PERFIL
-        // ==========================================
-
         binding.btnVolverPerfil.setOnClickListener {
-
-            startActivity(
-                Intent(this, PerfilActivity::class.java)
-            )
-
-            finish()
-        }
-
-        // ==========================================
-        // BARRA DE NAVEGACIÓN
-        // ==========================================
-
-        // INICIO
-        binding.barraNavegacion.navInicio.setOnClickListener {
-
-            startActivity(
-                Intent(this, MainActivity::class.java)
-            )
-
-            finish()
-        }
-
-        // ASIGNADAS
-        binding.barraNavegacion.navAsignadas.setOnClickListener {
-
-            startActivity(
-                Intent(this, AsignadasActivity::class.java)
-            )
-
-            finish()
-        }
-
-        // INVENTARIO
-        binding.barraNavegacion.navInventario.setOnClickListener {
-
-            startActivity(
-                Intent(this, InventarioActivity::class.java)
-            )
-
-            finish()
-        }
-
-        // AVISOS
-        binding.barraNavegacion.navAvisos.setOnClickListener {
-
-            startActivity(
-                Intent(this, AvisosActivity::class.java)
-            )
-
-            finish()
-        }
-
-        // PERFIL
-        binding.barraNavegacion.navPerfil.setOnClickListener {
-
-            startActivity(
-                Intent(this, PerfilActivity::class.java)
-            )
-
+            startActivity(Intent(this, PerfilActivity::class.java))
             finish()
         }
     }

@@ -31,7 +31,7 @@ class AsignadasActivity : AppCompatActivity() {
     private lateinit var sessionMgr: SessionManager
 
     private var idPlato: Int = -1
-    private var nombrePlato: String = "Pollo Guisado Criollo"
+    private var nombrePlato: String = "Menú pendiente por la Jefa"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,16 +48,19 @@ class AsignadasActivity : AppCompatActivity() {
             insets
         }
 
+        NavigationHelper.setupStickyTopBar(this, binding.root, lifecycleScope)
+
         val platoJefa = sessionMgr.getPlatoJefa(this)
         nombrePlato = if (intent.hasExtra("nombre_plato")) {
-            intent.getStringExtra("nombre_plato") ?: platoJefa
+            intent.getStringExtra("nombre_plato") ?: platoJefa.takeIf { it.isNotBlank() } ?: "Menú pendiente por la Jefa"
         } else {
-            platoJefa
+            platoJefa.takeIf { it.isNotBlank() } ?: "Menú pendiente por la Jefa"
         }
         idPlato = intent.getIntExtra("id_plato", sessionMgr.getPlatoJefaId(this))
 
         configurarEncabezadoYPlato()
         configurarAcciones()
+        configurarConmutadorNutricional()
         configurarListaOperarias()
         configurarNavegacion()
 
@@ -185,6 +188,25 @@ class AsignadasActivity : AppCompatActivity() {
         }
 
         dialog.show()
+    }
+
+    private fun configurarConmutadorNutricional() {
+        val btnPrimaria = findViewById<TextView>(R.id.btnPrimaria)
+        val btnSecundaria = findViewById<TextView>(R.id.btnSecundaria)
+
+        btnPrimaria?.setOnClickListener {
+            btnPrimaria.setBackgroundResource(R.drawable.bg_pill_green)
+            btnPrimaria.setTextColor(android.graphics.Color.WHITE)
+            btnSecundaria?.background = null
+            btnSecundaria?.setTextColor(android.graphics.Color.parseColor("#64748B"))
+        }
+
+        btnSecundaria?.setOnClickListener {
+            btnSecundaria.setBackgroundResource(R.drawable.bg_pill_green)
+            btnSecundaria.setTextColor(android.graphics.Color.WHITE)
+            btnPrimaria?.background = null
+            btnPrimaria?.setTextColor(android.graphics.Color.parseColor("#64748B"))
+        }
     }
 
     private fun configurarListaOperarias() {
