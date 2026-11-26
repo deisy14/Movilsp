@@ -35,8 +35,8 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Hola, Jefa de Cocina"
-                android:textColor="#1B3317"
+                android:text="Hola, Manipuladora jefe"
+                android:textColor="#FFFFFF"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -46,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:text="Coordinación y Gestión PAE"
-                android:textColor="#3F4F2A"
+                android:textColor="#FFFFFF"
                 android:textSize="12sp" />
 
             <TextView
@@ -57,7 +57,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:text="I.E. Técnico San José · Sede Principal"
-                android:textColor="#2E3D1F"
+                android:textColor="#FDFFFC"
                 android:textSize="11sp"
                 android:textStyle="bold" />
 
@@ -203,7 +203,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Lun"
-                            android:textColor="#1E293B"
+                            android:textColor="#FFFFFF"
                             android:textSize="10sp"
                             android:textStyle="bold" />
 
@@ -213,7 +213,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:text="2"
-                            android:textColor="#1E293B"
+                            android:textColor="#FFFFFF"
                             android:textSize="17sp"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -417,51 +417,38 @@
 
                 </LinearLayout>
 
-                <!-- BANNER AMARILLO INTERACTIVO DE FECHA (LLEVA A PANTALLA 2) -->
+                <!-- CABECERA MENÚS + HISTORIAL -->
                 <LinearLayout
-                    android:id="@+id/bannerCalendarioMes"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:background="@drawable/bg_banner_amarillo_borde"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="16dp"
-                    android:paddingVertical="14dp">
+                    android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/txtFechaSeleccionadaBanner"
+                        android:id="@+id/txtTituloMenusSeleccionados"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Lun, 26 de octubre"
+                        android:text="Menús"
                         android:textColor="#1E293B"
-                        android:textSize="14sp"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/btnHistorialMenus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="›"
-                        android:textColor="#D97706"
-                        android:textSize="22sp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:paddingHorizontal="6dp"
+                        android:paddingVertical="4dp"
+                        android:text="Historial →"
+                        android:textColor="#1E293B"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
-
                 </LinearLayout>
-
-                <!-- TÍTULO SECCIÓN MENÚS SELECCIONADOS -->
-                <TextView
-                    android:id="@+id/txtTituloMenusSeleccionados"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:text="Menús seleccionados"
-                    android:textColor="#1E293B"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
 
                 <!-- SCROLL HORIZONTAL DE TARJETAS DE MENÚS (DESAYUNO, ALMUERZO, MERIENDA) -->
                 <HorizontalScrollView
@@ -730,13 +717,48 @@
                     </LinearLayout>
                 </HorizontalScrollView>
 
+                <!-- BANNER AMARILLO INTERACTIVO: "PROGRAMAR SIGUIENTE SEMANA" -->
+                <LinearLayout
+                    android:id="@+id/bannerCalendarioMes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/bg_dia_semana_activo"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="14dp">
+
+                    <TextView
+                        android:id="@+id/txtFechaSeleccionadaBanner"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Programar siguiente semana"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="›"
+                        android:textColor="#FFFFFF"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
                 <!-- BANNER AMARILLO: "REGISTRA LA ASISTENCIA" -->
                 <LinearLayout
                     android:id="@+id/bannerRegistraAsistencia"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="22dp"
-                    android:background="@drawable/bg_banner_amarillo_borde"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_dia_semana_activo"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground"
@@ -750,7 +772,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Registra la asistencia"
-                        android:textColor="#1E293B"
+                        android:textColor="#FFFFFF"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -758,7 +780,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="›"
-                        android:textColor="#D97706"
+                        android:textColor="#FFFFFF"
                         android:textSize="22sp"
                         android:textStyle="bold" />
 

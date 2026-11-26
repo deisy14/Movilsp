@@ -154,7 +154,7 @@ class InicioJefaActivity : AppCompatActivity() {
             }
             launch {
                 try {
-                    SedeContratoManager.sincronizarSeccionesContrato(this@InicioJefaActivity, idSede ?: 1)
+                    SedeContratoManager.sincronizarSeccionesContrato(this@InicioJefaActivity, idSede ?: 0)
                     actualizarResumen()
                     actualizarPlatosVisuales()
                 } catch (_: Exception) { }
@@ -236,7 +236,7 @@ class InicioJefaActivity : AppCompatActivity() {
             if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
         }
 
-        binding.txtFechaSeleccionadaBanner.text = textoFecha
+        binding.txtFechaSeleccionadaBanner.text = "Programar siguiente semana"
         binding.txtFechaResumenDia.text = textoFecha
 
         actualizarPlatosVisuales()
@@ -251,8 +251,8 @@ class InicioJefaActivity : AppCompatActivity() {
         if (activo) {
             container.setBackgroundResource(R.drawable.bg_dia_semana_activo)
             container.elevation = 4f * resources.displayMetrics.density
-            txtNombre.setTextColor(Color.parseColor("#1E293B"))
-            txtNumero.setTextColor(Color.parseColor("#1E293B"))
+            txtNombre.setTextColor(Color.WHITE)
+            txtNumero.setTextColor(Color.WHITE)
         } else {
             container.setBackgroundResource(R.drawable.bg_dia_semana_inactivo)
             container.elevation = 0f
@@ -435,11 +435,17 @@ class InicioJefaActivity : AppCompatActivity() {
         binding.btnDiaSab.setOnClickListener { if (diasSemanaActual.size > 5) seleccionarDia(diasSemanaActual[5]) }
         binding.btnDiaDom.setOnClickListener { if (diasSemanaActual.size > 6) seleccionarDia(diasSemanaActual[6]) }
 
-        // Clic en la flecha amarilla del recuadro del calendario -> Abre Pantalla 2 (MenuDelDiaMesActivity)
-        binding.bannerCalendarioMes.setOnClickListener {
+        // Clic en "Historial ->" -> Abre MenuDelDiaMesActivity (pantalla de Historial mensual)
+        binding.btnHistorialMenus.setOnClickListener {
             val intent = Intent(this, MenuDelDiaMesActivity::class.java).apply {
                 putExtra("fecha_milisegundos", diaSeleccionado.timeInMillis)
             }
+            startActivity(intent)
+        }
+
+        // Clic en "Programar siguiente semana" -> Abre PlanificacionSemanalJefaActivity
+        binding.bannerCalendarioMes.setOnClickListener {
+            val intent = Intent(this, PlanificacionSemanalJefaActivity::class.java)
             startActivity(intent)
         }
 

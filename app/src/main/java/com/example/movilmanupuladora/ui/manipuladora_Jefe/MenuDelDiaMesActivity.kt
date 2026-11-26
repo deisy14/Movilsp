@@ -87,12 +87,43 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
         generarGridMes()
         actualizarDetallePlatos()
         cargarPlatosBackend()
+        cargarAsistenciasDelBackend()
+
+        val idSedeSincronizar = SedeContratoManager.resolverIdSedeEfectivo(sessionManager)
+        lifecycleScope.launch {
+            try {
+                SedeContratoManager.sincronizarSeccionesContrato(this@MenuDelDiaMesActivity, idSedeSincronizar)
+                actualizarDetallePlatos()
+            } catch (_: Exception) { }
+        }
     }
 
     override fun onResume() {
         super.onResume()
         actualizarDetallePlatos()
         generarGridMes()
+        cargarAsistenciasDelBackend()
+        val idSedeSincronizar = SedeContratoManager.resolverIdSedeEfectivo(sessionManager)
+        lifecycleScope.launch {
+            try {
+                SedeContratoManager.sincronizarSeccionesContrato(this@MenuDelDiaMesActivity, idSedeSincronizar)
+                actualizarDetallePlatos()
+            } catch (_: Exception) { }
+        }
+    }
+
+    private var asistenciasBackend: List<com.example.movilmanupuladora.data.model.AsistenciaDiaria> = emptyList()
+
+    private fun cargarAsistenciasDelBackend() {
+        lifecycleScope.launch {
+            try {
+                val res = RetrofitClient.apiService.obtenerAsistenciaDiaria()
+                if (res.isSuccessful && res.body() != null) {
+                    asistenciasBackend = res.body()!!
+                    actualizarDetallePlatos()
+                }
+            } catch (_: Exception) { }
+        }
     }
 
     private fun cargarPlatosBackend() {
@@ -176,17 +207,13 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
         binding.cardDetalleMerienda.setOnClickListener { mostrarDialogoSeleccionarPlato("Merienda") }
         binding.btnVerDetalleMerienda.setOnClickListener { platoActualMerienda?.let { mostrarModalDetalle(it) } }
 
-        // Botón para acceder directamente a la planificación semanal completa
-        binding.btnPlanificarSemanaSiguiente.setOnClickListener {
-            val intent = Intent(this, PlanificacionSemanalJefaActivity::class.java).apply {
-                putExtra("semana_offset", 1) // Siguiente semana
+        // Botón amarillo de asistencia del día -> abre AsistenciaJefaActivity para la fecha seleccionada
+        binding.cardAsistenciaDia.setOnClickListener {
+            val fechaClave = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(diaSeleccionado.time)
+            val intent = Intent(this, AsistenciaJefaActivity::class.java).apply {
+                putExtra("fecha_seleccionada", fechaClave)
             }
             startActivity(intent)
-        }
-
-        // Botón para enviar programación de menús directamente al supervisor
-        binding.btnEnviarProgramacionSupervisor.setOnClickListener {
-            confirmarYEnviarAlSupervisor()
         }
     }
 
@@ -288,25 +315,25 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
                         val isPast = calDiaActual.before(hoyCero)
                         val isSelected = esMismoDia(calDiaActual, diaSeleccionado)
 
+                        val fStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calDiaActual.time)
+                        val tieneMenu = !sessionManager.getPlatoDiaServicio(this, fStr, "Desayuno").isNullOrBlank() ||
+                                        !sessionManager.getPlatoDiaServicio(this, fStr, "Almuerzo").isNullOrBlank() ||
+                                        !sessionManager.getPlatoDiaServicio(this, fStr, "Merienda").isNullOrBlank()
+
                         when {
                             isSelected -> {
                                 txtDia.setBackgroundResource(R.drawable.circulo_amarillo_badge)
                                 txtDia.setTextColor(Color.parseColor("#1E293B"))
                                 txtDia.typeface = android.graphics.Typeface.DEFAULT_BOLD
                             }
-                            isPast -> {
-                                // Días anteriores: bolita verde rellena (reemplaza círculos punteados)
-                                txtDia.setBackgroundResource(R.drawable.bg_pill_green)
-                                txtDia.setTextColor(Color.parseColor("#2A5226"))
-                                txtDia.typeface = android.graphics.Typeface.DEFAULT_BOLD
-                            }
-                            isToday -> {
-                                txtDia.setBackgroundResource(R.drawable.circulo_amarillo_badge)
-                                txtDia.setTextColor(Color.parseColor("#1E293B"))
+                            tieneMenu -> {
+                                // Días que ya tienen menú seleccionado: bolita amarillo clarito
+                                txtDia.setBackgroundResource(R.drawable.bg_dia_con_menu)
+                                txtDia.setTextColor(Color.parseColor("#92400E"))
                                 txtDia.typeface = android.graphics.Typeface.DEFAULT_BOLD
                             }
                             else -> {
-                                // Días posteriores: circulitos grises
+                                // Días posteriores sin menú seleccionado: circulitos grises
                                 txtDia.setBackgroundResource(R.drawable.bg_pill_gray)
                                 txtDia.setTextColor(Color.parseColor("#64748B"))
                                 txtDia.typeface = android.graphics.Typeface.DEFAULT_BOLD
@@ -336,6 +363,42 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
             }
 
             binding.contenedorGridCalendario.addView(fila)
+        }
+    }
+
+    private fun actualizarAsistenciaDiaUI(fechaClave: String) {
+        binding.cardAsistenciaDia.visibility = View.VISIBLE
+        val registrosFecha = asistenciasBackend.filter { it.fecha.trim().startsWith(fechaClave) }
+        val hoyClave = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Calendar.getInstance().time)
+
+        if (registrosFecha.isNotEmpty()) {
+            val regPrimaria = registrosFecha.filter { it.obtenerIdGradoReal() == 16 }.maxByOrNull { it.obtenerIdReal() ?: 0 }
+            val regSecundaria = registrosFecha.filter { it.obtenerIdGradoReal() == 19 }.maxByOrNull { it.obtenerIdReal() ?: 0 }
+            val total = if (regPrimaria != null || regSecundaria != null) {
+                (regPrimaria?.ninosPresentes ?: 0) + (regSecundaria?.ninosPresentes ?: 0)
+            } else {
+                registrosFecha.sumOf { it.ninosPresentes }
+            }
+            binding.txtTotalAsistenciaDia.text = "$total niños • Editar"
+            binding.txtDetalleGradosAsistenciaDia.text = if (regPrimaria != null || regSecundaria != null) {
+                "Primaria: ${regPrimaria?.ninosPresentes ?: 0} • Secundaria: ${regSecundaria?.ninosPresentes ?: 0} (toca para editar)"
+            } else {
+                "Total registrado: $total estudiantes (toca para editar)"
+            }
+        } else if (fechaClave == hoyClave) {
+            val p = AsistenciaManager.obtenerPrimaria(this)
+            val s = AsistenciaManager.obtenerSecundaria(this)
+            val tot = p + s
+            if (tot > 0) {
+                binding.txtTotalAsistenciaDia.text = "$tot niños • Editar"
+                binding.txtDetalleGradosAsistenciaDia.text = "Primaria: $p • Secundaria: $s (toca para editar)"
+            } else {
+                binding.txtTotalAsistenciaDia.text = "Registrar"
+                binding.txtDetalleGradosAsistenciaDia.text = "Sin registro de asistencia"
+            }
+        } else {
+            binding.txtTotalAsistenciaDia.text = "Registrar"
+            binding.txtDetalleGradosAsistenciaDia.text = "Sin registro de asistencia"
         }
     }
 
@@ -375,8 +438,8 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
         val esPasado = calDiaSelCero.before(hoyCero)
         val menuDia = MenuPaeCatalog.obtenerMenuDiaCompleto(diaSeleccionado)
 
-        // 0. ASISTENCIA DEL DÍA (Oculta según diseño requerido)
-        binding.cardAsistenciaDia.visibility = View.GONE
+        // 0. ASISTENCIA DEL DÍA (botón amarillo interactivo para ver o editar asistencia de esa fecha)
+        actualizarAsistenciaDiaUI(fechaClave)
 
         // 1. DESAYUNO
         if (!customDes.isNullOrBlank()) {
@@ -508,94 +571,6 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
         binding.cardDetalleDesayuno.visibility = if (secciones.isEmpty() || secciones.contains("Desayuno")) View.VISIBLE else View.GONE
         binding.cardDetalleAlmuerzo.visibility = if (secciones.contains("Almuerzo")) View.VISIBLE else View.GONE
         binding.cardDetalleMerienda.visibility = if (secciones.contains("Merienda")) View.VISIBLE else View.GONE
-
-        actualizarBotonSecuenciaSemana()
-    }
-
-    // =========================================================
-    // FLUJO SECUENCIAL DE PLANIFICACIÓN SEMANAL (LUNES A VIERNES)
-    // =========================================================
-
-    private fun actualizarBotonSecuenciaSemana() {
-        val calLunes = (diaSeleccionado.clone() as Calendar).apply {
-            firstDayOfWeek = Calendar.MONDAY
-            set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
-            set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
-        }
-
-        val diasSemanaHabiles = (0..4).map { offset ->
-            (calLunes.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, offset) }
-        }
-
-        val todosCompletos = diasSemanaHabiles.all { esDiaCompletoProgramado(it) }
-        val diaActualCompleto = esDiaCompletoProgramado(diaSeleccionado)
-        val dayOfWeek = diaSeleccionado.get(Calendar.DAY_OF_WEEK)
-
-        // Quitar completamente cualquier icono del botón de planificar
-        binding.btnPlanificarSemanaSiguiente.icon = null
-
-        if (todosCompletos) {
-            // Toda la semana completa de Lunes a Viernes planificada
-            binding.btnPlanificarSemanaSiguiente.text = "Semana planificada (Lunes a Viernes)"
-            binding.btnPlanificarSemanaSiguiente.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#E2E8F0"))
-            binding.btnPlanificarSemanaSiguiente.setTextColor(Color.parseColor("#334155"))
-            binding.btnPlanificarSemanaSiguiente.setOnClickListener {
-                Toast.makeText(this, "Esta semana ya tiene todos sus días planificados. Presiona 'Enviar programación al supervisor' abajo para oficializarla.", Toast.LENGTH_LONG).show()
-            }
-        } else if (diaActualCompleto && dayOfWeek in Calendar.MONDAY..Calendar.THURSDAY) {
-            // El día actual ya tiene todos sus platos requeridos: avanzar al siguiente día hábil
-            val calSiguiente = (diaSeleccionado.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, 1) }
-            val numDiaSig = calSiguiente.get(Calendar.DAY_OF_MONTH)
-            val nombreDiaSig = when (calSiguiente.get(Calendar.DAY_OF_WEEK)) {
-                Calendar.TUESDAY -> "Martes"
-                Calendar.WEDNESDAY -> "Miércoles"
-                Calendar.THURSDAY -> "Jueves"
-                Calendar.FRIDAY -> "Viernes"
-                else -> "siguiente"
-            }
-
-            binding.btnPlanificarSemanaSiguiente.text = "Planificar día $numDiaSig ($nombreDiaSig) ➡️"
-            binding.btnPlanificarSemanaSiguiente.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FAC94B"))
-            binding.btnPlanificarSemanaSiguiente.setTextColor(Color.parseColor("#1E293B"))
-            binding.btnPlanificarSemanaSiguiente.setOnClickListener {
-                diaSeleccionado = calSiguiente
-                generarGridMes()
-                actualizarDetallePlatos()
-            }
-        } else {
-            val nombreDia = when (dayOfWeek) {
-                Calendar.MONDAY -> "Lunes"
-                Calendar.TUESDAY -> "Martes"
-                Calendar.WEDNESDAY -> "Miércoles"
-                Calendar.THURSDAY -> "Jueves"
-                Calendar.FRIDAY -> "Viernes"
-                Calendar.SATURDAY -> "Sábado"
-                Calendar.SUNDAY -> "Domingo"
-                else -> "Día"
-            }
-            val numDia = diaSeleccionado.get(Calendar.DAY_OF_MONTH)
-
-            if (!diaActualCompleto && dayOfWeek in Calendar.MONDAY..Calendar.FRIDAY) {
-                val secciones = SedeContratoManager.obtenerSeccionesActivas(this)
-                val faltantes = if (secciones.isNotEmpty()) secciones.joinToString(" y ") else "Desayuno"
-                binding.btnPlanificarSemanaSiguiente.text = "Programar $faltantes de $nombreDia $numDia"
-            } else {
-                binding.btnPlanificarSemanaSiguiente.text = "Planificar toda la semana siguiente"
-            }
-
-            binding.btnPlanificarSemanaSiguiente.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FAC94B"))
-            binding.btnPlanificarSemanaSiguiente.setTextColor(Color.parseColor("#1E293B"))
-            binding.btnPlanificarSemanaSiguiente.setOnClickListener {
-                if (dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY) {
-                    val proxLunes = (calLunes.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, 7) }
-                    diaSeleccionado = proxLunes
-                    generarGridMes()
-                    actualizarDetallePlatos()
-                } else {
-                    Toast.makeText(this, "Completa los platos requeridos de $nombreDia $numDia para avanzar", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
     }
 
     private fun confirmarYEnviarAlSupervisor() {

@@ -9,6 +9,9 @@ data class PlatoResponse(
     @SerializedName("id_seccion")
     val idSeccion: Int? = null,
 
+    @SerializedName("nombre_seccion", alternate = ["seccion", "seccion_nombre"])
+    val nombreSeccion: String? = null,
+
     @SerializedName("nombre_plato")
     val nombrePlato: String? = null,
 

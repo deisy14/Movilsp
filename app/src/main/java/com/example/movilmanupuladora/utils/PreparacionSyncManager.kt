@@ -734,7 +734,10 @@ object PreparacionSyncManager {
                 .putInt("plato_${servKey}_id", idPlato ?: -1)
                 .apply()
 
-            // 3. Persistir en la nube (backend DRF turnos)
+            // 3. Persistir en la nube (backend DRF turnos + /api/menus/ para Minuta del Supervisor)
+            val fechaEfectiva = if (!fecha.isNullOrBlank()) fecha else java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+            sincronizarMenuConBackend(context, servCapitalizado, nombrePlato, idPlato, fechaEfectiva)
+
             val tag = "$PREFIX_PLATO${nombrePlato.trim().take(30)}#${servCapitalizado}#${idPlato ?: -1}"
             SessionManager.getToken(context)
             val res = RetrofitClient.apiService.obtenerTurnos()
@@ -767,6 +770,127 @@ object PreparacionSyncManager {
         } catch (e: Exception) {
             Log.e(TAG, "Error guardando plato de servicio en backend: ${e.message}")
             return@withContext false
+        }
+    }
+
+    /**
+     * Registra o actualiza el menú programado en /api/menus/ para que sea visible
+     * en el módulo Minuta del Supervisor (PaeVisual) para su revisión, aprobación o rechazo.
+     */
+    private suspend fun sincronizarMenuConBackend(
+        context: Context,
+        servicio: String,
+        nombrePlato: String,
+        idPlato: Int?,
+        fecha: String
+    ) {
+        try {
+            val sessionMgr = SessionManager(context)
+            val idSede = SedeContratoManager.resolverIdSedeEfectivo(sessionMgr)
+            if (idSede <= 0) return
+
+            val idInstitucion = sessionMgr.getInstitucionId()
+            val idSeccion = when (servicio.lowercase()) {
+                "desayuno" -> 1
+                "merienda" -> 3
+                else -> 2
+            }
+            val idJornada = if (idSeccion == 1) 1 else 2
+
+            val cal = java.util.Calendar.getInstance()
+            try {
+                val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+                cal.time = sdf.parse(fecha) ?: java.util.Date()
+            } catch (_: Exception) { }
+            val diaSemanaIdx = when (cal.get(java.util.Calendar.DAY_OF_WEEK)) {
+                java.util.Calendar.MONDAY -> 0
+                java.util.Calendar.TUESDAY -> 1
+                java.util.Calendar.WEDNESDAY -> 2
+                java.util.Calendar.THURSDAY -> 3
+                java.util.Calendar.FRIDAY -> 4
+                else -> 0
+            }
+            val semanaMesIdx = ((cal.get(java.util.Calendar.WEEK_OF_MONTH) - 1).coerceIn(0, 3))
+            val numMenuCiclo = (semanaMesIdx * 5 + diaSemanaIdx + 1).coerceIn(1, 20)
+
+            var idContrato = 0
+            try {
+                val cRes = RetrofitClient.apiService.obtenerContratosRaw()
+                if (cRes.isSuccessful && cRes.body() != null) {
+                    val root = cRes.body()!!
+                    val arr = when {
+                        root.isJsonArray -> root.asJsonArray
+                        root.isJsonObject && root.asJsonObject.has("results") -> root.asJsonObject.getAsJsonArray("results")
+                        root.isJsonObject && root.asJsonObject.has("data") -> root.asJsonObject.getAsJsonArray("data")
+                        else -> null
+                    }
+                    if (arr != null) {
+                        for (el in arr) {
+                            if (!el.isJsonObject) continue
+                            val obj = el.asJsonObject
+                            val cid = if (obj.has("id_contrato") && obj.get("id_contrato").isJsonPrimitive) obj.get("id_contrato").asInt
+                            else if (obj.has("id") && obj.get("id").isJsonPrimitive) obj.get("id").asInt else 0
+                            val cSede = if (obj.has("id_sede") && obj.get("id_sede").isJsonPrimitive) obj.get("id_sede").asInt else 0
+                            val cInst = if (obj.has("id_institucion") && obj.get("id_institucion").isJsonPrimitive) obj.get("id_institucion").asInt else 0
+                            if (cid > 0 && ((cSede == idSede) || (idInstitucion > 0 && cInst == idInstitucion) || idContrato == 0)) {
+                                idContrato = cid
+                                if (cSede == idSede || (idInstitucion > 0 && cInst == idInstitucion)) break
+                            }
+                        }
+                    }
+                }
+            } catch (_: Exception) { }
+
+            val cupos = SedeContratoManager.obtenerCuposSede(context).takeIf { it > 0 } ?: 1
+            val infoNutricional = "[SEDE:$idSede] [MENU_CICLO:$numMenuCiclo] [Elegido Jefa] $nombrePlato"
+            val payload = mutableMapOf<String, Any?>(
+                "id_jornada" to idJornada,
+                "fecha" to fecha,
+                "ninos_presentes" to cupos,
+                "id_seccion" to idSeccion,
+                "id_sede" to idSede,
+                "estado" to "Pendiente",
+                "informacion_nutricional" to infoNutricional
+            )
+            if (idContrato > 0) payload["id_contrato"] = idContrato
+            if (idPlato != null && idPlato > 0) payload["id_plato"] = idPlato
+
+            var idMenuExistente = 0
+            try {
+                val mRes = RetrofitClient.apiService.obtenerMenusRaw()
+                if (mRes.isSuccessful && mRes.body() != null) {
+                    val root = mRes.body()!!
+                    val arr = when {
+                        root.isJsonArray -> root.asJsonArray
+                        root.isJsonObject && root.asJsonObject.has("results") -> root.asJsonObject.getAsJsonArray("results")
+                        root.isJsonObject && root.asJsonObject.has("data") -> root.asJsonObject.getAsJsonArray("data")
+                        else -> null
+                    }
+                    if (arr != null) {
+                        for (el in arr) {
+                            if (!el.isJsonObject) continue
+                            val obj = el.asJsonObject
+                            val mFecha = if (obj.has("fecha") && obj.get("fecha").isJsonPrimitive) obj.get("fecha").asString else ""
+                            val mSec = if (obj.has("id_seccion") && obj.get("id_seccion").isJsonPrimitive) obj.get("id_seccion").asInt else 0
+                            val mSede = if (obj.has("id_sede") && obj.get("id_sede").isJsonPrimitive) obj.get("id_sede").asInt else 0
+                            val mInfo = if (obj.has("informacion_nutricional") && obj.get("informacion_nutricional").isJsonPrimitive) obj.get("informacion_nutricional").asString else ""
+                            if (mFecha.startsWith(fecha) && mSec == idSeccion && (mSede == idSede || mInfo.contains("[SEDE:$idSede]"))) {
+                                idMenuExistente = if (obj.has("id_menu") && obj.get("id_menu").isJsonPrimitive) obj.get("id_menu").asInt
+                                else if (obj.has("id") && obj.get("id").isJsonPrimitive) obj.get("id").asInt else 0
+                                if (idMenuExistente > 0) break
+                            }
+                        }
+                    }
+                }
+            } catch (_: Exception) { }
+
+            if (idMenuExistente > 0) {
+                RetrofitClient.apiService.actualizarMenu(idMenuExistente, payload)
+            } else {
+                RetrofitClient.apiService.registrarMenu(payload)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error sincronizarMenuConBackend", e)
         }
     }
 

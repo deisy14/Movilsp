@@ -62,7 +62,8 @@ class AsistenciaJefaActivity : AppCompatActivity() {
     private val GRAMAJE_KG_SECUNDARIA = 0.38
 
     private val fechaHoy: String
-        get() = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        get() = intent.getStringExtra("fecha_seleccionada")?.takeIf { it.isNotBlank() }
+            ?: SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,18 +85,26 @@ class AsistenciaJefaActivity : AppCompatActivity() {
     }
 
     private fun configurarFecha() {
+        val dateObjetivo = try {
+            SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(fechaHoy) ?: Date()
+        } catch (_: Exception) {
+            Date()
+        }
         try {
             val formato = SimpleDateFormat("EEEE, d 'de' MMMM 'de' yyyy", Locale.forLanguageTag("es-CO"))
-            val fecha = formato.format(Date()).replaceFirstChar { it.uppercase() }
+            val fecha = formato.format(dateObjetivo).replaceFirstChar { it.uppercase() }
             binding.txtFechaAsistencia.text = fecha
         } catch (_: Exception) {
             val formato = SimpleDateFormat("EEEE, d 'de' MMMM 'de' yyyy", Locale.getDefault())
-            val fecha = formato.format(Date()).replaceFirstChar { it.uppercase() }
+            val fecha = formato.format(dateObjetivo).replaceFirstChar { it.uppercase() }
             binding.txtFechaAsistencia.text = fecha
         }
     }
 
     private fun cargarAsistenciaGuardada() {
+        val hoyStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        if (fechaHoy != hoyStr) return
+
         val p = AsistenciaManager.obtenerPrimaria(this)
         val s = AsistenciaManager.obtenerSecundaria(this)
         val totM = AsistenciaManager.obtenerManana(this)

@@ -53,7 +53,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Menú del día"
+            android:text="Historial"
             android:textColor="#1E293B"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -254,25 +254,28 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- TARJETA DE ASISTENCIA REGISTRADA DEL DÍA -->
+            <!-- TARJETA / BOTÓN AMARILLO DE ASISTENCIA DEL DÍA -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardAsistenciaDia"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="4dp"
-                android:visibility="gone"
-                app:cardBackgroundColor="#F8FAFC"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:visibility="visible"
+                app:cardBackgroundColor="#FEF3C7"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:strokeColor="#CBD5E1"
-                app:strokeWidth="1dp">
+                app:cardElevation="1dp"
+                app:strokeColor="#F59E0B"
+                app:strokeWidth="1.5dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:padding="14dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -286,7 +289,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="👥 Asistencia del Día"
-                            android:textColor="#1E293B"
+                            android:textColor="#92400E"
                             android:textSize="13sp"
                             android:textStyle="bold" />
 
@@ -294,13 +297,13 @@
                             android:id="@+id/txtTotalAsistenciaDia"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/bg_pill_green"
-                            android:paddingStart="8dp"
-                            android:paddingTop="3dp"
-                            android:paddingEnd="8dp"
-                            android:paddingBottom="3dp"
-                            android:text="0 niños"
-                            android:textColor="#2A5226"
+                            android:background="@drawable/bg_chip_pendiente"
+                            android:paddingStart="10dp"
+                            android:paddingTop="4dp"
+                            android:paddingEnd="10dp"
+                            android:paddingBottom="4dp"
+                            android:text="Editar asistencia"
+                            android:textColor="#92400E"
                             android:textSize="11sp"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -311,7 +314,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="Sin registro de asistencia"
-                        android:textColor="#64748B"
+                        android:textColor="#78350F"
                         android:textSize="12sp" />
 
                 </LinearLayout>
@@ -673,35 +676,6 @@
                 </com.google.android.material.card.MaterialCardView>
 
             </LinearLayout>
-
-            <!-- BOTÓN PLANIFICAR DÍA / SEMANA -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnPlanificarSemanaSiguiente"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="6dp"
-                android:layout_marginBottom="10dp"
-                android:text="Planificar siguiente día"
-                android:textColor="#1E293B"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                app:backgroundTint="#FAC94B"
-                app:cornerRadius="16dp"
-                app:strokeColor="#F59E0B"
-                app:strokeWidth="1dp" />
-
-            <!-- BOTÓN ENVIAR PROGRAMACIÓN AL SUPERVISOR -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnEnviarProgramacionSupervisor"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginBottom="28dp"
-                android:text="Enviar programación al supervisor"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                app:backgroundTint="#16A34A"
-                app:cornerRadius="16dp" />
 
         </LinearLayout>
 

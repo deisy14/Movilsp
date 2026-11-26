@@ -308,7 +308,7 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- BOTÓN NUEVA RECETA -->
+            <!-- BOTÓN NUEVA RECETA (MOVIDO AL BOTÓN CENTRAL + DE LA BARRA DE NAVEGACIÓN) -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnNuevaReceta"
                 android:layout_width="match_parent"
@@ -319,21 +319,95 @@
                 android:textColor="#92400E"
                 android:textSize="15sp"
                 android:textStyle="bold"
+                android:visibility="gone"
                 app:cornerRadius="16dp"
                 app:elevation="0dp"
                 app:strokeColor="#FCD34D"
                 app:strokeWidth="1dp" />
 
-            <!-- SECCIÓN: SUGERENCIAS DE IA PARA LA SEMANA -->
+            <!-- SECCIÓN: BOTONES DE SECCIONES Y SUGERENCIAS DE IA -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="16dp"
                 android:orientation="vertical">
 
+                <!-- BOTONES DE SECCIONES HORIZONTALES SEGÚN CONTRATO (EN LUGAR DE + NUEVA RECETA) -->
+                <LinearLayout
+                    android:id="@+id/layoutSelectorSeccionesIA"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:visibility="visible">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSeccionDesayuno"
+                        android:layout_width="0dp"
+                        android:layout_height="42dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="#F4B41F"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:padding="0dp"
+                        android:text="Desayuno"
+                        android:textAllCaps="false"
+                        android:textColor="#1E293B"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        app:cornerRadius="20dp"
+                        app:elevation="0dp"
+                        app:strokeColor="#F59E0B"
+                        app:strokeWidth="1dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSeccionAlmuerzo"
+                        android:layout_width="0dp"
+                        android:layout_height="42dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="#FEF3C7"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:padding="0dp"
+                        android:text="Almuerzo"
+                        android:textAllCaps="false"
+                        android:textColor="#92400E"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        app:cornerRadius="20dp"
+                        app:elevation="0dp"
+                        app:strokeColor="#FDE68A"
+                        app:strokeWidth="1dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSeccionMerienda"
+                        android:layout_width="0dp"
+                        android:layout_height="42dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="#FEF3C7"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:padding="0dp"
+                        android:text="Merienda"
+                        android:textAllCaps="false"
+                        android:textColor="#92400E"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        app:cornerRadius="20dp"
+                        app:elevation="0dp"
+                        app:strokeColor="#FDE68A"
+                        app:strokeWidth="1dp" />
+
+                </LinearLayout>
+
+                <!-- TÍTULO DE SUGERENCIAS DE IA (DEBAJO DE LOS BOTONES DE SECCIONES) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -378,79 +452,6 @@
                             android:src="@drawable/ic_info"
                             app:tint="#1E293B" />
                     </FrameLayout>
-
-                </LinearLayout>
-
-                <!-- BOTONES DE SECCIONES HORIZONTALES AMARILLOS (DESAYUNO, ALMUERZO, MERIENDA) -->
-                <LinearLayout
-                    android:id="@+id/layoutSelectorSeccionesIA"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginBottom="4dp"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:visibility="gone"
-                    android:weightSum="3">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSeccionDesayuno"
-                        android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="6dp"
-                        android:layout_weight="1"
-                        android:backgroundTint="#F4B41F"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        android:padding="0dp"
-                        android:text="Desayuno"
-                        android:textAllCaps="false"
-                        android:textColor="#1E293B"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        app:cornerRadius="20dp"
-                        app:elevation="0dp"
-                        app:strokeColor="#F59E0B"
-                        app:strokeWidth="1dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSeccionAlmuerzo"
-                        android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="6dp"
-                        android:layout_weight="1"
-                        android:backgroundTint="#FEF3C7"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        android:padding="0dp"
-                        android:text="Almuerzo"
-                        android:textAllCaps="false"
-                        android:textColor="#92400E"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        app:cornerRadius="20dp"
-                        app:elevation="0dp"
-                        app:strokeColor="#FDE68A"
-                        app:strokeWidth="1dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSeccionMerienda"
-                        android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:layout_weight="1"
-                        android:backgroundTint="#FEF3C7"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        android:padding="0dp"
-                        android:text="Merienda"
-                        android:textAllCaps="false"
-                        android:textColor="#92400E"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        app:cornerRadius="20dp"
-                        app:elevation="0dp"
-                        app:strokeColor="#FDE68A"
-                        app:strokeWidth="1dp" />
 
                 </LinearLayout>
 
@@ -590,7 +591,7 @@
 
             </LinearLayout>
 
-            <!-- TABS DE SERVICIOS: DESAYUNO, ALMUERZO, MERIENDA -->
+            <!-- TABS DE SERVICIOS (OCULTOS PORQUE YA ESTÁN LOS BOTONES DE SECCIÓN ARRIBA) -->
             <LinearLayout
                 android:id="@+id/layoutTabsServicios"
                 android:layout_width="match_parent"
@@ -599,7 +600,8 @@
                 android:background="@drawable/bg_card"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:padding="4dp">
+                android:padding="4dp"
+                android:visibility="gone">
 
                 <!-- TAB DESAYUNO -->
                 <LinearLayout
