@@ -87,6 +87,18 @@ class HistorialNotificacionesJefaActivity : AppCompatActivity() {
                         textoCompleto.contains("FAC", ignoreCase = true) ||
                         textoCompleto.contains("#REM", ignoreCase = true)
 
+                val density = resources.displayMetrics.density
+                if (esLeida) {
+                    itemBinding.cardItemNotificacion.setCardBackgroundColor(Color.parseColor("#FFFFFF"))
+                    itemBinding.cardItemNotificacion.strokeColor = Color.parseColor("#F1F5F9")
+                    itemBinding.cardItemNotificacion.strokeWidth = (1 * density).toInt()
+                } else {
+                    // Efecto amarillito suave para notificaciones nuevas/no leídas
+                    itemBinding.cardItemNotificacion.setCardBackgroundColor(Color.parseColor("#FEFCE8"))
+                    itemBinding.cardItemNotificacion.strokeColor = Color.parseColor("#FDE68A")
+                    itemBinding.cardItemNotificacion.strokeWidth = (1.5f * density).toInt()
+                }
+
                 val colorBarra = when {
                     esLeida -> "#F4B41F"
                     esEntrega -> "#F4B41F"
@@ -145,6 +157,9 @@ class HistorialNotificacionesJefaActivity : AppCompatActivity() {
 
                 itemBinding.cardItemNotificacion.setOnClickListener {
                     NotificacionesJefaManager.marcarLeida(this, notif.id)
+                    itemBinding.cardItemNotificacion.setCardBackgroundColor(Color.parseColor("#FFFFFF"))
+                    itemBinding.cardItemNotificacion.strokeColor = Color.parseColor("#F1F5F9")
+                    itemBinding.cardItemNotificacion.strokeWidth = (1 * density).toInt()
                     itemBinding.badgeEstadoNotif.text = "Leída"
                     itemBinding.badgeEstadoNotif.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#DCFCE7"))
                     itemBinding.badgeEstadoNotif.setTextColor(Color.parseColor("#166534"))

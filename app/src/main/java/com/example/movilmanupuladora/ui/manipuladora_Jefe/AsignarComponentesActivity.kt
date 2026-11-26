@@ -95,7 +95,9 @@ class AsignarComponentesActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 PreparacionSyncManager.sincronizarDesdeBackend(this@AsignarComponentesActivity)
-                ManipuladorasManager.cargarDesdeBackend()
+                val idSede = sessionManager.getSedeId().takeIf { it > 0 }
+                val sedeNombre = sessionManager.getSedeNombre()
+                ManipuladorasManager.cargarDesdeBackend(this@AsignarComponentesActivity, idSede, sedeNombre)
             } catch (_: Exception) { }
             cargarAsignacionesGuardadas()
             cambiarServicio(servicioActual)
@@ -286,7 +288,8 @@ class AsignarComponentesActivity : AppCompatActivity() {
         componente: String,
         cocineraActual: ManipuladorasManager.Manipuladora?
     ) {
-        val cocinerasActivas = ManipuladorasManager.obtenerManipuladoras().filter { it.activa }
+        val cocinerasActivas = ManipuladorasManager.obtenerManipuladorasSede(context = this)
+            .filter { it.activa }
         if (cocinerasActivas.isEmpty()) {
             Toast.makeText(this, "No hay cocineras activas disponibles", Toast.LENGTH_SHORT).show()
             return
@@ -428,7 +431,7 @@ class AsignarComponentesActivity : AppCompatActivity() {
 
     private fun cargarAsignacionesGuardadas() {
         val prefs = getSharedPreferences("ASIGNACIONES_PAE", Context.MODE_PRIVATE)
-        val cocineras = ManipuladorasManager.obtenerManipuladoras()
+        val cocineras = ManipuladorasManager.obtenerManipuladorasSede(context = this)
 
         for (serv in listOf("Desayuno", "Almuerzo", "Merienda")) {
             val platoNombre = sessionManager.getPlatoDiaServicio(this, fechaSeleccionada, serv) ?: continue

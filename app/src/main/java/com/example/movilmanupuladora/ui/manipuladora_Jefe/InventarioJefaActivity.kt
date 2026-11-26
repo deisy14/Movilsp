@@ -109,7 +109,6 @@ class InventarioJefaActivity : AppCompatActivity() {
             .ifBlank { "PA" }
         binding.txtInicialesPerfilInv.text = iniciales
 
-        binding.btnVolverInventario.setOnClickListener { finish() }
         binding.btnNotificacionesInv.setOnClickListener {
             startActivity(Intent(this, HistorialNotificacionesJefaActivity::class.java))
         }

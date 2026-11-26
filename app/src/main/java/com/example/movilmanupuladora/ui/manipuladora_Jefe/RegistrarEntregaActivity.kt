@@ -25,6 +25,10 @@ import com.example.movilmanupuladora.databinding.ActivityRegistrarEntregaBinding
 import com.example.movilmanupuladora.utils.SessionManager
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -57,6 +61,7 @@ class RegistrarEntregaActivity : AppCompatActivity() {
     private var numeroRemision = ""
     private var nombreSupervisor = ""
     private var entregaYaAceptada = false
+    private var enviandoEntrega = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -326,6 +331,7 @@ class RegistrarEntregaActivity : AppCompatActivity() {
 
             if (!entregaYaAceptada) {
                 val toggleItem = View.OnClickListener {
+                    if (enviandoEntrega) return@OnClickListener
                     item.verificado = !item.verificado
                     actualizarVisualItem()
                     actualizarConteoCheck()
@@ -531,8 +537,17 @@ class RegistrarEntregaActivity : AppCompatActivity() {
             return
         }
 
+        // Bloquear toda edición de la factura y de la firma digital apenas se presiona Enviar
+        enviandoEntrega = true
         binding.btnAceptarEntrega.isEnabled = false
         binding.btnAceptarEntrega.text = "Enviando..."
+        binding.btnRechazarEntrega.isEnabled = false
+        binding.btnMarcarTodos.isEnabled = false
+        binding.edtObservacionesEntrega.isEnabled = false
+        binding.edtObservacionesEntrega.isFocusable = false
+        binding.btnBorrarFirma.isEnabled = false
+        binding.btnBorrarFirma.visibility = View.GONE
+        binding.signatureView.isEnabled = false
 
         val obs = binding.edtObservacionesEntrega.text.toString().trim()
             .ifEmpty { "Víveres verificados y acta firmada en sede escolar." }
@@ -567,70 +582,58 @@ class RegistrarEntregaActivity : AppCompatActivity() {
             try {
                 NotificacionesJefaManager.agregarNotificacionSede(
                     this@RegistrarEntregaActivity,
-                    "✅ Entrega recibida conforme ($numeroRemision)",
+                    "Entrega recibida conforme ($numeroRemision)",
                     "Remisión $numeroRemision aceptada e ingresada al inventario de la sede. Observaciones: $obs",
                     "Inventario"
                 )
             } catch (_: Exception) {}
 
-            // 4. AUTENTICACIÓN Y CONFIRMACIÓN EN EL BACKEND
+            // 4. CONFIRMACIÓN EN PARALELO EN EL BACKEND (el backend notifica automáticamente a Supervisor y Admin)
             sessionManager.fetchAuthToken()
             RetrofitClient.cargarToken(this@RegistrarEntregaActivity)
 
-            for (item in listaIngredientesDespacho) {
-                item.idEntrega?.let { idEnt ->
-                    try {
-                        val cantRecibida = if (item.verificado) item.cantidad else 0.0
-                        val cantRechazada = if (item.verificado) 0.0 else item.cantidad
-                        val motivoItem = if (!item.verificado) "No verificado por la sede: $obs" else ""
+            coroutineScope {
+                listaIngredientesDespacho.mapNotNull { item ->
+                    item.idEntrega?.let { idEnt ->
+                        async(Dispatchers.IO) {
+                            try {
+                                val cantRecibida = if (item.verificado) item.cantidad else 0.0
+                                val cantRechazada = if (item.verificado) 0.0 else item.cantidad
+                                val motivoItem = if (!item.verificado) "No verificado por la sede: $obs" else ""
 
-                        RetrofitClient.apiService.confirmarRecepcionEntrega(
-                            idEnt,
-                            ConfirmarRecepcionRequest(
-                                cantidadRecibida = cantRecibida,
-                                cantidadRechazada = cantRechazada,
-                                motivoRechazo = motivoItem
-                            )
-                        )
-                    } catch (e: Exception) {
-                        android.util.Log.e("REGISTRAR_ENTREGA", "Error confirmando entrega $idEnt en backend: ${e.message}")
+                                RetrofitClient.apiService.confirmarRecepcionEntrega(
+                                    idEnt,
+                                    ConfirmarRecepcionRequest(
+                                        cantidadRecibida = cantRecibida,
+                                        cantidadRechazada = cantRechazada,
+                                        motivoRechazo = motivoItem
+                                    )
+                                )
+                            } catch (e: Exception) {
+                                android.util.Log.e("REGISTRAR_ENTREGA", "Error confirmando entrega $idEnt en backend: ${e.message}")
+                            }
+                        }
                     }
-                }
+                }.awaitAll()
             }
 
-            // 5. NOTIFICACIONES REMOTAS AL SUPERVISOR Y AL ADMINISTRADOR
-            try {
-                val titSup = "✅ Entrega Aceptada Conforme en $sedeNombre"
-                val msgSup = "La remisión $numeroRemision ha sido verificada completa, firmada digitalmente y aceptada por la Jefa de Manipuladoras en $sedeNombre. Observaciones: $obs."
-                RetrofitClient.apiService.enviarNotificacion(
-                    titSup.toRequestBody("text/plain".toMediaTypeOrNull()),
-                    msgSup.toRequestBody("text/plain".toMediaTypeOrNull()),
-                    null
-                )
-            } catch (_: Exception) {}
-
-            try {
-                val titAdmin = "🔔 Recepción firmada en sede: $sedeNombre"
-                val msgAdmin = "La Jefa de Manipuladoras ha firmado la remisión $numeroRemision en $sedeNombre. Ingreso acreditado al inventario. Observaciones: $obs."
-                RetrofitClient.apiService.enviarNotificacion(
-                    titAdmin.toRequestBody("text/plain".toMediaTypeOrNull()),
-                    msgAdmin.toRequestBody("text/plain".toMediaTypeOrNull()),
-                    null
-                )
-            } catch (_: Exception) {}
-
+            enviandoEntrega = false
             aplicarModoEntregaAceptada(obs)
 
-            val mensajeFinal = "Se ha enviado el comprobante firmado digitalmente.\n\n• El Supervisor ($nombreSupervisor) recibió la confirmación conforme.\n• Todos los insumos verificados fueron agregados al inventario de la sede."
-
-            MaterialAlertDialogBuilder(this@RegistrarEntregaActivity)
-                .setTitle("¡Entrega Aceptada Conforme!")
-                .setMessage(mensajeFinal)
-                .setPositiveButton("Aceptar") { _, _ ->
-                    finish()
+            // Mostrar alerta flotante limpia en la esquina superior derecha
+            binding.cardAlertaExito.alpha = 0f
+            binding.cardAlertaExito.visibility = View.VISIBLE
+            binding.cardAlertaExito.animate().alpha(1f).setDuration(200).start()
+            binding.btnCerrarAlertaExito.setOnClickListener {
+                binding.cardAlertaExito.visibility = View.GONE
+            }
+            binding.cardAlertaExito.postDelayed({
+                if (!isFinishing && !isDestroyed) {
+                    binding.cardAlertaExito.animate().alpha(0f).setDuration(250).withEndAction {
+                        binding.cardAlertaExito.visibility = View.GONE
+                    }.start()
                 }
-                .setCancelable(false)
-                .show()
+            }, 3500)
         }
     }
 
