@@ -4,8 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="16dp"
     app:cardBackgroundColor="#FFFFFF"
-    app:cardCornerRadius="22dp"
+    app:cardCornerRadius="24dp"
     app:cardElevation="8dp"
     app:strokeColor="#F4B41F"
     app:strokeWidth="1.5dp">
@@ -22,156 +23,172 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <!-- TÍTULO DE LA VENTANA EMERGENTE -->
-            <TextView
-                android:id="@+id/txtTituloModal"
+            <!-- HANDLE SUPERIOR -->
+            <View
+                android:layout_width="36dp"
+                android:layout_height="4dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="12dp"
+                android:background="#CBD5E1" />
+
+            <!-- ENCABEZADO Y CERRAR -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="Editar Perfil"
-                android:textColor="#1B3317"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ACTUALIZA TU NOMBRE COMPLETO Y TELÉFONO DE CONTACTO"
+                        android:textColor="#92400E"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtTituloModal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Editar Perfil"
+                        android:textColor="#1E293B"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/btnCerrarEditarPerfil"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Cerrar"
+                    android:padding="6dp"
+                    android:src="@android:drawable/ic_menu_close_clear_cancel"
+                    app:tint="#64748B" />
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/txtSubtituloModal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:gravity="center"
-                android:text="Actualiza tu contraseña de acceso y teléfono de contacto."
-                android:textColor="#64748B"
-                android:textSize="12sp" />
+                android:visibility="gone" />
 
-            <!-- NOTA INSTITUCIONAL -->
-            <TextView
+            <!-- BANNER INFORMATIVO PAE -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/bg_banner_aprobado"
-                android:padding="10dp"
-                android:text="El nombre y correo son gestionados por el Administrador PAE. Puedes actualizar tu contraseña y teléfono."
-                android:textColor="#176B35"
-                android:textSize="11.5sp" />
+                android:layout_marginTop="14dp"
+                app:cardBackgroundColor="#E8F5E9"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#15803D"
+                app:strokeWidth="1dp">
 
-            <!-- NOMBRE (SOLO LECTURA) -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="12dp"
+                    android:text="El correo electrónico es gestionado por el Administrador PAE. Puedes actualizar tu nombre y teléfono de contacto."
+                    android:textColor="#15803D"
+                    android:textSize="11.5sp" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- CAMPO: NOMBRE COMPLETO -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="Nombre (Solo lectura)"
+                android:layout_marginTop="16dp"
+                android:text="Nombre completo"
                 android:textColor="#1E293B"
-                android:textSize="13sp"
+                android:textSize="12.5sp"
                 android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/edtNombre"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="46dp"
                 android:layout_marginTop="4dp"
                 android:background="@drawable/bg_input"
-                android:enabled="false"
-                android:focusable="false"
-                android:hint="Nombre completo"
+                android:hint="Maria Alejandra Velazco"
+                android:inputType="textPersonName"
                 android:paddingHorizontal="14dp"
                 android:singleLine="true"
-                android:textColor="#64748B"
-                android:textSize="14sp" />
+                android:textColor="#1E293B"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
-            <!-- CORREO (SOLO LECTURA) -->
+            <!-- CAMPO: CORREO (SOLO LECTURA) -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="14dp"
                 android:text="Correo (Solo lectura)"
                 android:textColor="#1E293B"
-                android:textSize="13sp"
+                android:textSize="12.5sp"
                 android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/edtCorreo"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="46dp"
                 android:layout_marginTop="4dp"
-                android:background="@drawable/bg_input"
+                android:background="@drawable/bg_tag_plato"
                 android:enabled="false"
                 android:focusable="false"
-                android:hint="Correo electrónico"
+                android:hint="mrgthmnss@gmail.com"
                 android:paddingHorizontal="14dp"
                 android:singleLine="true"
                 android:textColor="#64748B"
                 android:textSize="14sp" />
 
-            <!-- TELÉFONO -->
+            <!-- CAMPO: TELÉFONO DE CONTACTO -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="14dp"
                 android:text="Teléfono de contacto"
                 android:textColor="#1E293B"
-                android:textSize="13sp"
+                android:textSize="12.5sp"
                 android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/edtTelefono"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="46dp"
                 android:layout_marginTop="4dp"
                 android:background="@drawable/bg_input"
-                android:hint="Número de teléfono"
+                android:hint="314 582 1940"
                 android:inputType="phone"
                 android:paddingHorizontal="14dp"
                 android:singleLine="true"
                 android:textColor="#1E293B"
-                android:textSize="14sp" />
-
-            <!-- NUEVA CONTRASEÑA -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="Nueva contraseña"
-                android:textColor="#1E293B"
-                android:textSize="13sp"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
+            <!-- CAMPOS DE CONTRASEÑA OCULTOS (MANTENIDOS PARA BINDING) -->
             <EditText
                 android:id="@+id/edtPasswordNueva"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/bg_input"
-                android:hint="Ingresa la nueva contraseña"
-                android:inputType="textPassword"
-                android:paddingHorizontal="14dp"
-                android:singleLine="true"
-                android:textColor="#1E293B"
-                android:textSize="14sp" />
-
-            <!-- CONFIRMAR CONTRASEÑA -->
-            <TextView
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="Confirmar nueva contraseña"
-                android:textColor="#1E293B"
-                android:textSize="13sp"
-                android:textStyle="bold" />
+                android:visibility="gone" />
 
             <EditText
                 android:id="@+id/edtPasswordConfirmar"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/bg_input"
-                android:hint="Repite la nueva contraseña"
-                android:inputType="textPassword"
-                android:paddingHorizontal="14dp"
-                android:singleLine="true"
-                android:textColor="#1E293B"
-                android:textSize="14sp" />
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
 
-            <!-- BOTONES BORDES Y AMARILLO -->
+            <!-- BOTÓN GUARDAR CAMBIOS -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnGuardarCambios"
                 android:layout_width="match_parent"
@@ -183,19 +200,22 @@
                 android:textColor="#1B3317"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                app:cornerRadius="12dp" />
+                app:cornerRadius="14dp"
+                app:elevation="0dp" />
 
+            <!-- BOTÓN CANCELAR -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCancelar"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="46dp"
                 android:layout_marginTop="8dp"
                 android:text="Cancelar"
                 android:textAllCaps="false"
-                android:textColor="#64748B"
+                android:textColor="#1E293B"
                 android:textSize="14sp"
-                app:cornerRadius="12dp"
+                android:textStyle="bold"
+                app:cornerRadius="14dp"
                 app:strokeColor="#CBD5E1"
                 app:strokeWidth="1dp" />
 

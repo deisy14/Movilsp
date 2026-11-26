@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
+    android:layout_marginBottom="10dp"
     app:cardBackgroundColor="#FFFFFF"
     app:cardCornerRadius="14dp"
     app:cardElevation="2dp"
@@ -17,35 +17,14 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="12dp">
-
-        <!-- ESPACIO PARA LA IMAGEN DEL PRODUCTO / INGREDIENTE -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="54dp"
-            android:layout_height="54dp"
-            app:cardBackgroundColor="#F8FAFC"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp"
-            app:strokeColor="#E2E8F0"
-            app:strokeWidth="1dp">
-
-            <ImageView
-                android:id="@+id/imgProductoManipuladora"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:contentDescription="Imagen del producto"
-                android:padding="6dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_food" />
-
-        </com.google.android.material.card.MaterialCardView>
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="14dp">
 
         <!-- NOMBRE DEL PRODUCTO Y CATEGORÍA -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="14dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="12dp"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -56,7 +35,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:text="Nombre del Producto"
-                android:textColor="#1B3317"
+                android:textColor="#1E293B"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -64,26 +43,44 @@
                 android:id="@+id/txtCategoriaProductoManipuladora"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="Granos • Inventario Admin"
+                android:layout_marginTop="3dp"
+                android:text="Granos · Inventario Admin"
                 android:textColor="#64748B"
                 android:textSize="12sp" />
 
         </LinearLayout>
 
-        <!-- CANTIDAD Y UNIDAD DE MEDIDA JUNTOS (EJ: 20kg, 50u, 30L) -->
-        <TextView
-            android:id="@+id/txtCantidadUnidadManipuladora"
+        <!-- CANTIDAD (PASTILLA) Y ESTADO DISPONIBLE/AGOTADO ABAJO -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_pill_green"
-            android:gravity="center"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="6dp"
-            android:text="20kg"
-            android:textColor="#1B3317"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtCantidadUnidadManipuladora"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_pill_green"
+                android:gravity="center"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="5dp"
+                android:text="20K"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtEstadoProductoManipuladora"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="Disponible"
+                android:textColor="#15803D"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

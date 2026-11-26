@@ -22,6 +22,8 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.data.api.RetrofitClient
@@ -90,6 +92,17 @@ class ReconocimientoFacialActivity : AppCompatActivity() {
 
         binding = ActivityReconocimientoFacialBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            binding.layoutTopBarFacial.setPadding(
+                (20 * resources.displayMetrics.density).toInt(),
+                systemBars.top + (10 * resources.displayMetrics.density).toInt(),
+                (20 * resources.displayMetrics.density).toInt(),
+                (14 * resources.displayMetrics.density).toInt()
+            )
+            insets
+        }
 
         modoActual = intent.getStringExtra(EXTRA_MODO) ?: MODO_LOGIN
         correoRegistro = intent.getStringExtra(EXTRA_CORREO)?.ifBlank { null } ?: sessionManager.getUserEmail()

@@ -1,154 +1,302 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="#FAF9F5"
+    tools:context=".ui.manipuladora.MenuDiaActivity">
 
-    <!-- ===================================== -->
-    <!-- CONTENIDO QUE SE PUEDE DESLIZAR -->
-    <!-- ===================================== -->
+    <!-- BARRA SUPERIOR FIJA STICKY (ALWAYS ON TOP) -->
+    <include
+        android:id="@+id/includeStickyBar"
+        layout="@layout/view_sticky_top_bar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:elevation="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <!-- CONTENIDO CON SCROLL -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:fillViewport="true"
-        android:paddingBottom="90dp">
+        android:overScrollMode="never"
+        android:scrollbars="none"
+        app:layout_constraintTop_toBottomOf="@id/includeStickyBar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:paddingHorizontal="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="24dp">
 
-            <!-- =============================== -->
-            <!-- BARRA SUPERIOR -->
-            <!-- =============================== -->
-
+            <!-- SUB-ENCABEZADO: FLECHA ATRÁS, TÍTULO Y RACIONES -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingBottom="16dp">
+                android:layout_marginBottom="16dp">
 
-                <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:contentDescription="Volver"
-                    android:src="@drawable/ic_arrow_back"
-                    app:tint="#173F2A" />
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/btnVolverMenu"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="18dp"
+                    app:cardElevation="1dp"
+                    app:strokeColor="#CBD5E1"
+                    app:strokeWidth="1dp">
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="SIRAE"
-                    android:textColor="#176B35"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
-
-                <View
-                    android:layout_width="28dp"
-                    android:layout_height="28dp" />
-
-            </LinearLayout>
-
-
-            <!-- =============================== -->
-            <!-- FECHA Y TURNO -->
-            <!-- =============================== -->
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="65dp"
-                android:background="@drawable/bg_manana_activo"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="14dp">
-
-                <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:contentDescription="Calendario"
-                    android:src="@drawable/ic_calendar"
-                    app:tint="#173F2A" />
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="Volver"
+                        android:src="@drawable/ic_arrow_back"
+                        app:tint="#1E293B" />
+                </com.google.android.material.card.MaterialCardView>
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
                     android:layout_weight="1"
-                    android:layout_marginStart="10dp"
                     android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Martes, 3 Sep 2026"
-                        android:textColor="#173F2A"
-                        android:textSize="13sp"
+                        android:text="Menú del día"
+                        android:textColor="#1E293B"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Turno asignado"
-                        android:textColor="#4A5A4F"
-                        android:textSize="11sp" />
+                        android:text="Revisa los platos asignados para hoy"
+                        android:textColor="#64748B"
+                        android:textSize="11.5sp" />
 
                 </LinearLayout>
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_pill_light_green"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="6dp"
+                    android:text="165 raciones"
+                    android:textColor="#1B3317"
+                    android:textSize="11.5sp"
+                    android:textStyle="bold" />
+
             </LinearLayout>
 
-
-            <!-- =============================== -->
-            <!-- TITULO -->
-            <!-- =============================== -->
-
-            <TextView
-                android:layout_width="wrap_content"
+            <!-- TARJETA FECHA Y TURNO ASIGNADO -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"
-                android:text="Menú del día"
-                android:textColor="#173F2A"
-                android:textSize="24sp"
-                android:textStyle="bold" />
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="2dp"
+                app:strokeColor="#F4B41F"
+                app:strokeWidth="1.5dp">
 
-            <TextView
-                android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="14dp">
+
+                    <FrameLayout
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/bg_pill_green">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_calendar"
+                            app:tint="#FFFFFF" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Sábado, 21 Nov 2026"
+                            android:textColor="#1E293B"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Turno asignado · Mañana (6:00 a. m. – 2:00 p. m.)"
+                            android:textColor="#64748B"
+                            android:textSize="11.5sp" />
+
+                    </LinearLayout>
+
+                    <!-- SELECTOR MAÑANA / TARDE -->
+                    <LinearLayout
+                        android:layout_width="130dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_tag_plato"
+                        android:orientation="horizontal"
+                        android:padding="2dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_pill_green"
+                            android:gravity="center"
+                            android:text="Mañana"
+                            android:textColor="#FFFFFF"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="Tarde"
+                            android:textColor="#64748B"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- BOTÓN PRINCIPAL: VER COMPONENTES -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnVerComponentes"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="14dp"
+                android:backgroundTint="#F4B41F"
+                android:text="Ver componentes  ➔"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:cornerRadius="14dp"
+                app:elevation="0dp" />
+
+            <!-- TARJETA VERDE OSCURO (#1B3317): CRUCE CON INVENTARIO EN BODEGA -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Revisa los platos asignados para hoy"
-                android:textColor="#65736A"
-                android:textSize="14sp" />
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="#1B3317"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="3dp"
+                app:strokeWidth="0dp">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
 
-            <!-- =============================== -->
-            <!-- PLATO PRINCIPAL (dinámico) -->
-            <!-- =============================== -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="CRUCE CON INVENTARIO EN BODEGA"
+                            android:textColor="#FFFFFF"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="6 insumos disponibles · 1 agotado"
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Stock verificado para 3 tiempos de comida"
+                            android:textColor="#FFFFFF"
+                            android:textSize="11.5sp" />
+
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnIrInventarioMenu"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="38dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:text="Inventario  ➔"
+                        android:textAllCaps="false"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="#2A5226"
+                        app:cornerRadius="12dp"
+                        app:strokeColor="#3A6A34"
+                        app:strokeWidth="1dp" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- CONTENEDOR DINÁMICO DE PLATOS Y MENÚS (DESAYUNO, ALMUERZO, MERIENDA) -->
             <LinearLayout
                 android:id="@+id/contenedorPlatoPrincipal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
+                android:layout_marginTop="16dp"
                 android:orientation="vertical" />
-
-
-            <!-- =============================== -->
-            <!-- OTROS PLATOS (dinámico) -->
-            <!-- =============================== -->
 
             <TextView
                 android:id="@+id/tvOtrosPlatos"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"
+                android:layout_marginTop="16dp"
                 android:text="Otros platos"
-                android:textColor="#173F2A"
+                android:textColor="#1E293B"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:visibility="gone" />
@@ -159,44 +307,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
 
-
-            <!-- =============================== -->
-            <!-- BOTÓN -->
-            <!-- =============================== -->
-
-            <Button
-                android:id="@+id/btnVerComponentes"
-                android:layout_width="match_parent"
-                android:layout_height="58dp"
-                android:layout_marginTop="24dp"
-                android:backgroundTint="#FFD928"
-                android:text="Ver componentes     ›"
-                android:textAllCaps="false"
-                android:textColor="#173F2A"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-
-            <!-- Espacio para que el último contenido -->
-            <!-- no quede oculto detrás de la barra -->
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="90dp" />
-
         </LinearLayout>
 
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
-
-    <!-- ===================================== -->
-    <!-- BARRA INFERIOR FIJA -->
-    <!-- ===================================== -->
-
-    <include
-        layout="@layout/activity_barra_navegacion"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom" />
-
-</FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
