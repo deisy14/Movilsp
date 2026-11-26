@@ -5,13 +5,20 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
+import android.view.View
+import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.lifecycle.lifecycleScope
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.databinding.ActivityBarraNavegacionBinding
+import com.example.movilmanupuladora.databinding.PopupNotificacionesBinding
 import com.example.movilmanupuladora.ui.manipuladora.AsignadasActivity
 import com.example.movilmanupuladora.ui.manipuladora.AvisosActivity
 import com.example.movilmanupuladora.ui.manipuladora.InventarioActivity
 import com.example.movilmanupuladora.ui.manipuladora.MainActivity
 import com.example.movilmanupuladora.ui.manipuladora.PerfilActivity
+import com.example.movilmanupuladora.ui.manipuladora.PreparacionActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.launch
 
 object NavigationHelper {
 
@@ -136,6 +143,116 @@ object NavigationHelper {
                 @Suppress("DEPRECATION")
                 activity.overridePendingTransition(0, 0)
                 activity.finish()
+            }
+        }
+    }
+
+    fun showNotificationPopup(activity: Activity) {
+        val popupBinding = PopupNotificacionesBinding.inflate(activity.layoutInflater)
+        popupBinding.txtCantidadNotificaciones.text = "0"
+        popupBinding.contenedorSinNotificaciones.visibility = View.GONE
+        popupBinding.contenedorNotificaciones.visibility = View.VISIBLE
+
+        if (activity is androidx.lifecycle.LifecycleOwner) {
+            activity.lifecycleScope.launch {
+                try {
+                    val response = com.example.movilmanupuladora.data.api.RetrofitClient.apiService.obtenerNotificaciones()
+                    if (response.isSuccessful && !response.body().isNullOrEmpty()) {
+                        val notifs = response.body()!!
+                        val noLeidas = notifs.count { it.leido == false }
+                        popupBinding.txtCantidadNotificaciones.text = noLeidas.toString()
+                        if (notifs.isEmpty()) {
+                            popupBinding.contenedorNotificaciones.visibility = View.GONE
+                            popupBinding.contenedorSinNotificaciones.visibility = View.VISIBLE
+                        } else {
+                            popupBinding.contenedorNotificaciones.visibility = View.VISIBLE
+                            popupBinding.contenedorSinNotificaciones.visibility = View.GONE
+                        }
+                    } else {
+                        popupBinding.txtCantidadNotificaciones.text = "0"
+                        popupBinding.contenedorNotificaciones.visibility = View.GONE
+                        popupBinding.contenedorSinNotificaciones.visibility = View.VISIBLE
+                    }
+                } catch (_: Exception) {
+                    popupBinding.txtCantidadNotificaciones.text = "0"
+                    popupBinding.contenedorNotificaciones.visibility = View.GONE
+                    popupBinding.contenedorSinNotificaciones.visibility = View.VISIBLE
+                }
+            }
+        }
+
+        val dialog = MaterialAlertDialogBuilder(activity)
+            .setView(popupBinding.root)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        popupBinding.notificacionPreparacion.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(activity, PreparacionActivity::class.java)
+            activity.startActivity(intent)
+        }
+
+        popupBinding.notificacionInventario.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(activity, InventarioActivity::class.java)
+            activity.startActivity(intent)
+        }
+
+        popupBinding.notificacionAsistencia.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(activity, AsignadasActivity::class.java)
+            activity.startActivity(intent)
+        }
+
+        popupBinding.btnVerTodasNotificaciones.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(activity, AvisosActivity::class.java)
+            activity.startActivity(intent)
+        }
+
+        dialog.show()
+    }
+
+    fun setupStickyTopBar(
+        activity: Activity,
+        rootView: View,
+        lifecycleScope: LifecycleCoroutineScope? = null,
+        onNotificationClick: (() -> Unit)? = null
+    ) {
+        val sessionMgr = SessionManager(activity)
+        val nombreUser = sessionMgr.getUserName() ?: "Manipuladora"
+        val sedeNombre = sessionMgr.getUbicacionCompleta()
+
+        val tvNombre = rootView.findViewById<android.widget.TextView>(R.id.tvNombreUsuarioSticky)
+        val tvInst = rootView.findViewById<android.widget.TextView>(R.id.tvInstitucion)
+        val btnNotif = rootView.findViewById<View>(R.id.btnNotificaciones)
+        val badge = rootView.findViewById<View>(R.id.badgeNotificacionesSticky)
+
+        tvNombre?.text = nombreUser
+        tvInst?.text = if (sedeNombre.isNotBlank()) sedeNombre else "Sede Principal"
+
+        btnNotif?.setOnClickListener {
+            if (onNotificationClick != null) {
+                onNotificationClick()
+            } else {
+                showNotificationPopup(activity)
+            }
+        }
+
+        if (lifecycleScope != null) {
+            lifecycleScope.launch {
+                try {
+                    val response = com.example.movilmanupuladora.data.api.RetrofitClient.apiService.obtenerNotificaciones()
+                    if (response.isSuccessful && !response.body().isNullOrEmpty()) {
+                        val noLeidas = response.body()!!.count { it.leido == false }
+                        badge?.visibility = if (noLeidas > 0) View.VISIBLE else View.GONE
+                    } else {
+                        badge?.visibility = View.GONE
+                    }
+                } catch (_: Exception) {
+                    badge?.visibility = View.GONE
+                }
             }
         }
     }
