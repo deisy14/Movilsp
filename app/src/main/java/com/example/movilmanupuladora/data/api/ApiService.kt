@@ -253,6 +253,12 @@ interface ApiService {
         @retrofit2.http.Query("estado") estado: String? = null
     ): Response<List<com.example.movilmanupuladora.data.model.EntregaItem>>
 
+    @GET("entregas/")
+    suspend fun obtenerEntregasRaw(
+        @retrofit2.http.Query("id_sede") idSede: Int? = null,
+        @retrofit2.http.Query("estado") estado: String? = null
+    ): Response<com.google.gson.JsonElement>
+
     @POST("entregas/{id}/confirmar-recepcion/")
     suspend fun confirmarRecepcionEntrega(
         @Path("id") idEntrega: Int,
@@ -287,6 +293,9 @@ interface ApiService {
     suspend fun obtenerConfiguracionSede(
         @retrofit2.http.Path("id") id: Int
     ): Response<com.google.gson.JsonElement>
+
+    @GET("jornadas/")
+    suspend fun obtenerJornadasRaw(): Response<com.google.gson.JsonElement>
 
     // =========================================================
     // RECONOCIMIENTO FACIAL BIOMÉTRICO (SIRAE)

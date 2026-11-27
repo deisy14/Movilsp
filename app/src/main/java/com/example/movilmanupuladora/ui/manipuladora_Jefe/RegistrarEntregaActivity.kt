@@ -150,20 +150,30 @@ class RegistrarEntregaActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 // Traer todas las entregas para poder consultar tanto las pendientes como las ya recibidas
-                val resp = RetrofitClient.apiService.obtenerEntregas(
+                val resp = RetrofitClient.apiService.obtenerEntregasRaw(
                     idSede = if (idSede > 0) idSede else null,
                     estado = null
                 )
-                if (resp.isSuccessful) {
-                    val lista = resp.body()
-                    if (!lista.isNullOrEmpty()) {
+                if (resp.isSuccessful && resp.body() != null) {
+                    val root = resp.body()!!
+                    val arr = when {
+                        root.isJsonArray -> root.asJsonArray
+                        root.isJsonObject && root.asJsonObject.has("results") -> root.asJsonObject.getAsJsonArray("results")
+                        root.isJsonObject && root.asJsonObject.has("data") -> root.asJsonObject.getAsJsonArray("data")
+                        else -> null
+                    }
+                    val listType = object : com.google.gson.reflect.TypeToken<List<com.example.movilmanupuladora.data.model.EntregaItem>>() {}.type
+                    val lista: List<com.example.movilmanupuladora.data.model.EntregaItem> =
+                        if (arr != null) com.google.gson.Gson().fromJson(arr, listType) ?: emptyList() else emptyList()
+                    if (lista.isNotEmpty()) {
                         val remisionParam = intent.getStringExtra("numero_remision")?.trim() ?: numeroRemision.trim()
                         val entregasRemision = if (remisionParam.isNotBlank()) {
                             lista.filter {
-                                val doc = it.documentoEntrega?.trim() ?: ""
-                                doc.equals(remisionParam, ignoreCase = true) ||
-                                        doc.contains(remisionParam, ignoreCase = true) ||
-                                        remisionParam.contains(doc, ignoreCase = true)
+                                val doc = it.documentoEntrega?.trim().orEmpty()
+                                doc.isNotBlank() && (
+                                        doc.equals(remisionParam, ignoreCase = true) ||
+                                                doc.contains(remisionParam, ignoreCase = true)
+                                        )
                             }
                         } else {
                             val primerDoc = lista.firstOrNull { !it.documentoEntrega.isNullOrBlank() }?.documentoEntrega

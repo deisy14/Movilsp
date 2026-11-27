@@ -163,12 +163,22 @@
 
                     </LinearLayout>
 
-                    <!-- ENCABEZADOS DÍAS DE LA SEMANA (LUN - DOM) -->
+                    <!-- ENCABEZADOS DÍAS DE LA SEMANA (DOM - SÁB) -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="Dom"
+                            android:textColor="#94A3B8"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="0dp"
@@ -230,16 +240,6 @@
                             android:textSize="12sp"
                             android:textStyle="bold" />
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:text="Dom"
-                            android:textColor="#94A3B8"
-                            android:textSize="12sp"
-                            android:textStyle="bold" />
-
                     </LinearLayout>
 
                     <!-- CONTENEDOR DE LA CUADRÍCULA DE DÍAS (FILAS DINÁMICAS) -->
@@ -252,72 +252,6 @@
 
                 </LinearLayout>
 
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- TARJETA / BOTÓN AMARILLO DE ASISTENCIA DEL DÍA -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardAsistenciaDia"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="4dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                android:visibility="visible"
-                app:cardBackgroundColor="#FEF3C7"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="1dp"
-                app:strokeColor="#F59E0B"
-                app:strokeWidth="1.5dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="14dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/txtTituloAsistencia"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="👥 Asistencia del Día"
-                            android:textColor="#92400E"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/txtTotalAsistenciaDia"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/bg_chip_pendiente"
-                            android:paddingStart="10dp"
-                            android:paddingTop="4dp"
-                            android:paddingEnd="10dp"
-                            android:paddingBottom="4dp"
-                            android:text="Editar asistencia"
-                            android:textColor="#92400E"
-                            android:textSize="11sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/txtDetalleGradosAsistenciaDia"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Sin registro de asistencia"
-                        android:textColor="#78350F"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <!-- TRES TARJETAS DE MENÚ DEL DÍA (DESAYUNO, ALMUERZO, MERIENDA) -->
@@ -676,6 +610,86 @@
                 </com.google.android.material.card.MaterialCardView>
 
             </LinearLayout>
+
+            <!-- TARJETA / BOTÓN AMARILLO DE ASISTENCIA DEL DÍA (DE ÚLTIMO) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardAsistenciaDia"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="4dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:visibility="visible"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:strokeColor="#FDE68A"
+                app:strokeWidth="1.5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="14dp">
+
+                    <FrameLayout
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:layout_marginEnd="12dp"
+                        android:background="@drawable/bg_chip_pendiente">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="Asistencia del día"
+                            android:src="@drawable/ic_clipboard_asistencia" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/txtTituloAsistencia"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Asistencia del día"
+                            android:textColor="#64748B"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/txtDetalleGradosAsistenciaDia"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Sin registro de asistencia"
+                            android:textColor="#1E293B"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/txtTotalAsistenciaDia"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_btn_amarillo_pill"
+                        android:paddingStart="16dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="8dp"
+                        android:text="Registrar"
+                        android:textColor="#1E293B"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 

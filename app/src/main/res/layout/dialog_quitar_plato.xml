@@ -5,69 +5,144 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardBackgroundColor="#FFFFFF"
-    app:cardCornerRadius="22dp"
+    app:cardCornerRadius="26dp"
     app:cardElevation="8dp"
-    app:strokeColor="#F4B41F"
-    app:strokeWidth="1.5dp">
+    app:strokeColor="#F1F5F9"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:paddingHorizontal="20dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="22dp">
 
         <TextView
             android:id="@+id/txtTituloQuitarPlato"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Quitar plato del servicio"
-            android:textColor="#1B3317"
+            android:text="¿Quitar plato del servicio?"
+            android:textColor="#1E293B"
             android:textSize="19sp"
             android:textStyle="bold" />
 
-        <View
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardPreviewQuitarPlato"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="14dp"
-            android:background="#E2E8F0" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#F3E8D2"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="12dp">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/imgPlatoQuitarModal"
+                    android:layout_width="86dp"
+                    android:layout_height="76dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/plato1"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.SmallComponent" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvNombrePlatoQuitarModal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="3"
+                        android:text="Plato seleccionado"
+                        android:textColor="#1E293B"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_chip_pendiente"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="5dp">
+
+                        <TextView
+                            android:id="@+id/tvBadgeQuitarModal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Desayuno"
+                            android:textColor="#1E293B"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:id="@+id/txtMensajeQuitarPlato"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="¿Estás segura de que deseas quitar este plato del servicio?"
-            android:textColor="#334155"
-            android:textSize="14sp"
-            android:lineSpacingExtra="5dp" />
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:lineSpacingExtra="2dp"
+            android:text="Esta acción eliminará el plato del servicio\nseleccionado."
+            android:textColor="#475569"
+            android:textSize="13sp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSiQuitar"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_marginTop="20dp"
-            android:backgroundTint="#F4B41F"
+            android:layout_marginTop="18dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
             android:text="Sí, quitar"
             android:textAllCaps="false"
-            android:textColor="#1B3317"
-            android:textSize="14sp"
+            android:textColor="#1E293B"
+            android:textSize="15sp"
             android:textStyle="bold"
-            app:cornerRadius="12dp" />
+            app:backgroundTint="#FBC02D"
+            app:cornerRadius="24dp"
+            app:elevation="0dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCancelarQuitar"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
             android:text="Cancelar"
             android:textAllCaps="false"
-            android:textColor="#64748B"
-            android:textSize="14sp"
-            app:cornerRadius="12dp"
-            app:strokeColor="#CBD5E1"
-            app:strokeWidth="1dp" />
+            android:textColor="#1E293B"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:backgroundTint="#FFFFFF"
+            app:cornerRadius="24dp"
+            app:strokeColor="#1E293B"
+            app:strokeWidth="1.2dp" />
 
     </LinearLayout>
 

@@ -93,6 +93,8 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 SedeContratoManager.sincronizarSeccionesContrato(this@MenuDelDiaMesActivity, idSedeSincronizar)
+                PreparacionSyncManager.sincronizarMenusPorFechaDesdeBackend(this@MenuDelDiaMesActivity)
+                generarGridMes()
                 actualizarDetallePlatos()
             } catch (_: Exception) { }
         }
@@ -107,6 +109,8 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 SedeContratoManager.sincronizarSeccionesContrato(this@MenuDelDiaMesActivity, idSedeSincronizar)
+                PreparacionSyncManager.sincronizarMenusPorFechaDesdeBackend(this@MenuDelDiaMesActivity)
+                generarGridMes()
                 actualizarDetallePlatos()
             } catch (_: Exception) { }
         }
@@ -234,16 +238,16 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
         val calGrid = mesActual.clone() as Calendar
         calGrid.set(Calendar.DAY_OF_MONTH, 1)
 
-        // Encontrar el día de inicio respecto al Lunes (1 = Lun, 2 = Mar, ..., 7 = Dom)
+        // Encontrar el día de inicio respecto al Domingo (0 = Dom, 1 = Lun, ..., 6 = Sáb)
         val primerDiaSemana = calGrid.get(Calendar.DAY_OF_WEEK)
-        val offsetLunes = when (primerDiaSemana) {
-            Calendar.MONDAY -> 0
-            Calendar.TUESDAY -> 1
-            Calendar.WEDNESDAY -> 2
-            Calendar.THURSDAY -> 3
-            Calendar.FRIDAY -> 4
-            Calendar.SATURDAY -> 5
-            Calendar.SUNDAY -> 6
+        val offsetDomingo = when (primerDiaSemana) {
+            Calendar.SUNDAY -> 0
+            Calendar.MONDAY -> 1
+            Calendar.TUESDAY -> 2
+            Calendar.WEDNESDAY -> 3
+            Calendar.THURSDAY -> 4
+            Calendar.FRIDAY -> 5
+            Calendar.SATURDAY -> 6
             else -> 0
         }
 
@@ -256,7 +260,7 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
 
         var diaMesActual = 1
         var diaMesSiguiente = 1
-        val totalSemanas = if (offsetLunes + diasEnMes > 35) 6 else 5
+        val totalSemanas = if (offsetDomingo + diasEnMes > 35) 6 else 5
 
         for (semana in 0 until totalSemanas) {
             val fila = LinearLayout(this).apply {
@@ -286,9 +290,9 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
                 }
 
                 when {
-                    indiceTotal < offsetLunes -> {
+                    indiceTotal < offsetDomingo -> {
                         // Días del mes anterior
-                        val numDia = maxDiasMesAnterior - offsetLunes + indiceTotal + 1
+                        val numDia = maxDiasMesAnterior - offsetDomingo + indiceTotal + 1
                         txtDia.text = numDia.toString()
                         txtDia.setTextColor(Color.parseColor("#CBD5E1"))
                     }
@@ -314,6 +318,8 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
                         val isToday = esMismoDia(calDiaActual, Calendar.getInstance())
                         val isPast = calDiaActual.before(hoyCero)
                         val isSelected = esMismoDia(calDiaActual, diaSeleccionado)
+                        val dayOfWeek = calDiaActual.get(Calendar.DAY_OF_WEEK)
+                        val esFinDeSemana = dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY
 
                         val fStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calDiaActual.time)
                         val tieneMenu = !sessionManager.getPlatoDiaServicio(this, fStr, "Desayuno").isNullOrBlank() ||
@@ -321,6 +327,12 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
                                         !sessionManager.getPlatoDiaServicio(this, fStr, "Merienda").isNullOrBlank()
 
                         when {
+                            esFinDeSemana -> {
+                                // Sábados y domingos no son días escolares PAE: sin bolita y no programables
+                                txtDia.background = null
+                                txtDia.setTextColor(Color.parseColor("#CBD5E1"))
+                                txtDia.typeface = android.graphics.Typeface.DEFAULT
+                            }
                             isSelected -> {
                                 txtDia.setBackgroundResource(R.drawable.circulo_amarillo_badge)
                                 txtDia.setTextColor(Color.parseColor("#1E293B"))
@@ -333,19 +345,24 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
                                 txtDia.typeface = android.graphics.Typeface.DEFAULT_BOLD
                             }
                             else -> {
-                                // Días posteriores sin menú seleccionado: circulitos grises
+                                // Días escolares sin menú seleccionado: circulitos grises
                                 txtDia.setBackgroundResource(R.drawable.bg_pill_gray)
                                 txtDia.setTextColor(Color.parseColor("#64748B"))
                                 txtDia.typeface = android.graphics.Typeface.DEFAULT_BOLD
                             }
                         }
 
-                        cellContainer.isClickable = true
-                        cellContainer.isFocusable = true
-                        cellContainer.setOnClickListener {
-                            diaSeleccionado = calDiaActual
-                            generarGridMes()
-                            actualizarDetallePlatos()
+                        if (!esFinDeSemana) {
+                            cellContainer.isClickable = true
+                            cellContainer.isFocusable = true
+                            cellContainer.setOnClickListener {
+                                diaSeleccionado = calDiaActual
+                                generarGridMes()
+                                actualizarDetallePlatos()
+                            }
+                        } else {
+                            cellContainer.isClickable = false
+                            cellContainer.isFocusable = false
                         }
 
                         diaMesActual++
@@ -379,26 +396,26 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
             } else {
                 registrosFecha.sumOf { it.ninosPresentes }
             }
-            binding.txtTotalAsistenciaDia.text = "$total niños • Editar"
+            binding.txtTotalAsistenciaDia.text = "Editar"
             binding.txtDetalleGradosAsistenciaDia.text = if (regPrimaria != null || regSecundaria != null) {
-                "Primaria: ${regPrimaria?.ninosPresentes ?: 0} • Secundaria: ${regSecundaria?.ninosPresentes ?: 0} (toca para editar)"
+                "$total niños • Prim: ${regPrimaria?.ninosPresentes ?: 0} • Sec: ${regSecundaria?.ninosPresentes ?: 0}"
             } else {
-                "Total registrado: $total estudiantes (toca para editar)"
+                "$total estudiantes presentes"
             }
-        } else if (fechaClave == hoyClave) {
-            val p = AsistenciaManager.obtenerPrimaria(this)
-            val s = AsistenciaManager.obtenerSecundaria(this)
+        } else {
+            val pFecha = AsistenciaManager.obtenerPrimariaFecha(this, fechaClave)
+            val sFecha = AsistenciaManager.obtenerSecundariaFecha(this, fechaClave)
+            val totFecha = AsistenciaManager.obtenerTotalFecha(this, fechaClave)
+            val p = if (totFecha > 0) pFecha else if (fechaClave == hoyClave) AsistenciaManager.obtenerPrimaria(this) else 0
+            val s = if (totFecha > 0) sFecha else if (fechaClave == hoyClave) AsistenciaManager.obtenerSecundaria(this) else 0
             val tot = p + s
             if (tot > 0) {
-                binding.txtTotalAsistenciaDia.text = "$tot niños • Editar"
-                binding.txtDetalleGradosAsistenciaDia.text = "Primaria: $p • Secundaria: $s (toca para editar)"
+                binding.txtTotalAsistenciaDia.text = "Editar"
+                binding.txtDetalleGradosAsistenciaDia.text = "$tot niños • Prim: $p • Sec: $s"
             } else {
                 binding.txtTotalAsistenciaDia.text = "Registrar"
                 binding.txtDetalleGradosAsistenciaDia.text = "Sin registro de asistencia"
             }
-        } else {
-            binding.txtTotalAsistenciaDia.text = "Registrar"
-            binding.txtDetalleGradosAsistenciaDia.text = "Sin registro de asistencia"
         }
     }
 
@@ -455,8 +472,8 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
             binding.txtDetalleNombreDesayuno.text = customDes
             binding.txtDetalleNombreDesayuno.setTextColor(Color.parseColor("#1E293B"))
             binding.badgeEstadoDesayuno.text = "✓ Programado"
-            binding.badgeEstadoDesayuno.setBackgroundResource(R.drawable.bg_pill_green)
-            binding.badgeEstadoDesayuno.setTextColor(Color.parseColor("#2A5226"))
+            binding.badgeEstadoDesayuno.setBackgroundResource(R.drawable.bg_chip_pendiente)
+            binding.badgeEstadoDesayuno.setTextColor(Color.parseColor("#92400E"))
         } else if (esPasado) {
             val nomDes = menuDia.desayuno.nombre
             val imgDes = MenuPaeCatalog.obtenerImagenPorNombre(nomDes)
@@ -497,8 +514,8 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
             binding.txtDetalleNombreAlmuerzo.text = customAlm
             binding.txtDetalleNombreAlmuerzo.setTextColor(Color.parseColor("#1E293B"))
             binding.badgeEstadoAlmuerzo.text = "✓ Programado"
-            binding.badgeEstadoAlmuerzo.setBackgroundResource(R.drawable.bg_pill_green)
-            binding.badgeEstadoAlmuerzo.setTextColor(Color.parseColor("#2A5226"))
+            binding.badgeEstadoAlmuerzo.setBackgroundResource(R.drawable.bg_chip_pendiente)
+            binding.badgeEstadoAlmuerzo.setTextColor(Color.parseColor("#92400E"))
         } else if (esPasado) {
             val nomAlm = menuDia.almuerzo.nombre
             val imgAlm = MenuPaeCatalog.obtenerImagenPorNombre(nomAlm)
@@ -539,8 +556,8 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
             binding.txtDetalleNombreMerienda.text = customMer
             binding.txtDetalleNombreMerienda.setTextColor(Color.parseColor("#1E293B"))
             binding.badgeEstadoMerienda.text = "✓ Programado"
-            binding.badgeEstadoMerienda.setBackgroundResource(R.drawable.bg_pill_green)
-            binding.badgeEstadoMerienda.setTextColor(Color.parseColor("#2A5226"))
+            binding.badgeEstadoMerienda.setBackgroundResource(R.drawable.bg_chip_pendiente)
+            binding.badgeEstadoMerienda.setTextColor(Color.parseColor("#92400E"))
         } else if (esPasado) {
             val nomMer = menuDia.merienda.nombre
             val imgMer = MenuPaeCatalog.obtenerImagenPorNombre(nomMer)
@@ -675,7 +692,7 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
                         PreparacionSyncManager.guardarPlatoServicio(this@MenuDelDiaMesActivity, "Almuerzo", alm, idAlm, fClave)
                         try {
                             val body = mapOf(
-                                "id_jornada" to 1,
+                                "id_jornada" to 5,
                                 "fecha" to fClave,
                                 "ninos_presentes" to 120,
                                 "id_contrato" to 1,
@@ -699,7 +716,7 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
                         PreparacionSyncManager.guardarPlatoServicio(this@MenuDelDiaMesActivity, "Merienda", mer, idMer, fClave)
                         try {
                             val body = mapOf(
-                                "id_jornada" to 1,
+                                "id_jornada" to 5,
                                 "fecha" to fClave,
                                 "ninos_presentes" to 120,
                                 "id_contrato" to 1,

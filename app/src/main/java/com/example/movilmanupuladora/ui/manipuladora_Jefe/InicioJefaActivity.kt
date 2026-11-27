@@ -173,16 +173,16 @@ class InicioJefaActivity : AppCompatActivity() {
     }
 
     // =========================================================
-    // CONFIGURACIÓN DINÁMICA DE LA SEMANA (LUN - VIE)
+    // CONFIGURACIÓN DINÁMICA DE LA SEMANA (DOM - SÁB)
     // =========================================================
 
     private fun configurarSemanaActual() {
         diasSemanaActual.clear()
 
-        // Calcular el lunes de la semana actual
-        val calLunes = Calendar.getInstance().apply {
-            firstDayOfWeek = Calendar.MONDAY
-            set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        // Calcular el domingo de la semana actual
+        val calSemana = Calendar.getInstance().apply {
+            firstDayOfWeek = Calendar.SUNDAY
+            set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
             set(Calendar.HOUR_OF_DAY, 0)
             set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
@@ -190,25 +190,25 @@ class InicioJefaActivity : AppCompatActivity() {
         }
 
         for (i in 0 until 7) {
-            diasSemanaActual.add(calLunes.clone() as Calendar)
-            calLunes.add(Calendar.DAY_OF_MONTH, 1)
+            diasSemanaActual.add(calSemana.clone() as Calendar)
+            calSemana.add(Calendar.DAY_OF_MONTH, 1)
         }
 
-        // Subtítulo con rango de semana: e.g. "Menús programados · 2 – 8 de noviembre"
+        // Subtítulo con rango de semana: e.g. "Menús programados · 22 – 28 de noviembre"
         val primerDia = diasSemanaActual.first()
         val ultimoDia = diasSemanaActual.last()
         val mesNombre = SimpleDateFormat("MMMM", Locale.forLanguageTag("es-CO")).format(primerDia.time)
         val rangoTexto = "Menús programados · ${primerDia.get(Calendar.DAY_OF_MONTH)} – ${ultimoDia.get(Calendar.DAY_OF_MONTH)} de $mesNombre"
         binding.txtRangoSemana.text = rangoTexto
 
-        // Asignar los números de cada día
-        binding.txtNumDiaLun.text = diasSemanaActual[0].get(Calendar.DAY_OF_MONTH).toString()
-        binding.txtNumDiaMar.text = diasSemanaActual[1].get(Calendar.DAY_OF_MONTH).toString()
-        binding.txtNumDiaMie.text = diasSemanaActual[2].get(Calendar.DAY_OF_MONTH).toString()
-        binding.txtNumDiaJue.text = diasSemanaActual[3].get(Calendar.DAY_OF_MONTH).toString()
-        binding.txtNumDiaVie.text = diasSemanaActual[4].get(Calendar.DAY_OF_MONTH).toString()
-        binding.txtNumDiaSab.text = diasSemanaActual[5].get(Calendar.DAY_OF_MONTH).toString()
-        binding.txtNumDiaDom.text = diasSemanaActual[6].get(Calendar.DAY_OF_MONTH).toString()
+        // Asignar los números de cada día (Dom - Sáb)
+        binding.txtNumDiaDom.text = diasSemanaActual[0].get(Calendar.DAY_OF_MONTH).toString()
+        binding.txtNumDiaLun.text = diasSemanaActual[1].get(Calendar.DAY_OF_MONTH).toString()
+        binding.txtNumDiaMar.text = diasSemanaActual[2].get(Calendar.DAY_OF_MONTH).toString()
+        binding.txtNumDiaMie.text = diasSemanaActual[3].get(Calendar.DAY_OF_MONTH).toString()
+        binding.txtNumDiaJue.text = diasSemanaActual[4].get(Calendar.DAY_OF_MONTH).toString()
+        binding.txtNumDiaVie.text = diasSemanaActual[5].get(Calendar.DAY_OF_MONTH).toString()
+        binding.txtNumDiaSab.text = diasSemanaActual[6].get(Calendar.DAY_OF_MONTH).toString()
 
         // Por defecto seleccionar el día de hoy si está dentro de la semana
         val hoy = Calendar.getInstance()
@@ -221,14 +221,14 @@ class InicioJefaActivity : AppCompatActivity() {
     private fun seleccionarDia(cal: Calendar) {
         diaSeleccionado = cal.clone() as Calendar
 
-        // Actualizar visual de los 7 botones
-        actualizarBotonDia(binding.btnDiaLun, binding.txtNomDiaLun, binding.txtNumDiaLun, esMismoDia(diasSemanaActual[0], diaSeleccionado))
-        actualizarBotonDia(binding.btnDiaMar, binding.txtNomDiaMar, binding.txtNumDiaMar, esMismoDia(diasSemanaActual[1], diaSeleccionado))
-        actualizarBotonDia(binding.btnDiaMie, binding.txtNomDiaMie, binding.txtNumDiaMie, esMismoDia(diasSemanaActual[2], diaSeleccionado))
-        actualizarBotonDia(binding.btnDiaJue, binding.txtNomDiaJue, binding.txtNumDiaJue, esMismoDia(diasSemanaActual[3], diaSeleccionado))
-        actualizarBotonDia(binding.btnDiaVie, binding.txtNomDiaVie, binding.txtNumDiaVie, esMismoDia(diasSemanaActual[4], diaSeleccionado))
-        actualizarBotonDia(binding.btnDiaSab, binding.txtNomDiaSab, binding.txtNumDiaSab, esMismoDia(diasSemanaActual[5], diaSeleccionado))
-        actualizarBotonDia(binding.btnDiaDom, binding.txtNomDiaDom, binding.txtNumDiaDom, esMismoDia(diasSemanaActual[6], diaSeleccionado))
+        // Actualizar visual de los 7 botones (Dom - Sáb)
+        actualizarBotonDia(binding.btnDiaDom, binding.txtNomDiaDom, binding.txtNumDiaDom, esMismoDia(diasSemanaActual[0], diaSeleccionado))
+        actualizarBotonDia(binding.btnDiaLun, binding.txtNomDiaLun, binding.txtNumDiaLun, esMismoDia(diasSemanaActual[1], diaSeleccionado))
+        actualizarBotonDia(binding.btnDiaMar, binding.txtNomDiaMar, binding.txtNumDiaMar, esMismoDia(diasSemanaActual[2], diaSeleccionado))
+        actualizarBotonDia(binding.btnDiaMie, binding.txtNomDiaMie, binding.txtNumDiaMie, esMismoDia(diasSemanaActual[3], diaSeleccionado))
+        actualizarBotonDia(binding.btnDiaJue, binding.txtNomDiaJue, binding.txtNumDiaJue, esMismoDia(diasSemanaActual[4], diaSeleccionado))
+        actualizarBotonDia(binding.btnDiaVie, binding.txtNomDiaVie, binding.txtNumDiaVie, esMismoDia(diasSemanaActual[5], diaSeleccionado))
+        actualizarBotonDia(binding.btnDiaSab, binding.txtNomDiaSab, binding.txtNumDiaSab, esMismoDia(diasSemanaActual[6], diaSeleccionado))
 
         // Formatear texto de fecha: "Lun, 26 de octubre"
         val formato = SimpleDateFormat("EEE, d 'de' MMMM", Locale.forLanguageTag("es-CO"))
@@ -249,10 +249,10 @@ class InicioJefaActivity : AppCompatActivity() {
         activo: Boolean
     ) {
         if (activo) {
-            container.setBackgroundResource(R.drawable.bg_dia_semana_activo)
-            container.elevation = 4f * resources.displayMetrics.density
-            txtNombre.setTextColor(Color.WHITE)
-            txtNumero.setTextColor(Color.WHITE)
+            container.setBackgroundResource(R.drawable.bg_inicio_amarillo_suave)
+            container.elevation = 2f * resources.displayMetrics.density
+            txtNombre.setTextColor(Color.parseColor("#92400E"))
+            txtNumero.setTextColor(Color.parseColor("#92400E"))
         } else {
             container.setBackgroundResource(R.drawable.bg_dia_semana_inactivo)
             container.elevation = 0f
@@ -426,14 +426,14 @@ class InicioJefaActivity : AppCompatActivity() {
     // =========================================================
 
     private fun configurarEventos() {
-        // Clic en los días de la semana (7 días)
-        binding.btnDiaLun.setOnClickListener { if (diasSemanaActual.isNotEmpty()) seleccionarDia(diasSemanaActual[0]) }
-        binding.btnDiaMar.setOnClickListener { if (diasSemanaActual.size > 1) seleccionarDia(diasSemanaActual[1]) }
-        binding.btnDiaMie.setOnClickListener { if (diasSemanaActual.size > 2) seleccionarDia(diasSemanaActual[2]) }
-        binding.btnDiaJue.setOnClickListener { if (diasSemanaActual.size > 3) seleccionarDia(diasSemanaActual[3]) }
-        binding.btnDiaVie.setOnClickListener { if (diasSemanaActual.size > 4) seleccionarDia(diasSemanaActual[4]) }
-        binding.btnDiaSab.setOnClickListener { if (diasSemanaActual.size > 5) seleccionarDia(diasSemanaActual[5]) }
-        binding.btnDiaDom.setOnClickListener { if (diasSemanaActual.size > 6) seleccionarDia(diasSemanaActual[6]) }
+        // Clic en los días de la semana (Dom - Sáb)
+        binding.btnDiaDom.setOnClickListener { if (diasSemanaActual.isNotEmpty()) seleccionarDia(diasSemanaActual[0]) }
+        binding.btnDiaLun.setOnClickListener { if (diasSemanaActual.size > 1) seleccionarDia(diasSemanaActual[1]) }
+        binding.btnDiaMar.setOnClickListener { if (diasSemanaActual.size > 2) seleccionarDia(diasSemanaActual[2]) }
+        binding.btnDiaMie.setOnClickListener { if (diasSemanaActual.size > 3) seleccionarDia(diasSemanaActual[3]) }
+        binding.btnDiaJue.setOnClickListener { if (diasSemanaActual.size > 4) seleccionarDia(diasSemanaActual[4]) }
+        binding.btnDiaVie.setOnClickListener { if (diasSemanaActual.size > 5) seleccionarDia(diasSemanaActual[5]) }
+        binding.btnDiaSab.setOnClickListener { if (diasSemanaActual.size > 6) seleccionarDia(diasSemanaActual[6]) }
 
         // Clic en "Historial ->" -> Abre MenuDelDiaMesActivity (pantalla de Historial mensual)
         binding.btnHistorialMenus.setOnClickListener {
@@ -443,9 +443,11 @@ class InicioJefaActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // Clic en "Programar siguiente semana" -> Abre PlanificacionSemanalJefaActivity
+        // Clic en "Programar siguiente semana" -> Abre PlanificacionSemanalJefaActivity en la próxima semana
         binding.bannerCalendarioMes.setOnClickListener {
-            val intent = Intent(this, PlanificacionSemanalJefaActivity::class.java)
+            val intent = Intent(this, PlanificacionSemanalJefaActivity::class.java).apply {
+                putExtra("semana_offset", 1)
+            }
             startActivity(intent)
         }
 
@@ -621,21 +623,23 @@ class InicioJefaActivity : AppCompatActivity() {
     }
 
     private fun actualizarResumen() {
-        val p = AsistenciaManager.obtenerPrimaria(this)
-        val s = AsistenciaManager.obtenerSecundaria(this)
-        val suma = p + s
-        val guardados = if (suma > 0) {
-            suma
+        val primariaHoy = AsistenciaManager.obtenerPrimaria(this)
+        val secundariaHoy = AsistenciaManager.obtenerSecundaria(this)
+        val totalAsistenciaHoy = primariaHoy + secundariaHoy
+        val cuposTotales = SedeContratoManager.obtenerCuposSede(this)
+
+        binding.txtRacionesTotales.text = primariaHoy.toString()
+        binding.txtMenusActivos.text = secundariaHoy.toString()
+        binding.txtCantManipuladoras.text = cuposTotales.toString()
+
+        if (cuposTotales > 0 && totalAsistenciaHoy > cuposTotales) {
+            binding.txtAlertaExcesoCupos.visibility = View.VISIBLE
+            binding.txtAlertaExcesoCupos.text = "⚠️ Excede el total de cupos ($totalAsistenciaHoy / $cuposTotales)"
+            binding.txtCantManipuladoras.setTextColor(Color.parseColor("#DC2626"))
         } else {
-            AsistenciaManager.obtenerManana(this)
+            binding.txtAlertaExcesoCupos.visibility = View.GONE
+            binding.txtCantManipuladoras.setTextColor(Color.parseColor("#1E293B"))
         }
-
-        binding.txtRacionesTotales.text = guardados.toString()
-        binding.txtMenusActivos.text = SedeContratoManager.obtenerSeccionesActivas(this).ifEmpty { setOf("Desayuno") }.size.toString()
-
-        val idSede = sessionManager.getSedeId().takeIf { it > 0 }
-        val cantManipuladoras = ManipuladorasManager.obtenerManipuladorasSede(idSede, sessionManager.getSedeNombre(), this).size
-        binding.txtCantManipuladoras.text = cantManipuladoras.toString()
         actualizarBadgeNotificaciones()
     }
 
