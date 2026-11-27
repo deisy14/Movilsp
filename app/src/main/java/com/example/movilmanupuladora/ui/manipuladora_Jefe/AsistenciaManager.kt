@@ -114,9 +114,41 @@ object AsistenciaManager {
     }
 
     fun obtenerTotalFecha(context: Context, fecha: String): Int {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val p = prefs.getInt("asist_${fecha}_primaria", -1)
+        val s = prefs.getInt("asist_${fecha}_secundaria", -1)
+        if (p >= 0 || s >= 0) {
+            return (p.coerceAtLeast(0)) + (s.coerceAtLeast(0))
+        }
         val detalle = obtenerDetalleGradosFecha(context, fecha)
         if (detalle.isEmpty()) return 0
         return detalle.values.mapNotNull { it.toIntOrNull() }.sum()
+    }
+
+    fun guardarTotalFecha(context: Context, fecha: String, primaria: Int, secundaria: Int) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putInt("asist_${fecha}_primaria", primaria)
+            .putInt("asist_${fecha}_secundaria", secundaria)
+            .apply()
+    }
+
+    fun obtenerPrimariaFecha(context: Context, fecha: String): Int {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val saved = prefs.getInt("asist_${fecha}_primaria", -1)
+        if (saved >= 0) return saved
+        val det = obtenerDetalleGradosFecha(context, fecha)
+        if (det.isEmpty()) return 0
+        return listOf("jar", "p1", "p2", "p3", "p4", "p5").sumOf { det[it]?.toIntOrNull() ?: 0 }
+    }
+
+    fun obtenerSecundariaFecha(context: Context, fecha: String): Int {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val saved = prefs.getInt("asist_${fecha}_secundaria", -1)
+        if (saved >= 0) return saved
+        val det = obtenerDetalleGradosFecha(context, fecha)
+        if (det.isEmpty()) return 0
+        return listOf("s6", "s7", "s8", "s9", "s10", "s11").sumOf { det[it]?.toIntOrNull() ?: 0 }
     }
 
     fun obtenerDetalleGradosHoy(context: Context): Map<String, String> {

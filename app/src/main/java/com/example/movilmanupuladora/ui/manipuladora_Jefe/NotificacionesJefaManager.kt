@@ -231,14 +231,27 @@ object NotificacionesJefaManager {
                 val session = SessionManager(context)
                 val idSede = session.getSedeId().takeIf { it > 0 }
                 val resEntregas = withContext(Dispatchers.IO) {
-                    RetrofitClient.apiService.obtenerEntregas(
+                    RetrofitClient.apiService.obtenerEntregasRaw(
                         idSede = idSede,
                         estado = "EN_TRANSITO"
                     )
                 }
-                if (resEntregas.isSuccessful && !resEntregas.body().isNullOrEmpty()) {
-                    val entregas = resEntregas.body()!!
-                    val agrupadas = entregas.groupBy { it.documentoEntrega ?: "#REM-${it.idEntrega ?: 0}" }
+                val entregas: List<com.example.movilmanupuladora.data.model.EntregaItem> = if (resEntregas.isSuccessful && resEntregas.body() != null) {
+                    val root = resEntregas.body()!!
+                    val arr = when {
+                        root.isJsonArray -> root.asJsonArray
+                        root.isJsonObject && root.asJsonObject.has("results") -> root.asJsonObject.getAsJsonArray("results")
+                        root.isJsonObject && root.asJsonObject.has("data") -> root.asJsonObject.getAsJsonArray("data")
+                        else -> null
+                    }
+                    val type = object : TypeToken<List<com.example.movilmanupuladora.data.model.EntregaItem>>() {}.type
+                    if (arr != null) gson.fromJson(arr, type) ?: emptyList() else emptyList()
+                } else emptyList()
+                if (entregas.isNotEmpty()) {
+                    val agrupadas = entregas.groupBy {
+                        it.documentoEntrega?.trim()?.takeIf { doc -> doc.isNotBlank() }
+                            ?: "#REM-${it.idEntrega ?: 0}"
+                    }
 
                     for ((rem, items) in agrupadas) {
                         val tit = "Nueva entrega despachada: $rem"

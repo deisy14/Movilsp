@@ -316,8 +316,13 @@ class SessionManager(context: Context) {
             .getInt("plato_${servKey}_id", -1)
     }
 
+    private fun clavePlanDiaSede(fecha: String, servKey: String): String {
+        val idSede = getSedeId()
+        return if (idSede > 0) "plan_${idSede}_${fecha}_${servKey}" else "plan_${fecha}_${servKey}"
+    }
+
     /**
-     * Guarda el plato asignado a un día específico (fecha yyyy-MM-dd) y servicio (Desayuno, Almuerzo, Merienda).
+     * Guarda el plato asignado a un día específico (fecha yyyy-MM-dd) y servicio (Desayuno, Almuerzo, Merienda) aislado por sede.
      */
     fun savePlatoDiaServicio(context: Context, fecha: String, servicio: String, nombre: String, id: Int? = null) {
         val servKey = when (servicio.lowercase()) {
@@ -326,18 +331,19 @@ class SessionManager(context: Context) {
             "merienda" -> "merienda"
             else -> "desayuno"
         }
+        val key = clavePlanDiaSede(fecha, servKey)
         val turnoPref = context.getSharedPreferences("TURNO_PAE", Context.MODE_PRIVATE).edit()
         val jefaPref = context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE).edit()
 
-        turnoPref.putString("plan_${fecha}_${servKey}", nombre)
-        jefaPref.putString("plan_${fecha}_${servKey}", nombre)
+        turnoPref.putString(key, nombre)
+        jefaPref.putString(key, nombre)
 
         if (id != null && id > 0) {
-            turnoPref.putInt("plan_${fecha}_${servKey}_id", id)
-            jefaPref.putInt("plan_${fecha}_${servKey}_id", id)
+            turnoPref.putInt("${key}_id", id)
+            jefaPref.putInt("${key}_id", id)
         } else {
-            turnoPref.remove("plan_${fecha}_${servKey}_id")
-            jefaPref.remove("plan_${fecha}_${servKey}_id")
+            turnoPref.remove("${key}_id")
+            jefaPref.remove("${key}_id")
         }
         turnoPref.apply()
         jefaPref.apply()
@@ -347,7 +353,7 @@ class SessionManager(context: Context) {
     }
 
     /**
-     * Desasigna el plato de un día y servicio específico.
+     * Desasigna el plato de un día y servicio específico de la sede actual.
      */
     fun desasignarPlatoDiaServicio(context: Context, fecha: String, servicio: String) {
         val servKey = when (servicio.lowercase()) {
@@ -356,13 +362,14 @@ class SessionManager(context: Context) {
             "merienda" -> "merienda"
             else -> "desayuno"
         }
+        val key = clavePlanDiaSede(fecha, servKey)
         context.getSharedPreferences("TURNO_PAE", Context.MODE_PRIVATE).edit()
-            .remove("plan_${fecha}_${servKey}")
-            .remove("plan_${fecha}_${servKey}_id")
+            .remove(key)
+            .remove("${key}_id")
             .apply()
         context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE).edit()
-            .remove("plan_${fecha}_${servKey}")
-            .remove("plan_${fecha}_${servKey}_id")
+            .remove(key)
+            .remove("${key}_id")
             .apply()
 
         desasignarPlatoServicio(context, servicio)
@@ -454,12 +461,13 @@ class SessionManager(context: Context) {
             "merienda" -> "merienda"
             else -> "desayuno"
         }
+        val key = clavePlanDiaSede(fecha, servKey)
         val tVal = context.getSharedPreferences("TURNO_PAE", Context.MODE_PRIVATE)
-            .getString("plan_${fecha}_${servKey}", null)
+            .getString(key, null)
         if (!tVal.isNullOrBlank()) return tVal
 
         val jVal = context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE)
-            .getString("plan_${fecha}_${servKey}", null)
+            .getString(key, null)
         if (!jVal.isNullOrBlank()) return jVal
 
         return null
@@ -475,12 +483,13 @@ class SessionManager(context: Context) {
             "merienda" -> "merienda"
             else -> "desayuno"
         }
+        val key = clavePlanDiaSede(fecha, servKey)
         val tId = context.getSharedPreferences("TURNO_PAE", Context.MODE_PRIVATE)
-            .getInt("plan_${fecha}_${servKey}_id", -1)
+            .getInt("${key}_id", -1)
         if (tId != -1) return tId
 
         val jId = context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE)
-            .getInt("plan_${fecha}_${servKey}_id", -1)
+            .getInt("${key}_id", -1)
         if (jId != -1) return jId
 
         return -1

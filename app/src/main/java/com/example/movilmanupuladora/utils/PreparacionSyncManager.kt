@@ -11,6 +11,8 @@ import com.example.movilmanupuladora.ui.manipuladora_Jefe.ManipuladorasManager
 import com.example.movilmanupuladora.ui.manipuladora_Jefe.PreparacionEstadoManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.text.Normalizer
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -679,7 +681,8 @@ object PreparacionSyncManager {
         servicio: String,
         nombrePlato: String,
         idPlato: Int?,
-        fecha: String? = null
+        fecha: String? = null,
+        estadoMenu: String = "Pendiente"
     ): Boolean = withContext(Dispatchers.IO) {
         try {
             val sessionMgr = SessionManager(context)
@@ -736,7 +739,7 @@ object PreparacionSyncManager {
 
             // 3. Persistir en la nube (backend DRF turnos + /api/menus/ para Minuta del Supervisor)
             val fechaEfectiva = if (!fecha.isNullOrBlank()) fecha else java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
-            sincronizarMenuConBackend(context, servCapitalizado, nombrePlato, idPlato, fechaEfectiva)
+            sincronizarMenuConBackend(context, servCapitalizado, nombrePlato, idPlato, fechaEfectiva, estadoMenu)
 
             val tag = "$PREFIX_PLATO${nombrePlato.trim().take(30)}#${servCapitalizado}#${idPlato ?: -1}"
             SessionManager.getToken(context)
@@ -782,7 +785,8 @@ object PreparacionSyncManager {
         servicio: String,
         nombrePlato: String,
         idPlato: Int?,
-        fecha: String
+        fecha: String,
+        estadoMenu: String = "Pendiente"
     ) {
         try {
             val sessionMgr = SessionManager(context)
@@ -795,7 +799,42 @@ object PreparacionSyncManager {
                 "merienda" -> 3
                 else -> 2
             }
-            val idJornada = if (idSeccion == 1) 1 else 2
+            var idJornada = if (idSeccion == 1) 3 else 5
+            try {
+                val jRes = RetrofitClient.apiService.obtenerJornadasRaw()
+                if (jRes.isSuccessful && jRes.body() != null) {
+                    val rootJ = jRes.body()!!
+                    val arrJ = when {
+                        rootJ.isJsonArray -> rootJ.asJsonArray
+                        rootJ.isJsonObject && rootJ.asJsonObject.has("results") -> rootJ.asJsonObject.getAsJsonArray("results")
+                        rootJ.isJsonObject && rootJ.asJsonObject.has("data") -> rootJ.asJsonObject.getAsJsonArray("data")
+                        else -> null
+                    }
+                    if (arrJ != null) {
+                        var jManana = 0
+                        var jTarde = 0
+                        var jFirst = 0
+                        for (el in arrJ) {
+                            if (!el.isJsonObject) continue
+                            val obj = el.asJsonObject
+                            val jid = if (obj.has("id_jornada") && obj.get("id_jornada").isJsonPrimitive) obj.get("id_jornada").asInt
+                            else if (obj.has("id") && obj.get("id").isJsonPrimitive) obj.get("id").asInt else 0
+                            val jnom = if (obj.has("nombre_jornada") && obj.get("nombre_jornada").isJsonPrimitive) obj.get("nombre_jornada").asString.lowercase()
+                            else if (obj.has("nombre") && obj.get("nombre").isJsonPrimitive) obj.get("nombre").asString.lowercase() else ""
+                            if (jid > 0) {
+                                if (jFirst == 0) jFirst = jid
+                                if (jManana == 0 && (jnom.contains("mañan") || jnom.contains("manan"))) jManana = jid
+                                if (jTarde == 0 && jnom.contains("tard")) jTarde = jid
+                            }
+                        }
+                        idJornada = if (idSeccion == 1) {
+                            jManana.takeIf { it > 0 } ?: jFirst.takeIf { it > 0 } ?: 3
+                        } else {
+                            jTarde.takeIf { it > 0 } ?: jManana.takeIf { it > 0 } ?: jFirst.takeIf { it > 0 } ?: 5
+                        }
+                    }
+                }
+            } catch (_: Exception) { }
 
             val cal = java.util.Calendar.getInstance()
             try {
@@ -842,20 +881,21 @@ object PreparacionSyncManager {
             } catch (_: Exception) { }
 
             val cupos = SedeContratoManager.obtenerCuposSede(context).takeIf { it > 0 } ?: 1
-            val infoNutricional = "[SEDE:$idSede] [MENU_CICLO:$numMenuCiclo] [Elegido Jefa] $nombrePlato"
+            val infoNutricional = "[SEDE:$idSede] [SEC:$idSeccion] [MENU_CICLO:$numMenuCiclo] [Elegido Jefa] $nombrePlato"
             val payload = mutableMapOf<String, Any?>(
                 "id_jornada" to idJornada,
                 "fecha" to fecha,
                 "ninos_presentes" to cupos,
                 "id_seccion" to idSeccion,
                 "id_sede" to idSede,
-                "estado" to "Pendiente",
+                "estado" to estadoMenu,
                 "informacion_nutricional" to infoNutricional
             )
             if (idContrato > 0) payload["id_contrato"] = idContrato
             if (idPlato != null && idPlato > 0) payload["id_plato"] = idPlato
 
             var idMenuExistente = 0
+            var eraRechazado = false
             try {
                 val mRes = RetrofitClient.apiService.obtenerMenusRaw()
                 if (mRes.isSuccessful && mRes.body() != null) {
@@ -871,12 +911,23 @@ object PreparacionSyncManager {
                             if (!el.isJsonObject) continue
                             val obj = el.asJsonObject
                             val mFecha = if (obj.has("fecha") && obj.get("fecha").isJsonPrimitive) obj.get("fecha").asString else ""
-                            val mSec = if (obj.has("id_seccion") && obj.get("id_seccion").isJsonPrimitive) obj.get("id_seccion").asInt else 0
+                            val mSecRaw = if (obj.has("id_seccion") && obj.get("id_seccion").isJsonPrimitive) obj.get("id_seccion").asInt else 0
+                            val mJorRaw = if (obj.has("id_jornada") && obj.get("id_jornada").isJsonPrimitive) obj.get("id_jornada").asInt else 0
                             val mSede = if (obj.has("id_sede") && obj.get("id_sede").isJsonPrimitive) obj.get("id_sede").asInt else 0
                             val mInfo = if (obj.has("informacion_nutricional") && obj.get("informacion_nutricional").isJsonPrimitive) obj.get("informacion_nutricional").asString else ""
-                            if (mFecha.startsWith(fecha) && mSec == idSeccion && (mSede == idSede || mInfo.contains("[SEDE:$idSede]"))) {
+                            val secDetectada = when {
+                                mSecRaw > 0 -> mSecRaw
+                                Regex("\\[SEC:(\\d+)\\]").find(mInfo)?.groupValues?.getOrNull(1)?.toIntOrNull() != null ->
+                                    Regex("\\[SEC:(\\d+)\\]").find(mInfo)!!.groupValues[1].toInt()
+                                mJorRaw == 3 -> 1
+                                mJorRaw == 5 -> if (mInfo.contains("merienda", ignoreCase = true)) 3 else 2
+                                else -> mJorRaw
+                            }
+                            if (mFecha.startsWith(fecha) && secDetectada == idSeccion && (mSede == idSede || mInfo.contains("[SEDE:$idSede]"))) {
                                 idMenuExistente = if (obj.has("id_menu") && obj.get("id_menu").isJsonPrimitive) obj.get("id_menu").asInt
                                 else if (obj.has("id") && obj.get("id").isJsonPrimitive) obj.get("id").asInt else 0
+                                val estPrevio = if (obj.has("estado") && obj.get("estado").isJsonPrimitive) obj.get("estado").asString else ""
+                                eraRechazado = estPrevio.contains("rechaz", ignoreCase = true)
                                 if (idMenuExistente > 0) break
                             }
                         }
@@ -884,8 +935,21 @@ object PreparacionSyncManager {
                 }
             } catch (_: Exception) { }
 
+            if (eraRechazado) {
+                payload["estado"] = "Pendiente"
+            }
+
             if (idMenuExistente > 0) {
-                RetrofitClient.apiService.actualizarMenu(idMenuExistente, payload)
+                val upRes = RetrofitClient.apiService.actualizarMenu(idMenuExistente, payload)
+                if (eraRechazado && upRes.isSuccessful) {
+                    try {
+                        val ieNom = sessionMgr.getInstitucionNombre()?.takeIf { it.isNotBlank() } ?: "Institución Educativa"
+                        val sedeNom = sessionMgr.getSedeNombre()?.takeIf { it.isNotBlank() } ?: "Sede"
+                        val tit = "Plato corregido y reenviado - $servicio".toRequestBody("text/plain".toMediaTypeOrNull())
+                        val msg = "La manipuladora jefe de la institución educativa $ieNom de la sede $sedeNom cambió el plato rechazado del $fecha ($servicio) por \"$nombrePlato\" para su aprobación.".toRequestBody("text/plain".toMediaTypeOrNull())
+                        RetrofitClient.apiService.enviarNotificacion(tit, msg, null)
+                    } catch (_: Exception) { }
+                }
             } else {
                 RetrofitClient.apiService.registrarMenu(payload)
             }
@@ -1098,6 +1162,138 @@ object PreparacionSyncManager {
             true
         } catch (e: Exception) {
             Log.e(TAG, "Error al descontar inventario: ${e.message}")
+            false
+        }
+    }
+
+    /**
+     * Sincroniza los menús programados en /api/menus/ del backend para la sede actual
+     * hacia SessionManager por fecha y servicio, para que aparezcan en Historial y Menú del día.
+     */
+    suspend fun sincronizarMenusPorFechaDesdeBackend(context: Context): Boolean = withContext(Dispatchers.IO) {
+        try {
+            SessionManager.getToken(context)
+            val sessionMgr = SessionManager(context)
+            val idSede = SedeContratoManager.resolverIdSedeEfectivo(sessionMgr)
+            if (idSede <= 0) return@withContext false
+
+            val mRes = RetrofitClient.apiService.obtenerMenusRaw()
+            if (!mRes.isSuccessful || mRes.body() == null) return@withContext false
+
+            val platosMapa = mutableMapOf<Int, String>()
+            try {
+                val pRes = RetrofitClient.apiService.obtenerPlatos()
+                if (pRes.isSuccessful && !pRes.body().isNullOrEmpty()) {
+                    for (p in pRes.body()!!) {
+                        val nom = p.nombrePlato?.trim()
+                        if (p.idPlato > 0 && !nom.isNullOrBlank()) {
+                            platosMapa[p.idPlato] = nom
+                        }
+                    }
+                }
+            } catch (_: Exception) { }
+
+            val root = mRes.body()!!
+            val arr = when {
+                root.isJsonArray -> root.asJsonArray
+                root.isJsonObject && root.asJsonObject.has("results") -> root.asJsonObject.getAsJsonArray("results")
+                root.isJsonObject && root.asJsonObject.has("data") -> root.asJsonObject.getAsJsonArray("data")
+                else -> null
+            } ?: return@withContext false
+
+            var sincronizados = 0
+            for (el in arr) {
+                if (!el.isJsonObject) continue
+                val obj = el.asJsonObject
+                val mFechaRaw = if (obj.has("fecha") && obj.get("fecha").isJsonPrimitive) obj.get("fecha").asString.trim() else ""
+                val mFecha = if (mFechaRaw.length >= 10) mFechaRaw.substring(0, 10) else mFechaRaw
+                if (mFecha.length != 10) continue
+
+                val mSede = when {
+                    obj.has("id_sede") && obj.get("id_sede").isJsonPrimitive -> try { obj.get("id_sede").asInt } catch (_: Exception) { 0 }
+                    obj.has("id_sede") && obj.get("id_sede").isJsonObject -> {
+                        val so = obj.getAsJsonObject("id_sede")
+                        if (so.has("id_sede") && so.get("id_sede").isJsonPrimitive) so.get("id_sede").asInt else 0
+                    }
+                    else -> 0
+                }
+                val mInfo = if (obj.has("informacion_nutricional") && obj.get("informacion_nutricional").isJsonPrimitive) {
+                    obj.get("informacion_nutricional").asString.trim()
+                } else ""
+
+                if (mSede != idSede && !mInfo.contains("[SEDE:$idSede]")) continue
+
+                val mSecRaw = when {
+                    obj.has("id_seccion") && obj.get("id_seccion").isJsonPrimitive -> try { obj.get("id_seccion").asInt } catch (_: Exception) { 0 }
+                    obj.has("id_seccion") && obj.get("id_seccion").isJsonObject -> {
+                        val secObj = obj.getAsJsonObject("id_seccion")
+                        if (secObj.has("id_seccion") && secObj.get("id_seccion").isJsonPrimitive) secObj.get("id_seccion").asInt else 0
+                    }
+                    else -> 0
+                }
+                val mJorRaw = when {
+                    obj.has("id_jornada") && obj.get("id_jornada").isJsonPrimitive -> try { obj.get("id_jornada").asInt } catch (_: Exception) { 0 }
+                    obj.has("id_jornada") && obj.get("id_jornada").isJsonObject -> {
+                        val jo = obj.getAsJsonObject("id_jornada")
+                        if (jo.has("id_jornada") && jo.get("id_jornada").isJsonPrimitive) jo.get("id_jornada").asInt else 0
+                    }
+                    else -> 0
+                }
+                val mSec = when {
+                    mSecRaw > 0 -> mSecRaw
+                    Regex("\\[SEC:(\\d+)\\]").find(mInfo)?.groupValues?.getOrNull(1)?.toIntOrNull() != null ->
+                        Regex("\\[SEC:(\\d+)\\]").find(mInfo)!!.groupValues[1].toInt()
+                    mJorRaw == 3 -> 1
+                    mJorRaw == 5 -> if (mInfo.contains("merienda", ignoreCase = true)) 3 else 2
+                    else -> mJorRaw
+                }
+                val servicio = when (mSec) {
+                    1 -> "Desayuno"
+                    3 -> "Merienda"
+                    2 -> "Almuerzo"
+                    else -> "Almuerzo"
+                }
+
+                val mPlatoId = when {
+                    obj.has("id_plato") && obj.get("id_plato").isJsonPrimitive -> try { obj.get("id_plato").asInt } catch (_: Exception) { 0 }
+                    obj.has("id_plato") && obj.get("id_plato").isJsonObject -> {
+                        val po = obj.getAsJsonObject("id_plato")
+                        if (po.has("id_plato") && po.get("id_plato").isJsonPrimitive) po.get("id_plato").asInt else 0
+                    }
+                    else -> 0
+                }
+                var nombrePlato = when {
+                    obj.has("nombre_plato") && obj.get("nombre_plato").isJsonPrimitive -> obj.get("nombre_plato").asString.trim()
+                    obj.has("id_plato") && obj.get("id_plato").isJsonObject -> {
+                        val po = obj.getAsJsonObject("id_plato")
+                        if (po.has("nombre_plato") && po.get("nombre_plato").isJsonPrimitive) po.get("nombre_plato").asString.trim() else ""
+                    }
+                    else -> ""
+                }
+                if (nombrePlato.isBlank() && mPlatoId > 0) {
+                    nombrePlato = platosMapa[mPlatoId].orEmpty()
+                }
+                if (nombrePlato.isBlank() && mInfo.contains("[Elegido Jefa]")) {
+                    nombrePlato = mInfo.substringAfter("[Elegido Jefa]").trim()
+                }
+                if (nombrePlato.isBlank() && mInfo.isNotBlank()) {
+                    nombrePlato = mInfo.replace(Regex("\\[[^\\]]+\\]\\s*"), "").trim()
+                }
+
+                if (nombrePlato.isNotBlank()) {
+                    sessionMgr.savePlatoDiaServicio(
+                        context,
+                        mFecha,
+                        servicio,
+                        nombrePlato,
+                        if (mPlatoId > 0) mPlatoId else null
+                    )
+                    sincronizados++
+                }
+            }
+            sincronizados > 0
+        } catch (e: Exception) {
+            Log.e(TAG, "Error sincronizando menus por fecha: ${e.message}")
             false
         }
     }

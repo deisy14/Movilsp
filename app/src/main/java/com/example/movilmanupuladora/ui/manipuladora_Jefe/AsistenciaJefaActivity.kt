@@ -65,6 +65,9 @@ class AsistenciaJefaActivity : AppCompatActivity() {
         get() = intent.getStringExtra("fecha_seleccionada")?.takeIf { it.isNotBlank() }
             ?: SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
 
+    private val esFechaHoy: Boolean
+        get() = fechaHoy == SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -129,51 +132,78 @@ class AsistenciaJefaActivity : AppCompatActivity() {
             try {
                 sessionManager.fetchAuthToken()
 
-                // 1. Primero intentar sincronizar desde Turnos (inmediato en tiempo real)
-                PreparacionSyncManager.sincronizarDesdeBackend(this@AsistenciaJefaActivity)
-                val pSync = AsistenciaManager.obtenerPrimaria(this@AsistenciaJefaActivity)
-                val sSync = AsistenciaManager.obtenerSecundaria(this@AsistenciaJefaActivity)
-                val totMSync = AsistenciaManager.obtenerManana(this@AsistenciaJefaActivity)
-                val totTSync = AsistenciaManager.obtenerTarde(this@AsistenciaJefaActivity)
+                if (esFechaHoy) {
+                    // 1. Solo para HOY sincronizar desde Turnos e inicializar con datos del día actual
+                    PreparacionSyncManager.sincronizarDesdeBackend(this@AsistenciaJefaActivity)
+                    val pSync = AsistenciaManager.obtenerPrimaria(this@AsistenciaJefaActivity)
+                    val sSync = AsistenciaManager.obtenerSecundaria(this@AsistenciaJefaActivity)
+                    val totMSync = AsistenciaManager.obtenerManana(this@AsistenciaJefaActivity)
+                    val totTSync = AsistenciaManager.obtenerTarde(this@AsistenciaJefaActivity)
 
-                if (pSync > 0 || sSync > 0) {
-                    primariaManana = pSync
-                    secundariaManana = sSync
-                } else if (totMSync > 0) {
-                    primariaManana = (totMSync * 0.6).toInt()
-                    secundariaManana = totMSync - primariaManana
+                    if (pSync > 0 || sSync > 0) {
+                        primariaManana = pSync
+                        secundariaManana = sSync
+                    } else if (totMSync > 0) {
+                        primariaManana = (totMSync * 0.6).toInt()
+                        secundariaManana = totMSync - primariaManana
+                    } else {
+                        primariaManana = 0
+                        secundariaManana = 0
+                    }
+                    if (totTSync > 0) {
+                        primariaTarde = (totTSync * 0.6).toInt()
+                        secundariaTarde = totTSync - primariaTarde
+                    } else {
+                        primariaTarde = 0
+                        secundariaTarde = 0
+                    }
                 } else {
-                    primariaManana = 0
-                    secundariaManana = 0
-                }
-                if (totTSync > 0) {
-                    primariaTarde = (totTSync * 0.6).toInt()
-                    secundariaTarde = totTSync - primariaTarde
-                } else {
+                    // Para fechas anteriores/diferentes a hoy, cargar solo lo guardado para ESA fecha
+                    primariaManana = AsistenciaManager.obtenerPrimariaFecha(this@AsistenciaJefaActivity, fechaHoy)
+                    secundariaManana = AsistenciaManager.obtenerSecundariaFecha(this@AsistenciaJefaActivity, fechaHoy)
                     primariaTarde = 0
                     secundariaTarde = 0
                 }
 
-                // 2. Identificar IDs de grados para Primaria y Secundaria del catálogo
+                // 2. Identificar IDs de grados válidos del catálogo en el backend
                 val gradosRes = asistenciaRepository.obtenerGrados()
                 if (gradosRes.isSuccessful && !gradosRes.body().isNullOrEmpty()) {
                     val grados = gradosRes.body()!!
-                    idGradoPrimaria = grados.find { it.obtenerNombreReal().contains("primaria", ignoreCase = true) }?.obtenerIdReal() ?: 16
-                    idGradoSecundaria = grados.find { it.obtenerNombreReal().contains("secundaria", ignoreCase = true) }?.obtenerIdReal() ?: 19
+                    val idsDisponibles = grados.mapNotNull { it.obtenerIdReal() }
+                    idGradoPrimaria = grados.find {
+                        val n = it.obtenerNombreReal()
+                        n.contains("primaria", ignoreCase = true) ||
+                            n.contains("primero", ignoreCase = true) ||
+                            n.contains("transicion", ignoreCase = true) ||
+                            n.contains("jardin", ignoreCase = true)
+                    }?.obtenerIdReal()
+                        ?: (if (idsDisponibles.contains(16)) 16 else idsDisponibles.firstOrNull() ?: 16)
+
+                    idGradoSecundaria = grados.find {
+                        val n = it.obtenerNombreReal()
+                        n.contains("secundaria", ignoreCase = true) ||
+                            n.contains("sexto", ignoreCase = true) ||
+                            n.contains("septimo", ignoreCase = true) ||
+                            n.contains("media", ignoreCase = true)
+                    }?.obtenerIdReal()
+                        ?: (if (idsDisponibles.contains(19)) 19 else idsDisponibles.lastOrNull() ?: idGradoPrimaria)
                 }
 
-                // 3. Obtener asistencias de hoy del backend exclusivamente
+                // 3. Obtener asistencias de la fecha seleccionada del backend
                 val res = asistenciaRepository.obtenerAsistencias()
                 if (res.isSuccessful && res.body() != null) {
                     val lista = res.body()!!
-                    val registrosHoy = lista.filter { it.fecha.trim().startsWith(fechaHoy) }
+                    val registrosFecha = lista.filter { it.fecha.trim().startsWith(fechaHoy) }
 
-                    val regPrimaria = registrosHoy
+                    val regPrimaria = registrosFecha
                         .filter { it.obtenerIdGradoReal() == idGradoPrimaria || it.obtenerIdGradoReal() == 16 }
                         .maxByOrNull { it.obtenerIdReal() ?: 0 }
 
-                    val regSecundaria = registrosHoy
-                        .filter { it.obtenerIdGradoReal() == idGradoSecundaria || it.obtenerIdGradoReal() == 19 }
+                    val regSecundaria = registrosFecha
+                        .filter {
+                            (it.obtenerIdGradoReal() == idGradoSecundaria || it.obtenerIdGradoReal() == 19) &&
+                                it.obtenerIdReal() != regPrimaria?.obtenerIdReal()
+                        }
                         .maxByOrNull { it.obtenerIdReal() ?: 0 }
 
                     if (regPrimaria != null) {
@@ -185,8 +215,8 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                         idAsistenciaSecundariaManana = regSecundaria.obtenerIdReal()
                     }
 
-                    if (regPrimaria == null && regSecundaria == null && registrosHoy.isNotEmpty()) {
-                        val regLegacy = registrosHoy.maxByOrNull { it.obtenerIdReal() ?: 0 }!!
+                    if (regPrimaria == null && regSecundaria == null && registrosFecha.isNotEmpty()) {
+                        val regLegacy = registrosFecha.maxByOrNull { it.obtenerIdReal() ?: 0 }!!
                         val total = regLegacy.ninosPresentes
                         primariaManana = (total * 0.6).toInt()
                         secundariaManana = total - primariaManana
@@ -194,9 +224,12 @@ class AsistenciaJefaActivity : AppCompatActivity() {
 
                     val totalCalculado = primariaManana + secundariaManana
                     if (totalCalculado > 0) {
-                        AsistenciaManager.guardarPrimaria(this@AsistenciaJefaActivity, primariaManana)
-                        AsistenciaManager.guardarSecundaria(this@AsistenciaJefaActivity, secundariaManana)
-                        AsistenciaManager.guardarManana(this@AsistenciaJefaActivity, totalCalculado)
+                        AsistenciaManager.guardarTotalFecha(this@AsistenciaJefaActivity, fechaHoy, primariaManana, secundariaManana)
+                        if (esFechaHoy) {
+                            AsistenciaManager.guardarPrimaria(this@AsistenciaJefaActivity, primariaManana)
+                            AsistenciaManager.guardarSecundaria(this@AsistenciaJefaActivity, secundariaManana)
+                            AsistenciaManager.guardarManana(this@AsistenciaJefaActivity, totalCalculado)
+                        }
                     }
                 }
 
@@ -367,8 +400,8 @@ class AsistenciaJefaActivity : AppCompatActivity() {
             layoutSecundaria.visibility = View.VISIBLE
         }
 
-        // Cargar los valores guardados previamente
-        val detalle = AsistenciaManager.obtenerDetalleGradosHoy(this)
+        // Cargar los valores guardados previamente para la fecha seleccionada
+        val detalle = AsistenciaManager.obtenerDetalleGradosFecha(this, fechaHoy)
         edtJardin.setText(detalle["jar"].orEmpty())
         edtP1.setText(detalle["p1"].orEmpty())
         edtP2.setText(detalle["p2"].orEmpty())
@@ -476,7 +509,7 @@ class AsistenciaJefaActivity : AppCompatActivity() {
                 "jar" to strJar, "p1" to strP1, "p2" to strP2, "p3" to strP3, "p4" to strP4, "p5" to strP5,
                 "s6" to strS6, "s7" to strS7, "s8" to strS8, "s9" to strS9, "s10" to strS10, "s11" to strS11
             )
-            AsistenciaManager.guardarDetalleGradosHoy(this@AsistenciaJefaActivity, mapaDetalle)
+            AsistenciaManager.guardarDetalleGradosFecha(this@AsistenciaJefaActivity, fechaHoy, mapaDetalle)
 
             if (total == 0) {
                 AlertDialog.Builder(this)
@@ -513,86 +546,105 @@ class AsistenciaJefaActivity : AppCompatActivity() {
         binding.btnRegistrarAsistencia.isEnabled = false
         binding.btnRegistrarAsistencia.text = "Guardando asistencia..."
 
-        // 1. Guardar localmente de inmediato en AsistenciaManager
+        // 1. Guardar localmente para la fecha seleccionada (y solo tocar los totales de hoy si es hoy)
         if (jornadaActual == "MANANA") {
             primariaManana = totalPrimaria
             secundariaManana = totalSecundaria
-            AsistenciaManager.guardarManana(this@AsistenciaJefaActivity, total)
+            if (esFechaHoy) AsistenciaManager.guardarManana(this@AsistenciaJefaActivity, total)
         } else {
             primariaTarde = totalPrimaria
             secundariaTarde = totalSecundaria
-            AsistenciaManager.guardarTarde(this@AsistenciaJefaActivity, total)
+            if (esFechaHoy) AsistenciaManager.guardarTarde(this@AsistenciaJefaActivity, total)
         }
-        AsistenciaManager.guardarPrimaria(this@AsistenciaJefaActivity, totalPrimaria)
-        AsistenciaManager.guardarSecundaria(this@AsistenciaJefaActivity, totalSecundaria)
+        AsistenciaManager.guardarTotalFecha(this@AsistenciaJefaActivity, fechaHoy, totalPrimaria, totalSecundaria)
+        if (esFechaHoy) {
+            AsistenciaManager.guardarPrimaria(this@AsistenciaJefaActivity, totalPrimaria)
+            AsistenciaManager.guardarSecundaria(this@AsistenciaJefaActivity, totalSecundaria)
+        }
         actualizarDatosAsistencia()
 
         lifecycleScope.launch {
+            var errorServidor: String? = null
             try {
-                // 2. Sincronizar en la nube en Turnos de inmediato con el token de sesión (para todos los móviles)
-                PreparacionSyncManager.guardarAsistenciaEnNube(
-                    context = applicationContext,
-                    primaria = totalPrimaria,
-                    secundaria = totalSecundaria,
-                    total = total,
-                    jornada = jornadaActual
+                // 2. Sincronizar en la nube en Turnos solo cuando es el día de hoy
+                if (esFechaHoy) {
+                    PreparacionSyncManager.guardarAsistenciaEnNube(
+                        context = applicationContext,
+                        primaria = totalPrimaria,
+                        secundaria = totalSecundaria,
+                        total = total,
+                        jornada = jornadaActual
+                    )
+                }
+
+                // 3. Persistir en la tabla de asistencia diaria del backend para fechaHoy
+                sessionManager.fetchAuthToken()
+                val userId = sessionManager.getUserId().takeIf { it > 0 } ?: 19
+                val idP = if (jornadaActual == "MANANA") idAsistenciaPrimariaManana else idAsistenciaPrimariaTarde
+                val idS = if (jornadaActual == "MANANA") idAsistenciaSecundariaManana else idAsistenciaSecundariaTarde
+
+                val resP = asistenciaRepository.guardarAsistenciaLimpia(
+                    idExistente = idP,
+                    idGrado = idGradoPrimaria,
+                    fecha = fechaHoy,
+                    ninosPresentes = totalPrimaria,
+                    idUsuario = userId
                 )
+                if (resP.isSuccessful && resP.body() != null) {
+                    val nuevoId = resP.body()!!.obtenerIdReal()
+                    if (jornadaActual == "MANANA") idAsistenciaPrimariaManana = nuevoId
+                    else idAsistenciaPrimariaTarde = nuevoId
+                } else if (!resP.isSuccessful) {
+                    val err = try { resP.errorBody()?.string() } catch (_: Exception) { null }
+                    errorServidor = "HTTP ${resP.code()}: ${err ?: "Error guardando Primaria"}"
+                    android.util.Log.e("AsistenciaJefa", "Error Primaria: $errorServidor")
+                }
 
-                // 3. Persistir en la tabla de asistencia diaria del backend
-                try {
-                    sessionManager.fetchAuthToken()
-                    val userId = sessionManager.getUserId().takeIf { it > 0 } ?: 19
-                    val idP = if (jornadaActual == "MANANA") idAsistenciaPrimariaManana else idAsistenciaPrimariaTarde
-                    val idS = if (jornadaActual == "MANANA") idAsistenciaSecundariaManana else idAsistenciaSecundariaTarde
-
-                    val resP = asistenciaRepository.guardarAsistenciaLimpia(
-                        idExistente = idP,
-                        idGrado = idGradoPrimaria,
-                        fecha = fechaHoy,
-                        ninosPresentes = totalPrimaria,
-                        idUsuario = userId
-                    )
-                    if (resP.isSuccessful && resP.body() != null) {
-                        val nuevoId = resP.body()!!.obtenerIdReal()
-                        if (jornadaActual == "MANANA") idAsistenciaPrimariaManana = nuevoId
-                        else idAsistenciaPrimariaTarde = nuevoId
-                    }
-
-                    val resS = asistenciaRepository.guardarAsistenciaLimpia(
-                        idExistente = idS,
-                        idGrado = idGradoSecundaria,
-                        fecha = fechaHoy,
-                        ninosPresentes = totalSecundaria,
-                        idUsuario = userId
-                    )
-                    if (resS.isSuccessful && resS.body() != null) {
-                        val nuevoId = resS.body()!!.obtenerIdReal()
-                        if (jornadaActual == "MANANA") idAsistenciaSecundariaManana = nuevoId
-                        else idAsistenciaSecundariaTarde = nuevoId
-                    }
-                } catch (e: Exception) {
-                    android.util.Log.e("AsistenciaJefa", "Error registrando asistencia en backend: ${e.message}")
+                val resS = asistenciaRepository.guardarAsistenciaLimpia(
+                    idExistente = idS,
+                    idGrado = idGradoSecundaria,
+                    fecha = fechaHoy,
+                    ninosPresentes = totalSecundaria,
+                    idUsuario = userId
+                )
+                if (resS.isSuccessful && resS.body() != null) {
+                    val nuevoId = resS.body()!!.obtenerIdReal()
+                    if (jornadaActual == "MANANA") idAsistenciaSecundariaManana = nuevoId
+                    else idAsistenciaSecundariaTarde = nuevoId
+                } else if (!resS.isSuccessful) {
+                    val err = try { resS.errorBody()?.string() } catch (_: Exception) { null }
+                    errorServidor = "HTTP ${resS.code()}: ${err ?: "Error guardando Secundaria"}"
+                    android.util.Log.e("AsistenciaJefa", "Error Secundaria: $errorServidor")
                 }
 
                 dialog?.dismiss()
                 binding.btnRegistrarAsistencia.isEnabled = true
                 binding.btnRegistrarAsistencia.text = "Guardar asistencia"
 
-                Toast.makeText(
-                    this@AsistenciaJefaActivity,
-                    "¡Asistencia sincronizada!",
-                    Toast.LENGTH_SHORT
-                ).show()
+                if (errorServidor != null) {
+                    Toast.makeText(
+                        this@AsistenciaJefaActivity,
+                        "Guardado local, pero falló en servidor ($errorServidor)",
+                        Toast.LENGTH_LONG
+                    ).show()
+                } else {
+                    Toast.makeText(
+                        this@AsistenciaJefaActivity,
+                        if (esFechaHoy) "¡Asistencia sincronizada!" else "¡Asistencia del $fechaHoy guardada!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
 
             } catch (e: Exception) {
+                android.util.Log.e("AsistenciaJefa", "Excepción guardando asistencia: ${e.message}")
                 dialog?.dismiss()
                 binding.btnRegistrarAsistencia.isEnabled = true
                 binding.btnRegistrarAsistencia.text = "Guardar asistencia"
 
                 Toast.makeText(
                     this@AsistenciaJefaActivity,
-                    "¡Asistencia sincronizada!",
-                    Toast.LENGTH_SHORT
+                    "Guardado local, error de conexión: ${e.message}",
+                    Toast.LENGTH_LONG
                 ).show()
             }
         }
