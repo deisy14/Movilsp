@@ -78,7 +78,22 @@ class PreparacionActivity : AppCompatActivity() {
         }
 
         binding.btnMarcarPreparado.setOnClickListener {
+            val miNombre = sessionMgr.getUserName() ?: "Manipuladora"
+            val miCorreo = sessionMgr.getUserEmail() ?: ""
+            val comp = componenteAsignado ?: "Preparación general"
+            val estadoActual = PreparacionEstadoManager.obtenerEstado(this, miNombre, comp, miCorreo)
+
+            val siguienteEstado = when (estadoActual) {
+                PreparacionEstadoManager.ESTADO_POR_HACER -> PreparacionEstadoManager.ESTADO_EN_PROCESO
+                PreparacionEstadoManager.ESTADO_EN_PROCESO -> PreparacionEstadoManager.ESTADO_FINALIZADA
+                else -> PreparacionEstadoManager.ESTADO_FINALIZADA
+            }
+            ejecutarCambioEstadoDirecto(siguienteEstado)
+        }
+
+        binding.btnMarcarPreparado.setOnLongClickListener {
             mostrarDialogoEstadoPreparacion()
+            true
         }
 
         configurarPestañasEstado()
@@ -139,12 +154,12 @@ class PreparacionActivity : AppCompatActivity() {
         val tabEnProceso = findViewById<TextView>(R.id.tabEnProceso)
         val tabListo = findViewById<TextView>(R.id.tabListo)
 
-        fun destacarTab(activo: TextView?) {
+        fun destacarTab(activo: TextView?, colorFondo: Int, colorTexto: Int) {
             val tabs = listOf(tabPorHacer, tabEnProceso, tabListo)
             for (t in tabs) {
                 if (t == activo) {
-                    t?.setBackgroundResource(R.drawable.bg_pill_green)
-                    t?.setTextColor(Color.WHITE)
+                    t?.setBackgroundResource(colorFondo)
+                    t?.setTextColor(colorTexto)
                 } else {
                     t?.background = null
                     t?.setTextColor(Color.parseColor("#64748B"))
@@ -156,29 +171,38 @@ class PreparacionActivity : AppCompatActivity() {
             PreparacionEstadoManager.ESTADO_POR_HACER -> {
                 binding.badgeTurnoPreparacion.text = "Estado: Por hacer"
                 binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_pill_yellow)
-                binding.badgeTurnoPreparacion.setTextColor(0xFF7A5500.toInt())
-                binding.btnMarcarPreparado.text = "Actualizar Estado de Preparación"
-                destacarTab(tabPorHacer)
+                binding.badgeTurnoPreparacion.setTextColor(Color.parseColor("#7A5500"))
+                binding.btnMarcarPreparado.text = "Cambiar Estado (Por Hacer) ➔"
+                binding.btnMarcarPreparado.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#F4B41F"))
+                binding.btnMarcarPreparado.setTextColor(Color.parseColor("#FFFFFF"))
+                destacarTab(tabPorHacer, R.drawable.bg_pill_yellow, Color.parseColor("#7A5500"))
             }
             PreparacionEstadoManager.ESTADO_EN_PROCESO -> {
-                binding.badgeTurnoPreparacion.text = "Estado: En preparación"
-                binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_pill_yellow)
-                binding.badgeTurnoPreparacion.setTextColor(0xFF855B00.toInt())
-                binding.btnMarcarPreparado.text = "Actualizar Estado de Preparación"
-                destacarTab(tabEnProceso)
+                binding.badgeTurnoPreparacion.text = "Estado: En preparación ⏳"
+                binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_pill_light_green)
+                binding.badgeTurnoPreparacion.setTextColor(Color.parseColor("#15803D"))
+                binding.btnMarcarPreparado.text = "Cambiar Estado (En Proceso) ➔"
+                binding.btnMarcarPreparado.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#2563EB"))
+                binding.btnMarcarPreparado.setTextColor(Color.parseColor("#FFFFFF"))
+                destacarTab(tabEnProceso, R.drawable.bg_pill_green, Color.WHITE)
             }
             PreparacionEstadoManager.ESTADO_FINALIZADA -> {
-                binding.badgeTurnoPreparacion.text = "Estado: Listo"
+                binding.badgeTurnoPreparacion.text = "Estado: Finalizada ✓"
                 binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_pill_green)
-                binding.badgeTurnoPreparacion.setTextColor(0xFF176B35.toInt())
-                binding.btnMarcarPreparado.text = "Actualizar Estado de Preparación"
-                destacarTab(tabListo)
+                binding.badgeTurnoPreparacion.setTextColor(Color.WHITE)
+                binding.btnMarcarPreparado.text = "Preparación Finalizada ✓"
+                binding.btnMarcarPreparado.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#16A34A"))
+                binding.btnMarcarPreparado.setTextColor(Color.parseColor("#FFFFFF"))
+                destacarTab(tabListo, R.drawable.bg_pill_green, Color.WHITE)
             }
             else -> {
                 binding.badgeTurnoPreparacion.text = "Estado: $estado"
                 binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_pill_yellow)
-                binding.btnMarcarPreparado.text = "Actualizar Estado de Preparación"
-                destacarTab(tabPorHacer)
+                binding.badgeTurnoPreparacion.setTextColor(Color.parseColor("#7A5500"))
+                binding.btnMarcarPreparado.text = "Cambiar Estado de Preparación"
+                binding.btnMarcarPreparado.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#F4B41F"))
+                binding.btnMarcarPreparado.setTextColor(Color.parseColor("#FFFFFF"))
+                destacarTab(tabPorHacer, R.drawable.bg_pill_yellow, Color.parseColor("#7A5500"))
             }
         }
     }
@@ -267,13 +291,13 @@ class PreparacionActivity : AppCompatActivity() {
 
     private fun mostrarDialogoEstadoPreparacion() {
         val opciones = listOf(
-            "Por hacer / Pendiente",
-            "En proceso / En preparación",
-            "Finalizada / Completada"
+            Triple("Por hacer / Pendiente", Color.parseColor("#FEF3C7"), Color.parseColor("#D97706")),
+            Triple("En proceso / En preparación ⏳", Color.parseColor("#DBEAFE"), Color.parseColor("#2563EB")),
+            Triple("Finalizada / Completada ✓", Color.parseColor("#DCFCE7"), Color.parseColor("#16A34A"))
         )
 
         val dialogBinding = com.example.movilmanupuladora.databinding.DialogOpcionesJefaBinding.inflate(layoutInflater)
-        dialogBinding.txtTituloOpciones.text = "Actualizar Estado de Preparación"
+        dialogBinding.txtTituloOpciones.text = "Seleccionar Estado de Preparación"
         dialogBinding.contenedorBotonesOpciones.removeAllViews()
 
         val dialog = MaterialAlertDialogBuilder(this)
@@ -282,24 +306,25 @@ class PreparacionActivity : AppCompatActivity() {
 
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
-        for ((index, opcion) in opciones.withIndex()) {
+        for ((index, item) in opciones.withIndex()) {
+            val (opcion, bgHex, strokeHex) = item
             val btn = com.google.android.material.button.MaterialButton(this).apply {
                 text = opcion
                 isAllCaps = false
-                setTextColor(Color.parseColor("#1E293B"))
+                setTextColor(strokeHex)
                 textSize = 14f
-                backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFFFFF"))
-                strokeColor = android.content.res.ColorStateList.valueOf(Color.parseColor("#CBD5E1"))
-                strokeWidth = (1 * resources.displayMetrics.density).toInt()
-                cornerRadius = (12 * resources.displayMetrics.density).toInt()
+                backgroundTintList = android.content.res.ColorStateList.valueOf(bgHex)
+                strokeColor = android.content.res.ColorStateList.valueOf(strokeHex)
+                strokeWidth = (1.5 * resources.displayMetrics.density).toInt()
+                cornerRadius = (14 * resources.displayMetrics.density).toInt()
                 gravity = android.view.Gravity.START or android.view.Gravity.CENTER_VERTICAL
-                setPadding((14 * resources.displayMetrics.density).toInt(), (12 * resources.displayMetrics.density).toInt(), (14 * resources.displayMetrics.density).toInt(), (12 * resources.displayMetrics.density).toInt())
+                setPadding((16 * resources.displayMetrics.density).toInt(), (14 * resources.displayMetrics.density).toInt(), (16 * resources.displayMetrics.density).toInt(), (14 * resources.displayMetrics.density).toInt())
 
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
-                    bottomMargin = (8 * resources.displayMetrics.density).toInt()
+                    bottomMargin = (10 * resources.displayMetrics.density).toInt()
                 }
 
                 setOnClickListener {
@@ -334,7 +359,13 @@ class PreparacionActivity : AppCompatActivity() {
         val miCorreo = sessionMgr.getUserEmail() ?: ""
         val comp = componenteAsignado ?: "Preparación general"
 
-        PreparacionEstadoManager.guardarEstado(this, miNombre, comp, miCorreo, nuevoEstado)
+        PreparacionEstadoManager.guardarEstado(
+            context = this,
+            persona = miNombre,
+            componente = comp,
+            estado = nuevoEstado,
+            correo = miCorreo
+        )
         actualizarVistaEstado(nuevoEstado)
         Toast.makeText(this, "Estado actualizado a: $nuevoEstado", Toast.LENGTH_SHORT).show()
     }
@@ -345,7 +376,13 @@ class PreparacionActivity : AppCompatActivity() {
         val miCorreo = sessionMgr.getUserEmail() ?: ""
         val comp = componenteAsignado ?: "Preparación general"
 
-        PreparacionEstadoManager.guardarEstado(this, miNombre, comp, miCorreo, nuevoEstado)
+        PreparacionEstadoManager.guardarEstado(
+            context = this,
+            persona = miNombre,
+            componente = comp,
+            estado = nuevoEstado,
+            correo = miCorreo
+        )
         actualizarVistaEstado(nuevoEstado)
         Toast.makeText(this, "Estado actualizado a: $nuevoEstado", Toast.LENGTH_SHORT).show()
     }

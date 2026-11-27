@@ -132,10 +132,16 @@ class AsignadasActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        binding.tvComponenteMiPlato.setOnClickListener {
+            val compAsignado = sessionMgr.getComponenteAsignado(this) ?: "Preparación general"
+            val miNombre = sessionMgr.getUserName() ?: "Manipuladora"
+            mostrarDialogoOpcionesEstadoAsignada(compAsignado, miNombre)
+        }
+
         binding.cardMiPlatoAsignado.setOnClickListener {
             val compAsignado = sessionMgr.getComponenteAsignado(this) ?: "Preparación general"
             val miNombre = sessionMgr.getUserName() ?: "Manipuladora"
-            mostrarDialogoDetalleAsignacion("Preparación de $compAsignado", miNombre)
+            mostrarDialogoOpcionesEstadoAsignada(compAsignado, miNombre)
         }
 
         binding.cardVerEquipo.setOnClickListener {
@@ -180,7 +186,28 @@ class AsignadasActivity : AppCompatActivity() {
 
         dialogBinding.btnMarcarCompletado.setOnClickListener {
             dialog.dismiss()
-            Toast.makeText(this, "¡Tarea '$nombrePaso' marcada como completada!", Toast.LENGTH_SHORT).show()
+            val compAsignado = sessionMgr.getComponenteAsignado(this) ?: "Preparación general"
+            val miNombre = sessionMgr.getUserName() ?: "Manipuladora"
+            val miCorreo = sessionMgr.getUserEmail() ?: ""
+
+            val estadoActual = PreparacionEstadoManager.obtenerEstado(this, miNombre, compAsignado, miCorreo)
+            val siguienteEstado = when (estadoActual) {
+                PreparacionEstadoManager.ESTADO_POR_HACER -> PreparacionEstadoManager.ESTADO_EN_PROCESO
+                PreparacionEstadoManager.ESTADO_EN_PROCESO -> PreparacionEstadoManager.ESTADO_FINALIZADA
+                else -> PreparacionEstadoManager.ESTADO_FINALIZADA
+            }
+
+            PreparacionEstadoManager.guardarEstado(
+                context = this,
+                persona = miNombre,
+                componente = compAsignado,
+                estado = siguienteEstado,
+                correo = miCorreo
+            )
+
+            configurarEncabezadoYPlato()
+            configurarListaOperarias()
+            Toast.makeText(this, "¡Estado de $compAsignado actualizado a '$siguienteEstado'!", Toast.LENGTH_SHORT).show()
         }
 
         dialogBinding.btnCerrarDetalle.setOnClickListener {
@@ -188,6 +215,79 @@ class AsignadasActivity : AppCompatActivity() {
         }
 
         dialog.show()
+    }
+
+    private fun mostrarDialogoOpcionesEstadoAsignada(componente: String, persona: String) {
+        val miCorreo = sessionMgr.getUserEmail() ?: ""
+        val opciones = listOf(
+            Triple("Por hacer / Pendiente", android.graphics.Color.parseColor("#FEF3C7"), android.graphics.Color.parseColor("#D97706")),
+            Triple("En proceso / En preparación ⏳", android.graphics.Color.parseColor("#DBEAFE"), android.graphics.Color.parseColor("#2563EB")),
+            Triple("Finalizada / Completada ✓", android.graphics.Color.parseColor("#DCFCE7"), android.graphics.Color.parseColor("#16A34A"))
+        )
+
+        val dialogBinding = com.example.movilmanupuladora.databinding.DialogOpcionesJefaBinding.inflate(layoutInflater)
+        dialogBinding.txtTituloOpciones.text = "Seleccionar Estado de $componente"
+        dialogBinding.contenedorBotonesOpciones.removeAllViews()
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(dialogBinding.root)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        for ((index, item) in opciones.withIndex()) {
+            val (opcion, bgHex, strokeHex) = item
+            val btn = com.google.android.material.button.MaterialButton(this).apply {
+                text = opcion
+                isAllCaps = false
+                setTextColor(strokeHex)
+                textSize = 14f
+                backgroundTintList = android.content.res.ColorStateList.valueOf(bgHex)
+                strokeColor = android.content.res.ColorStateList.valueOf(strokeHex)
+                strokeWidth = (1.5 * resources.displayMetrics.density).toInt()
+                cornerRadius = (14 * resources.displayMetrics.density).toInt()
+                gravity = android.view.Gravity.START or android.view.Gravity.CENTER_VERTICAL
+                setPadding((16 * resources.displayMetrics.density).toInt(), (14 * resources.displayMetrics.density).toInt(), (16 * resources.displayMetrics.density).toInt(), (14 * resources.displayMetrics.density).toInt())
+
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    bottomMargin = (10 * resources.displayMetrics.density).toInt()
+                }
+
+                setOnClickListener {
+                    dialog.dismiss()
+                    val nuevoEstado = when (index) {
+                        0 -> PreparacionEstadoManager.ESTADO_POR_HACER
+                        1 -> PreparacionEstadoManager.ESTADO_EN_PROCESO
+                        2 -> PreparacionEstadoManager.ESTADO_FINALIZADA
+                        else -> PreparacionEstadoManager.ESTADO_POR_HACER
+                    }
+                    PreparacionEstadoManager.guardarEstado(
+                        context = this@AsignadasActivity,
+                        persona = persona,
+                        componente = componente,
+                        estado = nuevoEstado,
+                        correo = miCorreo
+                    )
+                    configurarEncabezadoYPlato()
+                    configurarListaOperarias()
+                    Toast.makeText(this@AsignadasActivity, "Estado actualizado a: $nuevoEstado", Toast.LENGTH_SHORT).show()
+                }
+            }
+            dialogBinding.contenedorBotonesOpciones.addView(btn)
+        }
+
+        dialogBinding.btnCancelarOpciones.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.90).toInt(),
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
     }
 
     private fun configurarConmutadorNutricional() {

@@ -369,227 +369,22 @@
 
                     </LinearLayout>
 
-                    <!-- AVATARES HORIZONTALES (MV, LG, DR, CL) -->
+                    <!-- CONTENEDOR DINÁMICO DE LA LISTA DEL EQUIPO REAL -->
                     <LinearLayout
+                        android:id="@+id/layoutEquipoOperarias"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        android:gravity="center"
-                        android:orientation="horizontal">
-
-                        <!-- AVATAR 1 (TÚ - MV) -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:orientation="vertical">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                app:cardBackgroundColor="#FEF9E7"
-                                app:cardCornerRadius="24dp"
-                                app:cardElevation="0dp"
-                                app:strokeColor="#F4B41F"
-                                app:strokeWidth="2dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:text="MV"
-                                    android:textColor="#1B3317"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold" />
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="Tú"
-                                android:textColor="#1E293B"
-                                android:textSize="11sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-
-                        <!-- AVATAR 2 (LUZ - LG) -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:orientation="vertical">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                app:cardBackgroundColor="#F8FAFC"
-                                app:cardCornerRadius="24dp"
-                                app:cardElevation="0dp"
-                                app:strokeColor="#E2E8F0"
-                                app:strokeWidth="1dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:text="LG"
-                                    android:textColor="#475569"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold" />
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="Luz"
-                                android:textColor="#64748B"
-                                android:textSize="11sp" />
-                        </LinearLayout>
-
-                        <!-- AVATAR 3 (DIANA - DR) -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:orientation="vertical">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                app:cardBackgroundColor="#F8FAFC"
-                                app:cardCornerRadius="24dp"
-                                app:cardElevation="0dp"
-                                app:strokeColor="#E2E8F0"
-                                app:strokeWidth="1dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:text="DR"
-                                    android:textColor="#475569"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold" />
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="Diana"
-                                android:textColor="#64748B"
-                                android:textSize="11sp" />
-                        </LinearLayout>
-
-                        <!-- AVATAR 4 (CARMEN - CL) -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:orientation="vertical">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                app:cardBackgroundColor="#F8FAFC"
-                                app:cardCornerRadius="24dp"
-                                app:cardElevation="0dp"
-                                app:strokeColor="#E2E8F0"
-                                app:strokeWidth="1dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:text="CL"
-                                    android:textColor="#475569"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold" />
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="Carmen"
-                                android:textColor="#64748B"
-                                android:textSize="11sp" />
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                    <!-- TARJETA INTERNA AMARILLA SUPER SUAVE CON BORDES: MARIA ALEJANDRA VELAZCO / PENDIENTE DE ASIGNACIÓN -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        app:cardBackgroundColor="#FEF9E7"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="#F4B41F"
-                        app:strokeWidth="1.5dp">
+                        android:layout_marginTop="12dp"
+                        android:orientation="vertical"
+                        android:visibility="visible">
 
                         <LinearLayout
+                            android:id="@+id/contenedorListaOperarias"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:padding="12dp">
+                            android:orientation="vertical" />
 
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Maria Alejandra Velazco"
-                                    android:textColor="#1E293B"
-                                    android:textSize="13sp"
-                                    android:textStyle="bold" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
-                                    android:text="Pendiente de asignación"
-                                    android:textColor="#64748B"
-                                    android:textSize="11sp" />
-
-                            </LinearLayout>
-
-                            <!-- BADGE "PENDIENTE" CON BORDES DEFINIDOS -->
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                app:cardBackgroundColor="#FEF9E7"
-                                app:cardCornerRadius="8dp"
-                                app:cardElevation="0dp"
-                                app:strokeColor="#F4B41F"
-                                app:strokeWidth="1dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:paddingHorizontal="8dp"
-                                    android:paddingVertical="3dp"
-                                    android:text="PENDIENTE"
-                                    android:textColor="#B45309"
-                                    android:textSize="10.5sp"
-                                    android:textStyle="bold" />
-
-                            </com.google.android.material.card.MaterialCardView>
-
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -1012,19 +807,7 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- CONTENEDORES OCULTOS PARA COMPATIBILIDAD CON ASIGNADASACTIVITY -->
-            <LinearLayout
-                android:id="@+id/layoutEquipoOperarias"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone">
-                <LinearLayout
-                    android:id="@+id/contenedorListaOperarias"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" />
-            </LinearLayout>
+
 
             <View
                 android:id="@+id/cardPasoAsignado1"
