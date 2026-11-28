@@ -82,6 +82,9 @@ interface ApiService {
     @GET("platos/")
     suspend fun obtenerPlatos(): Response<List<PlatoResponse>>
 
+    @GET("platos/")
+    suspend fun obtenerPlatosRaw(): Response<com.google.gson.JsonElement>
+
     @GET("platos/{id}/")
     suspend fun obtenerPlatoPorId(
         @Path("id") id: Int

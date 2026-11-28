@@ -122,6 +122,11 @@ class MainActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
+                com.example.movilmanupuladora.utils.SedeContratoManager.sincronizarSeccionesContrato(
+                    this@MainActivity,
+                    SessionManager(this@MainActivity).getSedeId()
+                )
+                actualizarEstadoJornadaInicio()
                 com.example.movilmanupuladora.utils.PreparacionSyncManager.sincronizarDesdeBackend(this@MainActivity)
                 actualizarInformacionSeccion()
                 cargarAsistenciaLocal()
@@ -166,6 +171,11 @@ class MainActivity : AppCompatActivity() {
         iniciarPollingAsistenciaEnVivo()
         lifecycleScope.launch {
             try {
+                com.example.movilmanupuladora.utils.SedeContratoManager.sincronizarSeccionesContrato(
+                    this@MainActivity,
+                    SessionManager(this@MainActivity).getSedeId()
+                )
+                actualizarEstadoJornadaInicio()
                 com.example.movilmanupuladora.utils.PreparacionSyncManager.sincronizarDesdeBackend(this@MainActivity)
                 actualizarInformacionSeccion()
                 cargarAsistenciaLocal()
@@ -227,6 +237,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun actualizarEstadoJornadaInicio() {
+        val secciones = com.example.movilmanupuladora.utils.SedeContratoManager.obtenerSeccionesActivas(this)
+        val tieneDesayuno = secciones.isEmpty() || secciones.contains("Desayuno")
+        val tieneAlmuerzo = secciones.contains("Almuerzo")
+        val tieneMerienda = secciones.contains("Merienda")
+
+        binding.btnSeccionDesayuno.visibility = if (tieneDesayuno) View.VISIBLE else View.GONE
+        binding.btnSeccionAlmuerzo.visibility = if (tieneAlmuerzo) View.VISIBLE else View.GONE
+        binding.btnSeccionMerienda.visibility = if (tieneMerienda) View.VISIBLE else View.GONE
+
+        binding.btnSeccionDesayuno.alpha = 1.0f
+        binding.btnSeccionDesayuno.isEnabled = tieneDesayuno
+        binding.btnSeccionAlmuerzo.alpha = 1.0f
+        binding.btnSeccionAlmuerzo.isEnabled = tieneAlmuerzo
+        binding.btnSeccionMerienda.alpha = 1.0f
+        binding.btnSeccionMerienda.isEnabled = tieneMerienda
+
         if (jornadaActualInicio == "MANANA") {
             binding.btnJornadaManana.setBackgroundResource(R.drawable.bg_pill_green)
             binding.btnJornadaManana.setTextColor(Color.WHITE)
@@ -234,17 +260,12 @@ class MainActivity : AppCompatActivity() {
             binding.btnJornadaTarde.setBackgroundResource(0)
             binding.btnJornadaTarde.setTextColor(Color.parseColor("#64748B"))
 
-            // Mantener todas las secciones activas para que la manipuladora pueda revisar los 3 servicios
-            binding.btnSeccionDesayuno.alpha = 1.0f
-            binding.btnSeccionDesayuno.isEnabled = true
-
-            binding.btnSeccionAlmuerzo.alpha = 1.0f
-            binding.btnSeccionAlmuerzo.isEnabled = true
-
-            binding.btnSeccionMerienda.alpha = 1.0f
-            binding.btnSeccionMerienda.isEnabled = true
-
-            seleccionarSeccion(0) // Selecciona Desayuno por defecto
+            val idxDef = when {
+                tieneDesayuno -> 0
+                tieneAlmuerzo -> 1
+                else -> 2
+            }
+            seleccionarSeccion(idxDef)
         } else {
             binding.btnJornadaTarde.setBackgroundResource(R.drawable.bg_pill_green)
             binding.btnJornadaTarde.setTextColor(Color.WHITE)
@@ -252,17 +273,12 @@ class MainActivity : AppCompatActivity() {
             binding.btnJornadaManana.setBackgroundResource(0)
             binding.btnJornadaManana.setTextColor(Color.parseColor("#64748B"))
 
-            // Mantener todas las secciones activas también en la tarde
-            binding.btnSeccionDesayuno.alpha = 1.0f
-            binding.btnSeccionDesayuno.isEnabled = true
-
-            binding.btnSeccionAlmuerzo.alpha = 1.0f
-            binding.btnSeccionAlmuerzo.isEnabled = true
-
-            binding.btnSeccionMerienda.alpha = 1.0f
-            binding.btnSeccionMerienda.isEnabled = true
-
-            seleccionarSeccion(2) // Selecciona Merienda por defecto
+            val idxDef = when {
+                tieneMerienda -> 2
+                tieneAlmuerzo -> 1
+                else -> 0
+            }
+            seleccionarSeccion(idxDef)
         }
     }
 
@@ -566,7 +582,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun esFinDeSemanaHoy(): Boolean {
+        val dow = java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_WEEK)
+        return dow == java.util.Calendar.SATURDAY || dow == java.util.Calendar.SUNDAY
+    }
+
     private suspend fun cargarAsistenciaBackend() {
+        if (esFinDeSemanaHoy()) {
+            withContext(Dispatchers.Main) {
+                actualizarVistaAsistencia(0, 0, 0, hayRegistro = false)
+            }
+            return
+        }
         withContext(Dispatchers.IO) {
             try {
                 SessionManager.getToken(this@MainActivity)
@@ -618,15 +645,11 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     if (totalEstudiantes == 0) {
-                        val pLocal = AsistenciaManager.obtenerPrimaria(this@MainActivity)
-                        val sLocal = AsistenciaManager.obtenerSecundaria(this@MainActivity)
-                        val totLocal = (pLocal + sLocal).takeIf { it > 0 }
-                            ?: AsistenciaManager.obtenerManana(this@MainActivity).takeIf { it > 0 }
-                            ?: AsistenciaManager.obtenerTarde(this@MainActivity)
-                        if (totLocal > 0) {
-                            totalEstudiantes = totLocal
-                            totalPrimaria = pLocal
-                            totalSecundaria = sLocal
+                        val totFecha = AsistenciaManager.obtenerTotalFecha(this@MainActivity, fechaHoy)
+                        if (totFecha > 0) {
+                            totalEstudiantes = totFecha
+                            totalPrimaria = AsistenciaManager.obtenerPrimariaFecha(this@MainActivity, fechaHoy)
+                            totalSecundaria = AsistenciaManager.obtenerSecundariaFecha(this@MainActivity, fechaHoy)
                         }
                     }
 
@@ -664,33 +687,33 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun cargarAsistenciaLocal() {
-        val p = AsistenciaManager.obtenerPrimaria(this)
-        val s = AsistenciaManager.obtenerSecundaria(this)
-        var total = p + s
-        if (total == 0) {
-            total = AsistenciaManager.obtenerManana(this)
+        if (esFinDeSemanaHoy()) {
+            actualizarVistaAsistencia(0, 0, 0, hayRegistro = false)
+            return
         }
-        if (total == 0) {
-            total = AsistenciaManager.obtenerTarde(this)
-        }
+        val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        val p = AsistenciaManager.obtenerPrimariaFecha(this, fechaHoy)
+        val s = AsistenciaManager.obtenerSecundariaFecha(this, fechaHoy)
+        val total = AsistenciaManager.obtenerTotalFecha(this, fechaHoy).takeIf { it > 0 } ?: (p + s)
         actualizarVistaAsistencia(p, s, total, hayRegistro = (total > 0))
     }
 
     private fun actualizarVistaAsistencia(primaria: Int, secundaria: Int, total: Int, hayRegistro: Boolean = true) {
-        val p = if (primaria > 0) primaria else AsistenciaManager.obtenerPrimaria(this)
-        val s = if (secundaria > 0) secundaria else AsistenciaManager.obtenerSecundaria(this)
-        val tot = if (total > 0) total else (p + s).takeIf { it > 0 } ?: AsistenciaManager.obtenerManana(this)
-
-        if (tot > 0) {
-            binding.tvTotalAsistenciaSumatoria.text = "$tot est."
-            binding.tvDesgloseAsistencia.text = "Prim: $p Â· Sec: $s"
-            binding.tvRacionesBadge.text = tot.toString()
-            binding.tvSubtituloRacionesCalculadas.text = "$tot raciones calculadas Â· Primaria $p Â· Sec. $s"
+        val esFinSem = esFinDeSemanaHoy()
+        if (!esFinSem && hayRegistro && total > 0) {
+            binding.tvTotalAsistenciaSumatoria.text = "$total est."
+            binding.tvDesgloseAsistencia.text = "Prim: $primaria · Sec: $secundaria"
+            binding.tvRacionesBadge.text = total.toString()
+            binding.tvSubtituloRacionesCalculadas.text = "$total raciones calculadas · Primaria $primaria · Sec. $secundaria"
         } else {
-            binding.tvTotalAsistenciaSumatoria.text = "â€”"
-            binding.tvDesgloseAsistencia.text = "Sin registro aÃºn"
-            binding.tvRacionesBadge.text = "â€”"
-            binding.tvSubtituloRacionesCalculadas.text = "Raciones pendientes de registro por la jefa"
+            binding.tvTotalAsistenciaSumatoria.text = "—"
+            binding.tvDesgloseAsistencia.text = if (esFinSem) "Fin de semana" else "Sin registro aún"
+            binding.tvRacionesBadge.text = "—"
+            binding.tvSubtituloRacionesCalculadas.text = if (esFinSem) {
+                "No se registra asistencia en fin de semana"
+            } else {
+                "Raciones pendientes de registro por la jefa"
+            }
         }
     }
 
@@ -706,25 +729,26 @@ class MainActivity : AppCompatActivity() {
     private fun mostrarDialogoAsistenciaPorGrados() {
         val dialogBinding = com.example.movilmanupuladora.databinding.DialogDetalleAsistenciaBinding.inflate(layoutInflater)
 
-        // Cargar valores guardados en AsistenciaManager (registrados por la Jefa)
-        val detalle = AsistenciaManager.obtenerDetalleGradosHoy(this)
+        val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        val hayHoy = !esFinDeSemanaHoy() && AsistenciaManager.obtenerTotalFecha(this, fechaHoy) > 0
+        val detalle = if (hayHoy) AsistenciaManager.obtenerDetalleGradosHoy(this) else emptyMap()
 
-        val jar = detalle["jar"]?.toIntOrNull() ?: 15
-        val p1 = detalle["p1"]?.toIntOrNull() ?: 20
-        val p2 = detalle["p2"]?.toIntOrNull() ?: 20
-        val p3 = detalle["p3"]?.toIntOrNull() ?: 15
-        val p4 = detalle["p4"]?.toIntOrNull() ?: 15
-        val p5 = detalle["p5"]?.toIntOrNull() ?: 14
+        val jar = detalle["jar"]?.toIntOrNull() ?: 0
+        val p1 = detalle["p1"]?.toIntOrNull() ?: 0
+        val p2 = detalle["p2"]?.toIntOrNull() ?: 0
+        val p3 = detalle["p3"]?.toIntOrNull() ?: 0
+        val p4 = detalle["p4"]?.toIntOrNull() ?: 0
+        val p5 = detalle["p5"]?.toIntOrNull() ?: 0
 
-        val s6 = detalle["s6"]?.toIntOrNull() ?: 12
-        val s7 = detalle["s7"]?.toIntOrNull() ?: 12
-        val s8 = detalle["s8"]?.toIntOrNull() ?: 11
-        val s9 = detalle["s9"]?.toIntOrNull() ?: 11
-        val s10 = detalle["s10"]?.toIntOrNull() ?: 10
-        val s11 = detalle["s11"]?.toIntOrNull() ?: 10
+        val s6 = detalle["s6"]?.toIntOrNull() ?: 0
+        val s7 = detalle["s7"]?.toIntOrNull() ?: 0
+        val s8 = detalle["s8"]?.toIntOrNull() ?: 0
+        val s9 = detalle["s9"]?.toIntOrNull() ?: 0
+        val s10 = detalle["s10"]?.toIntOrNull() ?: 0
+        val s11 = detalle["s11"]?.toIntOrNull() ?: 0
 
-        val pSaved = AsistenciaManager.obtenerPrimaria(this)
-        val sSaved = AsistenciaManager.obtenerSecundaria(this)
+        val pSaved = if (hayHoy) AsistenciaManager.obtenerPrimariaFecha(this, fechaHoy) else 0
+        val sSaved = if (hayHoy) AsistenciaManager.obtenerSecundariaFecha(this, fechaHoy) else 0
 
         val finalP = if (detalle.isEmpty() || detalle.values.all { it.isBlank() }) {
             if (pSaved > 0) pSaved else 99

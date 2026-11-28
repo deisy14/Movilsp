@@ -31,6 +31,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -562,8 +563,20 @@ class RegistrarEntregaActivity : AppCompatActivity() {
         val obs = binding.edtObservacionesEntrega.text.toString().trim()
             .ifEmpty { "Víveres verificados y acta firmada en sede escolar." }
         val sedeNombre = sessionManager.getSedeNombre() ?: "Sede Central"
+        val nombreJefa = sessionManager.getUserName()?.trim()?.takeIf { it.isNotBlank() } ?: "Manipuladora Jefe"
+        val firmaBytes = binding.signatureView.getSignaturePngBytes()
 
         lifecycleScope.launch {
+            val animPuntosJob = launch {
+                val estados = listOf("Enviando.", "Enviando..", "Enviando...")
+                var idx = 0
+                while (true) {
+                    binding.btnAceptarEntrega.text = estados[idx % estados.size]
+                    idx++
+                    kotlinx.coroutines.delay(350)
+                }
+            }
+            try {
             // 1. PERSISTENCIA LOCAL GARANTIZADA DE ACEPTACIÓN
             val key = normalizarClaveRemision(numeroRemision)
             val prefs = getSharedPreferences("ENTREGAS_RECIBIDAS_PREFS", Context.MODE_PRIVATE)
@@ -588,14 +601,22 @@ class RegistrarEntregaActivity : AppCompatActivity() {
                 android.util.Log.e("REGISTRAR_ENTREGA", "Error actualizando inventario local: ${e.message}")
             }
 
-            // 3. NOTIFICACIÓN LOCAL EN LA APP PARA LA JEFA
+            // 3. NOTIFICACIÓN LOCAL EN LA APP PARA LA JEFA (ya marcada como leída porque ella misma la acaba de aceptar)
             try {
+                val tituloLocal = "Entrega recibida conforme ($numeroRemision)"
+                val msgLocal = "Remisión $numeroRemision aceptada e ingresada al inventario de la sede. Observaciones: $obs"
                 NotificacionesJefaManager.agregarNotificacionSede(
                     this@RegistrarEntregaActivity,
-                    "Entrega recibida conforme ($numeroRemision)",
-                    "Remisión $numeroRemision aceptada e ingresada al inventario de la sede. Observaciones: $obs",
+                    tituloLocal,
+                    msgLocal,
                     "Inventario"
                 )
+                NotificacionesJefaManager.obtenerNotificacionesSede(this@RegistrarEntregaActivity)
+                    .filter {
+                        it.titulo == tituloLocal ||
+                            (!it.numeroRemision.isNullOrBlank() && it.numeroRemision.equals(numeroRemision, ignoreCase = true))
+                    }
+                    .forEach { NotificacionesJefaManager.marcarLeida(this@RegistrarEntregaActivity, it.id) }
             } catch (_: Exception) {}
 
             // 4. CONFIRMACIÓN EN PARALELO EN EL BACKEND (el backend notifica automáticamente a Supervisor y Admin)
@@ -603,7 +624,7 @@ class RegistrarEntregaActivity : AppCompatActivity() {
             RetrofitClient.cargarToken(this@RegistrarEntregaActivity)
 
             coroutineScope {
-                listaIngredientesDespacho.mapNotNull { item ->
+                val tareasRecepcion = listaIngredientesDespacho.mapNotNull { item ->
                     item.idEntrega?.let { idEnt ->
                         async(Dispatchers.IO) {
                             try {
@@ -624,7 +645,35 @@ class RegistrarEntregaActivity : AppCompatActivity() {
                             }
                         }
                     }
-                }.awaitAll()
+                }
+                val tareaNotif = async(Dispatchers.IO) {
+                    // 5. NOTIFICAR AL SUPERVISOR EN PARALELO CON REMISIÓN, NOMBRE DE LA JEFA Y FIRMA COMPACTA
+                    try {
+                        val tituloNotif = "Entrega aceptada: $numeroRemision"
+                        val mensajeNotif = "La remisión $numeroRemision fue aceptada por la manipuladora jefe $nombreJefa ($sedeNombre)."
+                        val tituloBody = tituloNotif.toRequestBody("text/plain".toMediaTypeOrNull())
+                        val mensajeBody = mensajeNotif.toRequestBody("text/plain".toMediaTypeOrNull())
+                        val imagenPart = firmaBytes?.let { bytes ->
+                            val reqFile = bytes.toRequestBody("image/jpeg".toMediaTypeOrNull())
+                            MultipartBody.Part.createFormData(
+                                "imagen",
+                                "firma_${normalizarClaveRemision(numeroRemision)}.jpg",
+                                reqFile
+                            )
+                        }
+                        val resNotif = RetrofitClient.apiService.enviarNotificacion(tituloBody, mensajeBody, imagenPart)
+                        if (!resNotif.isSuccessful && imagenPart != null) {
+                            RetrofitClient.apiService.enviarNotificacion(tituloBody, mensajeBody, null)
+                        }
+                    } catch (e: Exception) {
+                        android.util.Log.e("REGISTRAR_ENTREGA", "Error enviando notificación con firma al supervisor: ${e.message}")
+                    }
+                }
+                (tareasRecepcion + tareaNotif).awaitAll()
+            }
+
+            } finally {
+                animPuntosJob.cancel()
             }
 
             enviandoEntrega = false

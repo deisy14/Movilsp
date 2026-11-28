@@ -72,15 +72,28 @@ class SignatureView @JvmOverloads constructor(
 
     fun hasSignature(): Boolean = hasSignature
 
-    fun getSignatureBase64(): String? {
+    fun getSignaturePngBytes(): ByteArray? {
         if (!hasSignature || width <= 0 || height <= 0) return null
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         canvas.drawColor(Color.WHITE)
         draw(canvas)
+        val maxW = 480
+        val exportBitmap = if (width > maxW) {
+            val scaledH = ((height.toFloat() / width.toFloat()) * maxW).toInt().coerceAtLeast(1)
+            Bitmap.createScaledBitmap(bitmap, maxW, scaledH, true)
+        } else {
+            bitmap
+        }
         val stream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
-        val byteArray = stream.toByteArray()
+        exportBitmap.compress(Bitmap.CompressFormat.JPEG, 82, stream)
+        if (exportBitmap !== bitmap) exportBitmap.recycle()
+        bitmap.recycle()
+        return stream.toByteArray()
+    }
+
+    fun getSignatureBase64(): String? {
+        val byteArray = getSignaturePngBytes() ?: return null
         return Base64.encodeToString(byteArray, Base64.NO_WRAP)
     }
 }

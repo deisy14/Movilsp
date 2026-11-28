@@ -19,7 +19,22 @@ class MenuRepository(private val apiService: ApiService) {
 
     // Platos (con su componente: Proteína, Principio, Acompañamiento, etc.)
     suspend fun obtenerPlatos(): Response<List<PlatoResponse>> {
-        return apiService.obtenerPlatos()
+        val res = apiService.obtenerPlatosRaw()
+        if (res.isSuccessful && res.body() != null) {
+            val root = res.body()!!
+            val arr = when {
+                root.isJsonArray -> root.asJsonArray
+                root.isJsonObject && root.asJsonObject.has("results") -> root.asJsonObject.getAsJsonArray("results")
+                root.isJsonObject && root.asJsonObject.has("data") -> root.asJsonObject.getAsJsonArray("data")
+                else -> null
+            }
+            val type = object : com.google.gson.reflect.TypeToken<List<PlatoResponse>>() {}.type
+            val lista: List<PlatoResponse> = if (arr != null) {
+                com.google.gson.Gson().fromJson(arr, type) ?: emptyList()
+            } else emptyList()
+            return Response.success(lista, res.raw())
+        }
+        return Response.error(res.code(), res.errorBody() ?: okhttp3.ResponseBody.create(null, ""))
     }
 
     suspend fun obtenerPlatoPorId(id: Int): Response<PlatoResponse> {

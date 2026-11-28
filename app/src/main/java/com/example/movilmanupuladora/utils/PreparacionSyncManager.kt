@@ -1281,6 +1281,9 @@ object PreparacionSyncManager {
                 }
 
                 if (nombrePlato.isNotBlank()) {
+                    val mEstado = if (obj.has("estado") && obj.get("estado").isJsonPrimitive) {
+                        obj.get("estado").asString.trim()
+                    } else "Pendiente"
                     sessionMgr.savePlatoDiaServicio(
                         context,
                         mFecha,
@@ -1288,6 +1291,7 @@ object PreparacionSyncManager {
                         nombrePlato,
                         if (mPlatoId > 0) mPlatoId else null
                     )
+                    sessionMgr.saveEstadoMenuDiaServicio(context, mFecha, servicio, mEstado)
                     sincronizados++
                 }
             }

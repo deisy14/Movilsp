@@ -453,7 +453,7 @@
             app:strokeColor="#F4B41F"
             app:strokeWidth="1.5dp" />
 
-        <!-- Botón Aceptar y Notificar (amarillo con texto blanco) -->
+        <!-- Botón Aceptar (amarillo con texto blanco) -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAceptarEntrega"
             style="@style/Widget.Material3.Button"
@@ -462,7 +462,7 @@
             android:layout_marginStart="8dp"
             android:layout_weight="1.5"
             android:backgroundTint="#F4B41F"
-            android:text="Aceptar y Notificar"
+            android:text="Aceptar"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold"

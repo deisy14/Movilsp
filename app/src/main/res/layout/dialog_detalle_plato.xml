@@ -117,30 +117,32 @@
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
-                    <!-- BADGE ASIGNADO (VERDE OSCURO #1B3317 CON CHECK) -->
+                    <!-- BADGE ESTADO INVENTARIO -->
                     <LinearLayout
+                        android:id="@+id/layoutBadgeEstadoModal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:background="@drawable/bg_pill_green"
+                        android:background="@drawable/bg_chip_pendiente"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingHorizontal="14dp"
                         android:paddingVertical="5dp">
 
                         <ImageView
+                            android:id="@+id/imgBadgeEstadoModal"
                             android:layout_width="14dp"
                             android:layout_height="14dp"
                             android:layout_marginEnd="4dp"
                             android:src="@drawable/ic_check_circle"
-                            app:tint="#FFFFFF" />
+                            app:tint="#92400E" />
 
                         <TextView
                             android:id="@+id/tvBadgeEstadoModal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Asignado"
-                            android:textColor="#FFFFFF"
+                            android:textColor="#92400E"
                             android:textSize="11.5sp"
                             android:textStyle="bold" />
 
@@ -159,6 +161,7 @@
 
                 <!-- SECCIÓN -->
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardSeccionModal"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="6dp"
@@ -206,14 +209,15 @@
 
                 <!-- COMPONENTE -->
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardComponenteModal"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    app:cardBackgroundColor="#E8F5E9"
+                    app:cardBackgroundColor="#FEF3C7"
                     app:cardCornerRadius="14dp"
                     app:cardElevation="1dp"
-                    app:strokeColor="#15803D"
+                    app:strokeColor="#FDE68A"
                     app:strokeWidth="1dp">
 
                     <LinearLayout
@@ -226,7 +230,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="COMPONENTE"
-                            android:textColor="#15803D"
+                            android:textColor="#92400E"
                             android:textSize="10sp"
                             android:textStyle="bold" />
 
@@ -236,7 +240,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="3dp"
                             android:text="Componente Proteico y Cereal"
-                            android:textColor="#1B3317"
+                            android:textColor="#92400E"
                             android:textSize="13sp"
                             android:textStyle="bold" />
 
@@ -244,8 +248,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Jugo natural o bebida láctea"
-                            android:textColor="#15803D"
+                            android:text="Receta y preparación PAE"
+                            android:textColor="#B45309"
                             android:textSize="11sp" />
 
                     </LinearLayout>
@@ -287,6 +291,7 @@
 
                     <!-- PORCIÓN -->
                     <LinearLayout
+                        android:id="@+id/layoutPorcionRow"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
@@ -312,6 +317,7 @@
 
                     <!-- TOTAL A PREPARAR -->
                     <LinearLayout
+                        android:id="@+id/layoutTotalPrepararRow"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
@@ -330,11 +336,20 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="165 raciones"
-                            android:textColor="#1B3317"
+                            android:textColor="#92400E"
                             android:textSize="13sp"
                             android:textStyle="bold" />
 
                     </LinearLayout>
+
+                    <!-- PREPARACIÓN PASO A PASO POR COMPONENTE -->
+                    <LinearLayout
+                        android:id="@+id/layoutPasosCatalogoModal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="vertical"
+                        android:visibility="gone" />
 
                 </LinearLayout>
 
@@ -355,7 +370,71 @@
                 app:cornerRadius="14dp"
                 app:elevation="0dp" />
 
-            <!-- SECCIÓN: CONSULTAR PLATO DE OTRO SERVICIO -->
+            <!-- GRAMAJE TOTAL REQUERIDO HOY (DINÁMICO SEGÚN ASISTENCIA) -->
+            <LinearLayout
+                android:id="@+id/layoutGramajeTotalHoySection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tvTituloGramajeModal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gramaje total requerido hoy"
+                    android:textColor="#1E293B"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:cardBackgroundColor="#1B3317"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="1dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="14dp"
+                        android:paddingVertical="10dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="INGREDIENTE"
+                            android:textColor="#FFFFFF"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="TOTAL REQUERIDO"
+                            android:textColor="#FFFFFF"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <LinearLayout
+                    android:id="@+id/layoutFilasGramajeModal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="vertical" />
+
+            </LinearLayout>
+
+            <!-- SECCIÓN: CONFIGURAR PLATO PARA EL DÍA -->
             <LinearLayout
                 android:id="@+id/layoutSeleccionServicioModal"
                 android:layout_width="match_parent"
@@ -367,9 +446,9 @@
                     android:id="@+id/tvTituloAsignarServicio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Consultar plato de otro servicio:"
+                    android:text="Configurar este plato para el día:"
                     android:textColor="#1E293B"
-                    android:textSize="12sp"
+                    android:textSize="12.5sp"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -398,7 +477,7 @@
                         app:strokeColor="#15803D"
                         app:strokeWidth="1.5dp" />
 
-                    <!-- ALMUERZO (ACTIVO EN VERDE OSCURO #1B3317) -->
+                    <!-- ALMUERZO -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnAsignarAlmuerzoModal"
                         android:layout_width="0dp"
@@ -445,30 +524,38 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
                     android:gravity="center"
-                    android:text="Toca un servicio para revisar su porción, gramaje e instrucciones."
+                    android:text="Toca un servicio para asignar o quitar este plato."
                     android:textColor="#64748B"
                     android:textSize="11sp" />
 
             </LinearLayout>
 
-            <!-- GRAMAJE TOTAL REQUERIDO HOY -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Gramaje total requerido hoy"
-                android:textColor="#1E293B"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <!-- ENCABEZADO DE TABLA (BANNER VERDE OSCURO #1B3317 Y TEXTO BLANCO) -->
-            <com.google.android.material.card.MaterialCardView
+            <!-- SECCIÓN ESTÁTICA LEGACY OCULTA -->
+            <LinearLayout
+                android:id="@+id/layoutEjemploLegacyOculto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:cardBackgroundColor="#1B3317"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="1dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- GRAMAJE TOTAL REQUERIDO HOY -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Gramaje total requerido hoy"
+                    android:textColor="#1E293B"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <!-- ENCABEZADO DE TABLA (BANNER VERDE OSCURO #1B3317 Y TEXTO BLANCO) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:cardBackgroundColor="#1B3317"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="1dp"
                 app:strokeWidth="0dp">
 
                 <LinearLayout
@@ -825,6 +912,8 @@
 
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
 
             </LinearLayout>
 

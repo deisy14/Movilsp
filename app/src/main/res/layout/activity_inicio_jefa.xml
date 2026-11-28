@@ -96,15 +96,14 @@
             <!-- Badge numérico / indicador de nueva notificación -->
             <TextView
                 android:id="@+id/badgeNotificacionesJefa"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
                 android:layout_gravity="top|end"
-                android:layout_marginTop="-2dp"
-                android:layout_marginEnd="-2dp"
                 android:elevation="8dp"
                 android:translationZ="8dp"
                 android:background="@drawable/bg_badge_notificacion"
                 android:gravity="center"
+                android:includeFontPadding="false"
                 android:textColor="#FFFFFF"
                 android:textSize="10sp"
                 android:textStyle="bold"
@@ -793,9 +792,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground"
+                    android:clickable="false"
+                    android:focusable="false"
                     app:cardBackgroundColor="#FFFFFF"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="2dp"
@@ -838,13 +836,6 @@
                                     android:textSize="12sp" />
                             </LinearLayout>
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="›"
-                                android:textColor="#94A3B8"
-                                android:textSize="20sp" />
-
                         </LinearLayout>
 
                         <!-- TRES MÉTRICAS CON DIVISORES -->
@@ -872,7 +863,7 @@
                                         android:layout_width="18dp"
                                         android:layout_height="18dp"
                                         android:layout_gravity="center"
-                                        android:src="@drawable/ic_nav_manipuladoras"
+                                        android:src="@drawable/ic_check"
                                         app:tint="#1E293B" />
                                 </FrameLayout>
 

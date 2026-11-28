@@ -308,6 +308,15 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- RESUMEN COMPACTO DE PLATOS PROGRAMADOS DEL DÍA SELECCIONADO -->
+            <LinearLayout
+                android:id="@+id/layoutPlatosProgramadosDia"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal"
+                android:visibility="gone" />
+
             <!-- BOTÓN NUEVA RECETA (MOVIDO AL BOTÓN CENTRAL + DE LA BARRA DE NAVEGACIÓN) -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnNuevaReceta"

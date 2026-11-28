@@ -67,6 +67,26 @@ class SugerenciaIaActivity : AppCompatActivity() {
     }
 
     private fun configurarSelectorMomentos() {
+        val secciones = com.example.movilmanupuladora.utils.SedeContratoManager.obtenerSeccionesActivas(this)
+        val visDes = secciones.isEmpty() || secciones.contains("Desayuno")
+        val visAlm = secciones.contains("Almuerzo")
+        val visMer = secciones.contains("Merienda")
+
+        binding.btnMomentoDesayuno.visibility = if (visDes) View.VISIBLE else View.GONE
+        binding.btnMomentoAlmuerzo.visibility = if (visAlm) View.VISIBLE else View.GONE
+        binding.btnMomentoMerienda.visibility = if (visMer) View.VISIBLE else View.GONE
+
+        if ((seccionSeleccionadaId == 1 && !visDes) ||
+            (seccionSeleccionadaId == 2 && !visAlm) ||
+            (seccionSeleccionadaId == 3 && !visMer)
+        ) {
+            seccionSeleccionadaId = when {
+                visDes -> 1
+                visAlm -> 2
+                else -> 3
+            }
+        }
+
         actualizarEstiloBotonMomento(binding.btnMomentoDesayuno, seccionSeleccionadaId == 1)
         actualizarEstiloBotonMomento(binding.btnMomentoAlmuerzo, seccionSeleccionadaId == 2)
         actualizarEstiloBotonMomento(binding.btnMomentoMerienda, seccionSeleccionadaId == 3)

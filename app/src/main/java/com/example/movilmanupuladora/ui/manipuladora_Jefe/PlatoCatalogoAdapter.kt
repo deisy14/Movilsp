@@ -26,10 +26,14 @@ class PlatoCatalogoAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val plato = listaPlatos[position]
-        holder.binding.tvNombrePlatoCatalogo.text = plato.nombrePlato ?: "Plato PAE"
-        holder.binding.tvComponenteCatalogo.text = plato.componente ?: "Sopas, Sazón y Proteína"
+        val nombreLimpio = com.example.movilmanupuladora.utils.SessionManager.limpiarPrefijoMenu(
+            plato.nombrePlato ?: "Plato PAE"
+        )
+        holder.binding.tvNombrePlatoCatalogo.text = nombreLimpio
+        holder.binding.tvComponenteCatalogo.text = plato.componente?.takeIf { it.isNotBlank() }
+            ?: "Componentes configurados en PAE"
 
-        val imgRes = InicioJefaActivity.obtenerImagenPlato(plato.idPlato, position)
+        val imgRes = InicioJefaActivity.obtenerImagenPlatoPorNombre(nombreLimpio)
         holder.binding.imgPlatoCatalogo.setImageResource(imgRes)
 
         holder.itemView.setOnClickListener {
