@@ -17,8 +17,30 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="14dp">
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="12dp">
+
+        <!-- IMAGEN DEL INGREDIENTE -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardImagenProductoManipuladora"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="12dp"
+            app:cardBackgroundColor="#F8FAFC"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#E2E8F0"
+            app:strokeWidth="1dp">
+
+            <ImageView
+                android:id="@+id/imgProductoManipuladora"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="Imagen del ingrediente"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_food" />
+
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- NOMBRE DEL PRODUCTO Y CATEGORÍA -->
         <LinearLayout
@@ -76,7 +98,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
                 android:text="Disponible"
-                android:textColor="#15803D"
+                android:textColor="#2B5424"
                 android:textSize="11sp"
                 android:textStyle="bold" />
 

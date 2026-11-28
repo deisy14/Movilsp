@@ -696,7 +696,7 @@ class RegistrarEntregaActivity : AppCompatActivity() {
         }
     }
 
-    private fun dpToPx(dp: Float): Int {
+    private fun dpToPx(dp: Float): Int { 
         return (dp * resources.displayMetrics.density).toInt()
     }
 }

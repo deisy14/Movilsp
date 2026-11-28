@@ -30,8 +30,8 @@ object NavigationHelper {
         PERFIL
     }
 
-    private const val COLOR_ACTIVO_HEX = "#F4B41F"
-    private const val COLOR_INACTIVO_HEX = "#000000"
+    private const val COLOR_ACTIVO_HEX = "#2B5424"
+    private const val COLOR_INACTIVO_HEX = "#64748B"
 
     fun setupBarraNavegacion(
         activity: Activity,
@@ -76,6 +76,7 @@ object NavigationHelper {
         }
 
         val bottomBarBg = binding.root.findViewById<com.example.movilmanupuladora.ui.manipuladora.BottomBarBackground>(R.id.bottomBarBg)
+        bottomBarBg?.accentColor = colorActivo
         bottomBarBg?.post {
             val width = bottomBarBg.width.toFloat()
             if (width > 0) {
@@ -226,17 +227,27 @@ object NavigationHelper {
 
         val tvNombre = rootView.findViewById<android.widget.TextView>(R.id.tvNombreUsuarioSticky)
         val tvInst = rootView.findViewById<android.widget.TextView>(R.id.tvInstitucion)
+        val tvIniciales = rootView.findViewById<android.widget.TextView>(R.id.tvAvatarIniciales)
         val btnNotif = rootView.findViewById<View>(R.id.btnNotificaciones)
-        val badge = rootView.findViewById<View>(R.id.badgeNotificacionesSticky)
+        val badge = rootView.findViewById<android.widget.TextView>(R.id.badgeNotificacionesSticky)
 
-        tvNombre?.text = nombreUser
-        tvInst?.text = if (sedeNombre.isNotBlank()) sedeNombre else "Sede Principal"
+        tvNombre?.text = "Hola, $nombreUser"
+        tvInst?.text = if (sedeNombre.isNotBlank()) sedeNombre else "Sede asignada"
+        val iniciales = nombreUser.split("\\s+".toRegex())
+            .filter { it.isNotBlank() }
+            .take(2)
+            .mapNotNull { it.firstOrNull()?.uppercaseChar() }
+            .joinToString("")
+            .ifBlank { "PA" }
+        tvIniciales?.text = iniciales
 
         btnNotif?.setOnClickListener {
             if (onNotificationClick != null) {
                 onNotificationClick()
-            } else {
-                showNotificationPopup(activity)
+            } else if (activity !is AvisosActivity) {
+                val intent = Intent(activity, AvisosActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                activity.startActivity(intent)
             }
         }
 
@@ -247,6 +258,7 @@ object NavigationHelper {
                     if (response.isSuccessful && !response.body().isNullOrEmpty()) {
                         val noLeidas = response.body()!!.count { it.leido == false }
                         badge?.visibility = if (noLeidas > 0) View.VISIBLE else View.GONE
+                        badge?.text = if (noLeidas > 99) "99+" else noLeidas.toString()
                     } else {
                         badge?.visibility = View.GONE
                     }

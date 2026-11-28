@@ -10,6 +10,8 @@ import com.example.movilmanupuladora.ui.manipuladora_Jefe.AsistenciaManager
 import com.example.movilmanupuladora.ui.manipuladora_Jefe.ManipuladorasManager
 import com.example.movilmanupuladora.ui.manipuladora_Jefe.PreparacionEstadoManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -19,6 +21,13 @@ import java.util.Date
 import java.util.Locale
 
 object PreparacionSyncManager {
+
+    data class MiAsignacionItem(
+        val servicio: String,
+        val plato: String,
+        val componente: String,
+        val estado: String
+    )
 
     private const val TAG = "PreparacionSync"
     private const val PREFIX_PLATO = "PAE_PLATO:"
@@ -51,7 +60,15 @@ object PreparacionSyncManager {
     suspend fun sincronizarDesdeBackend(context: Context): Boolean = withContext(Dispatchers.IO) {
         try {
             SessionManager.getToken(context)
-            val resp = RetrofitClient.apiService.obtenerTurnos()
+            val resp = coroutineScope {
+                val turnosDef = async { RetrofitClient.apiService.obtenerTurnos() }
+                val manipDef = async { runCatching { ManipuladorasManager.cargarDesdeBackend() } }
+                val menusFechaDef = async { runCatching { sincronizarMenusPorFechaDesdeBackend(context) } }
+                val r = turnosDef.await()
+                manipDef.await()
+                menusFechaDef.await()
+                r
+            }
             if (!resp.isSuccessful || resp.body().isNullOrEmpty()) {
                 Log.d(TAG, "No se obtuvieron turnos o respuesta vacía: ${resp.code()}")
                 return@withContext false
@@ -59,21 +76,26 @@ object PreparacionSyncManager {
 
             val turnos = resp.body()!!
             val sessionMgr = SessionManager(context)
+            val idSedeActual = SedeContratoManager.resolverIdSedeEfectivo(sessionMgr)
             val jefaPrefs = context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE)
             val turnoPrefs = context.getSharedPreferences("TURNO_PAE", Context.MODE_PRIVATE)
             val jefaEditor = jefaPrefs.edit()
             val turnoEditor = turnoPrefs.edit()
 
-            // Asegurar que las manipuladoras del backend estén cargadas en memoria
-            try {
-                ManipuladorasManager.cargarDesdeBackend()
-            } catch (_: Exception) { }
             val listaManip = ManipuladorasManager.obtenerManipuladoras()
 
             var platoEncontrado = false
 
-            // 1. Platos seleccionados por servicio (Desayuno, Almuerzo, Merienda) y plato más reciente en la nube
-            val turnosPlatos = turnos.filter { it.obtenerNombreReal()?.startsWith(PREFIX_PLATO) == true }
+            // 1. Platos seleccionados por servicio (Desayuno, Almuerzo, Merienda) filtrados por sede
+            val turnosPlatos = turnos
+                .filter { t ->
+                    if (t.obtenerNombreReal()?.startsWith(PREFIX_PLATO) != true) return@filter false
+                    if (idSedeActual <= 0) return@filter true
+                    val obsSede = Regex("\\[SEDE:(\\d+)\\]").find(t.observaciones.orEmpty())
+                        ?.groupValues?.getOrNull(1)?.toIntOrNull()
+                    obsSede == idSedeActual
+                }
+                .sortedBy { it.obtenerIdReal() ?: 0 }
             for (t in turnosPlatos) {
                 val data = t.obtenerNombreReal()!!.removePrefix(PREFIX_PLATO).split("#")
                 if (data.isNotEmpty()) {
@@ -139,6 +161,10 @@ object PreparacionSyncManager {
             }
 
             // 2. Componentes asignados: agrupar por UID y Servicio para que Desayuno, Almuerzo y Merienda mantengan sus propios componentes
+            val misAsignacionesArray = org.json.JSONArray()
+            val miUidActual = sessionMgr.getUserId()
+            val miCorreoActual = sessionMgr.getUserEmail()?.trim()?.lowercase().orEmpty()
+            val miNombreActual = sessionMgr.getUserName()?.trim()?.lowercase().orEmpty()
             val turnosComp = turnos.filter { it.obtenerNombreReal()?.startsWith(PREFIX_COMP) == true }
             val turnosPorUsuarioYServicio = mutableMapOf<String, Turno>()
 
@@ -326,10 +352,27 @@ object PreparacionSyncManager {
                             correo = manipCorreo
                         )
 
+                        val esMia = (miUidActual > 0 && uid == miUidActual) ||
+                            (miCorreoActual.isNotBlank() && manipCorreo.equals(miCorreoActual, ignoreCase = true)) ||
+                            (miNombreActual.isNotBlank() && normalizar(manipNombre) == normalizar(miNombreActual))
+                        if (esMia) {
+                            misAsignacionesArray.put(
+                                org.json.JSONObject().apply {
+                                    put("servicio", servTurno)
+                                    put("componente", comp)
+                                    put("estado", estado)
+                                }
+                            )
+                        }
+
                         Log.d(TAG, "Componente de $manipNombre (uid=$uid, correo=$manipCorreo, serv=$servTurno) sincronizado: $comp ($estado)")
                     }
                 }
             }
+
+            context.getSharedPreferences("ASIGNACIONES_PAE", Context.MODE_PRIVATE).edit()
+                .putString("mis_asignaciones_json", misAsignacionesArray.toString())
+                .apply()
 
             // 3. Asistencia de estudiantes compartida en tiempo real (priorizar hoy y más reciente)
             val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
@@ -469,16 +512,30 @@ object PreparacionSyncManager {
                 }
                 val tagPlato = "$PREFIX_PLATO${nombreMenu.trim().take(30)}#$servLimpio#${idPlato ?: -1}"
                 val turnosPlatos = todosTurnos.filter { it.obtenerNombreReal()?.startsWith(PREFIX_PLATO) == true }
-                val existentePlato = turnosPlatos.firstOrNull {
+                val existentePlato = turnosPlatos.filter {
                     val raw = it.obtenerNombreReal()!!.removePrefix(PREFIX_PLATO).split("#")
                     raw.size > 1 && raw[1].trim().equals(servLimpio, ignoreCase = true)
-                } ?: turnosPlatos.firstOrNull()
+                }.maxByOrNull { it.obtenerIdReal() ?: 0 }
+                    ?: turnosPlatos.maxByOrNull { it.obtenerIdReal() ?: 0 }
 
+                val idSedeGuardado = SedeContratoManager.resolverIdSedeEfectivo(sessionMgr)
+                val obsSedeTag = if (idSedeGuardado > 0) "[SEDE:$idSedeGuardado]" else ""
                 val idP = existentePlato?.obtenerIdReal()
                 if (idP != null) {
-                    try { RetrofitClient.apiService.patchTurno(idP, mapOf("nombre_turno" to tagPlato)) } catch (_: Exception) { }
+                    try {
+                        val patchMap = if (obsSedeTag.isNotEmpty()) {
+                            mapOf("nombre_turno" to tagPlato, "observaciones" to obsSedeTag)
+                        } else {
+                            mapOf("nombre_turno" to tagPlato)
+                        }
+                        RetrofitClient.apiService.patchTurno(idP, patchMap)
+                    } catch (_: Exception) { }
                 } else {
-                    try { RetrofitClient.apiService.crearTurno(Turno(nombreTurno = tagPlato, horaInicio = "06:00:00", horaFin = "14:00:00")) } catch (_: Exception) { }
+                    try {
+                        RetrofitClient.apiService.crearTurno(
+                            Turno(nombreTurno = tagPlato, horaInicio = "06:00:00", horaFin = "14:00:00", observaciones = obsSedeTag.ifEmpty { null })
+                        )
+                    } catch (_: Exception) { }
                 }
 
                 // 2. Guardar o actualizar asignación de cada miembro con discriminación por servicio
@@ -654,12 +711,25 @@ object PreparacionSyncManager {
             val tag = "$PREFIX_PLATO${nombrePlato.trim().take(30)}#${jornada.trim()}#${idPlato ?: -1}"
             val res = RetrofitClient.apiService.obtenerTurnos()
             if (res.isSuccessful && res.body() != null) {
-                val existente = res.body()!!.firstOrNull { it.obtenerNombreReal()?.startsWith(PREFIX_PLATO) == true }
+                val idSedeSel = SedeContratoManager.resolverIdSedeEfectivo(sessionMgr)
+                val obsSedeSel = if (idSedeSel > 0) "[SEDE:$idSedeSel]" else ""
+                val existente = res.body()!!
+                    .filter {
+                        if (it.obtenerNombreReal()?.startsWith(PREFIX_PLATO) != true) return@filter false
+                        val s = Regex("\\[SEDE:(\\d+)\\]").find(it.observaciones.orEmpty())?.groupValues?.getOrNull(1)?.toIntOrNull()
+                        idSedeSel <= 0 || s == idSedeSel
+                    }
+                    .maxByOrNull { it.obtenerIdReal() ?: 0 }
                 val idT = existente?.obtenerIdReal()
                 if (idT != null) {
-                    RetrofitClient.apiService.patchTurno(idT, mapOf("nombre_turno" to tag))
+                    val patchMap = if (obsSedeSel.isNotEmpty()) {
+                        mapOf("nombre_turno" to tag, "observaciones" to obsSedeSel)
+                    } else {
+                        mapOf("nombre_turno" to tag)
+                    }
+                    RetrofitClient.apiService.patchTurno(idT, patchMap)
                 } else {
-                    RetrofitClient.apiService.crearTurno(Turno(nombreTurno = tag))
+                    RetrofitClient.apiService.crearTurno(Turno(nombreTurno = tag, observaciones = obsSedeSel.ifEmpty { null }))
                 }
                 Log.d(TAG, "Plato guardado exitosamente en nube: $tag")
                 return@withContext true
@@ -743,9 +813,15 @@ object PreparacionSyncManager {
 
             val tag = "$PREFIX_PLATO${nombrePlato.trim().take(30)}#${servCapitalizado}#${idPlato ?: -1}"
             SessionManager.getToken(context)
+            val idSedeServ = SedeContratoManager.resolverIdSedeEfectivo(sessionMgr)
+            val obsSedeServ = if (idSedeServ > 0) "[SEDE:$idSedeServ]" else ""
             val res = RetrofitClient.apiService.obtenerTurnos()
             if (res.isSuccessful && res.body() != null) {
-                val turnosPlatos = res.body()!!.filter { it.obtenerNombreReal()?.startsWith(PREFIX_PLATO) == true }
+                val turnosPlatos = res.body()!!.filter {
+                    if (it.obtenerNombreReal()?.startsWith(PREFIX_PLATO) != true) return@filter false
+                    val s = Regex("\\[SEDE:(\\d+)\\]").find(it.observaciones.orEmpty())?.groupValues?.getOrNull(1)?.toIntOrNull()
+                    idSedeServ <= 0 || s == idSedeServ
+                }
 
                 // Actualizar o limpiar cualquier turno del mismo plato en otro servicio
                 for (t in turnosPlatos) {
@@ -757,7 +833,12 @@ object PreparacionSyncManager {
 
                         // Si es el turno de este servicio, reemplazarlo con el nuevo plato
                         if (j.equals(servCapitalizado, ignoreCase = true)) {
-                            RetrofitClient.apiService.patchTurno(idT, mapOf("nombre_turno" to tag))
+                            val patchMap = if (obsSedeServ.isNotEmpty()) {
+                                mapOf("nombre_turno" to tag, "observaciones" to obsSedeServ)
+                            } else {
+                                mapOf("nombre_turno" to tag)
+                            }
+                            RetrofitClient.apiService.patchTurno(idT, patchMap)
                             Log.d(TAG, "Plato de $servCapitalizado actualizado en nube: $tag")
                             return@withContext true
                         }
@@ -765,7 +846,7 @@ object PreparacionSyncManager {
                 }
 
                 // Si no existía turno previo para este servicio, crearlo
-                RetrofitClient.apiService.crearTurno(Turno(nombreTurno = tag))
+                RetrofitClient.apiService.crearTurno(Turno(nombreTurno = tag, observaciones = obsSedeServ.ifEmpty { null }))
                 Log.d(TAG, "Plato de $servCapitalizado creado en nube: $tag")
                 return@withContext true
             }
@@ -1166,6 +1247,63 @@ object PreparacionSyncManager {
         }
     }
 
+    fun obtenerMisAsignaciones(context: Context): List<MiAsignacionItem> {
+        val sessionMgr = SessionManager(context)
+        val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        val miNombre = sessionMgr.getUserName().orEmpty()
+        val miCorreo = sessionMgr.getUserEmail().orEmpty()
+        val rawJson = context.getSharedPreferences("ASIGNACIONES_PAE", Context.MODE_PRIVATE)
+            .getString("mis_asignaciones_json", null)
+
+        val resultado = mutableListOf<MiAsignacionItem>()
+        if (!rawJson.isNullOrBlank()) {
+            try {
+                val arr = org.json.JSONArray(rawJson)
+                for (i in 0 until arr.length()) {
+                    val obj = arr.optJSONObject(i) ?: continue
+                    val serv = obj.optString("servicio", "Desayuno").ifBlank { "Desayuno" }
+                    val comp = obj.optString("componente", "").trim()
+                    if (comp.isBlank()) continue
+                    val estadoCloud = obj.optString("estado", PreparacionEstadoManager.ESTADO_POR_HACER)
+                    val estadoLocal = PreparacionEstadoManager.obtenerEstado(context, miNombre, comp, miCorreo)
+                    val estadoFinal = if (
+                        estadoLocal.contains("final", true) ||
+                        estadoLocal.contains("complet", true) ||
+                        estadoLocal.contains("proceso", true)
+                    ) {
+                        estadoLocal
+                    } else {
+                        estadoCloud
+                    }
+                    val plato = sessionMgr.getPlatoDiaServicio(context, fechaHoy, serv)
+                        ?.takeIf { it.isNotBlank() }
+                        ?: sessionMgr.getPlatoServicio(context, serv)?.takeIf { it.isNotBlank() }
+                        ?: sessionMgr.getPlatoJefa(context)
+                    if (resultado.none { it.servicio.equals(serv, true) && it.componente.equals(comp, true) }) {
+                        resultado.add(MiAsignacionItem(serv, plato, comp, estadoFinal))
+                    }
+                }
+            } catch (_: Exception) { }
+        }
+
+        if (resultado.isEmpty()) {
+            for (serv in listOf("Desayuno", "Almuerzo", "Merienda")) {
+                val comp = sessionMgr.getComponenteAsignado(context, serv)?.trim().orEmpty()
+                if (comp.isNotBlank()) {
+                    val estado = PreparacionEstadoManager.obtenerEstado(context, miNombre, comp, miCorreo)
+                    val plato = sessionMgr.getPlatoDiaServicio(context, fechaHoy, serv)
+                        ?.takeIf { it.isNotBlank() }
+                        ?: sessionMgr.getPlatoServicio(context, serv)?.takeIf { it.isNotBlank() }
+                        ?: sessionMgr.getPlatoJefa(context)
+                    if (resultado.none { it.servicio.equals(serv, true) && it.componente.equals(comp, true) }) {
+                        resultado.add(MiAsignacionItem(serv, plato, comp, estado))
+                    }
+                }
+            }
+        }
+        return resultado
+    }
+
     /**
      * Sincroniza los menús programados en /api/menus/ del backend para la sede actual
      * hacia SessionManager por fecha y servicio, para que aparezcan en Historial y Menú del día.
@@ -1177,13 +1315,16 @@ object PreparacionSyncManager {
             val idSede = SedeContratoManager.resolverIdSedeEfectivo(sessionMgr)
             if (idSede <= 0) return@withContext false
 
-            val mRes = RetrofitClient.apiService.obtenerMenusRaw()
+            val (mRes, pRes) = coroutineScope {
+                val mDef = async { RetrofitClient.apiService.obtenerMenusRaw() }
+                val pDef = async { runCatching { RetrofitClient.apiService.obtenerPlatos() }.getOrNull() }
+                Pair(mDef.await(), pDef.await())
+            }
             if (!mRes.isSuccessful || mRes.body() == null) return@withContext false
 
             val platosMapa = mutableMapOf<Int, String>()
             try {
-                val pRes = RetrofitClient.apiService.obtenerPlatos()
-                if (pRes.isSuccessful && !pRes.body().isNullOrEmpty()) {
+                if (pRes != null && pRes.isSuccessful && !pRes.body().isNullOrEmpty()) {
                     for (p in pRes.body()!!) {
                         val nom = p.nombrePlato?.trim()
                         if (p.idPlato > 0 && !nom.isNullOrBlank()) {

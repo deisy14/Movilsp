@@ -23,6 +23,7 @@ import com.example.movilmanupuladora.data.model.AsistenciaDiaria
 import com.example.movilmanupuladora.data.repository.AsistenciaRepository
 import com.example.movilmanupuladora.databinding.ActivityAsistenciaJefaBinding
 import com.example.movilmanupuladora.utils.PreparacionSyncManager
+import com.example.movilmanupuladora.utils.SedeContratoManager
 import com.example.movilmanupuladora.utils.SessionManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -241,6 +242,8 @@ class AsistenciaJefaActivity : AppCompatActivity() {
     }
 
     private fun configurarJornadas() {
+        aplicarJornadasPermitidasContrato()
+
         binding.btnManana.setOnClickListener {
             jornadaActual = "MANANA"
             actualizarInterfaz()
@@ -249,6 +252,22 @@ class AsistenciaJefaActivity : AppCompatActivity() {
         binding.btnTarde.setOnClickListener {
             jornadaActual = "TARDE"
             actualizarInterfaz()
+        }
+    }
+
+    private fun aplicarJornadasPermitidasContrato() {
+        val jornadas = SedeContratoManager.obtenerJornadasActivas(this)
+        val tieneManana = jornadas.any { it.contains("mañan", ignoreCase = true) || it.contains("manan", ignoreCase = true) }
+        val tieneTarde = jornadas.any { it.contains("tard", ignoreCase = true) }
+
+        if (tieneManana || tieneTarde) {
+            binding.btnManana.visibility = if (tieneManana) View.VISIBLE else View.GONE
+            binding.btnTarde.visibility = if (tieneTarde) View.VISIBLE else View.GONE
+            if (jornadaActual == "MANANA" && !tieneManana && tieneTarde) {
+                jornadaActual = "TARDE"
+            } else if (jornadaActual == "TARDE" && !tieneTarde && tieneManana) {
+                jornadaActual = "MANANA"
+            }
         }
     }
 

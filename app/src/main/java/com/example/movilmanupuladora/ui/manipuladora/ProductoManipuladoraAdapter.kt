@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.movilmanupuladora.R
 import com.example.movilmanupuladora.databinding.ItemProductoManipuladoraBinding
 import com.example.movilmanupuladora.ui.manipuladora_Jefe.ProductoAdmin
+import com.example.movilmanupuladora.utils.ImageLoaderUtil
 
 class ProductoManipuladoraAdapter(
     private var listaOriginal: List<ProductoAdmin>
@@ -30,7 +31,13 @@ class ProductoManipuladoraAdapter(
         val item = listaFiltrada[position]
         with(holder.binding) {
             txtNombreProductoManipuladora.text = item.nombre
-            txtCategoriaProductoManipuladora.text = "${item.categoria} · Inventario Admin"
+            txtCategoriaProductoManipuladora.text = "${item.categoria} · En bodega"
+
+            if (!item.imagenUrl.isNullOrBlank()) {
+                ImageLoaderUtil.cargarImagen(imgProductoManipuladora, item.imagenUrl, R.drawable.ic_food)
+            } else {
+                imgProductoManipuladora.setImageResource(item.imagenRes)
+            }
 
             val c = item.cantidad
             val u = item.unidadMedida
@@ -40,14 +47,14 @@ class ProductoManipuladoraAdapter(
 
             if (item.cantidad > 0.0) {
                 txtEstadoProductoManipuladora.text = "Disponible"
-                txtEstadoProductoManipuladora.setTextColor(Color.parseColor("#15803D"))
+                txtEstadoProductoManipuladora.setTextColor(Color.parseColor("#2B5424"))
                 txtCantidadUnidadManipuladora.setBackgroundResource(R.drawable.bg_pill_green)
                 root.strokeColor = Color.parseColor("#E2E8F0")
             } else {
                 txtEstadoProductoManipuladora.text = "Agotado"
                 txtEstadoProductoManipuladora.setTextColor(Color.parseColor("#B91C1C"))
                 txtCantidadUnidadManipuladora.setBackgroundResource(R.drawable.bg_chip_desayuno)
-                root.strokeColor = Color.parseColor("#F4B41F")
+                root.strokeColor = Color.parseColor("#F5B81F")
             }
         }
     }

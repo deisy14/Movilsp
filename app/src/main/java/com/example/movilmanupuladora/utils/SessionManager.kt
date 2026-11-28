@@ -164,6 +164,10 @@ class SessionManager(context: Context) {
     // Limpia completamente la sesión.
     fun clearSession() {
         prefs.edit().clear().apply()
+        appContext.getSharedPreferences("TURNO_PAE", Context.MODE_PRIVATE).edit().clear().apply()
+        appContext.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE).edit().clear().apply()
+        appContext.getSharedPreferences("ASIGNACIONES_PAE", Context.MODE_PRIVATE).edit().clear().apply()
+        appContext.getSharedPreferences("ASISTENCIA_PAE", Context.MODE_PRIVATE).edit().clear().apply()
         RetrofitClient.authToken = null
     }
 
@@ -222,18 +226,23 @@ class SessionManager(context: Context) {
      * Obtiene el plato seleccionado por la Jefa para el turno actual.
      */
     fun getPlatoJefa(context: Context): String {
+        val fechaHoy = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+        getPlatoDiaServicio(context, fechaHoy, "Desayuno")?.takeIf { it.isNotBlank() }?.let { return it }
+        getPlatoDiaServicio(context, fechaHoy, "Almuerzo")?.takeIf { it.isNotBlank() }?.let { return it }
+        getPlatoDiaServicio(context, fechaHoy, "Merienda")?.takeIf { it.isNotBlank() }?.let { return it }
+
         val turnoPref = context.getSharedPreferences("TURNO_PAE", Context.MODE_PRIVATE)
         val jefaPref = context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE)
 
-        return turnoPref.getString("plato_desayuno", null)
-            ?: turnoPref.getString("plato_almuerzo", null)
-            ?: turnoPref.getString("plato_merienda", null)
-            ?: turnoPref.getString("plato_nombre", null)
-            ?: jefaPref.getString("plato_desayuno", null)
-            ?: jefaPref.getString("plato_almuerzo", null)
-            ?: jefaPref.getString("plato_merienda", null)
-            ?: jefaPref.getString("plato_actual", null)
-            ?: prefs.getString("plato_seleccionado_nombre", null)
+        return turnoPref.getString("plato_desayuno", null)?.takeIf { it.isNotBlank() }
+            ?: turnoPref.getString("plato_almuerzo", null)?.takeIf { it.isNotBlank() }
+            ?: turnoPref.getString("plato_merienda", null)?.takeIf { it.isNotBlank() }
+            ?: jefaPref.getString("plato_desayuno", null)?.takeIf { it.isNotBlank() }
+            ?: jefaPref.getString("plato_almuerzo", null)?.takeIf { it.isNotBlank() }
+            ?: jefaPref.getString("plato_merienda", null)?.takeIf { it.isNotBlank() }
+            ?: turnoPref.getString("plato_nombre", null)?.takeIf { it.isNotBlank() }
+            ?: jefaPref.getString("plato_actual", null)?.takeIf { it.isNotBlank() }
+            ?: prefs.getString("plato_seleccionado_nombre", null)?.takeIf { it.isNotBlank() }
             ?: ""
     }
 

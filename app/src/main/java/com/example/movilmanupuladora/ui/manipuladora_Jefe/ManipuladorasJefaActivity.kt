@@ -22,6 +22,7 @@ import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.data.model.Turno
 import com.example.movilmanupuladora.databinding.ActivityManipuladorasJefaBinding
 import com.example.movilmanupuladora.utils.NavigationHelperJefa
+import com.example.movilmanupuladora.utils.SedeContratoManager
 import com.example.movilmanupuladora.utils.SessionManager
 import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.Dispatchers
@@ -376,6 +377,22 @@ class ManipuladorasJefaActivity : AppCompatActivity() {
     // =========================================================================
 
     private fun configurarJornada() {
+        val jornadas = SedeContratoManager.obtenerJornadasActivas(this)
+        val tieneManana = jornadas.any { it.contains("mañan", ignoreCase = true) || it.contains("manan", ignoreCase = true) }
+        val tieneTarde = jornadas.any { it.contains("tard", ignoreCase = true) }
+
+        if (tieneManana && !tieneTarde) {
+            binding.cardJornadaManana.visibility = View.VISIBLE
+            binding.cardJornadaTarde.visibility = View.GONE
+            binding.cardJornadaAmbas.visibility = View.GONE
+            jornadaSeleccionada = "Mañana"
+        } else if (tieneTarde && !tieneManana) {
+            binding.cardJornadaManana.visibility = View.GONE
+            binding.cardJornadaTarde.visibility = View.VISIBLE
+            binding.cardJornadaAmbas.visibility = View.GONE
+            jornadaSeleccionada = "Tarde"
+        }
+
         binding.cardJornadaManana.setOnClickListener {
             if (validarPermisoEdicion()) seleccionarJornada("Mañana")
         }

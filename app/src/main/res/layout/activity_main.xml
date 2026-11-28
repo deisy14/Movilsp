@@ -48,7 +48,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="12dp"
-                app:cardBackgroundColor="#1D3E1A"
+                android:visibility="gone"
+                app:cardBackgroundColor="#2B5424"
                 app:cardCornerRadius="24dp"
                 app:cardElevation="3dp"
                 app:strokeWidth="0dp">
@@ -128,7 +129,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 tools:text="165"
-                                android:text="165"
+                                android:text="—"
                                 android:textColor="#FFFFFF"
                                 android:textSize="20sp"
                                 android:textStyle="bold" />
@@ -175,8 +176,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Menú de hoy"
-                        android:textColor="#1B3317"
-                        android:textSize="18sp"
+                        android:textColor="#0F172A"
+                        android:textSize="19sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -192,11 +193,11 @@
                 <!-- SELECTOR PILL MAÑANA / TARDE -->
                 <LinearLayout
                     android:id="@+id/contenedorJornadasInicio"
-                    android:layout_width="150dp"
+                    android:layout_width="140dp"
                     android:layout_height="38dp"
-                    android:background="@drawable/bg_translucent_box"
+                    android:background="@android:color/transparent"
                     android:orientation="horizontal"
-                    android:padding="3dp"
+                    android:padding="2dp"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
@@ -206,13 +207,13 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:background="@drawable/bg_pill_green"
+                        android:background="@drawable/bg_pill_verde_manipuladora"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
                         android:text="Mañana"
-                        android:textColor="#FFFFFF"
-                        android:textSize="12sp"
+                        android:textColor="#2B5424"
+                        android:textSize="12.5sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -257,7 +258,7 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:text="Ver menú completo ›"
-                    android:textColor="#B45309"
+                    android:textColor="#2B5424"
                     android:textSize="12.5sp"
                     android:textStyle="bold" />
 
@@ -282,11 +283,11 @@
                     android:layout_marginEnd="6dp"
                     android:clickable="true"
                     android:focusable="true"
-                    app:cardBackgroundColor="#1D3E1A"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="2dp"
-                    app:strokeColor="#1D3E1A"
-                    app:strokeWidth="1dp">
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="1dp"
+                    app:strokeColor="#2B5424"
+                    app:strokeWidth="1.5dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -464,22 +465,26 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- CABECERA VERDE CON BORDE SUPERIOR REDONDEADO -->
+                    <!-- CABECERA LIMPIA DENTRO DE LA TARJETA -->
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="#1D3E1A"
+                        android:background="#FFFFFF"
                         android:paddingHorizontal="16dp"
-                        android:paddingVertical="10dp">
+                        android:paddingTop="14dp"
+                        android:paddingBottom="4dp">
 
                         <TextView
                             android:id="@+id/tvTagSeccionSeleccionada"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:letterSpacing="0.04"
+                            android:background="@drawable/bg_pill_verde_manipuladora"
+                            android:letterSpacing="0.03"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="5dp"
                             tools:text="TU COMPONENTE · DESAYUNO"
                             android:text="TU COMPONENTE · DESAYUNO"
-                            android:textColor="#FFFFFF"
+                            android:textColor="#166534"
                             android:textSize="11sp"
                             android:textStyle="bold"
                             app:layout_constraintTop_toTopOf="parent"
@@ -509,17 +514,17 @@
                                 android:layout_width="14dp"
                                 android:layout_height="14dp"
                                 android:src="@drawable/ic_clock"
-                                app:tint="#F4B41F" />
+                                app:tint="#64748B" />
 
                             <TextView
                                 android:id="@+id/tvHorarioServicio"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="4dp"
-                                tools:text="07:00 – 08:15"
-                                android:text="07:00 – 08:15"
-                                android:textColor="#F4B41F"
-                                android:textSize="11.5sp"
+                                tools:text="07:00 - 08:15"
+                                android:text="07:00 - 08:15"
+                                android:textColor="#475569"
+                                android:textSize="12sp"
                                 android:textStyle="bold" />
 
                         </LinearLayout>
@@ -547,8 +552,8 @@
                                 android:layout_height="76dp"
                                 app:cardCornerRadius="16dp"
                                 app:cardElevation="0dp"
-                                app:strokeColor="#F4B41F"
-                                app:strokeWidth="2dp">
+                                app:strokeColor="#E2E8F0"
+                                app:strokeWidth="1dp">
 
                                 <com.google.android.material.imageview.ShapeableImageView
                                     android:id="@+id/imgPlatoMain"
@@ -573,10 +578,10 @@
                                     android:layout_height="wrap_content"
                                     android:ellipsize="end"
                                     android:maxLines="2"
-                                    tools:text="Estación Proteica y Huevos"
-                                    android:text="Estación Proteica y Huevos"
-                                    android:textColor="#1B3317"
-                                    android:textSize="16sp"
+                                    tools:text="Yogurt"
+                                    android:text="Yogurt"
+                                    android:textColor="#0F172A"
+                                    android:textSize="18sp"
                                     android:textStyle="bold" />
 
                                 <TextView
@@ -587,7 +592,7 @@
                                     android:ellipsize="end"
                                     android:maxLines="2"
                                     tools:text="Plato de hoy: Huevos pericos con arroz blanco"
-                                    android:text="Plato de hoy: Huevos pericos con arroz blanco"
+                                    android:text="Cargando menú del día..."
                                     android:textColor="#1E293B"
                                     android:textSize="12sp" />
 
@@ -595,7 +600,7 @@
 
                         </LinearLayout>
 
-                        <!-- CAJA AMARILLA CON BEBIDA Y RACIONES -->
+                        <!-- CAJA MENTA CON COMPONENTE Y BORDE IZQUIERDO VERDE -->
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/cardAccesoAsignadas"
                             android:layout_width="match_parent"
@@ -604,60 +609,73 @@
                             android:clickable="true"
                             android:focusable="true"
                             android:foreground="?attr/selectableItemBackground"
-                            app:cardBackgroundColor="#FEF9C3"
+                            app:cardBackgroundColor="#E6EDE2"
                             app:cardCornerRadius="14dp"
                             app:cardElevation="0dp"
-                            app:strokeColor="#F4B41F"
+                            app:strokeColor="#C6D6BF"
                             app:strokeWidth="1dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:padding="12dp">
+                                android:orientation="horizontal">
 
-                                <TextView
-                                    android:id="@+id/tvSubtituloBebida"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    tools:text="Bebida láctea tibia (avena)"
-                                    android:text="Bebida láctea tibia (avena)"
-                                    android:textColor="#713F12"
-                                    android:textSize="13sp"
-                                    android:textStyle="bold" />
+                                <View
+                                    android:layout_width="4dp"
+                                    android:layout_height="match_parent"
+                                    android:background="#2B5424" />
 
-                                <TextView
-                                    android:id="@+id/tvSubtituloRacionesCalculadas"
-                                    android:layout_width="wrap_content"
+                                <LinearLayout
+                                    android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
-                                    tools:text="165 raciones calculadas · Primaria 99 · Sec. 66"
-                                    android:text="165 raciones calculadas · Primaria 99 · Sec. 66"
-                                    android:textColor="#854D0E"
-                                    android:textSize="11.5sp" />
+                                    android:layout_weight="1"
+                                    android:orientation="vertical"
+                                    android:padding="12dp">
 
-                                <TextView
-                                    android:id="@+id/tvSubtituloCardAsignadas"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
-                                    tools:text="Tu tarea"
-                                    android:text=""
-                                    android:textColor="#854D0E"
-                                    android:textSize="11sp"
-                                    android:visibility="gone" />
+                                    <TextView
+                                        android:id="@+id/tvSubtituloBebida"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        tools:text="Bebida"
+                                        android:text="Componente"
+                                        android:textColor="#2B5424"
+                                        android:textSize="13.5sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:id="@+id/tvSubtituloRacionesCalculadas"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="2dp"
+                                        tools:text="165 raciones calculadas · Primaria 99 · Sec. 66"
+                                        android:text="Consultando raciones..."
+                                        android:textColor="#334155"
+                                        android:textSize="12sp" />
+
+                                    <TextView
+                                        android:id="@+id/tvSubtituloCardAsignadas"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="2dp"
+                                        tools:text="Tu tarea"
+                                        android:text=""
+                                        android:textColor="#2B5424"
+                                        android:textSize="11sp"
+                                        android:visibility="gone" />
+
+                                </LinearLayout>
 
                             </LinearLayout>
 
                         </com.google.android.material.card.MaterialCardView>
 
-                        <!-- BOTÓN VER PREPARACIÓN -->
+                        <!-- BOTÓN VER PREPARACIÓN (VERDE INSTITUCIONAL) -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnVerPreparacion"
                             android:layout_width="match_parent"
                             android:layout_height="48dp"
-                            android:layout_marginTop="12dp"
-                            android:backgroundTint="#F4B41F"
+                            android:layout_marginTop="14dp"
+                            android:backgroundTint="#2B5424"
                             android:text="Ver preparación →"
                             android:textColor="#FFFFFF"
                             android:textSize="14sp"
@@ -760,20 +778,10 @@
                                 android:id="@+id/tvTotalAsistenciaSumatoria"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                tools:text="165"
-                                android:text="165"
+                                tools:text="165 est."
+                                android:text="0 est."
                                 android:textColor="#1E293B"
                                 android:textSize="20sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="3dp"
-                                android:layout_marginBottom="2dp"
-                                android:text="est."
-                                android:textColor="#64748B"
-                                android:textSize="12sp"
                                 android:textStyle="bold" />
 
                         </LinearLayout>
@@ -890,6 +898,144 @@
             </LinearLayout>
 
             <!-- ═══════════════════════════════════════════════════════════════
+                 6B. GRÁFICA DE APORTE NUTRICIONAL POR MENÚ (DASHBOARD)
+            ═══════════════════════════════════════════════════════════════ -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardNutricionDashboard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="2dp"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="APORTE NUTRICIONAL POR MENÚ"
+                                android:textColor="#2B5424"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.04" />
+
+                            <TextView
+                                android:id="@+id/tvNutriMenuNombre"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="Balance calórico del menú activo"
+                                android:textColor="#1E293B"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvNutriBadgeNivel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_pill_yellow"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="4dp"
+                            android:text="Minuta PAE"
+                            android:textColor="#7A5500"
+                            android:textSize="10.5sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <com.example.movilmanupuladora.ui.manipuladora.NutricionChartView
+                            android:id="@+id/chartNutricionMenu"
+                            android:layout_width="124dp"
+                            android:layout_height="124dp" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingVertical="3dp">
+                                <View android:layout_width="10dp" android:layout_height="10dp" android:background="#2B5424" />
+                                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="8dp" android:text="Proteínas" android:textColor="#475569" android:textSize="12sp" />
+                                <TextView android:id="@+id/tvNutriProt" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="18 g" android:textColor="#1E293B" android:textSize="12sp" android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingVertical="3dp">
+                                <View android:layout_width="10dp" android:layout_height="10dp" android:background="#F5B81F" />
+                                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="8dp" android:text="Carbohidratos" android:textColor="#475569" android:textSize="12sp" />
+                                <TextView android:id="@+id/tvNutriCarb" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="56 g" android:textColor="#1E293B" android:textSize="12sp" android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingVertical="3dp">
+                                <View android:layout_width="10dp" android:layout_height="10dp" android:background="#65A30D" />
+                                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="8dp" android:text="Grasas" android:textColor="#475569" android:textSize="12sp" />
+                                <TextView android:id="@+id/tvNutriGrasa" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="15 g" android:textColor="#1E293B" android:textSize="12sp" android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingVertical="3dp">
+                                <View android:layout_width="10dp" android:layout_height="10dp" android:background="#D97706" />
+                                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="8dp" android:text="Calcio / Hierro" android:textColor="#475569" android:textSize="12sp" />
+                                <TextView android:id="@+id/tvNutriCalc" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="220 mg" android:textColor="#1E293B" android:textSize="12sp" android:textStyle="bold" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ═══════════════════════════════════════════════════════════════
                  7. HISTORIAL Y MENÚS ANTERIORES
             ═══════════════════════════════════════════════════════════════ -->
             <com.google.android.material.card.MaterialCardView
@@ -897,7 +1043,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="20dp"
-                app:cardBackgroundColor="#1D3E1A"
+                app:cardBackgroundColor="#2B5424"
                 app:cardCornerRadius="24dp"
                 app:cardElevation="3dp"
                 app:strokeWidth="0dp">
@@ -997,7 +1143,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="Almuerzo"
-                                        android:textColor="#1B3317"
+                                        android:textColor="#2B5424"
                                         android:textSize="14sp"
                                         android:textStyle="bold" />
 
@@ -1099,7 +1245,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="Desayuno"
-                                        android:textColor="#1B3317"
+                                        android:textColor="#2B5424"
                                         android:textSize="14sp"
                                         android:textStyle="bold" />
 
@@ -1111,7 +1257,7 @@
                                         android:ellipsize="end"
                                         android:maxLines="1"
                                         tools:text="Huevos pericos con arroz blanco y a..."
-                                        android:text="Huevos pericos con arroz blanco y a..."
+                                        android:text="Cargando..."
                                         android:textColor="#64748B"
                                         android:textSize="11.5sp" />
 
@@ -1200,7 +1346,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="Merienda"
-                                        android:textColor="#1B3317"
+                                        android:textColor="#2B5424"
                                         android:textSize="14sp"
                                         android:textStyle="bold" />
 

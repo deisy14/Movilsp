@@ -65,46 +65,103 @@ class MenuDiaActivity : AppCompatActivity() {
 
     private fun cargarPlatos() {
         lifecycleScope.launch {
+            var resumenInvTexto = "Sin insumos registrados en tu sede"
             try {
-                val response = RetrofitClient.apiService.obtenerPlatos()
+                SessionManager.getToken(this@MenuDiaActivity)
+                com.example.movilmanupuladora.utils.PreparacionSyncManager.sincronizarDesdeBackend(this@MenuDiaActivity)
 
-                if (response.isSuccessful && !response.body().isNullOrEmpty()) {
-                    val platos = response.body()!!
-                    mostrarPlatos(platos)
-                } else {
-                    val platosPae = MenuPaeCatalog.menus.map {
-                        PlatoResponse(idPlato = it.id, nombrePlato = it.nombre, componente = it.componente)
+                // 1. Raciones reales
+                val racionesLocal = AsistenciaManager.obtenerManana(this@MenuDiaActivity)
+                var totalRaciones = racionesLocal
+                runCatching {
+                    val asistRes = RetrofitClient.apiService.obtenerAsistenciaDiaria()
+                    if (asistRes.isSuccessful && asistRes.body() != null) {
+                        val hoy = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+                        val lista = asistRes.body()!!
+                        val deHoy = lista.filter { it.fecha.startsWith(hoy) }.ifEmpty { lista }
+                        val sum = deHoy.sumOf { it.ninosPresentes }
+                        if (sum > 0) totalRaciones = sum
                     }
-                    mostrarPlatos(platosPae)
                 }
-            } catch (_: Exception) {
-                val platosPae = MenuPaeCatalog.menus.map {
-                    PlatoResponse(idPlato = it.id, nombrePlato = it.nombre, componente = it.componente)
+                binding.tvRacionesMenuDia.text = if (totalRaciones > 0) "$totalRaciones raciones" else "Sin registro"
+
+                // 2. Inventario real filtrado por la sede de la manipuladora
+                val sedeIdActual = sessionManager.getSedeId().takeIf { it > 0 }
+                runCatching {
+                    val invRes = RetrofitClient.apiService.obtenerInventario()
+                    val ingRes = RetrofitClient.apiService.obtenerIngredientes()
+                    val mapIng = ingRes.body().orEmpty().associateBy { it.obtenerIdReal() }
+                    val todosInv = invRes.body().orEmpty()
+                    val haySede = todosInv.any { (it.idSede ?: it.sede) != null }
+                    val itemsSede = todosInv.filter { inv ->
+                        val invSede = inv.idSede ?: inv.sede
+                        sedeIdActual == null || !haySede || invSede == sedeIdActual
+                    }
+                    val disponibles = itemsSede.count { (it.cantidadActual?.toDoubleOrNull() ?: it.cantidad ?: 0.0) > 0.0 }
+                    val agotados = itemsSede.size - disponibles
+                    binding.tvResumenInventarioMenu.text = if (itemsSede.isEmpty()) {
+                        "Sin insumos en tu sede"
+                    } else {
+                        "$disponibles insumos disponibles · $agotados agotados"
+                    }
+                    val sedeNombre = sessionManager.getSedeNombre()?.takeIf { it.isNotBlank() } ?: "tu sede"
+                    binding.tvSubtituloInventarioMenu.text = "Stock verificado en $sedeNombre"
+
+                    val topInsumos = itemsSede.take(3).mapNotNull { inv ->
+                        val cant = inv.cantidadActual?.toDoubleOrNull() ?: inv.cantidad ?: 0.0
+                        val ing = inv.obtenerIdIngredienteReal()?.let { mapIng[it] }
+                        val nom = ing?.obtenerNombreReal()?.takeIf { it.isNotBlank() }
+                            ?: inv.nombreIngrediente?.takeIf { it.isNotBlank() }
+                            ?: inv.nombre?.takeIf { it.isNotBlank() }
+                            ?: return@mapNotNull null
+                        "$nom (${if (cant % 1.0 == 0.0) cant.toInt() else cant})"
+                    }
+                    if (topInsumos.isNotEmpty()) {
+                        resumenInvTexto = "En bodega: ${topInsumos.joinToString(" · ")}"
+                    }
                 }
-                mostrarPlatos(platosPae)
+            } catch (_: Exception) { }
+
+            val platoJefa = sessionManager.getPlatoJefa(this@MenuDiaActivity)
+            val componenteAsignado = sessionManager.getComponenteAsignado(this@MenuDiaActivity)
+            val platoId = sessionManager.getPlatoJefaId(this@MenuDiaActivity)
+
+            if (platoJefa.isNotBlank()) {
+                mostrarPlatos(
+                    listOf(
+                        PlatoResponse(
+                            idPlato = if (platoId > 0) platoId else 1,
+                            nombrePlato = platoJefa,
+                            componente = componenteAsignado?.takeIf { it.isNotBlank() } ?: "Asignación de tu sede"
+                        )
+                    ),
+                    resumenInvTexto
+                )
+            } else {
+                mostrarPlatos(emptyList(), resumenInvTexto)
             }
         }
     }
 
-    private fun mostrarPlatos(platos: List<PlatoResponse>) {
+    private fun mostrarPlatos(platos: List<PlatoResponse>, resumenInvTexto: String = "Stock de tu sede") {
         val contenedorPrincipal = findViewById<LinearLayout>(R.id.contenedorPlatoPrincipal)
         val contenedorOtros = findViewById<LinearLayout>(R.id.contenedorOtrosPlatos)
-        val tvOtrosPlatos = findViewById<TextView>(R.id.tvOtrosPlatos)
 
         contenedorPrincipal?.removeAllViews()
         contenedorOtros?.removeAllViews()
 
-        if (platos.isEmpty()) return
+        if (platos.isEmpty()) {
+            val tvVacio = TextView(this).apply {
+                text = "Aún no tienes un menú asignado por la manipuladora jefa en tu sede."
+                setTextColor(Color.parseColor("#64748B"))
+                textSize = 13.5f
+                setPadding(16, 24, 16, 24)
+            }
+            contenedorPrincipal?.addView(tvVacio)
+            return
+        }
 
-        val tiemposComida = listOf(
-            Triple("DESAYUNO", "07:00 – 08:15", R.drawable.plato1),
-            Triple("ALMUERZO", "11:30 – 13:00", R.drawable.plato4),
-            Triple("MERIENDA", "09:30 – 10:15", R.drawable.plato3)
-        )
-
-        for ((index, tiempo) in tiemposComida.withIndex()) {
-            val plato = platos.getOrNull(index) ?: platos.first()
-
+        for (plato in platos) {
             val card = MaterialCardView(this).apply {
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -113,7 +170,7 @@ class MenuDiaActivity : AppCompatActivity() {
                 radius = (20 * resources.displayMetrics.density)
                 cardElevation = (2 * resources.displayMetrics.density)
                 setCardBackgroundColor(Color.WHITE)
-                strokeColor = Color.parseColor("#F4B41F")
+                strokeColor = Color.parseColor("#F5B81F")
                 strokeWidth = (1.5f * resources.displayMetrics.density).toInt()
             }
 
@@ -125,10 +182,10 @@ class MenuDiaActivity : AppCompatActivity() {
                 )
             }
 
-            // Header verde oscuro
+            // Header verde institucional
             val headerLayout = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
-                setBackgroundColor(Color.parseColor("#1B3317"))
+                setBackgroundColor(Color.parseColor("#2B5424"))
                 setPadding(
                     (16 * resources.displayMetrics.density).toInt(),
                     (10 * resources.displayMetrics.density).toInt(),
@@ -139,7 +196,7 @@ class MenuDiaActivity : AppCompatActivity() {
             }
 
             val tvMealTitle = TextView(this).apply {
-                text = tiempo.first
+                text = "MENÚ ASIGNADO EN TU SEDE"
                 setTextColor(Color.WHITE)
                 textSize = 12f
                 setTypeface(typeface, android.graphics.Typeface.BOLD)
@@ -147,8 +204,8 @@ class MenuDiaActivity : AppCompatActivity() {
             }
 
             val tvMealTime = TextView(this).apply {
-                text = "🕒 ${tiempo.second}"
-                setTextColor(Color.parseColor("#F4B41F"))
+                text = sessionManager.getSedeNombre()?.takeIf { it.isNotBlank() } ?: "Sede actual"
+                setTextColor(Color.parseColor("#F5B81F"))
                 textSize = 11.5f
                 setTypeface(typeface, android.graphics.Typeface.BOLD)
             }
@@ -191,7 +248,7 @@ class MenuDiaActivity : AppCompatActivity() {
                     LinearLayout.LayoutParams.MATCH_PARENT
                 )
                 scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
-                setImageResource(tiempo.third)
+                setImageResource(R.drawable.plato1)
             }
             imgCard.addView(imageView)
 
@@ -216,7 +273,7 @@ class MenuDiaActivity : AppCompatActivity() {
             }
 
             val tvDesc = TextView(this).apply {
-                text = "Bebida láctea tibia (avena) · 8 Ingredientes"
+                text = "Asignación activa de tu sede"
                 setTextColor(Color.parseColor("#64748B"))
                 textSize = 11.5f
                 layoutParams = LinearLayout.LayoutParams(
@@ -241,14 +298,14 @@ class MenuDiaActivity : AppCompatActivity() {
                 ).also { it.topMargin = (12 * resources.displayMetrics.density).toInt() }
                 radius = (12 * resources.displayMetrics.density)
                 cardElevation = 0f
-                setCardBackgroundColor(Color.parseColor("#E8F5E9"))
-                strokeColor = Color.parseColor("#15803D")
+                setCardBackgroundColor(Color.parseColor("#E6EDE2"))
+                strokeColor = Color.parseColor("#2B5424")
                 strokeWidth = (1f * resources.displayMetrics.density).toInt()
             }
 
             val tvPill = TextView(this).apply {
-                text = "En bodega: Arroz (20K) · Aceite vegetal (15L) · Leche entera (30L)  ✔"
-                setTextColor(Color.parseColor("#15803D"))
+                text = resumenInvTexto
+                setTextColor(Color.parseColor("#2B5424"))
                 textSize = 11.5f
                 setPadding(
                     (12 * resources.displayMetrics.density).toInt(),

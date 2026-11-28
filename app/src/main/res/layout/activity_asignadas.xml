@@ -75,14 +75,15 @@
                         android:textSize="12sp" />
                 </LinearLayout>
 
-                <!-- BADGE "INSUMOS LISTOS" CON BORDES DEFINIDOS -->
+                <!-- BADGE "INSUMOS LISTOS" OCULTO -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:cardBackgroundColor="#E8F5E9"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="#E6EDE2"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="0dp"
-                    app:strokeColor="#15803D"
+                    app:strokeColor="#2B5424"
                     app:strokeWidth="1.5dp">
 
                     <LinearLayout
@@ -98,14 +99,14 @@
                             android:layout_height="14dp"
                             android:layout_marginEnd="4dp"
                             android:src="@drawable/ic_reloj"
-                            app:tint="#15803D" />
+                            app:tint="#2B5424" />
 
                         <TextView
                             android:id="@+id/badgeEstadoTurno"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Insumos Listos"
-                            android:textColor="#15803D"
+                            android:textColor="#2B5424"
                             android:textSize="11.5sp"
                             android:textStyle="bold" />
 
@@ -122,7 +123,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="#1B3317"
+                app:cardBackgroundColor="#2B5424"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="3dp"
                 app:strokeWidth="0dp">
@@ -149,9 +150,10 @@
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/tvRacionesAsignadas"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="120 RACIONES PAE"
+                            android:text="— RACIONES PAE"
                             android:textColor="#FFFFFF"
                             android:textSize="11sp"
                             android:textStyle="bold" />
@@ -175,7 +177,7 @@
                                 android:id="@+id/tvNombreMiPlato"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Huevos Pericos Con Arroz Blanco"
+                                android:text="Cargando menú..."
                                 android:textColor="#FFFFFF"
                                 android:textSize="20sp"
                                 android:textStyle="bold" />
@@ -195,10 +197,10 @@
                         <com.google.android.material.card.MaterialCardView
                             android:layout_width="86dp"
                             android:layout_height="86dp"
-                            app:cardBackgroundColor="#1B3317"
+                            app:cardBackgroundColor="#2B5424"
                             app:cardCornerRadius="43dp"
                             app:cardElevation="2dp"
-                            app:strokeColor="#F4B41F"
+                            app:strokeColor="#F5B81F"
                             app:strokeWidth="2dp">
 
                             <com.google.android.material.card.MaterialCardView
@@ -225,12 +227,16 @@
 
                     </LinearLayout>
 
-                    <!-- BANNER INTERNO DORADO AMARILLO: COMPONENTE PENDIENTE DE ASIGNACIÓN -->
+                    <!-- BANNER INTERNO DORADO AMARILLO: COMPONENTE ASIGNADO -->
                     <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardComponenteMiPlato"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="14dp"
-                        app:cardBackgroundColor="#F4B41F"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        app:cardBackgroundColor="#F5B81F"
                         app:cardCornerRadius="12dp"
                         app:cardElevation="0dp"
                         app:strokeWidth="0dp">
@@ -238,40 +244,51 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
+                            android:gravity="center"
                             android:orientation="horizontal"
                             android:paddingHorizontal="14dp"
-                            android:paddingVertical="10dp">
-
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:layout_marginEnd="8dp"
-                                android:src="@drawable/ic_reloj"
-                                app:tint="#FFFFFF" />
+                            android:paddingVertical="12dp">
 
                             <TextView
                                 android:id="@+id/tvComponenteMiPlato"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Componente pendiente de asignación"
+                                android:text="Comenzar preparación"
                                 android:textColor="#FFFFFF"
-                                android:textSize="12sp"
+                                android:textSize="13sp"
                                 android:textStyle="bold" />
 
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
+                    <!-- BOTONES EXTRA SI HAY OTRO COMPONENTE DEL MISMO MENÚ -->
+                    <LinearLayout
+                        android:id="@+id/contenedorComponentesMiPlato"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone" />
+
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ACCIONES RÁPIDAS DE PREPARACIÓN (SIN EMOJIS NI ICONOS) -->
+            <!-- LISTA DE TODAS LAS ASIGNACIONES DE LA MANIPULADORA (DESAYUNO / ALMUERZO / MERIENDA) -->
+            <LinearLayout
+                android:id="@+id/contenedorMisAsignacionesMultiples"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical"
+                android:visibility="gone" />
+
+            <!-- ACCIONES RÁPIDAS OCULTAS (Ver Ingredientes está dentro de Pasos de Preparación) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
                 android:orientation="horizontal"
+                android:visibility="gone"
                 android:weightSum="2">
 
                 <com.google.android.material.button.MaterialButton
@@ -281,14 +298,14 @@
                     android:layout_height="48dp"
                     android:layout_marginEnd="6dp"
                     android:layout_weight="1"
-                    android:backgroundTint="#1B3317"
+                    android:backgroundTint="#2B5424"
                     android:text="Ver Ingredientes"
                     android:textAllCaps="false"
                     android:textColor="#FFFFFF"
                     android:textSize="13sp"
                     android:textStyle="bold"
                     app:cornerRadius="14dp"
-                    app:strokeColor="#1B3317"
+                    app:strokeColor="#2B5424"
                     app:strokeWidth="1.5dp" />
 
                 <com.google.android.material.button.MaterialButton
@@ -297,7 +314,7 @@
                     android:layout_height="48dp"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    android:backgroundTint="#F4B41F"
+                    android:backgroundTint="#F5B81F"
                     android:text="Preparar Mi Parte"
                     android:textAllCaps="false"
                     android:textColor="#FFFFFF"
@@ -390,11 +407,12 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- TARJETA: APORTE NUTRICIONAL POR RACIÓN -->
+            <!-- TARJETA: APORTE NUTRICIONAL MOVIDA AL DASHBOARD -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:visibility="gone"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="18dp"
                 app:cardElevation="2dp"
@@ -476,15 +494,15 @@
 
                     </LinearLayout>
 
-                    <!-- RECUADRO ENERGÍA POR PLATO EN AMARILLO SUAVE CON BORDES (#FEF9E7) -->
+                    <!-- RECUADRO ENERGÍA POR PLATO EN AMARILLO SUAVE CON BORDES (#FEF7E0) -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="14dp"
-                        app:cardBackgroundColor="#FEF9E7"
+                        app:cardBackgroundColor="#FEF7E0"
                         app:cardCornerRadius="14dp"
                         app:cardElevation="0dp"
-                        app:strokeColor="#F4B41F"
+                        app:strokeColor="#F5B81F"
                         app:strokeWidth="1.5dp">
 
                         <LinearLayout
@@ -497,7 +515,7 @@
                             <com.google.android.material.card.MaterialCardView
                                 android:layout_width="40dp"
                                 android:layout_height="40dp"
-                                app:cardBackgroundColor="#F4B41F"
+                                app:cardBackgroundColor="#F5B81F"
                                 app:cardCornerRadius="10dp"
                                 app:cardElevation="0dp"
                                 app:strokeWidth="0dp">
@@ -507,7 +525,7 @@
                                     android:layout_height="20dp"
                                     android:layout_gravity="center"
                                     android:src="@drawable/ic_food"
-                                    app:tint="#1B3317" />
+                                    app:tint="#2B5424" />
                             </com.google.android.material.card.MaterialCardView>
 
                             <LinearLayout
@@ -526,10 +544,11 @@
                                     android:textStyle="bold" />
 
                                 <TextView
+                                    android:id="@+id/tvEnergiaKcal"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="2dp"
-                                    android:text="385 kcal"
+                                    android:text="—"
                                     android:textColor="#1E293B"
                                     android:textSize="18sp"
                                     android:textStyle="bold" />
@@ -543,18 +562,20 @@
                                 android:orientation="vertical">
 
                                 <TextView
+                                    android:id="@+id/tvRequerimientoDiario"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="28% requerimiento diario"
-                                    android:textColor="#15803D"
+                                    android:text="Según minuta PAE"
+                                    android:textColor="#2B5424"
                                     android:textSize="11sp"
                                     android:textStyle="bold" />
 
                                 <TextView
+                                    android:id="@+id/tvGramosRacion"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="2dp"
-                                    android:text="310 g / ración"
+                                    android:text="Ración diaria"
                                     android:textColor="#64748B"
                                     android:textSize="11sp" />
 
@@ -603,10 +624,11 @@
                                         android:textSize="11sp" />
 
                                     <TextView
+                                        android:id="@+id/tvProteinasValor"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginTop="2dp"
-                                        android:text="16.5 g"
+                                        android:text="—"
                                         android:textColor="#1E293B"
                                         android:textSize="16sp"
                                         android:textStyle="bold" />
@@ -623,7 +645,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginTop="6dp"
-                                        android:text="Huevo AA y lácteos"
+                                        android:text="Según minuta PAE"
                                         android:textColor="#94A3B8"
                                         android:textSize="10sp" />
 
@@ -656,10 +678,11 @@
                                         android:textSize="11sp" />
 
                                     <TextView
+                                        android:id="@+id/tvCarbohidratosValor"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginTop="2dp"
-                                        android:text="48.0 g"
+                                        android:text="—"
                                         android:textColor="#1E293B"
                                         android:textSize="16sp"
                                         android:textStyle="bold" />
@@ -676,7 +699,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginTop="6dp"
-                                        android:text="Arroz fortificado"
+                                        android:text="Según minuta PAE"
                                         android:textColor="#94A3B8"
                                         android:textSize="10sp" />
 
@@ -719,10 +742,11 @@
                                         android:textSize="11sp" />
 
                                     <TextView
+                                        android:id="@+id/tvGrasasValor"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginTop="2dp"
-                                        android:text="13.2 g"
+                                        android:text="—"
                                         android:textColor="#1E293B"
                                         android:textSize="16sp"
                                         android:textStyle="bold" />
@@ -739,7 +763,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginTop="6dp"
-                                        android:text="Cocción controlada"
+                                        android:text="Según minuta PAE"
                                         android:textColor="#94A3B8"
                                         android:textSize="10sp" />
 
@@ -772,10 +796,11 @@
                                         android:textSize="11sp" />
 
                                     <TextView
+                                        android:id="@+id/tvCalcioHierroValor"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginTop="2dp"
-                                        android:text="240 mg · 3.1 mg"
+                                        android:text="—"
                                         android:textColor="#1E293B"
                                         android:textSize="15sp"
                                         android:textStyle="bold" />

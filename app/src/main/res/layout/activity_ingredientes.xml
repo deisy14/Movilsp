@@ -85,26 +85,27 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/tvRacionesIngredientes"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_pill_light_green"
                     android:paddingHorizontal="12dp"
                     android:paddingVertical="6dp"
-                    android:text="165 raciones"
-                    android:textColor="#1B3317"
+                    android:text="— raciones"
+                    android:textColor="#2B5424"
                     android:textSize="11.5sp"
                     android:textStyle="bold" />
 
             </LinearLayout>
 
-            <!-- TARJETA BLANCA CON CABECERA VERDE OSCURO Y BORDE DORADO -->
+            <!-- TARJETA BLANCA CON CABECERA VERDE Y BORDE DORADO -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="2dp"
-                app:strokeColor="#F4B41F"
+                app:strokeColor="#F5B81F"
                 app:strokeWidth="1.5dp">
 
                 <LinearLayout
@@ -112,11 +113,11 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- CABECERA VERDE OSCURO DE BORDE A BORDE -->
+                    <!-- CABECERA VERDE DE BORDE A BORDE -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="#1B3317"
+                        android:background="#2B5424"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingHorizontal="16dp"
@@ -132,9 +133,10 @@
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/tvDesgloseIngredientes"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Prim: 99 · Sec: 66"
+                            android:text="Prim: — · Sec: —"
                             android:textColor="#FFFFFF"
                             android:textSize="10.5sp"
                             android:textStyle="bold" />
@@ -185,7 +187,7 @@
                                     android:id="@+id/tvNombrePlatoIngredientes"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Huevos pericos con arroz blanco"
+                                    android:text="Cargando plato..."
                                     android:textColor="#1E293B"
                                     android:textSize="16.5sp"
                                     android:textStyle="bold" />

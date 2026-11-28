@@ -56,26 +56,7 @@ class MainActivity : AppCompatActivity() {
 
     private var jornadaActualInicio = "MANANA"
 
-    private val platosBaseRespaldo = listOf(
-        PlatoResponse(
-            idPlato = 1,
-            idSeccion = 1,
-            nombrePlato = "Huevos pericos con arroz blanco",
-            componente = "Refresco de avena, huevos pericos, arroz blanco"
-        ),
-        PlatoResponse(
-            idPlato = 11,
-            idSeccion = 2,
-            nombrePlato = "Pollo guisado con arroz blanco",
-            componente = "Refresco de avena, pollo guisado, arroz blanco"
-        ),
-        PlatoResponse(
-            idPlato = 9,
-            idSeccion = 3,
-            nombrePlato = "Leche con galleta cuca y mango",
-            componente = "Leche, galleta cuca, maní salado, mango"
-        )
-    )
+    private val platosBaseRespaldo = emptyList<PlatoResponse>()
 
     private val seccionesRespaldo = listOf(
         SeccionMenu(idSeccion = 1, idJornada = 1, nombreSeccion = "Desayuno"),
@@ -99,11 +80,8 @@ class MainActivity : AppCompatActivity() {
         SessionManager.getToken(this)
 
         val sessionMgr = SessionManager(this)
-        val nombreUser = sessionMgr.getUserName() ?: "Manipuladora"
-        binding.includeStickyBar.tvNombreUsuarioSticky.text = nombreUser
+        NavigationHelper.setupStickyTopBar(this, binding.root, lifecycleScope)
         binding.tvSaludo.text = "Jornada de Servicio PAE"
-        val sedeNombre = sessionMgr.getUbicacionCompleta()
-        binding.includeStickyBar.tvInstitucion.text = if (sedeNombre.isNotBlank()) sedeNombre else "Sede Principal"
 
         val fechaFormatted = SimpleDateFormat(
             "EEEE / d / MMM / yyyy",
@@ -121,11 +99,13 @@ class MainActivity : AppCompatActivity() {
         actualizarSumatoriaAsistencia()
 
         lifecycleScope.launch {
+            aplicarFiltrosContratoSede()
             try {
                 com.example.movilmanupuladora.utils.SedeContratoManager.sincronizarSeccionesContrato(
                     this@MainActivity,
                     SessionManager(this@MainActivity).getSedeId()
                 )
+                aplicarFiltrosContratoSede()
                 actualizarEstadoJornadaInicio()
                 com.example.movilmanupuladora.utils.PreparacionSyncManager.sincronizarDesdeBackend(this@MainActivity)
                 actualizarInformacionSeccion()
@@ -170,11 +150,13 @@ class MainActivity : AppCompatActivity() {
         actualizarBadgeNotificaciones()
         iniciarPollingAsistenciaEnVivo()
         lifecycleScope.launch {
+            aplicarFiltrosContratoSede()
             try {
                 com.example.movilmanupuladora.utils.SedeContratoManager.sincronizarSeccionesContrato(
                     this@MainActivity,
                     SessionManager(this@MainActivity).getSedeId()
                 )
+                aplicarFiltrosContratoSede()
                 actualizarEstadoJornadaInicio()
                 com.example.movilmanupuladora.utils.PreparacionSyncManager.sincronizarDesdeBackend(this@MainActivity)
                 actualizarInformacionSeccion()
@@ -234,6 +216,38 @@ class MainActivity : AppCompatActivity() {
         }
 
         actualizarEstadoJornadaInicio()
+        aplicarFiltrosContratoSede()
+    }
+
+    private fun aplicarFiltrosContratoSede() {
+        val jornadas = com.example.movilmanupuladora.utils.SedeContratoManager.obtenerJornadasActivas(this)
+        val tieneManana = jornadas.any { it.contains("mañan", ignoreCase = true) || it.contains("manan", ignoreCase = true) }
+        val tieneTarde = jornadas.any { it.contains("tard", ignoreCase = true) }
+        if (tieneManana || tieneTarde) {
+            binding.btnJornadaManana.visibility = if (tieneManana) View.VISIBLE else View.GONE
+            binding.btnJornadaTarde.visibility = if (tieneTarde) View.VISIBLE else View.GONE
+            if (jornadaActualInicio == "MANANA" && !tieneManana && tieneTarde) {
+                jornadaActualInicio = "TARDE"
+            } else if (jornadaActualInicio == "TARDE" && !tieneTarde && tieneManana) {
+                jornadaActualInicio = "MANANA"
+            }
+        }
+
+        val secciones = com.example.movilmanupuladora.utils.SedeContratoManager.obtenerSeccionesActivas(this)
+            .ifEmpty { setOf("Desayuno") }
+        binding.btnSeccionDesayuno.visibility = if (secciones.contains("Desayuno")) View.VISIBLE else View.GONE
+        binding.btnSeccionAlmuerzo.visibility = if (secciones.contains("Almuerzo")) View.VISIBLE else View.GONE
+        binding.btnSeccionMerienda.visibility = if (secciones.contains("Merienda")) View.VISIBLE else View.GONE
+
+        val secActual = seccionesNombres.getOrNull(seccionSeleccionada) ?: "Desayuno"
+        if (!secciones.contains(secActual)) {
+            val nuevaIdx = when (secciones.first()) {
+                "Almuerzo" -> 1
+                "Merienda" -> 2
+                else -> 0
+            }
+            seleccionarSeccion(nuevaIdx)
+        }
     }
 
     private fun actualizarEstadoJornadaInicio() {
@@ -254,8 +268,8 @@ class MainActivity : AppCompatActivity() {
         binding.btnSeccionMerienda.isEnabled = tieneMerienda
 
         if (jornadaActualInicio == "MANANA") {
-            binding.btnJornadaManana.setBackgroundResource(R.drawable.bg_pill_green)
-            binding.btnJornadaManana.setTextColor(Color.WHITE)
+            binding.btnJornadaManana.setBackgroundResource(R.drawable.bg_pill_verde_manipuladora)
+            binding.btnJornadaManana.setTextColor(Color.parseColor("#2B5424"))
 
             binding.btnJornadaTarde.setBackgroundResource(0)
             binding.btnJornadaTarde.setTextColor(Color.parseColor("#64748B"))
@@ -267,8 +281,8 @@ class MainActivity : AppCompatActivity() {
             }
             seleccionarSeccion(idxDef)
         } else {
-            binding.btnJornadaTarde.setBackgroundResource(R.drawable.bg_pill_green)
-            binding.btnJornadaTarde.setTextColor(Color.WHITE)
+            binding.btnJornadaTarde.setBackgroundResource(R.drawable.bg_pill_verde_manipuladora)
+            binding.btnJornadaTarde.setTextColor(Color.parseColor("#2B5424"))
 
             binding.btnJornadaManana.setBackgroundResource(0)
             binding.btnJornadaManana.setTextColor(Color.parseColor("#64748B"))
@@ -403,27 +417,27 @@ class MainActivity : AppCompatActivity() {
     private fun seleccionarSeccion(index: Int) {
         seccionSeleccionada = index
 
-        val colorActivo = Color.parseColor("#1D3E1A")
-        val colorInactivo = Color.parseColor("#FFFFFF")
-        val strokeActivo = Color.parseColor("#1D3E1A")
+        val colorActivo = Color.parseColor("#FFFFFF")
+        val colorInactivo = Color.parseColor("#F8FAFC")
+        val strokeActivo = Color.parseColor("#2B5424")
         val strokeInactivo = Color.parseColor("#E2E8F0")
 
         binding.btnSeccionDesayuno.setCardBackgroundColor(if (index == 0) colorActivo else colorInactivo)
         binding.btnSeccionDesayuno.strokeColor = if (index == 0) strokeActivo else strokeInactivo
-        binding.tvLabelDesayuno.setTextColor(if (index == 0) Color.WHITE else Color.parseColor("#1E293B"))
+        binding.tvLabelDesayuno.setTextColor(if (index == 0) Color.parseColor("#0F172A") else Color.parseColor("#64748B"))
 
         binding.btnSeccionAlmuerzo.setCardBackgroundColor(if (index == 1) colorActivo else colorInactivo)
         binding.btnSeccionAlmuerzo.strokeColor = if (index == 1) strokeActivo else strokeInactivo
-        binding.tvLabelAlmuerzo.setTextColor(if (index == 1) Color.WHITE else Color.parseColor("#1E293B"))
+        binding.tvLabelAlmuerzo.setTextColor(if (index == 1) Color.parseColor("#0F172A") else Color.parseColor("#64748B"))
 
         binding.btnSeccionMerienda.setCardBackgroundColor(if (index == 2) colorActivo else colorInactivo)
         binding.btnSeccionMerienda.strokeColor = if (index == 2) strokeActivo else strokeInactivo
-        binding.tvLabelMerienda.setTextColor(if (index == 2) Color.WHITE else Color.parseColor("#1E293B"))
+        binding.tvLabelMerienda.setTextColor(if (index == 2) Color.parseColor("#0F172A") else Color.parseColor("#64748B"))
 
         val horario = when (index) {
-            0 -> "07:00 â€“ 08:15"
-            1 -> "11:30 â€“ 13:00"
-            else -> "09:30 â€“ 10:15"
+            0 -> "07:00 - 08:15"
+            1 -> "11:30 - 13:00"
+            else -> "09:30 - 10:15"
         }
         binding.tvHorarioServicio.text = horario
 
@@ -503,11 +517,15 @@ class MainActivity : AppCompatActivity() {
         binding.tvTagSeccionSeleccionada.text = "TU COMPONENTE · ${nombreSeccion.uppercase()}"
         binding.tvSeccionSeleccionada.text = nombreSeccion.uppercase()
 
-        val platoActivo = when (seccionSeleccionada) {
+        val platoActivoRaw = when (seccionSeleccionada) {
             0 -> platoDes
             1 -> platoAlm
             else -> platoMer
         }?.takeIf { it.isNotBlank() } ?: sessionMgr.getPlatoJefa(this).takeIf { it.isNotBlank() }
+        val platoActivo = platoActivoRaw?.trim()
+            ?.replace(Regex("(?i)^men[uú]\\s*(?:n[°o.]?\\s*)?\\d*\\s*:\\s*"), "")
+            ?.trim()
+            ?.ifBlank { platoActivoRaw.trim() }
 
         if (!platoActivo.isNullOrBlank()) {
             binding.imgPlatoMain.setImageResource(
@@ -526,12 +544,12 @@ class MainActivity : AppCompatActivity() {
         } else if (componenteJefa.isNullOrBlank()) {
             // Caso 2: La jefa ya eligió menú pero no le asignó componente a ella
             binding.tvComponenteAsignado.text = "Sin componente asignado"
-            binding.tvPlatoSeleccionado.text = "Plato de hoy: $platoActivo"
+            binding.tvPlatoSeleccionado.text = "Menú: $platoActivo"
             binding.tvSubtituloCardAsignadas.text = "Toca para ver detalles y preparación"
         } else {
             // Caso 3: La jefa eligió menú y le asignó componente
             binding.tvComponenteAsignado.text = componenteJefa
-            binding.tvPlatoSeleccionado.text = "Plato: $platoActivo"
+            binding.tvPlatoSeleccionado.text = "Menú: $platoActivo"
             binding.tvSubtituloCardAsignadas.text = "Tu tarea: $componenteJefa · $platoActivo"
         }
 
@@ -544,13 +562,47 @@ class MainActivity : AppCompatActivity() {
         val miNombre = sessionMgr.getUserName() ?: "Manipuladora"
         val miCorreo = sessionMgr.getUserEmail() ?: ""
         val comp = componenteJefa ?: "Preparación general"
-        val estadoActual = com.example.movilmanupuladora.ui.manipuladora_Jefe.PreparacionEstadoManager.obtenerEstado(this, miNombre, comp, miCorreo)
-        val textoEtapas = when (estadoActual.lowercase()) {
-            "listo", "terminado" -> "3/3 etapas (Listo)"
-            "en proceso", "cocinando" -> "2/3 etapas (En proceso)"
-            else -> "1/3 etapas (Por iniciar)"
+        val estadoLocal = com.example.movilmanupuladora.ui.manipuladora_Jefe.PreparacionEstadoManager.obtenerEstado(this, miNombre, comp, miCorreo)
+        val asigSeccion = com.example.movilmanupuladora.utils.PreparacionSyncManager
+            .obtenerMisAsignaciones(this)
+            .firstOrNull { it.servicio.equals(nombreSeccion, true) && (componenteJefa.isNullOrBlank() || it.componente.equals(componenteJefa, true)) }
+        val estadoActual = asigSeccion?.estado ?: estadoLocal
+        val estaFinalizada = estadoActual.contains("final", true) ||
+            estadoActual.contains("complet", true) ||
+            estadoActual.contains("listo", true)
+
+        if (estaFinalizada) {
+            binding.btnVerPreparacion.isEnabled = false
+            binding.btnVerPreparacion.text = "Preparación finalizada ✓"
+            binding.btnVerPreparacion.backgroundTintList = android.content.res.ColorStateList.valueOf(0xFFE6EDE2.toInt())
+            binding.btnVerPreparacion.setTextColor(0xFF2B5424.toInt())
+            binding.cardPlatoMain.isEnabled = false
+            binding.cardAccesoAsignadas.isEnabled = false
+            binding.tvEtapasJornada.text = "3/3 etapas (Finalizada)"
+        } else {
+            val enProceso = estadoActual.contains("proceso", true) || estadoActual.contains("preparac", true)
+            binding.btnVerPreparacion.isEnabled = true
+            binding.btnVerPreparacion.text = if (enProceso) "Continuar preparación →" else "Comenzar preparación →"
+            binding.btnVerPreparacion.backgroundTintList = android.content.res.ColorStateList.valueOf(0xFF2B5424.toInt())
+            binding.btnVerPreparacion.setTextColor(Color.WHITE)
+            binding.cardPlatoMain.isEnabled = true
+            binding.cardAccesoAsignadas.isEnabled = true
+            binding.tvEtapasJornada.text = if (enProceso) "2/3 etapas (En preparación)" else "1/3 etapas (Por hacer)"
         }
-        binding.tvEtapasJornada.text = textoEtapas
+
+        // Actualizar gráfica de Aporte Nutricional por Menú
+        val (kcal, prot, carb, gras, calcTxt) = when (seccionSeleccionada) {
+            0 -> listOf(385, 14f, 52f, 12f, "210 mg")
+            1 -> listOf(620, 26f, 74f, 20f, "280 mg")
+            else -> listOf(290, 10f, 38f, 9f, "165 mg")
+        }
+        binding.tvNutriMenuNombre.text = if (!platoActivo.isNullOrBlank()) "$nombreSeccion · $platoActivo" else "$nombreSeccion · Minuta PAE"
+        binding.tvNutriBadgeNivel.text = nombreSeccion
+        binding.tvNutriProt.text = "${(prot as Float).toInt()} g"
+        binding.tvNutriCarb.text = "${(carb as Float).toInt()} g"
+        binding.tvNutriGrasa.text = "${(gras as Float).toInt()} g"
+        binding.tvNutriCalc.text = calcTxt as String
+        binding.chartNutricionMenu.setData(kcal as Int, prot, carb, gras)
     }
 
     private fun cargarDatosDesdeBackend() {
@@ -864,47 +916,46 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun configurarMenusAnteriores() {
-        val plato1 = listaPlatos.firstOrNull {
-            it.nombrePlato?.contains("pollo", true) == true
-        } ?: platosBaseRespaldo[1]
+        val sessionMgr = SessionManager(this)
+        val fmtIso = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val fmtCorto = SimpleDateFormat("dd MMM", Locale.forLanguageTag("es-CO"))
 
-        val plato2 = listaPlatos.firstOrNull {
-            it.nombrePlato?.contains("perico", true) == true || it.nombrePlato?.contains("huevo", true) == true
-        } ?: platosBaseRespaldo[0]
+        data class HistItem(val servicio: String, val plato: String, val fechaCorta: String)
+        val reales = mutableListOf<HistItem>()
 
-        val plato3 = listaPlatos.firstOrNull {
-            it.nombrePlato?.contains("cuca", true) == true || it.nombrePlato?.contains("leche", true) == true
-        } ?: platosBaseRespaldo[2]
+        for (diasAtras in 1..7) {
+            if (reales.size >= 3) break
+            val cal = java.util.Calendar.getInstance().apply { add(java.util.Calendar.DAY_OF_YEAR, -diasAtras) }
+            val fIso = fmtIso.format(cal.time)
+            val fCorta = fmtCorto.format(cal.time)
+            for (serv in listOf("Desayuno", "Almuerzo", "Merienda")) {
+                if (reales.size >= 3) break
+                val p = sessionMgr.getPlatoDiaServicio(this, fIso, serv)?.takeIf { it.isNotBlank() } ?: continue
+                reales.add(HistItem(serv, p, fCorta))
+            }
+        }
 
-        val fmtFechaHistorial = java.text.SimpleDateFormat("dd MMM", java.util.Locale.forLanguageTag("es-CO"))
-        val cal = java.util.Calendar.getInstance()
+        val cards = listOf(
+            Triple(binding.cardMenuAnterior1, binding.tvPlatoAnterior1, Pair(binding.tvSubtituloAnterior1, binding.tvFechaAnterior1)),
+            Triple(binding.cardMenuAnterior2, binding.tvPlatoAnterior2, Pair(binding.tvSubtituloAnterior2, binding.tvFechaAnterior2)),
+            Triple(binding.cardMenuAnterior3, binding.tvPlatoAnterior3, Pair(binding.tvSubtituloAnterior3, binding.tvFechaAnterior3))
+        )
+        val imgs = listOf(binding.imgMenuAnterior1, binding.imgMenuAnterior2, binding.imgMenuAnterior3)
 
-        cal.add(java.util.Calendar.DAY_OF_YEAR, -1)
-        val fecha1 = fmtFechaHistorial.format(cal.time)
-
-        cal.add(java.util.Calendar.DAY_OF_YEAR, -1)
-        val fecha2 = fmtFechaHistorial.format(cal.time)
-
-        cal.add(java.util.Calendar.DAY_OF_YEAR, -1)
-        val fecha3 = fmtFechaHistorial.format(cal.time)
-
-        binding.tvPlatoAnterior1.text = "Almuerzo"
-        binding.tvSubtituloAnterior1.text = formatearNombrePlato(plato1.nombrePlato)
-        binding.imgMenuAnterior1.setImageResource(obtenerImagenPlato(plato1))
-        binding.tvFechaAnterior1.text = fecha1
-        binding.cardMenuAnterior1.setOnClickListener { mostrarDialogoPlato(plato1) }
-
-        binding.tvPlatoAnterior2.text = "Desayuno"
-        binding.tvSubtituloAnterior2.text = formatearNombrePlato(plato2.nombrePlato)
-        binding.imgMenuAnterior2.setImageResource(obtenerImagenPlato(plato2))
-        binding.tvFechaAnterior2.text = fecha2
-        binding.cardMenuAnterior2.setOnClickListener { mostrarDialogoPlato(plato2) }
-
-        binding.tvPlatoAnterior3.text = "Merienda"
-        binding.tvSubtituloAnterior3.text = formatearNombrePlato(plato3.nombrePlato)
-        binding.imgMenuAnterior3.setImageResource(obtenerImagenPlato(plato3))
-        binding.tvFechaAnterior3.text = fecha3
-        binding.cardMenuAnterior3.setOnClickListener { mostrarDialogoPlato(plato3) }
+        for (i in cards.indices) {
+            val item = reales.getOrNull(i)
+            val (card, tvTit, pairSub) = cards[i]
+            if (item != null) {
+                card.visibility = View.VISIBLE
+                tvTit.text = item.servicio
+                pairSub.first.text = formatearNombrePlato(item.plato)
+                pairSub.second.text = item.fechaCorta
+                imgs[i].setImageResource(InicioJefaActivity.obtenerImagenPlatoPorNombre(item.plato))
+                card.setOnClickListener { abrirPreparacionODetalles() }
+            } else {
+                card.visibility = View.GONE
+            }
+        }
     }
 
     private fun formatearNombrePlato(nombre: String?): String {
@@ -915,7 +966,7 @@ class MainActivity : AppCompatActivity() {
                     if (it.isLowerCase()) it.titlecase() else it.toString()
                 }
             }
-            ?: "Arroz con pollo"
+            ?: "Menú por asignar"
     }
 
     private fun mostrarDialogoPlato(plato: PlatoResponse) {

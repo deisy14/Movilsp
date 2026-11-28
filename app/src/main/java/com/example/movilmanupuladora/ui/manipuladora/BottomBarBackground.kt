@@ -22,19 +22,27 @@ class BottomBarBackground @JvmOverloads constructor(
     }
 
     private val strokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#E5B838") // Borde dorado
+        color = Color.parseColor("#F5B81F") // Borde dorado
         style = Paint.Style.STROKE
         strokeWidth = 3f
     }
 
     private val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#E5B838")
+        color = Color.parseColor("#F5B81F")
         style = Paint.Style.FILL
     }
 
     private val path = Path()
 
     // Animatable notch X position
+    var accentColor: Int = Color.parseColor("#F5B81F")
+        set(value) {
+            field = value
+            strokePaint.color = value
+            dotPaint.color = value
+            invalidate()
+        }
+
     var drawNotch: Boolean = true
         set(value) {
             field = value

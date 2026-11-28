@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 class PreparacionActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPreparacionBinding
-    private var nombrePlatoActual: String = "Pollo Guisado Criollo"
+    private var nombrePlatoActual: String = "Menú por asignar"
     private var componenteAsignado: String? = null
     private var idPlatoLocal: Int = -1
 
@@ -49,7 +49,10 @@ class PreparacionActivity : AppCompatActivity() {
             nombrePlatoActual = "Menú no seleccionado"
             binding.tvNombrePlatoPreparacion.text = "La jefa aún no ha seleccionado el menú de hoy"
         } else {
-            nombrePlatoActual = platoResolver
+            nombrePlatoActual = platoResolver.trim()
+                .replace(Regex("(?i)^men[uú]\\s*(?:n[°o.]?\\s*)?\\d*\\s*:\\s*"), "")
+                .trim()
+                .ifBlank { platoResolver.trim() }
             val nombreFormateado = nombrePlatoActual.split(" ").joinToString(" ") { palabra ->
                 palabra.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
             }
@@ -59,6 +62,11 @@ class PreparacionActivity : AppCompatActivity() {
         val miNombre = sessionMgr.getUserName() ?: "Manipuladora"
         val miCorreo = sessionMgr.getUserEmail() ?: ""
 
+        val servicioSel = intent.getStringExtra("servicio_seleccionado")?.takeIf { it.isNotBlank() }
+        if (!servicioSel.isNullOrBlank()) {
+            binding.tvServicioPreparacion.text = "${servicioSel.uppercase()} · PREPARACIÓN"
+        }
+
         if (!componenteAsignado.isNullOrBlank()) {
             val estadoActual = PreparacionEstadoManager.obtenerEstado(
                 this,
@@ -67,7 +75,7 @@ class PreparacionActivity : AppCompatActivity() {
                 miCorreo
             )
             actualizarVistaEstado(estadoActual)
-            binding.tvComponentePreparacion.text = "Estación Proteica y Huevos"
+            binding.tvComponentePreparacion.text = "Componente: $componenteAsignado"
             binding.btnMarcarPreparado.visibility = View.VISIBLE
         } else {
             binding.badgeTurnoPreparacion.text = "Estado: Sin asignación"
@@ -77,11 +85,20 @@ class PreparacionActivity : AppCompatActivity() {
             binding.btnMarcarPreparado.visibility = View.GONE
         }
 
+        binding.btnVerIngredientesPrep.setOnClickListener {
+            val intent = Intent(this, IngredientesActivity::class.java).apply {
+                putExtra("id_plato", idPlatoLocal)
+                putExtra("nombre_plato", nombrePlatoActual)
+            }
+            startActivity(intent)
+        }
+
         binding.btnMarcarPreparado.setOnClickListener {
-            val miNombre = sessionMgr.getUserName() ?: "Manipuladora"
-            val miCorreo = sessionMgr.getUserEmail() ?: ""
+            val miNombreClick = sessionMgr.getUserName() ?: "Manipuladora"
+            val miCorreoClick = sessionMgr.getUserEmail() ?: ""
             val comp = componenteAsignado ?: "Preparación general"
-            val estadoActual = PreparacionEstadoManager.obtenerEstado(this, miNombre, comp, miCorreo)
+            val estadoActual = PreparacionEstadoManager.obtenerEstado(this, miNombreClick, comp, miCorreoClick)
+            if (estadoActual == PreparacionEstadoManager.ESTADO_FINALIZADA) return@setOnClickListener
 
             val siguienteEstado = when (estadoActual) {
                 PreparacionEstadoManager.ESTADO_POR_HACER -> PreparacionEstadoManager.ESTADO_EN_PROCESO
@@ -92,7 +109,13 @@ class PreparacionActivity : AppCompatActivity() {
         }
 
         binding.btnMarcarPreparado.setOnLongClickListener {
-            mostrarDialogoEstadoPreparacion()
+            val miNombreClick = sessionMgr.getUserName() ?: "Manipuladora"
+            val miCorreoClick = sessionMgr.getUserEmail() ?: ""
+            val comp = componenteAsignado ?: "Preparación general"
+            val estadoActual = PreparacionEstadoManager.obtenerEstado(this, miNombreClick, comp, miCorreoClick)
+            if (estadoActual != PreparacionEstadoManager.ESTADO_FINALIZADA) {
+                mostrarDialogoEstadoPreparacion()
+            }
             true
         }
 
@@ -136,15 +159,18 @@ class PreparacionActivity : AppCompatActivity() {
         }
 
         tabPorHacer?.setOnClickListener {
-            destacarTab(tabPorHacer)
+            val est = PreparacionEstadoManager.obtenerEstado(this, miNombre, comp, miCorreo)
+            if (est == PreparacionEstadoManager.ESTADO_FINALIZADA) return@setOnClickListener
             ejecutarCambioEstadoDirecto(PreparacionEstadoManager.ESTADO_POR_HACER)
         }
         tabEnProceso?.setOnClickListener {
-            destacarTab(tabEnProceso)
+            val est = PreparacionEstadoManager.obtenerEstado(this, miNombre, comp, miCorreo)
+            if (est == PreparacionEstadoManager.ESTADO_FINALIZADA) return@setOnClickListener
             ejecutarCambioEstadoDirecto(PreparacionEstadoManager.ESTADO_EN_PROCESO)
         }
         tabListo?.setOnClickListener {
-            destacarTab(tabListo)
+            val est = PreparacionEstadoManager.obtenerEstado(this, miNombre, comp, miCorreo)
+            if (est == PreparacionEstadoManager.ESTADO_FINALIZADA) return@setOnClickListener
             ejecutarCambioEstadoDirecto(PreparacionEstadoManager.ESTADO_FINALIZADA)
         }
     }
@@ -154,15 +180,21 @@ class PreparacionActivity : AppCompatActivity() {
         val tabEnProceso = findViewById<TextView>(R.id.tabEnProceso)
         val tabListo = findViewById<TextView>(R.id.tabListo)
 
+        val estaFinalizada = estado == PreparacionEstadoManager.ESTADO_FINALIZADA
+
         fun destacarTab(activo: TextView?, colorFondo: Int, colorTexto: Int) {
             val tabs = listOf(tabPorHacer, tabEnProceso, tabListo)
             for (t in tabs) {
+                t?.isEnabled = !estaFinalizada
+                t?.isClickable = !estaFinalizada
                 if (t == activo) {
                     t?.setBackgroundResource(colorFondo)
                     t?.setTextColor(colorTexto)
+                    t?.alpha = 1f
                 } else {
                     t?.background = null
                     t?.setTextColor(Color.parseColor("#64748B"))
+                    t?.alpha = if (estaFinalizada) 0.45f else 1f
                 }
             }
         }
@@ -172,35 +204,43 @@ class PreparacionActivity : AppCompatActivity() {
                 binding.badgeTurnoPreparacion.text = "Estado: Por hacer"
                 binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_pill_yellow)
                 binding.badgeTurnoPreparacion.setTextColor(Color.parseColor("#7A5500"))
-                binding.btnMarcarPreparado.text = "Cambiar Estado (Por Hacer) ➔"
-                binding.btnMarcarPreparado.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#F4B41F"))
+                binding.btnMarcarPreparado.isEnabled = true
+                binding.btnMarcarPreparado.isClickable = true
+                binding.btnMarcarPreparado.text = "Aceptar"
+                binding.btnMarcarPreparado.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#F5B81F"))
                 binding.btnMarcarPreparado.setTextColor(Color.parseColor("#FFFFFF"))
                 destacarTab(tabPorHacer, R.drawable.bg_pill_yellow, Color.parseColor("#7A5500"))
             }
             PreparacionEstadoManager.ESTADO_EN_PROCESO -> {
-                binding.badgeTurnoPreparacion.text = "Estado: En preparación ⏳"
-                binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_pill_light_green)
-                binding.badgeTurnoPreparacion.setTextColor(Color.parseColor("#15803D"))
-                binding.btnMarcarPreparado.text = "Cambiar Estado (En Proceso) ➔"
-                binding.btnMarcarPreparado.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#2563EB"))
+                binding.badgeTurnoPreparacion.text = "Estado: En preparación"
+                binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_pill_yellow)
+                binding.badgeTurnoPreparacion.setTextColor(Color.parseColor("#7A5500"))
+                binding.btnMarcarPreparado.isEnabled = true
+                binding.btnMarcarPreparado.isClickable = true
+                binding.btnMarcarPreparado.text = "Aceptar"
+                binding.btnMarcarPreparado.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#2B5424"))
                 binding.btnMarcarPreparado.setTextColor(Color.parseColor("#FFFFFF"))
-                destacarTab(tabEnProceso, R.drawable.bg_pill_green, Color.WHITE)
+                destacarTab(tabEnProceso, R.drawable.bg_pill_yellow, Color.parseColor("#7A5500"))
             }
             PreparacionEstadoManager.ESTADO_FINALIZADA -> {
-                binding.badgeTurnoPreparacion.text = "Estado: Finalizada ✓"
+                binding.badgeTurnoPreparacion.text = "Estado: Finalizada"
                 binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_pill_green)
                 binding.badgeTurnoPreparacion.setTextColor(Color.WHITE)
-                binding.btnMarcarPreparado.text = "Preparación Finalizada ✓"
-                binding.btnMarcarPreparado.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#16A34A"))
-                binding.btnMarcarPreparado.setTextColor(Color.parseColor("#FFFFFF"))
+                binding.btnMarcarPreparado.isEnabled = false
+                binding.btnMarcarPreparado.isClickable = false
+                binding.btnMarcarPreparado.text = "Finalizada ✓"
+                binding.btnMarcarPreparado.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#E6EDE2"))
+                binding.btnMarcarPreparado.setTextColor(Color.parseColor("#2B5424"))
                 destacarTab(tabListo, R.drawable.bg_pill_green, Color.WHITE)
             }
             else -> {
                 binding.badgeTurnoPreparacion.text = "Estado: $estado"
                 binding.badgeTurnoPreparacion.setBackgroundResource(R.drawable.bg_pill_yellow)
                 binding.badgeTurnoPreparacion.setTextColor(Color.parseColor("#7A5500"))
-                binding.btnMarcarPreparado.text = "Cambiar Estado de Preparación"
-                binding.btnMarcarPreparado.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#F4B41F"))
+                binding.btnMarcarPreparado.isEnabled = true
+                binding.btnMarcarPreparado.isClickable = true
+                binding.btnMarcarPreparado.text = "Aceptar"
+                binding.btnMarcarPreparado.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#F5B81F"))
                 binding.btnMarcarPreparado.setTextColor(Color.parseColor("#FFFFFF"))
                 destacarTab(tabPorHacer, R.drawable.bg_pill_yellow, Color.parseColor("#7A5500"))
             }
@@ -208,55 +248,55 @@ class PreparacionActivity : AppCompatActivity() {
     }
 
     private fun cargarPasosDesdeBackend() {
-        val pasosDinamicos = obtenerPasosComponente(componenteAsignado ?: nombrePlatoActual)
-
         lifecycleScope.launch {
             try {
+                if (idPlatoLocal <= 0 && nombrePlatoActual.isNotBlank()) {
+                    val resPlatos = RetrofitClient.apiService.obtenerPlatos()
+                    if (resPlatos.isSuccessful && !resPlatos.body().isNullOrEmpty()) {
+                        val buscado = nombrePlatoActual.lowercase().trim()
+                        val match = resPlatos.body()!!.firstOrNull { p ->
+                            val nom = (p.nombrePlato ?: "").lowercase()
+                                .replace(Regex("^men[uú]\\s*(?:n[°o.]?\\s*)?\\d*\\s*:\\s*"), "")
+                                .trim()
+                            nom == buscado || nom.contains(buscado) || buscado.contains(nom)
+                        }
+                        if (match != null) {
+                            idPlatoLocal = match.idPlato
+                        }
+                    }
+                }
+
                 val response = RetrofitClient.apiService.obtenerPasosPreparacion()
                 if (response.isSuccessful && !response.body().isNullOrEmpty()) {
                     val todosPasos = response.body()!!
-                    val pasosBackend = if (idPlatoLocal > 0) {
+                    val pasosBackend = (if (idPlatoLocal > 0) {
                         todosPasos.filter { it.idPlato == idPlatoLocal }
                     } else {
                         emptyList()
-                    }
-                    val pasosFinales = if (pasosBackend.isNotEmpty()) pasosBackend else pasosDinamicos
-                    mostrarPasos(pasosFinales)
+                    }).sortedBy { it.numeroPaso.trim().toIntOrNull() ?: 999 }
+                    mostrarPasos(pasosBackend)
                 } else {
-                    mostrarPasos(pasosDinamicos)
+                    mostrarPasos(emptyList())
                 }
             } catch (e: Exception) {
-                mostrarPasos(pasosDinamicos)
+                mostrarPasos(emptyList())
             }
         }
     }
 
-    private fun obtenerPasosComponente(componente: String): List<pasos_preparacion> {
-        val c = componente.lowercase().trim()
-        return when {
-            c.contains("huevo") -> listOf(
-                pasos_preparacion(idPlato = 1, numeroPaso = "1", descripcionPaso = "Lavado y desinfección de vegetales y selección de huevos frescos."),
-                pasos_preparacion(idPlato = 1, numeroPaso = "2", descripcionPaso = "Preparación del sofrito de tomate y cebolla con sal y condimentos."),
-                pasos_preparacion(idPlato = 1, numeroPaso = "3", descripcionPaso = "Incorporación de los huevos batidos y cocción a fuego medio hasta punto perfecto."),
-                pasos_preparacion(idPlato = 1, numeroPaso = "4", descripcionPaso = "Porcionamiento en bandeja térmica acompañado de arroz blanco.")
-            )
-            c.contains("pollo") -> listOf(
-                pasos_preparacion(idPlato = 1, numeroPaso = "1", descripcionPaso = "Descongelación y lavado de piezas de pollo bajo estrictas normas de inocuidad."),
-                pasos_preparacion(idPlato = 1, numeroPaso = "2", descripcionPaso = "Sazón con ajo, comino, sal y especias de la receta institucional."),
-                pasos_preparacion(idPlato = 1, numeroPaso = "3", descripcionPaso = "Cocción a fuego moderado hasta alcanzar temperatura interna superior a 75°C."),
-                pasos_preparacion(idPlato = 1, numeroPaso = "4", descripcionPaso = "Servido de porciones estandarizadas según gramaje escolar.")
-            )
-            else -> listOf(
-                pasos_preparacion(idPlato = 1, numeroPaso = "1", descripcionPaso = "Recepción, lavado y desinfección de materia prima e insumos de cocina."),
-                pasos_preparacion(idPlato = 1, numeroPaso = "2", descripcionPaso = "Alistamiento de utensilios y preparación previa (Mise en place)."),
-                pasos_preparacion(idPlato = 1, numeroPaso = "3", descripcionPaso = "Cocción controlada verificando temperatura interna y estándar PAE."),
-                pasos_preparacion(idPlato = 1, numeroPaso = "4", descripcionPaso = "Porcionamiento final y control de gramaje para entrega a estudiantes.")
-            )
-        }
-    }
-
     private fun mostrarPasos(pasos: List<pasos_preparacion>) {
+        binding.tvCantidadPasos.text = if (pasos.size == 1) "1 paso" else "${pasos.size} pasos"
         binding.contenedorPasos.removeAllViews()
+        if (pasos.isEmpty()) {
+            val tvVacio = android.widget.TextView(this).apply {
+                text = "Sin pasos de preparación registrados en el servidor para este plato."
+                setTextColor(android.graphics.Color.parseColor("#64748B"))
+                textSize = 13.5f
+                setPadding(16, 24, 16, 24)
+            }
+            binding.contenedorPasos.addView(tvVacio)
+            return
+        }
 
         for ((index, paso) in pasos.withIndex()) {
             val itemBinding = com.example.movilmanupuladora.databinding.ItemPasoCocinaBinding.inflate(
@@ -375,6 +415,8 @@ class PreparacionActivity : AppCompatActivity() {
         val miNombre = sessionMgr.getUserName() ?: "Manipuladora"
         val miCorreo = sessionMgr.getUserEmail() ?: ""
         val comp = componenteAsignado ?: "Preparación general"
+        val estadoPrevio = PreparacionEstadoManager.obtenerEstado(this, miNombre, comp, miCorreo)
+        if (estadoPrevio == PreparacionEstadoManager.ESTADO_FINALIZADA) return
 
         PreparacionEstadoManager.guardarEstado(
             context = this,

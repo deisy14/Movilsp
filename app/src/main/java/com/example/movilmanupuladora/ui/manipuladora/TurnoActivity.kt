@@ -2,15 +2,12 @@ package com.example.movilmanupuladora.ui.manipuladora
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import com.example.movilmanupuladora.data.api.RetrofitClient
 import com.example.movilmanupuladora.databinding.ActivityTurnoBinding
 import com.example.movilmanupuladora.utils.PreparacionSyncManager
 import com.example.movilmanupuladora.utils.SessionManager
@@ -19,18 +16,15 @@ import kotlinx.coroutines.launch
 class TurnoActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityTurnoBinding
-
-    private val handler = Handler(Looper.getMainLooper())
     private var isNavigating = false
 
-    private val irSiguientePantalla = Runnable {
+    private fun irSiguientePantalla() {
         if (!isNavigating) {
             isNavigating = true
             val intent = Intent(
                 this,
                 MainActivity::class.java
             )
-
             startActivity(intent)
             finish()
         }
@@ -52,82 +46,114 @@ class TurnoActivity : AppCompatActivity() {
 
         cargarTurno()
 
-        binding.cardTurno.setOnClickListener {
-            handler.removeCallbacks(irSiguientePantalla)
-            irSiguientePantalla.run()
+        binding.cardPlato.setOnClickListener {
+            irSiguientePantalla()
         }
+    }
 
-        handler.postDelayed(irSiguientePantalla, 5_000)
+    private fun limpiarNombreMenu(raw: String): String {
+        return raw.trim()
+            .replace(Regex("(?i)^men[uú]\\s*(?:n[°o.]?\\s*)?\\d*\\s*:\\s*"), "")
+            .trim()
+            .ifBlank { raw.trim() }
     }
 
     private fun cargarTurno() {
         val sessionMgr = SessionManager(this)
-        var platoJefa = sessionMgr.getPlatoJefa(this)
-        var componenteAsignado = sessionMgr.getComponenteAsignado(this)
+        val platoJefa = sessionMgr.getPlatoJefa(this)
+        val componenteAsignado = sessionMgr.getComponenteAsignado(this)
         val nombreUser = sessionMgr.getUserName() ?: ""
 
-        if (nombreUser.isNotBlank()) {
-            binding.txtTituloTurno.text = "¡Hola, $nombreUser!"
+        binding.txtTituloTurno.text = if (nombreUser.isNotBlank()) {
+            "¡Hola, $nombreUser!"
         } else {
-            binding.txtTituloTurno.text = "Iniciando tu turno"
+            "¡Hola, Manipuladora!"
         }
 
-        if (platoJefa.isNotBlank()) {
-            binding.txtPlatoAsignado.text = "$platoJefa  ➔"
+        binding.txtSubtituloTurno.text = if (platoJefa.isNotBlank()) {
+            "Menú: ${limpiarNombreMenu(platoJefa)}"
         } else {
-            binding.txtPlatoAsignado.text = "Sin plato asignado  ➔"
+            "Menú: Sincronizando..."
         }
 
-        if (!componenteAsignado.isNullOrBlank()) {
-            binding.txtSubtituloTurno.text = componenteAsignado
+        binding.txtPlatoAsignado.text = if (!componenteAsignado.isNullOrBlank()) {
+            "Preparar componente: $componenteAsignado  ➔"
         } else {
-            binding.txtSubtituloTurno.text = "Estación pendiente"
+            "Preparar componente: Consultando...  ➔"
         }
+
+        binding.txtSeccionTurno.text = "Sección de menú: Sincronizando..."
+        binding.txtMensajeTurno.text = "Sincronizando turno y horario..."
 
         lifecycleScope.launch {
             try {
                 // Sincronizar desde la nube para que aparezca la asignación más reciente hecha por la Jefa
                 PreparacionSyncManager.sincronizarDesdeBackend(this@TurnoActivity)
 
-                platoJefa = sessionMgr.getPlatoJefa(this@TurnoActivity)
-                componenteAsignado = sessionMgr.getComponenteAsignado(this@TurnoActivity)
-
-                if (platoJefa.isNotBlank()) {
-                    binding.txtPlatoAsignado.text = "$platoJefa  ➔"
-                } else {
-                    binding.txtPlatoAsignado.text = "Sin plato asignado  ➔"
-                }
-                if (!componenteAsignado.isNullOrBlank()) {
-                    binding.txtSubtituloTurno.text = componenteAsignado
-                } else {
-                    binding.txtSubtituloTurno.text = "Estación pendiente"
+                val todas = PreparacionSyncManager.obtenerMisAsignaciones(this@TurnoActivity)
+                val pendientes = todas.filter {
+                    !it.estado.contains("final", ignoreCase = true) &&
+                        !it.estado.contains("complet", ignoreCase = true) &&
+                        !it.estado.contains("listo", ignoreCase = true)
                 }
 
-                // Cargar horario de turno institucional
-                val res = RetrofitClient.apiService.obtenerTurnos()
-                if (res.isSuccessful && !res.body().isNullOrEmpty()) {
-                    val turno = res.body()!!.firstOrNull { !it.nombreTurno.orEmpty().startsWith("PAE_") }
-                        ?: res.body()!!.first()
-                    val nombreRaw = turno.nombreTurno ?: "Mañana"
-                    val nombreLimpio = if (nombreRaw.trim().startsWith("Turno", ignoreCase = true)) {
-                        nombreRaw.trim()
-                    } else {
-                        "Turno ${nombreRaw.trim()}"
+                val listaActiva = pendientes.ifEmpty { todas }
+                val seccionActiva = listaActiva.firstOrNull()?.servicio
+                val itemsSeccion = if (!seccionActiva.isNullOrBlank()) {
+                    listaActiva.filter { it.servicio.equals(seccionActiva, ignoreCase = true) }
+                } else {
+                    listaActiva
+                }
+
+                val platoMostrar = itemsSeccion.firstOrNull()?.plato?.takeIf { it.isNotBlank() } ?: platoJefa
+                binding.txtSubtituloTurno.text = if (platoMostrar.isNotBlank()) {
+                    "Menú: ${limpiarNombreMenu(platoMostrar)}"
+                } else {
+                    "Menú: Por asignar"
+                }
+
+                binding.txtPlatoAsignado.text = if (itemsSeccion.isNotEmpty()) {
+                    val comps = itemsSeccion.map { it.componente }.distinct().joinToString(" · ")
+                    "Preparar componente: $comps  ➔"
+                } else if (!componenteAsignado.isNullOrBlank() && todas.isEmpty()) {
+                    "Preparar componente: $componenteAsignado  ➔"
+                } else {
+                    "Preparar componente: Por asignar  ➔"
+                }
+
+                // Mostrar turno real asignado y sección de menú (Desayuno, Almuerzo, Merienda, etc.)
+                val emailUser = sessionMgr.getUserEmail()?.trim().orEmpty()
+                val manip = com.example.movilmanupuladora.ui.manipuladora_Jefe.ManipuladorasManager
+                    .obtenerManipuladoras()
+                    .firstOrNull {
+                        (emailUser.isNotBlank() && it.correo.equals(emailUser, true)) ||
+                            (nombreUser.isNotBlank() && it.nombre.equals(nombreUser, true))
                     }
-                    val hInicio = turno.horaInicio ?: "6:00 a. m."
-                    val hFin = turno.horaFin ?: "2:00 p. m."
-                    binding.txtMensajeTurno.text = "$nombreLimpio · $hInicio - $hFin · Ingresando..."
+                val turnoAsignado = manip?.jornada?.takeIf { it.isNotBlank() }
+                    ?: getSharedPreferences("TURNO_PAE", MODE_PRIVATE).getString("plato_jornada", null)?.takeIf { it.isNotBlank() }
+
+                val turnoTexto = if (!turnoAsignado.isNullOrBlank()) {
+                    if (turnoAsignado.startsWith("Turno", true)) turnoAsignado else "Turno $turnoAsignado"
                 } else {
-                    binding.txtMensajeTurno.text = "Turno Mañana · 6:00 a. m. - 2:00 p. m. · Ingresando..."
+                    "Turno Mañana"
                 }
+                val horarioTurno = when {
+                    turnoTexto.contains("tarde", ignoreCase = true) -> "12:00 – 18:00"
+                    turnoTexto.contains("noche", ignoreCase = true) -> "18:00 – 22:00"
+                    else -> "06:00 – 14:00"
+                }
+                val seccionTexto = if (!seccionActiva.isNullOrBlank()) {
+                    seccionActiva.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+                } else {
+                    "Por asignar"
+                }
+                binding.txtSeccionTurno.text = "Sección de menú: $seccionTexto"
+                binding.txtMensajeTurno.text = "$turnoTexto · $horarioTurno"
             } catch (e: Exception) {
                 Log.e("TurnoActivity", "Error al sincronizar turno: ${e.message}")
+                binding.txtSeccionTurno.text = "Sección de menú: Por asignar"
+                binding.txtMensajeTurno.text = "Turno Mañana · 06:00 – 14:00"
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        handler.removeCallbacks(irSiguientePantalla)
     }
 }

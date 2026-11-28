@@ -96,13 +96,14 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/tvRacionesMenuDia"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_pill_light_green"
                     android:paddingHorizontal="12dp"
                     android:paddingVertical="6dp"
-                    android:text="165 raciones"
-                    android:textColor="#1B3317"
+                    android:text="— raciones"
+                    android:textColor="#2B5424"
                     android:textSize="11.5sp"
                     android:textStyle="bold" />
 
@@ -157,7 +158,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Turno asignado · Mañana (6:00 a. m. – 2:00 p. m.)"
+                            android:text="Jornada activa de tu sede"
                             android:textColor="#64748B"
                             android:textSize="11.5sp" />
 
@@ -244,19 +245,21 @@
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/tvResumenInventarioMenu"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="6 insumos disponibles · 1 agotado"
+                            android:text="Consultando inventario..."
                             android:textColor="#FFFFFF"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/tvSubtituloInventarioMenu"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Stock verificado para 3 tiempos de comida"
+                            android:text="Stock de tu sede"
                             android:textColor="#FFFFFF"
                             android:textSize="11.5sp" />
 

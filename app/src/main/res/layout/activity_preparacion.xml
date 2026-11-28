@@ -69,7 +69,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Proceso de Preparación"
+                        android:text="Pasos de Preparación"
                         android:textColor="#1E293B"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -80,7 +80,7 @@
                         android:layout_marginTop="2dp"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text="Sigue las pautas e instrucciones de cocción e inocuidad e..."
+                        android:text="Sigue las pautas e instrucciones de cocción e inocuidad."
                         android:textColor="#64748B"
                         android:textSize="11.5sp" />
 
@@ -107,17 +107,18 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="#1B3317"
+                        android:background="#2B5424"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingHorizontal="16dp"
                         android:paddingVertical="10dp">
 
                         <TextView
+                            android:id="@+id/tvServicioPreparacion"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="DESAYUNO · TURNO MAÑANA"
+                            android:text="PREPARACIÓN DE COMPONENTE"
                             android:textColor="#FFFFFF"
                             android:textSize="11sp"
                             android:textStyle="bold" />
@@ -190,12 +191,12 @@
                                     android:id="@+id/tvNombrePlatoPreparacion"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Huevos pericos con arroz blanco"
+                                    android:text="Cargando plato..."
                                     android:textColor="#1E293B"
                                     android:textSize="16.5sp"
                                     android:textStyle="bold" />
 
-                                <!-- ESTACIÓN (BANNER VERDE OSCURO) -->
+                                <!-- ESTACIÓN (BANNER VERDE OSCURO SIN ICONO) -->
                                 <LinearLayout
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
@@ -206,18 +207,11 @@
                                     android:paddingHorizontal="10dp"
                                     android:paddingVertical="4dp">
 
-                                    <ImageView
-                                        android:layout_width="14dp"
-                                        android:layout_height="14dp"
-                                        android:layout_marginEnd="5dp"
-                                        android:src="@drawable/ic_check_circle"
-                                        app:tint="#FFFFFF" />
-
                                     <TextView
                                         android:id="@+id/tvComponentePreparacion"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Estación Proteica y Huevos"
+                                        android:text="Componente asignado"
                                         android:textColor="#FFFFFF"
                                         android:textSize="11.5sp"
                                         android:textStyle="bold" />
@@ -300,12 +294,12 @@
 
             </LinearLayout>
 
-            <!-- ENCABEZADO DE SECCIÓN PASO A PASO (BANNER VERDE OSCURO #1B3317) -->
+            <!-- ENCABEZADO DE SECCIÓN PASO A PASO (BANNER VERDE OSCURO #2B5424) -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="18dp"
-                app:cardBackgroundColor="#1B3317"
+                app:cardBackgroundColor="#2B5424"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="1dp"
                 app:strokeWidth="0dp">
@@ -322,16 +316,17 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="PASO A PASO DE COCCIÓN"
+                        android:text="PASOS DE PREPARACIÓN"
                         android:textColor="#FFFFFF"
                         android:textSize="13sp"
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tvCantidadPasos"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="4 pasos"
-                        android:textColor="#F4B41F"
+                        android:text="Cargando..."
+                        android:textColor="#F5B81F"
                         android:textSize="12sp"
                         android:textStyle="bold" />
 
@@ -399,14 +394,31 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- BOTÓN: ACTUALIZAR ESTADO DE PREPARACIÓN -->
+            <!-- BOTÓN: VER INGREDIENTES DEL PLATO -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnVerIngredientesPrep"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="#E6EDE2"
+                android:text="Ver Ingredientes"
+                android:textAllCaps="false"
+                android:textColor="#2B5424"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:cornerRadius="14dp"
+                app:strokeColor="#2B5424"
+                app:strokeWidth="1.5dp" />
+
+            <!-- BOTÓN: ACEPTAR / FINALIZADA -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnMarcarPreparado"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:layout_marginTop="20dp"
-                android:backgroundTint="#F4B41F"
-                android:text="Actualizar Estado de Preparación"
+                android:layout_marginTop="10dp"
+                android:backgroundTint="#F5B81F"
+                android:text="Aceptar"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"

@@ -56,9 +56,8 @@
                 android:id="@+id/cardTurno"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
+                android:clickable="false"
+                android:focusable="false"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="28dp"
                 app:cardElevation="10dp"
@@ -95,20 +94,20 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
                         android:gravity="center"
-                        android:text="¡Hola, Maria Alejandra Velazco!"
+                        android:text="¡Hola!"
                         android:textColor="#1E293B"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
-                    <!-- SUBTÍTULO O ESTACIÓN (COMPONENTE MÁS GRANDE) -->
+                    <!-- MENÚ ASIGNADO -->
                     <TextView
                         android:id="@+id/txtSubtituloTurno"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
                         android:gravity="center"
-                        tools:text="Estación Proteica y Huevos"
-                        android:text="Cargando estación..."
+                        tools:text="Menú: Frijoles con arroz y fideos"
+                        android:text="Menú: Sincronizando..."
                         android:textColor="#1E293B"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -117,8 +116,12 @@
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardPlato"
                         android:layout_width="match_parent"
-                        android:layout_height="52dp"
+                        android:layout_height="wrap_content"
+                        android:minHeight="52dp"
                         android:layout_marginTop="22dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
                         app:cardBackgroundColor="#1B3317"
                         app:cardCornerRadius="20dp"
                         app:cardElevation="2dp"
@@ -126,10 +129,12 @@
 
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
+                            android:minHeight="52dp"
                             android:gravity="center"
                             android:orientation="horizontal"
-                            android:paddingHorizontal="16dp">
+                            android:paddingHorizontal="16dp"
+                            android:paddingVertical="12dp">
 
                             <TextView
                                 android:id="@+id/txtPlatoAsignado"
@@ -137,25 +142,38 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:gravity="center"
-                                tools:text="Huevos pericos con arroz blanco  ➔"
-                                android:text="Cargando plato..."
-                                android:textColor="#CBD5E1"
-                                android:textSize="12sp" />
+                                tools:text="Preparar componente: Proteico  ➔"
+                                android:text="Preparar componente: Consultando..."
+                                android:textColor="#FFFFFF"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
 
                         </LinearLayout>
 
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- MENSAJE DE HORARIO DE TURNO -->
+                    <!-- SECCIÓN DE MENÚ (DESAYUNO / ALMUERZO) JUSTO DEBAJO DEL BOTÓN VERDE -->
+                    <TextView
+                        android:id="@+id/txtSeccionTurno"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="18dp"
+                        android:gravity="center"
+                        android:text="Sección de menú: Almuerzo"
+                        android:textColor="#2B5424"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <!-- MENSAJE DE TURNO Y HORARIO -->
                     <TextView
                         android:id="@+id/txtMensajeTurno"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
+                        android:layout_marginTop="4dp"
                         android:gravity="center"
-                        android:text="Turno Mañana · 06:00:00 – 14:00:00 · Ingresando..."
+                        android:text="Turno Mañana · 06:00 – 14:00"
                         android:textColor="#64748B"
-                        android:textSize="11.5sp"
+                        android:textSize="12sp"
                         android:textStyle="italic" />
 
                 </LinearLayout>

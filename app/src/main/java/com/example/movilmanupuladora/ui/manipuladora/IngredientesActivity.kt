@@ -42,9 +42,22 @@ class IngredientesActivity : AppCompatActivity() {
             finish()
         }
 
-        // Mostrar nombre del plato y componente si viene del intent
-        val nombrePlato = intent.getStringExtra("nombre_plato") ?: "Bandeja Paisa"
-        val componenteSeleccionado = intent.getStringExtra("componente_seleccionado")
+        // Mostrar nombre del plato y componente si viene del intent o sesión
+        val sessionMgr = com.example.movilmanupuladora.utils.SessionManager(this)
+        val nombrePlato = intent.getStringExtra("nombre_plato")?.takeIf { it.isNotBlank() }
+            ?: sessionMgr.getPlatoJefa(this).takeIf { it.isNotBlank() }
+            ?: "Menú por asignar"
+        val componenteSeleccionado = intent.getStringExtra("componente_seleccionado")?.takeIf { it.isNotBlank() }
+            ?: sessionMgr.getComponenteAsignado(this)
+
+        val prim = com.example.movilmanupuladora.ui.manipuladora_Jefe.AsistenciaManager.obtenerPrimaria(this)
+        val sec = com.example.movilmanupuladora.ui.manipuladora_Jefe.AsistenciaManager.obtenerSecundaria(this)
+        val tot = com.example.movilmanupuladora.ui.manipuladora_Jefe.AsistenciaManager.obtenerManana(this)
+            .takeIf { it > 0 } ?: (prim + sec)
+        findViewById<TextView>(R.id.tvRacionesIngredientes)?.text =
+            if (tot > 0) "$tot raciones" else "— raciones"
+        findViewById<TextView>(R.id.tvDesgloseIngredientes)?.text =
+            if (prim > 0 || sec > 0) "Prim: $prim · Sec: $sec" else "Prim: — · Sec: —"
 
         val tvNombrePlato = findViewById<TextView>(R.id.tvNombrePlatoIngredientes)
         val nombreFormateado = nombrePlato.split(" ").joinToString(" ") { palabra ->
@@ -91,102 +104,26 @@ class IngredientesActivity : AppCompatActivity() {
         cargarIngredientes()
     }
 
-    private val ingredientesFallback = listOf(
-        Ingrediente(
-            idIngrediente = 1,
-            nombreIngrediente = "Sal yodada y fluorada",
-            descripcion = "Sazón base y realce del sabor tradicional en cocciones, marinados y fondos",
-            marcaIngrediente = "Refisal / 500g"
-        ),
-        Ingrediente(
-            idIngrediente = 2,
-            nombreIngrediente = "Orégano seco molido",
-            descripcion = "Especia aromática para sazonar carnes, guisos y aportar fragancia al plato",
-            marcaIngrediente = "El Rey / 50g"
-        ),
-        Ingrediente(
-            idIngrediente = 3,
-            nombreIngrediente = "Ajo blanco fresco picado",
-            descripcion = "Aromatizante y condimento base indispensable para el sofrito y sofrito criollo",
-            marcaIngrediente = "Finca El Campo / 250g"
-        ),
-        Ingrediente(
-            idIngrediente = 4,
-            nombreIngrediente = "Comino molido criollo",
-            descripcion = "Condimento aromático tradicional para dar profundidad al sabor de fríjoles y carnes",
-            marcaIngrediente = "El Rey / 50g"
-        ),
-        Ingrediente(
-            idIngrediente = 5,
-            nombreIngrediente = "Color / Triguisar con achiote",
-            descripcion = "Condimento natural para dar apetitoso color dorado y sabor a guisos y sopas",
-            marcaIngrediente = "Triguisar / 70g"
-        ),
-        Ingrediente(
-            idIngrediente = 6,
-            nombreIngrediente = "Pimienta negra molida",
-            descripcion = "Toque especiado suave para marinar y despertar los sabores del adobo",
-            marcaIngrediente = "El Rey / 40g"
-        ),
-        Ingrediente(
-            idIngrediente = 7,
-            nombreIngrediente = "Aceite vegetal institucional",
-            descripcion = "Materia grasa vegetal para sofreír condimentos, dorar y cocinar las raciones",
-            marcaIngrediente = "Premier / 500ml"
-        ),
-        Ingrediente(
-            idIngrediente = 8,
-            nombreIngrediente = "Cebolla cabezona y tomate fresco",
-            descripcion = "Hortalizas frescas para elaborar la base del sofrito u hogao tradicional",
-            marcaIngrediente = "Huerta Institucional / 1kg"
-        ),
-        Ingrediente(
-            idIngrediente = 9,
-            nombreIngrediente = "Arroz blanco de grano largo",
-            descripcion = "Cereal base de acompañamiento cocinado al punto con toque de sal y ajo",
-            marcaIngrediente = "Diana / 1kg"
-        ),
-        Ingrediente(
-            idIngrediente = 10,
-            nombreIngrediente = "Proteína cárnica seleccionada",
-            descripcion = "Corte magro fresco certificado bajo estándar nutricional del programa",
-            marcaIngrediente = "Carnes del Campo / 1kg"
-        )
-    )
-
     private fun cargarIngredientes() {
         lifecycleScope.launch {
             try {
+                com.example.movilmanupuladora.utils.SessionManager.getToken(this@IngredientesActivity)
                 val response = RetrofitClient.apiService.obtenerIngredientes()
 
                 if (response.isSuccessful && !response.body().isNullOrEmpty()) {
                     val listaBackend = response.body()!!
-                    val tieneSal = listaBackend.any { it.nombreIngrediente?.contains("sal", ignoreCase = true) == true }
-                    val tieneOregano = listaBackend.any { it.nombreIngrediente?.contains("or", ignoreCase = true) == true }
-
-                    val listaFinal = if (!tieneSal || !tieneOregano) {
-                        val condimentosFaltantes = ingredientesFallback.filter { fallback ->
-                            listaBackend.none { backend ->
-                                backend.nombreIngrediente?.contains(fallback.nombreIngrediente?.split(" ")?.firstOrNull() ?: "", ignoreCase = true) == true
-                            }
-                        }
-                        listaBackend + condimentosFaltantes
-                    } else {
-                        listaBackend
-                    }
-
-                    listaIngredientesGlobal = listaFinal
+                    listaIngredientesGlobal = listaBackend
                     configurarFiltrosChips()
-                    mostrarIngredientes(listaFinal)
+                    mostrarIngredientes(listaBackend)
                 } else {
-                    listaIngredientesGlobal = ingredientesFallback
+                    listaIngredientesGlobal = emptyList()
                     configurarFiltrosChips()
-                    mostrarIngredientes(ingredientesFallback)
+                    mostrarIngredientes(emptyList())
                 }
             } catch (e: Exception) {
-                listaIngredientesGlobal = ingredientesFallback
+                listaIngredientesGlobal = emptyList()
                 configurarFiltrosChips()
-                mostrarIngredientes(ingredientesFallback)
+                mostrarIngredientes(emptyList())
             }
         }
     }
@@ -238,6 +175,17 @@ class IngredientesActivity : AppCompatActivity() {
     private fun mostrarIngredientes(ingredientes: List<Ingrediente>) {
         val contenedor = findViewById<LinearLayout>(R.id.contenedorIngredientes) ?: return
         contenedor.removeAllViews()
+
+        if (ingredientes.isEmpty()) {
+            val tvVacio = TextView(this).apply {
+                text = "Sin ingredientes registrados en el servidor para este plato."
+                setTextColor(android.graphics.Color.parseColor("#64748B"))
+                textSize = 13f
+                setPadding(16, 24, 16, 24)
+            }
+            contenedor.addView(tvVacio)
+            return
+        }
 
         for (ingrediente in ingredientes) {
             val itemBinding = com.example.movilmanupuladora.databinding.ItemIngredienteTablaBinding.inflate(

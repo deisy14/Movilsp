@@ -22,6 +22,7 @@ import com.example.movilmanupuladora.ui.manipuladora_Jefe.ManipuladorasManager
 import com.example.movilmanupuladora.ui.manipuladora_Jefe.AsistenciaManager
 import com.example.movilmanupuladora.utils.NavigationHelperJefa
 import com.example.movilmanupuladora.utils.PreparacionSyncManager
+import com.example.movilmanupuladora.utils.SedeContratoManager
 import com.example.movilmanupuladora.utils.SessionManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
@@ -42,6 +43,7 @@ class AsignarComponentesActivity : AppCompatActivity() {
     private val asignacionesPorServicio = mutableMapOf<String, MutableMap<String, ManipuladorasManager.Manipuladora>>()
 
     private var recetaPlegada: Boolean = false
+    private var guardandoAsignacion: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,7 +95,10 @@ class AsignarComponentesActivity : AppCompatActivity() {
         )
 
         lifecycleScope.launch {
+            aplicarSeccionesPermitidasContrato()
             try {
+                SedeContratoManager.sincronizarSeccionesContrato(this@AsignarComponentesActivity, sessionManager.getSedeId())
+                aplicarSeccionesPermitidasContrato()
                 PreparacionSyncManager.sincronizarDesdeBackend(this@AsignarComponentesActivity)
                 val idSede = sessionManager.getSedeId().takeIf { it > 0 }
                 val sedeNombre = sessionManager.getSedeNombre()
@@ -101,6 +106,16 @@ class AsignarComponentesActivity : AppCompatActivity() {
             } catch (_: Exception) { }
             cargarAsignacionesGuardadas()
             cambiarServicio(servicioActual)
+        }
+    }
+
+    private fun aplicarSeccionesPermitidasContrato() {
+        val permitidas = SedeContratoManager.obtenerSeccionesActivas(this).ifEmpty { setOf("Desayuno") }
+        binding.btnTabDesayuno.visibility = if (permitidas.contains("Desayuno")) View.VISIBLE else View.GONE
+        binding.btnTabAlmuerzo.visibility = if (permitidas.contains("Almuerzo")) View.VISIBLE else View.GONE
+        binding.btnTabMerienda.visibility = if (permitidas.contains("Merienda")) View.VISIBLE else View.GONE
+        if (!permitidas.any { it.equals(servicioActual, ignoreCase = true) }) {
+            servicioActual = permitidas.first()
         }
     }
 
@@ -353,6 +368,13 @@ class AsignarComponentesActivity : AppCompatActivity() {
     }
 
     private fun guardarAsignacionActual() {
+        if (guardandoAsignacion) return
+        guardandoAsignacion = true
+        binding.btnGuardarAsignacion.isEnabled = false
+        binding.btnGuardarAsignacion.alpha = 0.75f
+        binding.btnGuardarAsignacion.text = "Guardando..."
+        binding.progressGuardando.visibility = View.VISIBLE
+
         val mapaServicio = asignacionesPorServicio[servicioActual] ?: mutableMapOf<String, ManipuladorasManager.Manipuladora>()
         val platoNombre = binding.txtNombrePlato.text.toString()
 
@@ -419,14 +441,34 @@ class AsignarComponentesActivity : AppCompatActivity() {
                     jornada = jornadaNombre,
                     asignaciones = asignacionesList
                 )
-            } catch (_: Exception) { }
+            } catch (_: Exception) {
+            } finally {
+                guardandoAsignacion = false
+                binding.btnGuardarAsignacion.isEnabled = true
+                binding.btnGuardarAsignacion.alpha = 1f
+                binding.btnGuardarAsignacion.text = "✓ Guardar asignación"
+                binding.progressGuardando.visibility = View.GONE
+            }
 
-            Toast.makeText(
-                this@AsignarComponentesActivity,
-                "Asignación de $servicioActual guardada correctamente",
-                Toast.LENGTH_SHORT
-            ).show()
+            mostrarAlertaExito("Asignación de $servicioActual guardada correctamente")
         }
+    }
+
+    private fun mostrarAlertaExito(mensaje: String) {
+        binding.txtMensajeAlertaExito.text = mensaje
+        binding.cardAlertaExito.alpha = 0f
+        binding.cardAlertaExito.visibility = View.VISIBLE
+        binding.cardAlertaExito.animate().alpha(1f).setDuration(200).start()
+        binding.btnCerrarAlertaExito.setOnClickListener {
+            binding.cardAlertaExito.visibility = View.GONE
+        }
+        binding.cardAlertaExito.postDelayed({
+            if (!isFinishing && !isDestroyed) {
+                binding.cardAlertaExito.animate().alpha(0f).setDuration(250).withEndAction {
+                    binding.cardAlertaExito.visibility = View.GONE
+                }.start()
+            }
+        }, 3500)
     }
 
     private fun cargarAsignacionesGuardadas() {

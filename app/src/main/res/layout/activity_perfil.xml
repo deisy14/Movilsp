@@ -91,11 +91,11 @@
 
             </LinearLayout>
 
-            <!-- TARJETA VERDE OSCURO (#1B3317): PERFIL PRINCIPAL -->
+            <!-- TARJETA VERDE (#2B5424): PERFIL PRINCIPAL -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="#1B3317"
+                app:cardBackgroundColor="#2B5424"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="3dp"
                 app:strokeWidth="0dp">
@@ -124,7 +124,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:text="MV"
-                                android:textColor="#1B3317"
+                                android:textColor="#2B5424"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
                         </FrameLayout>
@@ -149,7 +149,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="2dp"
-                                android:text="Maria Alejandra Velazco"
+                                android:text="Manipuladora"
                                 android:textColor="#FFFFFF"
                                 android:textSize="17sp"
                                 android:textStyle="bold" />
@@ -161,7 +161,7 @@
                                 android:layout_marginTop="2dp"
                                 android:ellipsize="end"
                                 android:maxLines="1"
-                                android:text="Manipuladora · Normal Superior De Popayán · Sede Principal"
+                                android:text="Sede asignada"
                                 android:textColor="#FFFFFF"
                                 android:textSize="11sp" />
 
@@ -172,7 +172,7 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="#2A5226"
+                        android:background="#376430"
                         android:layout_marginVertical="12dp" />
 
                     <!-- CERTIFICACIÓN Y CÓDIGO -->
@@ -192,9 +192,10 @@
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/txtContratoPerfil"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Código: PAE-POP-042"
+                            android:text="Contrato: Consultando..."
                             android:textColor="#FFFFFF"
                             android:textSize="12sp"
                             android:textStyle="bold" />
@@ -221,7 +222,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="TURNO ASIGNADO HOY"
-                                android:textColor="#7A5500"
+                                android:textColor="#2B5424"
                                 android:textSize="10sp"
                                 android:textStyle="bold" />
 
@@ -230,7 +231,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="2dp"
-                                android:text="Turno Mañana · 6:00 a. m. – 2:00 p. m."
+                                android:text="Consultando jornada..."
                                 android:textColor="#1E293B"
                                 android:textSize="13sp"
                                 android:textStyle="bold" />
@@ -289,7 +290,7 @@
                             android:contentDescription="Editar"
                             android:padding="9dp"
                             android:src="@drawable/ic_editar"
-                            app:tint="#1B3317" />
+                            app:tint="#15803D" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -355,7 +356,7 @@
                             android:contentDescription="Avisos"
                             android:padding="9dp"
                             android:src="@drawable/ic_notificaciones"
-                            app:tint="#2A5226" />
+                            app:tint="#166534" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -420,7 +421,7 @@
                             android:contentDescription="Rostro"
                             android:padding="9dp"
                             android:src="@drawable/ic_reconocimiento_facial"
-                            app:tint="#1B3317" />
+                            app:tint="#15803D" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -487,7 +488,7 @@
                             android:contentDescription="Ayuda"
                             android:padding="9dp"
                             android:src="@drawable/ic_help"
-                            app:tint="#2A5226" />
+                            app:tint="#166534" />
 
                         <LinearLayout
                             android:layout_width="0dp"

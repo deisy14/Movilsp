@@ -17,6 +17,7 @@ import com.example.movilmanupuladora.utils.NavigationHelper
 import com.example.movilmanupuladora.utils.SessionManager
 import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -43,7 +44,6 @@ class InventarioActivity : AppCompatActivity() {
 
         NavigationHelper.setupStickyTopBar(this, binding.main, lifecycleScope)
 
-        inicializarListaLocalConValoresPredeterminados()
         configurarRecyclerView()
         configurarBotonesCategorias()
         configurarFiltrosResumen()
@@ -52,99 +52,9 @@ class InventarioActivity : AppCompatActivity() {
         cargarDatosDesdeServidor()
     }
 
-    private fun inicializarListaLocalConValoresPredeterminados() {
-        listaProductosAdmin.clear()
-        listaProductosAdmin.add(
-            ProductoAdmin(
-                id = 1,
-                idInventario = 20,
-                idIngrediente = 1,
-                nombre = "Arroz",
-                cantidad = 20.0,
-                unidadMedida = "kg",
-                categoria = "Granos",
-                descripcion = "Arroz de primera calidad",
-                imagenRes = R.drawable.ic_food
-            )
-        )
-        listaProductosAdmin.add(
-            ProductoAdmin(
-                id = 2,
-                idInventario = 21,
-                idIngrediente = 2,
-                nombre = "Frijoles",
-                cantidad = 20.0,
-                unidadMedida = "kg",
-                categoria = "Granos",
-                descripcion = "Frijoles rojos",
-                imagenRes = R.drawable.ic_food
-            )
-        )
-        listaProductosAdmin.add(
-            ProductoAdmin(
-                id = 3,
-                idInventario = 22,
-                idIngrediente = 3,
-                nombre = "Carne de res",
-                cantidad = 0.0,
-                unidadMedida = "kg",
-                categoria = "Granos",
-                descripcion = "Carne magra",
-                imagenRes = R.drawable.ic_food
-            )
-        )
-        listaProductosAdmin.add(
-            ProductoAdmin(
-                id = 4,
-                idInventario = 23,
-                idIngrediente = 5,
-                nombre = "Aceite vegetal",
-                cantidad = 15.0,
-                unidadMedida = "L",
-                categoria = "Granos",
-                descripcion = "Aceite de cocina",
-                imagenRes = R.drawable.ic_food
-            )
-        )
-        listaProductosAdmin.add(
-            ProductoAdmin(
-                id = 5,
-                idInventario = 24,
-                idIngrediente = 7,
-                nombre = "Leche entera",
-                cantidad = 30.0,
-                unidadMedida = "L",
-                categoria = "Lácteos",
-                descripcion = "Leche pasteurizada",
-                imagenRes = R.drawable.ic_food
-            )
-        )
-        listaProductosAdmin.add(
-            ProductoAdmin(
-                id = 6,
-                idInventario = 25,
-                idIngrediente = 8,
-                nombre = "Huevos",
-                cantidad = 50.0,
-                unidadMedida = "u",
-                categoria = "Lácteos",
-                descripcion = "Huevos tipo A",
-                imagenRes = R.drawable.ic_food
-            )
-        )
-        listaProductosAdmin.add(
-            ProductoAdmin(
-                id = 7,
-                idInventario = 26,
-                idIngrediente = 4,
-                nombre = "Tomate y cebolla",
-                cantidad = 12.0,
-                unidadMedida = "kg",
-                categoria = "Verduras",
-                descripcion = "Verduras frescas",
-                imagenRes = R.drawable.ic_food
-            )
-        )
+    override fun onResume() {
+        super.onResume()
+        cargarDatosDesdeServidor()
     }
 
     private fun configurarRecyclerView() {
@@ -254,8 +164,8 @@ class InventarioActivity : AppCompatActivity() {
     }
 
     private fun aplicarEstiloBotonActivo(vista: View) {
-        val colorBordeActivo = Color.parseColor("#F4B41F")
-        val colorFondoActivo = Color.parseColor("#FEF9E7")
+        val colorBordeActivo = Color.parseColor("#2B5424")
+        val colorFondoActivo = Color.parseColor("#E6EDE2")
 
         if (vista is MaterialCardView) {
             vista.setCardBackgroundColor(colorFondoActivo)
@@ -282,19 +192,45 @@ class InventarioActivity : AppCompatActivity() {
             try {
                 SessionManager.getToken(this@InventarioActivity)
 
-                val ingRes = RetrofitClient.apiService.obtenerIngredientes()
-                val mapIngredientes = if (ingRes.isSuccessful && !ingRes.body().isNullOrEmpty()) {
+                val ingDef = async { runCatching { RetrofitClient.apiService.obtenerIngredientes() }.getOrNull() }
+                val invDef = async { runCatching { RetrofitClient.apiService.obtenerInventario() }.getOrNull() }
+                val catDef = async { runCatching { RetrofitClient.apiService.obtenerCategoriasInventario() }.getOrNull() }
+                val uniDef = async { runCatching { RetrofitClient.apiService.obtenerUnidadesMedida() }.getOrNull() }
+
+                val ingRes = ingDef.await()
+                val invRes = invDef.await()
+                val catRes = catDef.await()
+                val uniRes = uniDef.await()
+
+                val mapIngredientes = if (ingRes != null && ingRes.isSuccessful && !ingRes.body().isNullOrEmpty()) {
                     ingRes.body()!!.associateBy { it.obtenerIdReal() }
                 } else {
                     emptyMap()
                 }
 
-                val invRes = RetrofitClient.apiService.obtenerInventario()
-                if (invRes.isSuccessful && !invRes.body().isNullOrEmpty()) {
-                    val itemsInventario = invRes.body()!!
-                    val listaServidor = mutableListOf<ProductoAdmin>()
+                val mapCategorias = if (catRes != null && catRes.isSuccessful && !catRes.body().isNullOrEmpty()) {
+                    catRes.body()!!.associate { it.idCategoriaInventario to it.nombreCategoria.trim() }
+                } else {
+                    emptyMap()
+                }
 
-                    for (inv in itemsInventario) {
+                val mapUnidades = if (uniRes != null && uniRes.isSuccessful && !uniRes.body().isNullOrEmpty()) {
+                    uniRes.body()!!.associate {
+                        it.idUnidadMedida to (it.abreviatura?.takeIf { a -> a.isNotBlank() } ?: it.nombreUnidad)
+                    }
+                } else {
+                    emptyMap()
+                }
+
+                val listaServidor = mutableListOf<ProductoAdmin>()
+                if (invRes != null && invRes.isSuccessful && !invRes.body().isNullOrEmpty()) {
+                    val sedeIdActual = SessionManager(this@InventarioActivity).getSedeId().takeIf { it > 0 }
+                    val haySedeEnItems = invRes.body()!!.any { (it.idSede ?: it.sede) != null }
+                    val itemsFiltrados = invRes.body()!!.filter { inv ->
+                        val invSedeId = inv.idSede ?: inv.sede
+                        sedeIdActual == null || !haySedeEnItems || invSedeId == sedeIdActual
+                    }
+                    for (inv in itemsFiltrados) {
                         val stockServidor = inv.cantidadActual?.toDoubleOrNull()
                             ?: inv.cantidad
                             ?: 0.0
@@ -303,24 +239,29 @@ class InventarioActivity : AppCompatActivity() {
                         val idIng = inv.obtenerIdIngredienteReal()
                         val ing = idIng?.let { mapIngredientes[it] }
 
-                        val nombre = inv.nombreIngrediente
-                            ?: ing?.nombre
+                        val nombre = ing?.obtenerNombreReal()
+                            ?.takeIf { it.isNotBlank() }
+                            ?: inv.nombreIngrediente?.takeIf { it.isNotBlank() }
+                            ?: inv.nombre?.takeIf { it.isNotBlank() }
                             ?: "Insumo #${idIng ?: idReal}"
 
                         val catId = ing?.obtenerCategoriaReal()
-                        val catNombre = when (catId) {
-                            2, 7 -> "Lácteos"
-                            4 -> "Granos"
-                            5 -> "Verduras"
-                            else -> "Granos"
-                        }
+                        val catNombre = (catId?.let { mapCategorias[it] })
+                            ?: when (catId) {
+                                2, 7 -> "Lácteos"
+                                4 -> "Granos"
+                                5 -> "Verduras"
+                                else -> "Otros"
+                            }
+
                         val unidId = inv.obtenerIdUnidadReal() ?: ing?.obtenerUnidadReal()
-                        val unidadStr = when (unidId) {
-                            1 -> "kg"
-                            2, 8 -> "L"
-                            3 -> "u"
-                            else -> "kg"
-                        }
+                        val unidadStr = (unidId?.let { mapUnidades[it] })
+                            ?: when (unidId) {
+                                1 -> "kg"
+                                2, 8 -> "L"
+                                3 -> "u"
+                                else -> "kg"
+                            }
 
                         listaServidor.add(
                             ProductoAdmin(
@@ -332,18 +273,16 @@ class InventarioActivity : AppCompatActivity() {
                                 unidadMedida = unidadStr,
                                 categoria = catNombre,
                                 descripcion = ing?.descripcion ?: "",
-                                imagenRes = R.drawable.ic_food
+                                imagenRes = R.drawable.ic_food,
+                                imagenUrl = ing?.imagenIngrediente?.takeIf { it.isNotBlank() }
                             )
                         )
-                    }
-
-                    if (listaServidor.isNotEmpty()) {
-                        listaProductosAdmin.clear()
-                        listaProductosAdmin.addAll(listaServidor)
                     }
                 }
 
                 withContext(Dispatchers.Main) {
+                    listaProductosAdmin.clear()
+                    listaProductosAdmin.addAll(listaServidor)
                     actualizarResumenYBotones()
                     adapter.actualizarLista(listaProductosAdmin)
                     if (categoriaFiltroActiva != null) {

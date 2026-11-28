@@ -80,11 +80,11 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/bg_pill_yellow"
+                        android:background="@drawable/bg_pill_green"
                         android:paddingHorizontal="10dp"
                         android:paddingVertical="4dp"
                         android:text="PAE Cocina"
-                        android:textColor="#7A5500"
+                        android:textColor="#FFFFFF"
                         android:textSize="11sp"
                         android:textStyle="bold" />
 
@@ -100,11 +100,11 @@
 
             </LinearLayout>
 
-            <!-- TARJETA VERDE OSCURO (#1B3317): ESTADO ACTUAL EN BODEGA -->
+            <!-- TARJETA VERDE (#2B5424): ESTADO ACTUAL EN BODEGA -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="#1B3317"
+                app:cardBackgroundColor="#2B5424"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="3dp"
                 app:strokeWidth="0dp">
@@ -151,7 +151,7 @@
                             android:clickable="true"
                             android:focusable="true"
                             android:foreground="?attr/selectableItemBackground"
-                            app:cardBackgroundColor="#2A5226"
+                            app:cardBackgroundColor="#376430"
                             app:cardCornerRadius="12dp"
                             app:cardElevation="0dp"
                             app:strokeWidth="0dp">
@@ -182,7 +182,7 @@
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
-                        <!-- DISPONIBLES (RESALTADO AMARILLO #F4B41F) -->
+                        <!-- DISPONIBLES (RESALTADO AMARILLO #F5B81F) -->
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/cardDisponiblesInventario"
                             android:layout_width="0dp"
@@ -192,7 +192,7 @@
                             android:clickable="true"
                             android:focusable="true"
                             android:foreground="?attr/selectableItemBackground"
-                            app:cardBackgroundColor="#F4B41F"
+                            app:cardBackgroundColor="#F5B81F"
                             app:cardCornerRadius="12dp"
                             app:cardElevation="0dp"
                             app:strokeWidth="0dp">
@@ -207,7 +207,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Disponibles"
-                                    android:textColor="#1B3317"
+                                    android:textColor="#2B5424"
                                     android:textSize="11sp" />
 
                                 <TextView
@@ -216,7 +216,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="4dp"
                                     android:text="6"
-                                    android:textColor="#1B3317"
+                                    android:textColor="#2B5424"
                                     android:textSize="20sp"
                                     android:textStyle="bold" />
 
@@ -233,7 +233,7 @@
                             android:clickable="true"
                             android:focusable="true"
                             android:foreground="?attr/selectableItemBackground"
-                            app:cardBackgroundColor="#2A5226"
+                            app:cardBackgroundColor="#376430"
                             app:cardCornerRadius="12dp"
                             app:cardElevation="0dp"
                             app:strokeWidth="0dp">
@@ -448,13 +448,13 @@
 
             </LinearLayout>
 
-            <!-- ENCABEZADO DE PRODUCTOS DEL ADMIN (BANNER VERDE OSCURO #1B3317) -->
+            <!-- ENCABEZADO DE PRODUCTOS DEL ADMIN (BANNER VERDE #2B5424) -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:cardBackgroundColor="#2B5424"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="10dp"
-                app:cardBackgroundColor="#1B3317"
                 app:cardCornerRadius="14dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="0dp">

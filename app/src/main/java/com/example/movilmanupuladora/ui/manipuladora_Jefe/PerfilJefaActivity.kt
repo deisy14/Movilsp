@@ -19,6 +19,7 @@ import com.example.movilmanupuladora.databinding.DialogEditarPerfilBinding
 import com.example.movilmanupuladora.ui.auth.LoginActivity
 import com.example.movilmanupuladora.ui.manipuladora.EditarPerfilActivity
 import com.example.movilmanupuladora.utils.NavigationHelperJefa
+import com.example.movilmanupuladora.utils.SedeContratoManager
 import com.example.movilmanupuladora.utils.SessionManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -74,6 +75,15 @@ class PerfilJefaActivity : AppCompatActivity() {
         binding.txtCargo.text = "$rol · $ubicacion"
         binding.txtInstitucionSede.text = ubicacion
         binding.txtTelefono.text = telefono
+        binding.txtContratoAsignado.text = SedeContratoManager.obtenerNumeroContrato(this) ?: "Sin contrato asignado"
+
+        lifecycleScope.launch {
+            try {
+                SedeContratoManager.sincronizarSeccionesContrato(this@PerfilJefaActivity, sessionManager.getSedeId())
+                binding.txtContratoAsignado.text =
+                    SedeContratoManager.obtenerNumeroContrato(this@PerfilJefaActivity) ?: "Sin contrato asignado"
+            } catch (_: Exception) { }
+        }
     }
 
     private fun configurarEventos() {

@@ -11,7 +11,9 @@ object SedeContratoManager {
 
     private const val PREFS_NAME = "SEDE_CONTRATO_CONFIG"
     private const val KEY_SECCIONES = "secciones_activas"
+    private const val KEY_JORNADAS = "jornadas_activas"
     private const val KEY_CUPOS = "cupos_sede"
+    private const val KEY_CONTRATO_NUMERO = "contrato_numero"
 
     fun resolverIdSedeEfectivo(sessionManager: SessionManager, idSedeParam: Int = 0): Int {
         val idGuardado = sessionManager.getSedeId()
@@ -168,8 +170,11 @@ object SedeContratoManager {
             }
 
             val claveSede = "${KEY_SECCIONES}_${if (idEfectivo > 0) idEfectivo else nombreSedeUser}"
+            val claveJornadasSede = "${KEY_JORNADAS}_${if (idEfectivo > 0) idEfectivo else nombreSedeUser}"
             val claveCuposSede = "${KEY_CUPOS}_${if (idEfectivo > 0) idEfectivo else nombreSedeUser}"
+            val claveContratoSede = "${KEY_CONTRATO_NUMERO}_${if (idEfectivo > 0) idEfectivo else nombreSedeUser}"
             val setNombres = mutableSetOf<String>()
+            val jornadasEncontradas = mutableSetOf<String>()
 
             // 1. Consultar contratos ordenados del ÚLTIMO activo al más antiguo (usando JsonElement para tolerar listas o paginación)
             val contratosRawRes = RetrofitClient.apiService.obtenerContratosRaw()
@@ -447,6 +452,16 @@ object SedeContratoManager {
                     }
 
                     // Si este último contrato aplicable a la sede ya tiene sus secciones definidas, nos quedamos SOLO con las de este contrato
+                    if (aplicaASede) {
+                        val numContrato = leerStringSeguro(cObj, "numero_cor", "codigo", "numero_contrato")
+                        if (numContrato.isNotBlank()) {
+                            prefs.edit()
+                                .putString(KEY_CONTRATO_NUMERO, numContrato)
+                                .putString(claveContratoSede, numContrato)
+                                .apply()
+                        }
+                    }
+
                     if (aplicaASede && seccionesEsteContrato.isNotEmpty()) {
                         seccionesUltimoContrato.addAll(seccionesEsteContrato)
                         encontradoEnUltimoContrato = true
@@ -479,6 +494,9 @@ object SedeContratoManager {
                                 val tieneSecciones = jObj.has("secciones") && jObj.get("secciones").isJsonArray && jObj.getAsJsonArray("secciones").size() > 0
 
                                 if (habilitada || cuposJ > 0 || tieneSecciones) {
+                                    val nomJ = leerStringSeguro(jObj, "nombre_jornada", "nombre").lowercase()
+                                    if (nomJ.contains("mañan") || nomJ.contains("manan")) jornadasEncontradas.add("Mañana")
+                                    if (nomJ.contains("tard")) jornadasEncontradas.add("Tarde")
                                     if (jObj.has("secciones") && jObj.get("secciones").isJsonArray) {
                                         for (secEl in jObj.getAsJsonArray("secciones")) {
                                             if (secEl.isJsonObject) {
@@ -499,6 +517,17 @@ object SedeContratoManager {
                         }
                     }
                 } catch (_: Exception) { }
+            }
+
+            if (jornadasEncontradas.isNotEmpty()) {
+                prefs.edit().putStringSet(claveJornadasSede, jornadasEncontradas).apply()
+            } else if (setNombres.isNotEmpty()) {
+                val jInferidas = mutableSetOf<String>()
+                if (setNombres.contains("Desayuno") || setNombres.contains("Almuerzo")) jInferidas.add("Mañana")
+                if (setNombres.contains("Merienda")) jInferidas.add("Tarde")
+                if (jInferidas.isNotEmpty()) {
+                    prefs.edit().putStringSet(claveJornadasSede, jInferidas).apply()
+                }
             }
 
             if (setNombres.isNotEmpty()) {
@@ -540,5 +569,37 @@ object SedeContratoManager {
         val claveCuposSede = "${KEY_CUPOS}_${if (idEfectivo > 0) idEfectivo else sedeNom}"
         val cuposSede = prefs.getInt(claveCuposSede, 0)
         return if (cuposSede > 0) cuposSede else prefs.getInt(KEY_CUPOS, 0)
+    }
+
+    /**
+     * Retorna el número de contrato PAE asignado a la sede actual (ej. PAE-2026-294).
+     */
+    fun obtenerNumeroContrato(context: Context): String? {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val sessionManager = SessionManager(context)
+        val idEfectivo = resolverIdSedeEfectivo(sessionManager)
+        val sedeNom = sessionManager.getSedeNombre()?.trim().orEmpty().lowercase()
+        val claveContratoSede = "${KEY_CONTRATO_NUMERO}_${if (idEfectivo > 0) idEfectivo else sedeNom}"
+        return prefs.getString(claveContratoSede, null)?.takeIf { it.isNotBlank() }
+            ?: prefs.getString(KEY_CONTRATO_NUMERO, null)?.takeIf { it.isNotBlank() }
+    }
+
+    /**
+     * Retorna las jornadas habilitadas para la sede según su contrato ("Mañana", "Tarde").
+     */
+    fun obtenerJornadasActivas(context: Context): Set<String> {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val sessionManager = SessionManager(context)
+        val idEfectivo = resolverIdSedeEfectivo(sessionManager)
+        val sedeNom = sessionManager.getSedeNombre()?.trim().orEmpty().lowercase()
+        val claveJornadasSede = "${KEY_JORNADAS}_${if (idEfectivo > 0) idEfectivo else sedeNom}"
+        val guardadas = prefs.getStringSet(claveJornadasSede, null)
+        if (!guardadas.isNullOrEmpty()) return guardadas
+
+        val secciones = obtenerSeccionesActivas(context)
+        val inferidas = mutableSetOf<String>()
+        if (secciones.contains("Desayuno") || secciones.contains("Almuerzo")) inferidas.add("Mañana")
+        if (secciones.contains("Merienda")) inferidas.add("Tarde")
+        return inferidas.ifEmpty { setOf("Mañana") }
     }
 }

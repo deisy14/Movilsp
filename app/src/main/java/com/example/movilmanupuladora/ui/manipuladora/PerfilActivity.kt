@@ -17,6 +17,7 @@ import com.example.movilmanupuladora.ui.auth.LoginActivity
 import com.example.movilmanupuladora.utils.NavigationHelper
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.imageview.ShapeableImageView
+import kotlinx.coroutines.launch
 
 class PerfilActivity : AppCompatActivity() {
 
@@ -58,6 +59,18 @@ class PerfilActivity : AppCompatActivity() {
         // ==========================================
 
         cargarDatosUsuario()
+
+        lifecycleScope.launch {
+            try {
+                com.example.movilmanupuladora.utils.SedeContratoManager.sincronizarSeccionesContrato(
+                    this@PerfilActivity,
+                    sessionManager.getSedeId()
+                )
+                val contrato = com.example.movilmanupuladora.utils.SedeContratoManager.obtenerNumeroContrato(this@PerfilActivity)
+                findViewById<android.widget.TextView>(R.id.txtContratoPerfil)?.text =
+                    "Contrato: ${contrato ?: "Sin asignar"}"
+            } catch (_: Exception) { }
+        }
 
         // ==========================================
         // BOTONES Y ACCIONES DEL PERFIL
@@ -138,6 +151,9 @@ class PerfilActivity : AppCompatActivity() {
     private fun cargarDatosUsuario() {
         val nombre = sessionManager.getUserName() ?: "Manipuladora"
         val cargo = sessionManager.getUserRole() ?: "Manipuladora de Alimentos"
+        val contrato = com.example.movilmanupuladora.utils.SedeContratoManager.obtenerNumeroContrato(this)
+        findViewById<android.widget.TextView>(R.id.txtContratoPerfil)?.text =
+            "Contrato: ${contrato ?: "Sin asignar"}"
         val ubicacion = sessionManager.getUbicacionCompleta()
 
         findViewById<android.widget.TextView>(R.id.txtNombreUsuario)?.text = nombre
@@ -151,13 +167,20 @@ class PerfilActivity : AppCompatActivity() {
             partes.firstOrNull()?.take(2)?.uppercase() ?: "PAE"
         }
         findViewById<android.widget.TextView>(R.id.txtInicialesAvatar)?.text = iniciales
+        val raciones = com.example.movilmanupuladora.ui.manipuladora_Jefe.AsistenciaManager.obtenerManana(this)
+        val sede = sessionManager.getSedeNombre()?.takeIf { it.isNotBlank() } ?: "Sede asignada"
+        findViewById<android.widget.TextView>(R.id.txtHorarioTurno)?.text = if (raciones > 0) {
+            "$sede · $raciones raciones hoy"
+        } else {
+            "$sede · Jornada activa"
+        }
     }
 
     private fun mostrarVentanaEmergenteEditarPerfil() {
         try {
             val dialogBinding = DialogEditarPerfilBinding.inflate(layoutInflater)
 
-            val nombreGuardado = sessionManager.getUserName() ?: "Maria Alejandra Velazco"
+            val nombreGuardado = sessionManager.getUserName() ?: "Manipuladora"
             val correoGuardado = sessionManager.getUserEmail() ?: ""
             val telefonoGuardado = sessionManager.getUserPhone() ?: ""
 

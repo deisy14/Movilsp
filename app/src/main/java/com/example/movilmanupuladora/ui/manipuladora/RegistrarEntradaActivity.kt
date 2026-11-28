@@ -84,23 +84,11 @@ class RegistrarEntradaActivity : AppCompatActivity() {
                     listaInventario = resInv.body()!!
                     poblarSpinner(listaInventario)
                 } else {
-                    // Fallback con datos de ejemplo del ciclo de 20 días si no hay datos
-                    val itemsMock = listOf(
-                        inventario(idInventario = 1, nombre = "Arroz blanco", cantidad = 50.0, unidad_medida = "lb", stockMinimo = "10"),
-                        inventario(idInventario = 2, nombre = "Lenteja pardina", cantidad = 20.0, unidad_medida = "lb", stockMinimo = "5"),
-                        inventario(idInventario = 3, nombre = "Fríjol rojo", cantidad = 30.0, unidad_medida = "lb", stockMinimo = "5")
-                    )
-                    listaInventario = itemsMock
+                    listaInventario = emptyList()
                     poblarSpinner(listaInventario)
                 }
             } catch (e: Exception) {
-                // Si falla conexión, mostrar mocks institucionales de 20 días
-                val itemsMock = listOf(
-                    inventario(idInventario = 1, nombre = "Arroz blanco", cantidad = 50.0, unidad_medida = "lb", stockMinimo = "10"),
-                    inventario(idInventario = 2, nombre = "Lenteja pardina", cantidad = 20.0, unidad_medida = "lb", stockMinimo = "5"),
-                    inventario(idInventario = 3, nombre = "Fríjol rojo", cantidad = 30.0, unidad_medida = "lb", stockMinimo = "5")
-                )
-                listaInventario = itemsMock
+                listaInventario = emptyList()
                 poblarSpinner(listaInventario)
             }
         }
