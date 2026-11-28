@@ -120,7 +120,7 @@ class InicioJefaActivity : AppCompatActivity() {
         // Monitoreo periódico en segundo plano para reflejar nuevas notificaciones automáticamente
         lifecycleScope.launch {
             while (isActive) {
-                delay(20000)
+                delay(1000)
                 try {
                     NotificacionesJefaManager.sincronizarNotificacionesDelBackend(this@InicioJefaActivity)
                     actualizarBadgeNotificaciones()
@@ -145,8 +145,6 @@ class InicioJefaActivity : AppCompatActivity() {
                     ManipuladorasManager.cargarDesdeBackend(this@InicioJefaActivity, idSede, sedeNombre)
                     actualizarResumen()
                 } catch (_: Exception) { }
-            }
-            launch {
                 try {
                     NotificacionesJefaManager.sincronizarNotificacionesDelBackend(this@InicioJefaActivity)
                     actualizarBadgeNotificaciones()
@@ -166,6 +164,7 @@ class InicioJefaActivity : AppCompatActivity() {
                         MenuPaeCatalog.registrarPlatosDesdeBackend(res.body()!!)
                     }
                     PreparacionSyncManager.sincronizarDesdeBackend(this@InicioJefaActivity)
+                    PreparacionSyncManager.sincronizarMenusPorFechaDesdeBackend(this@InicioJefaActivity)
                     actualizarPlatosVisuales()
                 } catch (_: Exception) { }
             }
@@ -240,6 +239,7 @@ class InicioJefaActivity : AppCompatActivity() {
         binding.txtFechaResumenDia.text = textoFecha
 
         actualizarPlatosVisuales()
+        actualizarResumen()
     }
 
     private fun actualizarBotonDia(
@@ -270,77 +270,85 @@ class InicioJefaActivity : AppCompatActivity() {
     // ACTUALIZACIÓN DE PLATOS DEL DÍA SELECCIONADO
     // =========================================================
 
+    private fun actualizarTarjetaServicio(
+        fechaClave: String,
+        servicio: String,
+        badge: TextView,
+        img: android.widget.ImageView,
+        txtNombre: TextView,
+        lblComponente: TextView,
+        txtComponente: TextView
+    ) {
+        val nombre = sessionManager.getPlatoDiaServicio(this, fechaClave, servicio)
+        val estadoMenu = sessionManager.getEstadoMenuDiaServicio(this, fechaClave, servicio)
+        val estaAprobado = estadoMenu.equals("Aprobado", ignoreCase = true) ||
+                estadoMenu.equals("Aprobada", ignoreCase = true)
+
+        if (!nombre.isNullOrBlank() && estaAprobado) {
+            badge.text = "Seleccionado"
+            badge.setBackgroundResource(R.drawable.bg_chip_seleccionado)
+            badge.setTextColor(Color.parseColor("#15803D"))
+            img.visibility = View.VISIBLE
+            img.setImageResource(obtenerImagenPlatoPorNombre(nombre))
+            txtNombre.text = nombre
+            lblComponente.visibility = View.VISIBLE
+            txtComponente.text = MenuPaeCatalog.obtenerComponentesPorNombre(nombre).joinToString(", ")
+        } else if (!nombre.isNullOrBlank()) {
+            badge.text = "Pendiente"
+            badge.setBackgroundResource(R.drawable.bg_chip_pendiente)
+            badge.setTextColor(Color.parseColor("#92400E"))
+            img.visibility = View.GONE
+            txtNombre.text = "Platos no aprobados"
+            lblComponente.visibility = View.GONE
+            txtComponente.text = "Los platos de esta semana aún no han sido aprobados por el supervisor"
+        } else {
+            badge.text = "Pendiente"
+            badge.setBackgroundResource(R.drawable.bg_chip_pendiente)
+            badge.setTextColor(Color.parseColor("#92400E"))
+            img.visibility = View.GONE
+            txtNombre.text = "Sin plato seleccionado"
+            lblComponente.visibility = View.GONE
+            txtComponente.text = "La manipuladora jefe aún no ha seleccionado el plato para esta jornada"
+        }
+    }
+
     private fun actualizarPlatosVisuales() {
-        val fechaClave = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(diaSeleccionado.time)
-
-        // 1. DESAYUNO
-        val nomDes = sessionManager.getPlatoDiaServicio(this, fechaClave, "Desayuno")
-        if (!nomDes.isNullOrBlank()) {
-            binding.badgeEstadoDesayuno.text = "Seleccionado"
-            binding.badgeEstadoDesayuno.setBackgroundResource(R.drawable.bg_chip_seleccionado)
-            binding.badgeEstadoDesayuno.setTextColor(Color.parseColor("#15803D"))
-            binding.imgDesayuno.visibility = View.VISIBLE
-            binding.imgDesayuno.setImageResource(obtenerImagenPlatoPorNombre(nomDes))
-            binding.txtNombreDesayuno.text = nomDes
-            binding.lblComponenteDesayuno.visibility = View.VISIBLE
-            val compDes = MenuPaeCatalog.obtenerComponentesPorNombre(nomDes).joinToString(", ")
-            binding.txtComponenteDesayuno.text = compDes
-        } else {
-            binding.badgeEstadoDesayuno.text = "Pendiente"
-            binding.badgeEstadoDesayuno.setBackgroundResource(R.drawable.bg_chip_pendiente)
-            binding.badgeEstadoDesayuno.setTextColor(Color.parseColor("#92400E"))
-            binding.imgDesayuno.visibility = View.GONE
-            binding.txtNombreDesayuno.text = "Sin plato seleccionado"
-            binding.lblComponenteDesayuno.visibility = View.GONE
-            binding.txtComponenteDesayuno.text = "La manipuladora jefe aún no ha seleccionado el plato para esta jornada"
+        val dow = diaSeleccionado.get(Calendar.DAY_OF_WEEK)
+        val esFinDeSemana = dow == Calendar.SATURDAY || dow == Calendar.SUNDAY
+        val calMostrar = (diaSeleccionado.clone() as Calendar).apply {
+            if (dow == Calendar.SATURDAY) add(Calendar.DAY_OF_MONTH, -1)
+            else if (dow == Calendar.SUNDAY) add(Calendar.DAY_OF_MONTH, -2)
         }
+        val fechaClave = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calMostrar.time)
 
-        // 2. ALMUERZO
-        val nomAlm = sessionManager.getPlatoDiaServicio(this, fechaClave, "Almuerzo")
-        if (!nomAlm.isNullOrBlank()) {
-            binding.badgeEstadoAlmuerzo.text = "Seleccionado"
-            binding.badgeEstadoAlmuerzo.setBackgroundResource(R.drawable.bg_chip_seleccionado)
-            binding.badgeEstadoAlmuerzo.setTextColor(Color.parseColor("#15803D"))
-            binding.imgAlmuerzo.visibility = View.VISIBLE
-            binding.imgAlmuerzo.setImageResource(obtenerImagenPlatoPorNombre(nomAlm))
-            binding.txtNombreAlmuerzo.text = nomAlm
-            binding.lblComponenteAlmuerzo.visibility = View.VISIBLE
-            val compAlm = MenuPaeCatalog.obtenerComponentesPorNombre(nomAlm).joinToString(", ")
-            binding.txtComponenteAlmuerzo.text = compAlm
-        } else {
-            binding.badgeEstadoAlmuerzo.text = "Pendiente"
-            binding.badgeEstadoAlmuerzo.setBackgroundResource(R.drawable.bg_chip_pendiente)
-            binding.badgeEstadoAlmuerzo.setTextColor(Color.parseColor("#92400E"))
-            binding.imgAlmuerzo.visibility = View.GONE
-            binding.txtNombreAlmuerzo.text = "Sin plato seleccionado"
-            binding.lblComponenteAlmuerzo.visibility = View.GONE
-            binding.txtComponenteAlmuerzo.text = "La manipuladora jefe aún no ha seleccionado el plato para esta jornada"
-        }
-
-        // 3. MERIENDA
-        val nomMer = sessionManager.getPlatoDiaServicio(this, fechaClave, "Merienda")
-        if (!nomMer.isNullOrBlank()) {
-            binding.badgeEstadoMerienda.text = "Seleccionado"
-            binding.badgeEstadoMerienda.setBackgroundResource(R.drawable.bg_chip_seleccionado)
-            binding.badgeEstadoMerienda.setTextColor(Color.parseColor("#15803D"))
-            binding.imgMerienda.visibility = View.VISIBLE
-            binding.imgMerienda.setImageResource(obtenerImagenPlatoPorNombre(nomMer))
-            binding.txtNombreMerienda.text = nomMer
-            binding.lblComponenteMerienda.visibility = View.VISIBLE
-            val compMer = MenuPaeCatalog.obtenerComponentesPorNombre(nomMer).joinToString(", ")
-            binding.txtComponenteMerienda.text = compMer
-        } else {
-            binding.badgeEstadoMerienda.text = "Pendiente"
-            binding.badgeEstadoMerienda.setBackgroundResource(R.drawable.bg_chip_pendiente)
-            binding.badgeEstadoMerienda.setTextColor(Color.parseColor("#92400E"))
-            binding.imgMerienda.visibility = View.GONE
-            binding.txtNombreMerienda.text = "Sin plato seleccionado"
-            binding.lblComponenteMerienda.visibility = View.GONE
-            binding.txtComponenteMerienda.text = "La manipuladora jefe aún no ha seleccionado el plato para esta jornada"
-        }
+        actualizarTarjetaServicio(
+            fechaClave, "Desayuno",
+            binding.badgeEstadoDesayuno, binding.imgDesayuno,
+            binding.txtNombreDesayuno, binding.lblComponenteDesayuno, binding.txtComponenteDesayuno
+        )
+        actualizarTarjetaServicio(
+            fechaClave, "Almuerzo",
+            binding.badgeEstadoAlmuerzo, binding.imgAlmuerzo,
+            binding.txtNombreAlmuerzo, binding.lblComponenteAlmuerzo, binding.txtComponenteAlmuerzo
+        )
+        actualizarTarjetaServicio(
+            fechaClave, "Merienda",
+            binding.badgeEstadoMerienda, binding.imgMerienda,
+            binding.txtNombreMerienda, binding.lblComponenteMerienda, binding.txtComponenteMerienda
+        )
 
         val seccionesActivas = SedeContratoManager.obtenerSeccionesActivas(this).ifEmpty { setOf("Desayuno") }
         acomodarTarjetasSegunSecciones(seccionesActivas)
+
+        if (esFinDeSemana) {
+            listOf(binding.cardDesayuno, binding.cardAlmuerzo, binding.cardMerienda).forEach { it.alpha = 0.6f }
+            listOf(binding.badgeEstadoDesayuno, binding.badgeEstadoAlmuerzo, binding.badgeEstadoMerienda).forEach { badge ->
+                badge.text = "Viernes"
+                badge.setTextColor(Color.parseColor("#64748B"))
+            }
+        } else {
+            listOf(binding.cardDesayuno, binding.cardAlmuerzo, binding.cardMerienda).forEach { it.alpha = 1.0f }
+        }
     }
 
     /**
@@ -457,12 +465,7 @@ class InicioJefaActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-
-        // Clic en "Resumen del día" -> Abre AsistenciaJefaActivity
-        binding.cardResumenDia.setOnClickListener {
-            val intent = Intent(this, AsistenciaJefaActivity::class.java)
-            startActivity(intent)
-        }
+        // "Resumen del día" es solo informativo (sin navegación al tocar)
 
         // Clic en tarjetas de comida -> Abre AsignarComponentesActivity para el servicio correspondiente
         binding.cardDesayuno.setOnClickListener {
@@ -622,19 +625,54 @@ class InicioJefaActivity : AppCompatActivity() {
         }
     }
 
+    private var asistenciasBackend: List<com.example.movilmanupuladora.data.model.AsistenciaDiaria> = emptyList()
+
     private fun actualizarResumen() {
-        val primariaHoy = AsistenciaManager.obtenerPrimaria(this)
-        val secundariaHoy = AsistenciaManager.obtenerSecundaria(this)
-        val totalAsistenciaHoy = primariaHoy + secundariaHoy
+        val fechaSel = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(diaSeleccionado.time)
+        val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        val dow = diaSeleccionado.get(Calendar.DAY_OF_WEEK)
+        val esFinDeSemana = dow == Calendar.SATURDAY || dow == Calendar.SUNDAY
+
+        var primariaDia = 0
+        var secundariaDia = 0
+
+        if (!esFinDeSemana) {
+            val regsFecha = asistenciasBackend.filter { it.fecha.trim().startsWith(fechaSel) }
+            if (regsFecha.isNotEmpty()) {
+                val regPrimaria = regsFecha.filter { it.obtenerIdGradoReal() == 16 }.maxByOrNull { it.obtenerIdReal() ?: 0 }
+                val regSecundaria = regsFecha.filter { it.obtenerIdGradoReal() == 19 }.maxByOrNull { it.obtenerIdReal() ?: 0 }
+                if (regPrimaria != null || regSecundaria != null) {
+                    primariaDia = regPrimaria?.ninosPresentes ?: 0
+                    secundariaDia = regSecundaria?.ninosPresentes ?: 0
+                } else {
+                    val tot = regsFecha.sumOf { it.ninosPresentes }
+                    primariaDia = (tot * 0.6).toInt()
+                    secundariaDia = tot - primariaDia
+                }
+            } else {
+                val detalle = AsistenciaManager.obtenerDetalleGradosFecha(this, fechaSel)
+                if (detalle.isNotEmpty()) {
+                    primariaDia = listOf("jar", "p1", "p2", "p3", "p4", "p5")
+                        .sumOf { detalle[it]?.toIntOrNull() ?: 0 }
+                    secundariaDia = listOf("s6", "s7", "s8", "s9", "s10", "s11")
+                        .sumOf { detalle[it]?.toIntOrNull() ?: 0 }
+                } else if (fechaSel == fechaHoy && AsistenciaManager.esAsistenciaDeHoy(this)) {
+                    primariaDia = AsistenciaManager.obtenerPrimaria(this)
+                    secundariaDia = AsistenciaManager.obtenerSecundaria(this)
+                }
+            }
+        }
+
+        val totalAsistenciaDia = primariaDia + secundariaDia
         val cuposTotales = SedeContratoManager.obtenerCuposSede(this)
 
-        binding.txtRacionesTotales.text = primariaHoy.toString()
-        binding.txtMenusActivos.text = secundariaHoy.toString()
+        binding.txtRacionesTotales.text = primariaDia.toString()
+        binding.txtMenusActivos.text = secundariaDia.toString()
         binding.txtCantManipuladoras.text = cuposTotales.toString()
 
-        if (cuposTotales > 0 && totalAsistenciaHoy > cuposTotales) {
+        if (cuposTotales > 0 && totalAsistenciaDia > cuposTotales) {
             binding.txtAlertaExcesoCupos.visibility = View.VISIBLE
-            binding.txtAlertaExcesoCupos.text = "⚠️ Excede el total de cupos ($totalAsistenciaHoy / $cuposTotales)"
+            binding.txtAlertaExcesoCupos.text = "⚠️ Excede el total de cupos ($totalAsistenciaDia / $cuposTotales)"
             binding.txtCantManipuladoras.setTextColor(Color.parseColor("#DC2626"))
         } else {
             binding.txtAlertaExcesoCupos.visibility = View.GONE
@@ -669,29 +707,32 @@ class InicioJefaActivity : AppCompatActivity() {
                 // 1. Sincronizar en tiempo real desde Turnos
                 com.example.movilmanupuladora.utils.PreparacionSyncManager.sincronizarDesdeBackend(this@InicioJefaActivity)
 
-                // 2. Consultar asistencia diaria del backend exclusivamente para hoy
+                // 2. Consultar asistencia diaria del backend (por fecha seleccionada y hoy)
                 val asistenciasRes = RetrofitClient.apiService.obtenerAsistenciaDiaria()
-                if (asistenciasRes.isSuccessful && !asistenciasRes.body().isNullOrEmpty()) {
+                if (asistenciasRes.isSuccessful && asistenciasRes.body() != null) {
                     val lista = asistenciasRes.body()!!
+                    asistenciasBackend = lista
                     val asistenciasHoy = lista.filter { it.fecha.trim().startsWith(fechaHoy) }
 
-                    val regPrimaria = asistenciasHoy.filter { it.obtenerIdGradoReal() == 16 }.maxByOrNull { it.obtenerIdReal() ?: 0 }
-                    val regSecundaria = asistenciasHoy.filter { it.obtenerIdGradoReal() == 19 }.maxByOrNull { it.obtenerIdReal() ?: 0 }
+                    if (asistenciasHoy.isNotEmpty()) {
+                        val regPrimaria = asistenciasHoy.filter { it.obtenerIdGradoReal() == 16 }.maxByOrNull { it.obtenerIdReal() ?: 0 }
+                        val regSecundaria = asistenciasHoy.filter { it.obtenerIdGradoReal() == 19 }.maxByOrNull { it.obtenerIdReal() ?: 0 }
 
-                    var p = regPrimaria?.ninosPresentes ?: AsistenciaManager.obtenerPrimaria(this@InicioJefaActivity)
-                    var s = regSecundaria?.ninosPresentes ?: AsistenciaManager.obtenerSecundaria(this@InicioJefaActivity)
+                        var p = regPrimaria?.ninosPresentes ?: 0
+                        var s = regSecundaria?.ninosPresentes ?: 0
 
-                    if (regPrimaria == null && regSecundaria == null && asistenciasHoy.isNotEmpty()) {
-                        val tot = asistenciasHoy.sumOf { it.ninosPresentes }
-                        p = (tot * 0.6).toInt()
-                        s = tot - p
-                    }
+                        if (regPrimaria == null && regSecundaria == null) {
+                            val tot = asistenciasHoy.sumOf { it.ninosPresentes }
+                            p = (tot * 0.6).toInt()
+                            s = tot - p
+                        }
 
-                    val total = p + s
-                    if (total > 0) {
-                        AsistenciaManager.guardarPrimaria(this@InicioJefaActivity, p)
-                        AsistenciaManager.guardarSecundaria(this@InicioJefaActivity, s)
-                        AsistenciaManager.guardarManana(this@InicioJefaActivity, total)
+                        val total = p + s
+                        if (total > 0) {
+                            AsistenciaManager.guardarPrimaria(this@InicioJefaActivity, p)
+                            AsistenciaManager.guardarSecundaria(this@InicioJefaActivity, s)
+                            AsistenciaManager.guardarManana(this@InicioJefaActivity, total)
+                        }
                     }
 
                     actualizarResumen()

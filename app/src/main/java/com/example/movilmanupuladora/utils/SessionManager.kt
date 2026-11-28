@@ -43,6 +43,10 @@ class SessionManager(context: Context) {
             currentToken = token
             return token
         }
+
+        fun limpiarPrefijoMenu(nombre: String): String {
+            return nombre.replace(Regex("^Men[uú]\\s*\\d+\\s*[:\\-–]\\s*", RegexOption.IGNORE_CASE), "").trim()
+        }
     }
 
     // Guarda el token JWT de acceso.
@@ -451,6 +455,57 @@ class SessionManager(context: Context) {
         "Leche con galleta cuca y fruta fresca"
     )
 
+    fun saveEstadoMenuDiaServicio(context: Context, fecha: String, servicio: String, estado: String) {
+        val servKey = when (servicio.lowercase()) {
+            "desayuno" -> "desayuno"
+            "almuerzo" -> "almuerzo"
+            "merienda" -> "merienda"
+            else -> "desayuno"
+        }
+        val key = "${clavePlanDiaSede(fecha, servKey)}_estado"
+        context.getSharedPreferences("TURNO_PAE", Context.MODE_PRIVATE).edit()
+            .putString(key, estado)
+            .apply()
+        context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE).edit()
+            .putString(key, estado)
+            .apply()
+    }
+
+    fun getEstadoMenuDiaServicio(context: Context, fecha: String, servicio: String): String {
+        val servKey = when (servicio.lowercase()) {
+            "desayuno" -> "desayuno"
+            "almuerzo" -> "almuerzo"
+            "merienda" -> "merienda"
+            else -> "desayuno"
+        }
+        val key = "${clavePlanDiaSede(fecha, servKey)}_estado"
+        val tEst = context.getSharedPreferences("TURNO_PAE", Context.MODE_PRIVATE)
+            .getString(key, null)
+        if (!tEst.isNullOrBlank()) return tEst
+        val jEst = context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE)
+            .getString(key, null)
+        return jEst ?: ""
+    }
+
+    /**
+     * Retorna true si el día tiene al menos un plato ya enviado al supervisor
+     * que aún está pendiente de aprobación (excluye Borrador y Aprobado).
+     */
+    fun estaDiaPendienteAprobacion(context: Context, fecha: String): Boolean {
+        val servicios = listOf("Desayuno", "Almuerzo", "Merienda")
+        for (serv in servicios) {
+            val plato = getPlatoDiaServicio(context, fecha, serv)
+            if (!plato.isNullOrBlank()) {
+                val estado = getEstadoMenuDiaServicio(context, fecha, serv).trim()
+                val esBorrador = estado.isBlank() || estado.equals("Borrador", ignoreCase = true)
+                val esAprobado = estado.equals("Aprobado", ignoreCase = true) ||
+                    estado.equals("Aprobada", ignoreCase = true)
+                if (!esBorrador && !esAprobado) return true
+            }
+        }
+        return false
+    }
+
     /**
      * Obtiene el plato de un día y servicio específico.
      */
@@ -464,11 +519,11 @@ class SessionManager(context: Context) {
         val key = clavePlanDiaSede(fecha, servKey)
         val tVal = context.getSharedPreferences("TURNO_PAE", Context.MODE_PRIVATE)
             .getString(key, null)
-        if (!tVal.isNullOrBlank()) return tVal
+        if (!tVal.isNullOrBlank()) return limpiarPrefijoMenu(tVal)
 
         val jVal = context.getSharedPreferences("ManipuladoraJefe", Context.MODE_PRIVATE)
             .getString(key, null)
-        if (!jVal.isNullOrBlank()) return jVal
+        if (!jVal.isNullOrBlank()) return limpiarPrefijoMenu(jVal)
 
         return null
     }

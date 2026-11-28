@@ -47,7 +47,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Nombre del plato"
-                android:textColor="#1B3317"
+                android:textColor="#92400E"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -64,11 +64,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:background="@drawable/bg_pill_green"
+                android:background="@drawable/bg_chip_pendiente"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="3dp"
                 android:text="Disponible en cocina"
-                android:textColor="#2A5226"
+                android:textColor="#92400E"
                 android:textSize="10sp"
                 android:textStyle="bold" />
 
@@ -79,7 +79,7 @@
             android:layout_height="20dp"
             android:contentDescription="Ver"
             android:src="@drawable/ic_arrow_forward"
-            app:tint="#1B3317" />
+            app:tint="#92400E" />
 
     </LinearLayout>
 

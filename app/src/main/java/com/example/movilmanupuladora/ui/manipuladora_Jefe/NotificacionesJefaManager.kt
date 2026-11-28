@@ -81,7 +81,10 @@ object NotificacionesJefaManager {
             val lista: List<NotificacionItem> = gson.fromJson(json, type) ?: emptyList()
             lista.map {
                 it.copy(leida = it.leida || leidas.contains(it.id))
-            }.sortedByDescending { it.timestamp }
+            }.sortedWith(
+                compareByDescending<NotificacionItem> { it.timestamp }
+                    .thenByDescending { it.id.removePrefix("backend_").toIntOrNull() ?: 0 }
+            )
         } catch (_: Exception) {
             emptyList()
         }
@@ -99,6 +102,7 @@ object NotificacionesJefaManager {
         return set
     }
 
+    @Synchronized
     fun marcarLeida(context: Context, id: String) {
         val prefs = context.getSharedPreferences("JEFA_NOTIFS_STORE", Context.MODE_PRIVATE)
         val leidas = obtenerConjuntoLeidas(context)
@@ -106,6 +110,10 @@ object NotificacionesJefaManager {
             prefs.edit()
                 .putString("NOTIFS_LEIDAS_CSV", leidas.joinToString("|"))
                 .apply()
+        }
+        val lista = obtenerNotificacionesSede(context)
+        if (lista.any { it.id == id && !it.leida }) {
+            guardarLista(context, lista.map { if (it.id == id) it.copy(leida = true) else it })
         }
     }
 
@@ -116,13 +124,23 @@ object NotificacionesJefaManager {
     fun obtenerConteoNoLeidas(context: Context): Int {
         val notifs = obtenerNotificacionesSede(context)
         val leidas = obtenerConjuntoLeidas(context)
-        return notifs.count { !it.leida && !leidas.contains(it.id) }
+        val prefsEntregas = context.getSharedPreferences("ENTREGAS_RECIBIDAS_PREFS", Context.MODE_PRIVATE)
+        return notifs.count { notif ->
+            val rem = notif.numeroRemision
+            val keyRem = rem?.replace("[^A-Za-z0-9_-]".toRegex(), "")
+            val entregaYaProcesada = !rem.isNullOrBlank() && (
+                prefsEntregas.getBoolean("recibida_$rem", false) ||
+                (!keyRem.isNullOrBlank() && prefsEntregas.getBoolean("remision_aceptada_$keyRem", false))
+            )
+            !notif.leida && !leidas.contains(notif.id) && !entregaYaProcesada
+        }
     }
 
     /**
      * Registra una nueva notificación para la sede de la jefa actual
      * estampando la fecha y hora exacta del suceso.
      */
+    @Synchronized
     fun agregarNotificacionSede(
         context: Context,
         titulo: String,
@@ -138,19 +156,30 @@ object NotificacionesJefaManager {
             "Reciente"
         }
 
+        val maxExistente = listaActual.maxOfOrNull { it.timestamp } ?: 0L
+        val tsNuevo = maxOf(System.currentTimeMillis(), maxExistente + 1000L)
+
         val nueva = NotificacionItem(
             id = id,
             titulo = titulo,
             mensaje = mensaje,
             fecha = fechaFormateada,
             categoria = categoria,
-            timestamp = System.currentTimeMillis()
+            timestamp = tsNuevo
         )
 
         // Evitar duplicar exactamente la misma notificación en la misma sede
         if (listaActual.none { it.titulo == titulo && it.mensaje == mensaje }) {
             listaActual.add(0, nueva)
-            guardarLista(context, listaActual)
+            synchronized(this) {
+                val actualesAhora = obtenerNotificacionesSede(context)
+                for (extra in actualesAhora) {
+                    if (listaActual.none { it.id == extra.id || (it.titulo == extra.titulo && it.mensaje == extra.mensaje) }) {
+                        listaActual.add(extra)
+                    }
+                }
+                guardarLista(context, listaActual)
+            }
         }
     }
 
@@ -281,17 +310,27 @@ object NotificacionesJefaManager {
                 }
             } catch (_: Exception) {}
 
-            guardarLista(context, listaActual)
+            synchronized(this) {
+                val actualesAhora = obtenerNotificacionesSede(context)
+                for (extra in actualesAhora) {
+                    if (listaActual.none { it.id == extra.id || (it.titulo == extra.titulo && it.mensaje == extra.mensaje) }) {
+                        listaActual.add(extra)
+                    }
+                }
+                guardarLista(context, listaActual)
+            }
         } catch (_: Exception) { }
     }
 
     private fun parsearTimestampBackend(fechaRaw: String?): Long? {
         if (fechaRaw.isNullOrBlank()) return null
+        // Normalizar fracciones de segundo a 3 dígitos (ms) para evitar que SimpleDateFormat sume microsegundos como ms
+        val fechaNormalizada = fechaRaw.trim()
+            .replace(Regex("\\.(\\d{3})\\d+"), ".$1")
+            .replace(Regex("Z$"), "+00:00")
         val formatos = listOf(
-            "yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX",
             "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
             "yyyy-MM-dd'T'HH:mm:ssXXX",
-            "yyyy-MM-dd'T'HH:mm:ss.SSSSSS",
             "yyyy-MM-dd'T'HH:mm:ss.SSS",
             "yyyy-MM-dd'T'HH:mm:ss",
             "yyyy-MM-dd HH:mm:ss",
@@ -300,8 +339,15 @@ object NotificacionesJefaManager {
         for (fmt in formatos) {
             try {
                 val parser = SimpleDateFormat(fmt, Locale.getDefault())
-                val fecha = parser.parse(fechaRaw)
-                if (fecha != null) return fecha.time
+                val fecha = parser.parse(fechaNormalizada)
+                if (fecha != null) {
+                    var ts = fecha.time
+                    // Si el servidor serializa hora UTC con sufijo -05:00, queda ~5h en el futuro respecto al reloj local
+                    if (ts > System.currentTimeMillis() + 60_000L) {
+                        ts -= 5 * 3_600_000L
+                    }
+                    return ts
+                }
             } catch (_: Exception) { }
         }
         return null
@@ -343,8 +389,7 @@ object NotificacionesJefaManager {
     }
 
     fun obtenerCantidadNoLeidas(context: Context): Int {
-        val lista = obtenerNotificacionesSede(context)
-        return lista.count { !it.leida }
+        return obtenerConteoNoLeidas(context)
     }
 
     fun marcarTodasComoLeidas(context: Context) {

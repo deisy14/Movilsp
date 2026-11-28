@@ -201,15 +201,15 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
             if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
         }
 
-        // Por defecto seleccionar el día de hoy si está dentro de la semana (y es día escolar Lun-Vie), o el lunes de esa semana
+        // Por defecto seleccionar hoy si es día hábil (Lun-Vie); si hoy es fin de semana en la semana actual, elegir el viernes anterior; en otras semanas, el lunes
         val hoy = Calendar.getInstance()
         val hoyEsFinDeSemana = hoy.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY ||
                 hoy.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY
         val indexHoy = if (!hoyEsFinDeSemana) diasSemanaSiguiente.indexOfFirst { esMismoDia(it, hoy) } else -1
-        diaSeleccionadoSemanaSiguiente = if (indexHoy != -1) {
-            diasSemanaSiguiente[indexHoy]
-        } else {
-            diasSemanaSiguiente.getOrElse(1) { diasSemanaSiguiente.first() }
+        diaSeleccionadoSemanaSiguiente = when {
+            indexHoy != -1 -> diasSemanaSiguiente[indexHoy]
+            semanaOffset == 0 && hoyEsFinDeSemana -> diasSemanaSiguiente.getOrElse(5) { diasSemanaSiguiente.first() }
+            else -> diasSemanaSiguiente.getOrElse(1) { diasSemanaSiguiente.first() }
         }
 
         renderizarNumerosSemanaSiguiente()
@@ -240,6 +240,7 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
 
             val dayOfWeek = dia.get(Calendar.DAY_OF_WEEK)
             val esFinDeSemana = dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY
+            val isSelected = esMismoDia(dia, diaSeleccionadoSemanaSiguiente)
 
             val txtNum = TextView(this).apply {
                 val p = FrameLayout.LayoutParams(
@@ -252,51 +253,61 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
                 text = dia.get(Calendar.DAY_OF_MONTH).toString()
 
                 val tieneAlgunMenu = tieneDes || tieneAlm || tieneMer
-                val isSelected = !esFinDeSemana && esMismoDia(dia, diaSeleccionadoSemanaSiguiente)
+                val colorTextoDia = when {
+                    esFinDeSemana && isSelected -> Color.parseColor("#1E293B")
+                    esFinDeSemana -> Color.parseColor("#CBD5E1")
+                    isSelected -> Color.parseColor("#1E293B")
+                    tieneAlgunMenu -> Color.parseColor("#92400E")
+                    else -> Color.parseColor("#1E293B")
+                }
                 when {
+                    esFinDeSemana && isSelected -> {
+                        setBackgroundResource(R.drawable.circulo_amarillo_badge)
+                        setTextColor(colorTextoDia)
+                        typeface = android.graphics.Typeface.DEFAULT_BOLD
+                    }
                     esFinDeSemana -> {
                         background = null
-                        setTextColor(Color.parseColor("#CBD5E1"))
+                        setTextColor(colorTextoDia)
                         typeface = android.graphics.Typeface.DEFAULT
                     }
                     isSelected -> {
                         setBackgroundResource(R.drawable.circulo_amarillo_badge)
-                        setTextColor(Color.parseColor("#1E293B"))
+                        setTextColor(colorTextoDia)
                         typeface = android.graphics.Typeface.DEFAULT_BOLD
                     }
                     tieneAlgunMenu -> {
                         setBackgroundResource(R.drawable.bg_dia_con_menu)
-                        setTextColor(Color.parseColor("#92400E"))
+                        setTextColor(colorTextoDia)
                         typeface = android.graphics.Typeface.DEFAULT_BOLD
                     }
                     else -> {
                         setBackgroundColor(Color.TRANSPARENT)
-                        setTextColor(Color.parseColor("#1E293B"))
+                        setTextColor(colorTextoDia)
                         typeface = android.graphics.Typeface.DEFAULT_BOLD
                     }
                 }
             }
 
-            if (!esFinDeSemana) {
-                cell.isClickable = true
-                cell.isFocusable = true
-                cell.setOnClickListener {
-                    diaSeleccionadoSemanaSiguiente = dia
-                    renderizarNumerosSemanaSiguiente()
-                    cargarPlatosSeleccionados()
-                    configurarViewPagerCarousel()
-                    configurarMenuDisponiblePAE()
-
-                    val formatoFecha = SimpleDateFormat("EEEE, d 'de' MMMM", Locale.forLanguageTag("es-CO"))
-                    val fechaStr = formatoFecha.format(dia.time)
-                    Toast.makeText(this, "Planificando para: $fechaStr", Toast.LENGTH_SHORT).show()
+            cell.isClickable = true
+            cell.isFocusable = true
+            cell.setOnClickListener {
+                diaSeleccionadoSemanaSiguiente = dia
+                renderizarNumerosSemanaSiguiente()
+                cargarPlatosSeleccionados()
+                configurarViewPagerCarousel()
+                configurarMenuDisponiblePAE()
+                actualizarEstadoFinDeSemanaUI()
+                if (esFinDeSemana) {
+                    Toast.makeText(this, "Los fines de semana no tienen servicio escolar PAE.", Toast.LENGTH_SHORT).show()
                 }
-            } else {
-                cell.isClickable = false
-                cell.isFocusable = false
             }
 
             cell.addView(txtNum)
+            if (!esFinDeSemana && sessionManager.estaDiaPendienteAprobacion(this, fechaDia)) {
+                val colorDot = if (isSelected) Color.parseColor("#1E293B") else Color.parseColor("#92400E")
+                com.example.movilmanupuladora.utils.CalendarDotHelper.aplicarPuntitoPendiente(cell, txtNum, colorDot)
+            }
             binding.layoutNumerosSemanaSiguiente.addView(cell)
         }
     }
@@ -358,6 +369,232 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
         platoSeleccionadoMerienda = buscarPlatoPorNombre(nomMer)
 
         actualizarSubtitulosTabs()
+        renderizarResumenPlatosDia()
+        actualizarEstadoFinDeSemanaUI()
+    }
+
+    private fun esDiaFinDeSemana(cal: Calendar): Boolean {
+        val dow = cal.get(Calendar.DAY_OF_WEEK)
+        return dow == Calendar.SATURDAY || dow == Calendar.SUNDAY
+    }
+
+    private fun esDiaPasado(cal: Calendar): Boolean {
+        val hoyClave = obtenerClaveFecha(Calendar.getInstance())
+        return obtenerClaveFecha(cal) < hoyClave
+    }
+
+    private fun estaServicioBloqueadoPorEnvio(cal: Calendar, servicio: String): Boolean {
+        val fecha = obtenerClaveFecha(cal)
+        val plato = sessionManager.getPlatoDiaServicio(this, fecha, servicio)
+        if (plato.isNullOrBlank()) return false
+        val estado = sessionManager.getEstadoMenuDiaServicio(this, fecha, servicio).trim()
+        return estado.isNotBlank() &&
+            !estado.equals("Borrador", ignoreCase = true) &&
+            !estado.equals("Rechazado", ignoreCase = true)
+    }
+
+    private fun actualizarEstadoFinDeSemanaUI() {
+        val esFinSem = esDiaFinDeSemana(diaSeleccionadoSemanaSiguiente)
+        val esPasado = esDiaPasado(diaSeleccionadoSemanaSiguiente)
+        val servActual = obtenerNombreComidaActual()
+        val bloqueadoEnvio = !esFinSem && estaServicioBloqueadoPorEnvio(diaSeleccionadoSemanaSiguiente, servActual)
+        val todosServiciosBloqueados = !esFinSem && obtenerJornadasPermitidas().all { tipo ->
+            val serv = when (tipo) {
+                TipoComida.DESAYUNO -> "Desayuno"
+                TipoComida.ALMUERZO -> "Almuerzo"
+                TipoComida.MERIENDA -> "Merienda"
+            }
+            estaServicioBloqueadoPorEnvio(diaSeleccionadoSemanaSiguiente, serv)
+        }
+
+        if (esFinSem) {
+            binding.btnSeleccionarPlato.isEnabled = false
+            binding.btnSeleccionarPlato.alpha = 0.45f
+            binding.btnSeleccionarPlato.text = "No disponible (Fin de semana)"
+            binding.btnGuardarSeleccion.isEnabled = false
+            binding.btnGuardarSeleccion.alpha = 0.45f
+        } else if (esPasado) {
+            binding.btnSeleccionarPlato.isEnabled = false
+            binding.btnSeleccionarPlato.alpha = 0.45f
+            binding.btnSeleccionarPlato.text = "Día anterior (Solo lectura)"
+            binding.btnGuardarSeleccion.isEnabled = false
+            binding.btnGuardarSeleccion.alpha = 0.45f
+        } else if (bloqueadoEnvio) {
+            binding.btnSeleccionarPlato.isEnabled = false
+            binding.btnSeleccionarPlato.alpha = 0.45f
+            binding.btnSeleccionarPlato.text = "Enviado al supervisor"
+            binding.btnGuardarSeleccion.isEnabled = !todosServiciosBloqueados
+            binding.btnGuardarSeleccion.alpha = if (todosServiciosBloqueados) 0.45f else 1.0f
+        } else if (!esSemanaAprobadaFijada) {
+            binding.btnSeleccionarPlato.isEnabled = true
+            binding.btnSeleccionarPlato.alpha = 1.0f
+            binding.btnGuardarSeleccion.isEnabled = true
+            binding.btnGuardarSeleccion.alpha = 1.0f
+            actualizarBotonSeleccionarPlato(posicionPlatoCarousel, obtenerPlatosActuales())
+        }
+    }
+
+    private fun renderizarResumenPlatosDia() {
+        val contenedor = binding.layoutPlatosProgramadosDia
+        contenedor.removeAllViews()
+
+        val esFinSem = esDiaFinDeSemana(diaSeleccionadoSemanaSiguiente)
+        val calResumen = (diaSeleccionadoSemanaSiguiente.clone() as Calendar).apply {
+            val dow = get(Calendar.DAY_OF_WEEK)
+            if (dow == Calendar.SATURDAY) add(Calendar.DAY_OF_MONTH, -1)
+            else if (dow == Calendar.SUNDAY) add(Calendar.DAY_OF_MONTH, -2)
+        }
+        val esPasado = esFinSem || esDiaPasado(diaSeleccionadoSemanaSiguiente)
+
+        val fecha = obtenerClaveFecha(calResumen)
+        val permitidas = obtenerJornadasPermitidas()
+        val serviciosMostrar = mutableListOf<Pair<TipoComida, InicioJefaActivity.Plato>>()
+
+        for (tipo in permitidas) {
+            val servNom = when (tipo) {
+                TipoComida.DESAYUNO -> "Desayuno"
+                TipoComida.ALMUERZO -> "Almuerzo"
+                TipoComida.MERIENDA -> "Merienda"
+            }
+            val plato = if (esFinSem) {
+                val nomGuardado = sessionManager.getPlatoDiaServicio(this, fecha, servNom)
+                val listaTipo = when (tipo) {
+                    TipoComida.DESAYUNO -> platosDesayuno
+                    TipoComida.ALMUERZO -> platosAlmuerzo
+                    TipoComida.MERIENDA -> platosMerienda
+                }
+                if (!nomGuardado.isNullOrBlank()) {
+                    listaTipo.firstOrNull { SessionManager.limpiarPrefijoMenu(it.nombre).equals(SessionManager.limpiarPrefijoMenu(nomGuardado), ignoreCase = true) }
+                        ?: InicioJefaActivity.Plato(id = 0, nombre = nomGuardado, componente = "Menú del viernes", imagen = InicioJefaActivity.obtenerImagenPlatoPorNombre(nomGuardado))
+                } else {
+                    null
+                }
+            } else {
+                when (tipo) {
+                    TipoComida.DESAYUNO -> platoSeleccionadoDesayuno
+                    TipoComida.ALMUERZO -> platoSeleccionadoAlmuerzo
+                    TipoComida.MERIENDA -> platoSeleccionadoMerienda
+                }
+            }
+            if (plato != null) {
+                serviciosMostrar.add(tipo to plato)
+            }
+        }
+
+        if (serviciosMostrar.isEmpty()) {
+            contenedor.visibility = View.GONE
+            return
+        }
+
+        contenedor.visibility = View.VISIBLE
+        val d = resources.displayMetrics.density
+
+        for ((idx, par) in serviciosMostrar.withIndex()) {
+            val (tipo, plato) = par
+            val servNombre = when (tipo) {
+                TipoComida.DESAYUNO -> "Desayuno"
+                TipoComida.ALMUERZO -> "Almuerzo"
+                TipoComida.MERIENDA -> "Merienda"
+            }
+            val estadoMenu = sessionManager.getEstadoMenuDiaServicio(this, fecha, servNombre).trim()
+            val yaEnviado = esPasado || (estadoMenu.isNotBlank() &&
+                !estadoMenu.equals("Borrador", ignoreCase = true) &&
+                !estadoMenu.equals("Rechazado", ignoreCase = true))
+
+            val card = com.google.android.material.card.MaterialCardView(this).apply {
+                val lp = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
+                    if (idx < serviciosMostrar.size - 1) marginEnd = (8 * d).toInt()
+                }
+                layoutParams = lp
+                radius = 14 * d
+                cardElevation = 1 * d
+                setCardBackgroundColor(if (esPasado) Color.parseColor("#F1F5F9") else Color.WHITE)
+                strokeColor = Color.parseColor(if (esPasado) "#CBD5E1" else "#FDE68A")
+                strokeWidth = (1 * d).toInt()
+                alpha = if (esPasado) 0.7f else 1.0f
+            }
+
+            val col = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding((10 * d).toInt(), (10 * d).toInt(), (10 * d).toInt(), (10 * d).toInt())
+            }
+
+            val badgeServ = TextView(this).apply {
+                text = if (esFinSem) "$servNombre (Viernes)" else servNombre
+                textSize = 10f
+                setTypeface(null, android.graphics.Typeface.BOLD)
+                setTextColor(Color.parseColor(if (esPasado) "#64748B" else "#92400E"))
+                setBackgroundResource(if (esPasado) R.drawable.bg_dia_semana_inactivo else R.drawable.bg_chip_pendiente)
+                setPadding((8 * d).toInt(), (2 * d).toInt(), (8 * d).toInt(), (2 * d).toInt())
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+            }
+            col.addView(badgeServ)
+
+            val filaPlato = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { topMargin = (8 * d).toInt() }
+            }
+
+            val img = com.google.android.material.imageview.ShapeableImageView(this).apply {
+                layoutParams = LinearLayout.LayoutParams((40 * d).toInt(), (40 * d).toInt())
+                scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
+                setImageResource(InicioJefaActivity.obtenerImagenPlatoPorNombre(plato.nombre))
+                shapeAppearanceModel = shapeAppearanceModel.toBuilder()
+                    .setAllCornerSizes(10 * d)
+                    .build()
+            }
+            filaPlato.addView(img)
+
+            val txtNombre = TextView(this).apply {
+                text = SessionManager.limpiarPrefijoMenu(plato.nombre)
+                textSize = 11.5f
+                maxLines = 2
+                ellipsize = android.text.TextUtils.TruncateAt.END
+                setTypeface(null, android.graphics.Typeface.BOLD)
+                setTextColor(Color.parseColor("#1E293B"))
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
+                    marginStart = (8 * d).toInt()
+                }
+            }
+            filaPlato.addView(txtNombre)
+            col.addView(filaPlato)
+
+            if (!yaEnviado && !esSemanaAprobadaFijada) {
+                val btnEditar = com.google.android.material.button.MaterialButton(this).apply {
+                    text = "Editar"
+                    isAllCaps = false
+                    textSize = 11f
+                    setTypeface(null, android.graphics.Typeface.BOLD)
+                    setTextColor(Color.parseColor("#1E293B"))
+                    backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FEF3C7"))
+                    cornerRadius = (12 * d).toInt()
+                    insetTop = 0
+                    insetBottom = 0
+                    minHeight = 0
+                    minimumHeight = 0
+                    setPadding(0, (5 * d).toInt(), 0, (5 * d).toInt())
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        (30 * d).toInt()
+                    ).apply { topMargin = (8 * d).toInt() }
+                    setOnClickListener {
+                        seleccionarTipoComida(tipo)
+                        binding.btnSeleccionarPlato.parent?.requestChildFocus(binding.btnSeleccionarPlato, binding.btnSeleccionarPlato)
+                    }
+                }
+                col.addView(btnEditar)
+            }
+
+            card.addView(col)
+            contenedor.addView(card)
+        }
     }
 
     private fun actualizarSubtitulosTabs() {
@@ -517,6 +754,7 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
         posicionPlatoCarousel = 0
         configurarViewPagerCarousel()
         configurarMenuDisponiblePAE()
+        actualizarEstadoFinDeSemanaUI()
     }
 
     private fun configurarBotonesSeccionesIA() {
@@ -801,7 +1039,9 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
     // =========================================================
 
     private fun configurarViewPagerCarousel() {
-        val platosActuales = obtenerPlatosActuales()
+        val platosActuales = obtenerPlatosActuales().map {
+            it.copy(nombre = SessionManager.limpiarPrefijoMenu(it.nombre))
+        }
         val adapter = SugerenciaIaAdapter(
             listaPlatos = platosActuales,
             servicioActual = obtenerNombreComidaActual(),
@@ -912,13 +1152,20 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
             TipoComida.DESAYUNO -> platosDesayuno
             TipoComida.ALMUERZO -> platosAlmuerzo
             TipoComida.MERIENDA -> platosMerienda
-        }
+        }.map { it.copy(nombre = SessionManager.limpiarPrefijoMenu(it.nombre)) }
+        val servActual = obtenerNombreComidaActual()
+        val esFinSem = esDiaFinDeSemana(diaSeleccionadoSemanaSiguiente)
+        val esPasado = esDiaPasado(diaSeleccionadoSemanaSiguiente)
+        val bloqueadoEnvio = esSemanaAprobadaFijada || (!esFinSem && estaServicioBloqueadoPorEnvio(diaSeleccionadoSemanaSiguiente, servActual))
         val adapter = MenuDisponibleAdapter(
             listaPlatos = listaCompleta,
-            servicioActual = obtenerNombreComidaActual(),
+            servicioActual = servActual,
             platoSeleccionadoActual = obtenerPlatoSeleccionadoActual(),
             otrosAsignados = obtenerOtrosAsignados(),
-            platosDiaAnterior = obtenerPlatosDiaAnterior()
+            platosDiaAnterior = obtenerPlatosDiaAnterior(),
+            bloqueadoPorEnvio = bloqueadoEnvio,
+            esFinDeSemana = esFinSem,
+            esDiaAnterior = esPasado
         ) { plato ->
             seleccionarPlatoParaSiguienteSemana(plato)
         }
@@ -975,6 +1222,14 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
         }
 
         binding.btnSeleccionarPlato.setOnClickListener {
+            if (esDiaFinDeSemana(diaSeleccionadoSemanaSiguiente)) {
+                Toast.makeText(this, "Los fines de semana no tienen servicio escolar PAE.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (estaServicioBloqueadoPorEnvio(diaSeleccionadoSemanaSiguiente, obtenerNombreComidaActual())) {
+                Toast.makeText(this, "Este menú ya fue enviado al supervisor. Solo puedes cambiarlo si es rechazado.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             val platos = obtenerPlatosActuales()
             if (platos.isNotEmpty() && posicionPlatoCarousel in platos.indices) {
                 val plato = platos[posicionPlatoCarousel]
@@ -998,6 +1253,10 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
         }
 
         binding.btnGuardarSeleccion.setOnClickListener {
+            if (esDiaFinDeSemana(diaSeleccionadoSemanaSiguiente)) {
+                Toast.makeText(this, "Los fines de semana no tienen servicio escolar PAE.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             val fechaStr = obtenerClaveFecha(diaSeleccionadoSemanaSiguiente)
             lifecycleScope.launch {
                 val des = platoSeleccionadoDesayuno
@@ -1005,13 +1264,13 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
                 val mer = platoSeleccionadoMerienda
 
                 if (des != null) {
-                    PreparacionSyncManager.guardarPlatoServicio(this@PlanificacionSemanalJefaActivity, "Desayuno", des.nombre, des.id, fechaStr)
+                    PreparacionSyncManager.guardarPlatoServicio(this@PlanificacionSemanalJefaActivity, "Desayuno", des.nombre, des.id, fechaStr, estadoMenu = "Borrador")
                 }
                 if (alm != null) {
-                    PreparacionSyncManager.guardarPlatoServicio(this@PlanificacionSemanalJefaActivity, "Almuerzo", alm.nombre, alm.id, fechaStr)
+                    PreparacionSyncManager.guardarPlatoServicio(this@PlanificacionSemanalJefaActivity, "Almuerzo", alm.nombre, alm.id, fechaStr, estadoMenu = "Borrador")
                 }
                 if (mer != null) {
-                    PreparacionSyncManager.guardarPlatoServicio(this@PlanificacionSemanalJefaActivity, "Merienda", mer.nombre, mer.id, fechaStr)
+                    PreparacionSyncManager.guardarPlatoServicio(this@PlanificacionSemanalJefaActivity, "Merienda", mer.nombre, mer.id, fechaStr, estadoMenu = "Borrador")
                 }
             }
             Toast.makeText(this, "Planificación del día guardada exitosamente", Toast.LENGTH_SHORT).show()
@@ -1225,7 +1484,16 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
             dialog.dismiss()
         }
 
+        val esFinSem = esDiaFinDeSemana(diaSeleccionadoSemanaSiguiente)
+        val bloqueado = estaServicioBloqueadoPorEnvio(diaSeleccionadoSemanaSiguiente, obtenerNombreComidaActual())
+        if (esFinSem || bloqueado) {
+            dialogBinding.btnSeleccionarDiaModal.isEnabled = false
+            dialogBinding.btnSeleccionarDiaModal.alpha = 0.45f
+            dialogBinding.btnSeleccionarDiaModal.text = if (esFinSem) "No disponible (Fin de semana)" else "Enviado al supervisor"
+        }
+
         dialogBinding.btnSeleccionarDiaModal.setOnClickListener {
+            if (esFinSem || bloqueado) return@setOnClickListener
             dialog.dismiss()
             seleccionarPlatoParaSiguienteSemana(plato)
         }
@@ -1248,6 +1516,18 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
     }
 
     private fun seleccionarPlatoParaSiguienteSemana(plato: InicioJefaActivity.Plato) {
+        if (esDiaFinDeSemana(diaSeleccionadoSemanaSiguiente)) {
+            Toast.makeText(this, "Los fines de semana no tienen servicio escolar PAE.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (esDiaPasado(diaSeleccionadoSemanaSiguiente)) {
+            Toast.makeText(this, "No se pueden editar menús de días anteriores.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (estaServicioBloqueadoPorEnvio(diaSeleccionadoSemanaSiguiente, obtenerNombreComidaActual())) {
+            Toast.makeText(this, "Este menú ya fue enviado al supervisor. Solo puedes cambiarlo si es rechazado.", Toast.LENGTH_SHORT).show()
+            return
+        }
         val permitidas = obtenerJornadasPermitidas().map {
             when (it) {
                 TipoComida.DESAYUNO -> "Desayuno"
@@ -1750,14 +2030,43 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
             return
         }
 
-        MaterialAlertDialogBuilder(this)
-            .setTitle("Enviar programación al supervisor")
-            .setMessage("¿Deseas enviar la programación de la semana al Supervisor PAE?\n\nAl enviarla, se actualizará la minuta semanal para su correspondiente revisión y visto bueno.")
-            .setPositiveButton("Sí, enviar") { _, _ ->
+        val hayPendientePorEnviar = diasHabiles.any { dia ->
+            val fechaStr = obtenerClaveFecha(dia)
+            permitidas.any { tipo ->
+                val serv = when (tipo) {
+                    TipoComida.DESAYUNO -> "Desayuno"
+                    TipoComida.ALMUERZO -> "Almuerzo"
+                    TipoComida.MERIENDA -> "Merienda"
+                }
+                val est = sessionManager.getEstadoMenuDiaServicio(this, fechaStr, serv).trim()
+                est.isBlank() || est.equals("Borrador", ignoreCase = true) || est.equals("Rechazado", ignoreCase = true)
+            }
+        }
+        if (!hayPendientePorEnviar) {
+            Toast.makeText(this, "Esta programación ya fue enviada", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        val dialog = android.app.Dialog(this)
+        val vistaDialog = layoutInflater.inflate(R.layout.dialog_confirmar_envio_supervisor, null)
+        dialog.setContentView(vistaDialog)
+        dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.90).toInt(),
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+
+        vistaDialog.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnConfirmarEnvioSupervisor)
+            .setOnClickListener {
+                dialog.dismiss()
                 ejecutarEnvioSupervisor()
             }
-            .setNegativeButton("Cancelar", null)
-            .show()
+        vistaDialog.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnCancelarEnvioSupervisor)
+            .setOnClickListener {
+                dialog.dismiss()
+            }
+
+        dialog.show()
     }
 
     private fun ejecutarEnvioSupervisor() {
@@ -1809,13 +2118,9 @@ class PlanificacionSemanalJefaActivity : AppCompatActivity() {
                     .putBoolean("enviada_supervisor_$semanaClave", true)
                     .apply()
 
-                MaterialAlertDialogBuilder(this@PlanificacionSemanalJefaActivity)
-                    .setTitle("✓ Programación Enviada al Supervisor")
-                    .setMessage("La programación de la semana ($rango) fue remitida exitosamente al supervisor PAE.\n\nSe ha actualizado la minuta para su revisión y aprobación.")
-                    .setPositiveButton("Aceptar") { _, _ ->
-                        finish()
-                    }
-                    .show()
+                Toast.makeText(this@PlanificacionSemanalJefaActivity, "Programación enviada", Toast.LENGTH_LONG).show()
+                renderizarNumerosSemanaSiguiente()
+                cargarPlatosSeleccionados()
             } catch (e: Exception) {
                 Toast.makeText(this@PlanificacionSemanalJefaActivity, "Error al enviar: ${e.message}", Toast.LENGTH_LONG).show()
             }

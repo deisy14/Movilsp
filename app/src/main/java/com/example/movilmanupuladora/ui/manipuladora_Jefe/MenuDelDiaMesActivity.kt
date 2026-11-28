@@ -376,6 +376,23 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
                 }
 
                 cellContainer.addView(txtDia)
+                val esDiaDelMesActual = indiceTotal >= offsetDomingo && (indiceTotal - offsetDomingo) < diasEnMes
+                if (esDiaDelMesActual) {
+                    val calDiaCheck = (mesActual.clone() as Calendar).apply {
+                        set(Calendar.DAY_OF_MONTH, indiceTotal - offsetDomingo + 1)
+                    }
+                    val dow = calDiaCheck.get(Calendar.DAY_OF_WEEK)
+                    val esFinSem = dow == Calendar.SATURDAY || dow == Calendar.SUNDAY
+                    val fCheck = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calDiaCheck.time)
+                    if (!esFinSem && sessionManager.estaDiaPendienteAprobacion(this, fCheck)) {
+                        val colorDot = if (esMismoDia(calDiaCheck, diaSeleccionado)) {
+                            Color.parseColor("#1E293B")
+                        } else {
+                            Color.parseColor("#92400E")
+                        }
+                        com.example.movilmanupuladora.utils.CalendarDotHelper.aplicarPuntitoPendiente(cellContainer, txtDia, colorDot)
+                    }
+                }
                 fila.addView(cellContainer)
             }
 
@@ -406,8 +423,8 @@ class MenuDelDiaMesActivity : AppCompatActivity() {
             val pFecha = AsistenciaManager.obtenerPrimariaFecha(this, fechaClave)
             val sFecha = AsistenciaManager.obtenerSecundariaFecha(this, fechaClave)
             val totFecha = AsistenciaManager.obtenerTotalFecha(this, fechaClave)
-            val p = if (totFecha > 0) pFecha else if (fechaClave == hoyClave) AsistenciaManager.obtenerPrimaria(this) else 0
-            val s = if (totFecha > 0) sFecha else if (fechaClave == hoyClave) AsistenciaManager.obtenerSecundaria(this) else 0
+            val p = if (totFecha > 0) pFecha else 0
+            val s = if (totFecha > 0) sFecha else 0
             val tot = p + s
             if (tot > 0) {
                 binding.txtTotalAsistenciaDia.text = "Editar"
